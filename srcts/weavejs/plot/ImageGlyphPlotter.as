@@ -13,42 +13,31 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Bitmap;
+	import Matrix = flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
-	import flash.net.URLRequest;
+	import URLRequest = weavejs.net.URLRequest;
 	
-	import mx.rpc.events.FaultEvent;
+	import ResultEvent = mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
-	import weave.Weave;
-	import weave.api.getCallbackCollection;
-	import weave.api.newDisposableChild;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.reportError;
-	import weave.api.setSessionState;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.IPlotter;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableWatcher;
-	import weave.data.AttributeColumns.AlwaysDefinedColumn;
-	import weave.data.AttributeColumns.BinnedColumn;
-	import weave.data.AttributeColumns.ColorColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.data.AttributeColumns.FilteredColumn;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableWatcher = weavejs.core.LinkableWatcher;
+	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+	import BinnedColumn = weavejs.data.column.BinnedColumn;
+	import ColorColumn = weavejs.data.column.ColorColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import FilteredColumn = weavejs.data.column.FilteredColumn;
 	
 	/**
 	 * ImagePlotter
-	 * 
-	 * @author adufilie
-	 * @author jfallon
-	 * @author pstickney
 	 */
 	public class ImageGlyphPlotter extends AbstractGlyphPlotter
 	{
@@ -64,19 +53,19 @@ package weave.visualization.plotters
 			alpha.defaultValue.value = 1;
 			
 			color.internalDynamicColumn.addImmediateCallback(this, handleColor, true);
-			getCallbackCollection(colorDataWatcher).addImmediateCallback(this, updateKeySources, true);
+			Weave.getCallbacks(colorDataWatcher).addImmediateCallback(this, updateKeySources, true);
 		}
 		
-		public const color:AlwaysDefinedColumn = newLinkableChild(this, AlwaysDefinedColumn);
-		public const alpha:AlwaysDefinedColumn = newLinkableChild(this, AlwaysDefinedColumn);
+		public const color:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+		public const alpha:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
 		
-		public const imageURL:AlwaysDefinedColumn = newLinkableChild(this, AlwaysDefinedColumn);
-		public const imageSize:AlwaysDefinedColumn = newLinkableChild(this, AlwaysDefinedColumn);
+		public const imageURL:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+		public const imageSize:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
 		
-		public const rotation:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const rotationOffset:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0, isFinite));
-		public const dataInDegrees:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
-		public const reverseRotation:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const rotation:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const rotationOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, isFinite));
+		public const dataInDegrees:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public const reverseRotation:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
 		private const _urlToImageMap:Object = new Object(); // maps a url to a BitmapData
 		private const tempMatrix:Matrix = new Matrix(); // reusable object
@@ -85,7 +74,7 @@ package weave.visualization.plotters
 		private static var _missingImageClass:Class;
 		private static const _missingImage:BitmapData = Bitmap(new _missingImageClass()).bitmapData;
 
-		private const colorDataWatcher:LinkableWatcher = newDisposableChild(this, LinkableWatcher);
+		private const colorDataWatcher:LinkableWatcher = Weave.disposableChild(this, LinkableWatcher);
 		
 		private function handleColor():void
 		{
@@ -220,16 +209,16 @@ package weave.visualization.plotters
 		private function handleImageFault(event:FaultEvent, url:String):void
 		{
 			event.fault.content = url;
-			reportError(event);
+			JS.error(event);
 		}
 		
 		[Deprecated] public function set xColumn(value:Object):void
 		{
-			setSessionState(dataX, value);
+			Weave.setState(dataX, value);
 		}
 		[Deprecated] public function set yColumn(value:Object):void
 		{
-			setSessionState(dataY, value);
+			Weave.setState(dataY, value);
 		}
 	}
 }

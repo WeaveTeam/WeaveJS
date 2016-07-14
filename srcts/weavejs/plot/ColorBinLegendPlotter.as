@@ -13,45 +13,40 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.geom.Point;
-	import flash.geom.Rectangle;
-	import flash.utils.Dictionary;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
+	import Rectangle = weavejs.geom.Rectangle;
+	import Dictionary = flash.utils.Dictionary;
 	
-	import weave.Weave;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.api.ui.ITextPlotter;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableFunction;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.core.LinkableWatcher;
-	import weave.data.AttributeColumns.BinnedColumn;
-	import weave.data.AttributeColumns.ColorColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.primitives.Bounds2D;
-	import weave.utils.BitmapText;
-	import weave.utils.ColumnUtils;
-	import weave.utils.LegendUtils;
-	import weave.utils.LinkableTextFormat;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import ITextPlotter = weavejs.api.ui.ITextPlotter;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableFunction = weavejs.core.LinkableFunction;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import LinkableWatcher = weavejs.core.LinkableWatcher;
+	import BinnedColumn = weavejs.data.column.BinnedColumn;
+	import ColorColumn = weavejs.data.column.ColorColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import BitmapText = weavejs.util.BitmapText;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import LegendUtils = weavejs.util.LegendUtils;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
 	/**
 	 * This plotter displays a legend for a ColorColumn.  If the ColorColumn contains a BinnedColumn, a list of bins
 	 * with their corresponding colors will be displayed.  If not a continuous color scale will be displayed.  By
 	 * default this plotter links to the static color column, but it can be linked to another by changing or removing
 	 * the dynamicColorColumn.staticName value.
-	 * 
-	 * @author adufilie
 	 */
 	public class ColorBinLegendPlotter extends AbstractPlotter implements ITextPlotter, ISelectableAttributes
 	{
@@ -60,7 +55,7 @@ package weave.visualization.plotters
 			dynamicColorColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
 			
 			setSingleKeySource(dynamicColorColumn);
-			registerLinkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
+			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			this.addSpatialDependencies(this.dynamicColorColumn, this.maxColumns, this.reverseOrder, this.itemLabelFunction);
 		}
 		
@@ -77,7 +72,7 @@ package weave.visualization.plotters
 		 * This plotter is specifically implemented for visualizing a ColorColumn.
 		 * This DynamicColumn only allows internal columns of type ColorColumn.
 		 */
-		public const dynamicColorColumn:DynamicColumn = registerLinkableChild(this, new DynamicColumn(ColorColumn), createHashMaps);
+		public const dynamicColorColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(ColorColumn), createHashMaps);
 		
 		/**
 		 * This accessor function provides convenient access to the internal ColorColumn, which may be null.
@@ -91,7 +86,7 @@ package weave.visualization.plotters
 		/**
 		 * This is the type of shape to be drawn for each legend item.
 		 */		
-		public const shapeType:LinkableString = registerLinkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE, verifyShapeType));
+		public const shapeType:LinkableString = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE, verifyShapeType));
 		public static const SHAPE_TYPE_CIRCLE:String = 'circle';
 		public static const SHAPE_TYPE_SQUARE:String = 'square';
 		public static const SHAPE_TYPE_LINE:String = 'line';
@@ -101,35 +96,35 @@ package weave.visualization.plotters
 		/**
 		 * This is the radius of the circle, in screen coordinates.
 		 */
-		public const shapeSize:LinkableNumber = registerLinkableChild(this, new LinkableNumber(25));
+		public const shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25));
 		/**
 		 * This is the line style used to draw the outline of the shape.
 		 */
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
 		/**
 		 * This is the maximum number of items to draw in a single row.
 		 * @default 1 
 		 */		
-		public const maxColumns:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1), createHashMaps);
+		public const maxColumns:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1), createHashMaps);
 		
 		/**
 		 * This is an option to reverse the item order.
 		 */
-		public const reverseOrder:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false), createHashMaps);
+		public const reverseOrder:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), createHashMaps);
 		
 		/**
 		 * This is the compiled function to apply to the item labels.
 		 */		
-		public const itemLabelFunction:LinkableFunction = registerLinkableChild(this, new LinkableFunction('string', true, false, ['number', 'string']), createHashMaps);
+		public const itemLabelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number', 'string']), createHashMaps);
 		
 		// TODO This should go somewhere else...
 		/**
 		 * This is the compiled function to apply to the title of the tool.
 		 */		
-		public const legendTitleFunction:LinkableFunction = registerLinkableChild(this, new LinkableFunction('column.getMetadata("title")', true, false, ['string', 'column']));
+		public const legendTitleFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('column.getMetadata("title")', true, false, ['string', 'column']));
 		
-		private const statsWatcher:LinkableWatcher = newLinkableChild(this, LinkableWatcher);
+		private const statsWatcher:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher);
 		
 		private var _binToBounds:Array = [];
 		private var _binToString:Array = [];
@@ -166,7 +161,7 @@ package weave.visualization.plotters
 				var adjustedIBin:int = (reverseOrder.value) ? (fakeNumBins + iBin) : (maxNumBins - 1 - iBin);
 				var row:int = adjustedIBin / maxCols;
 				var col:int = adjustedIBin % maxCols;
-				var b:IBounds2D = new Bounds2D();
+				var b:Bounds2D = new Bounds2D();
 				
 				getBackgroundDataBounds(tempBounds);
 				LegendUtils.getBoundsFromItemID(tempBounds, adjustedIBin, b, maxNumBins, maxCols, true);
@@ -185,7 +180,7 @@ package weave.visualization.plotters
 		}
 		
 		private var _drawBackground:Boolean = false; // this is used to check if we should draw the bins with no records.
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			// draw the bins that have no records in them in the background
 			_drawBackground = true;
@@ -198,7 +193,7 @@ package weave.visualization.plotters
 			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private function drawAll(recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		private function drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var internalColorColumn:ColorColumn = getInternalColorColumn();
 			if (internalColorColumn == null)
@@ -210,7 +205,7 @@ package weave.visualization.plotters
 				drawContinuousPlot(recordKeys, dataBounds, screenBounds, destination);
 		}
 			
-		protected function drawContinuousPlot(recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		protected function drawContinuousPlot(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			if (!_drawBackground)
 				return;
@@ -245,7 +240,7 @@ package weave.visualization.plotters
 			destination.draw(tempShape);
 		}
 		
-		protected function drawBinnedPlot(recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		protected function drawBinnedPlot(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var colorColumn:ColorColumn = getInternalColorColumn();
 			var binnedColumn:BinnedColumn = colorColumn.getInternalColumn() as BinnedColumn;
@@ -324,7 +319,7 @@ package weave.visualization.plotters
 		
 		// reusable temporary objects
 		private const tempPoint:Point = new Point();
-		private const tempBounds:IBounds2D = new Bounds2D();
+		private const tempBounds:Bounds2D = new Bounds2D();
 		private const tempRectangle:Rectangle = new Rectangle();
 		
 		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
@@ -338,13 +333,13 @@ package weave.visualization.plotters
 			if (binnedColumn)
 			{
 				var index:Number = binnedColumn.getValueFromKey(recordKey, Number);
-				var b:IBounds2D = _binToBounds[index];
+				var b:Bounds2D = _binToBounds[index];
 				if (b)
-					(output[0] as IBounds2D).copyFrom(b);
+					(output[0] as Bounds2D).copyFrom(b);
 			}
 		}
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			return output.setBounds(0, 1, 1, 0);
 		}

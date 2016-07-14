@@ -13,50 +13,42 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
-	import flash.display.Shape;
-	import flash.geom.Point;
-	import flash.utils.Dictionary;
+	import Graphics = PIXI.Graphics;
+	import Shape = flash.display.Shape;
+	import Point = weavejs.geom.Point;
+	import Dictionary = flash.utils.Dictionary;
 	
-	import weave.Weave;
-	import weave.api.detectLinkableObjectChange;
-	import weave.api.getCallbackCollection;
-	import weave.api.linkSessionState;
-	import weave.api.newDisposableChild;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.setSessionState;
-	import weave.api.data.ColumnMetadata;
-	import weave.api.data.DataType;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.data.ISimpleGeometry;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.IPlotterWithGeometries;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.compiler.StandardLib;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableHashMap;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.core.LinkableWatcher;
-	import weave.data.AttributeColumns.BinnedColumn;
-	import weave.data.AttributeColumns.ColorColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.data.AttributeColumns.EquationColumn;
-	import weave.data.AttributeColumns.FilteredColumn;
-	import weave.data.KeySets.KeySet;
-	import weave.primitives.GeometryType;
-	import weave.primitives.SimpleGeometry;
-	import weave.utils.ColumnUtils;
-	import weave.utils.DrawUtils;
-	import weave.utils.ObjectPool;
-	import weave.utils.VectorUtils;
-	import weave.visualization.plotters.styles.ExtendedLineStyle;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import DataType = weavejs.api.data.DataType;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import ISimpleGeometry = weavejs.api.data.ISimpleGeometry;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotterWithGeometries = weavejs.api.ui.IPlotterWithGeometries;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import StandardLib = weavejs.util.StandardLib;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableHashMap = weavejs.core.LinkableHashMap;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import LinkableWatcher = weavejs.core.LinkableWatcher;
+	import BinnedColumn = weavejs.data.column.BinnedColumn;
+	import ColorColumn = weavejs.data.column.ColorColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import EquationColumn = weavejs.data.column.EquationColumn;
+	import FilteredColumn = weavejs.data.column.FilteredColumn;
+	import KeySet = weavejs.data.key.KeySet;
+	import GeometryType = weavejs.primitives.GeometryType;
+	import SimpleGeometry = weavejs.primitives.SimpleGeometry;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import DrawUtils = weavejs.util.DrawUtils;
+	import ObjectPool = weavejs.util.ObjectPool;
+	import VectorUtils = weavejs.util.VectorUtils;
+	import ExtendedLineStyle = weavejs.geom.ExtendedLineStyle;
 	
 	public class OldParallelCoordinatesPlotter extends AbstractPlotter implements IPlotterWithGeometries, ISelectableAttributes
 	{
@@ -74,13 +66,13 @@ package weave.visualization.plotters
 			columns.childListCallbacks.addImmediateCallback(this, handleColumnsListChange);
 			xColumns.childListCallbacks.addImmediateCallback(this, handleColumnsListChange);
 			
-			linkSessionState(_filteredXData.filter, filteredKeySet.keyFilter);
-			linkSessionState(_filteredYData.filter, filteredKeySet.keyFilter);
-			registerLinkableChild(this, xData, updateFilterEquationColumns);
-			registerLinkableChild(this, yData, updateFilterEquationColumns);
+			Weave.linkState(_filteredXData.filter, filteredKeySet.keyFilter);
+			Weave.linkState(_filteredYData.filter, filteredKeySet.keyFilter);
+			Weave.linkableChild(this, xData, updateFilterEquationColumns);
+			Weave.linkableChild(this, yData, updateFilterEquationColumns);
 			
 			lineStyle.color.internalDynamicColumn.addImmediateCallback(this, handleColor, true);
-			getCallbackCollection(colorDataWatcher).addImmediateCallback(this, updateFilterEquationColumns, true);
+			Weave.getCallbacks(colorDataWatcher).addImmediateCallback(this, updateFilterEquationColumns, true);
 			
 			// updateFilterEquationColumns sets key source
 			this.addSpatialDependencies(
@@ -102,11 +94,11 @@ package weave.visualization.plotters
 			// This will be cleaned up automatically when the column is disposed.
 			var newColumn:IAttributeColumn = columns.childListCallbacks.lastObjectAdded as IAttributeColumn;
 			if (newColumn)
-				registerLinkableChild(spatialCallbacks, WeaveAPI.StatisticsCache.getColumnStatistics(newColumn));
+				Weave.linkableChild(spatialCallbacks, WeaveAPI.StatisticsCache.getColumnStatistics(newColumn));
 			
 			var newXColumn:IAttributeColumn = xColumns.childListCallbacks.lastObjectAdded as IAttributeColumn;
 			if (newXColumn)
-				registerLinkableChild(spatialCallbacks, WeaveAPI.StatisticsCache.getColumnStatistics(newXColumn));
+				Weave.linkableChild(spatialCallbacks, WeaveAPI.StatisticsCache.getColumnStatistics(newXColumn));
 			
 			_yColumns = columns.getObjects();
 			_xColumns = xColumns.getObjects();
@@ -140,26 +132,26 @@ package weave.visualization.plotters
 		/*
 		 * This is the line style used to draw the lines.
 		 */
-		public const lineStyle:ExtendedLineStyle = newLinkableChild(this, ExtendedLineStyle);
+		public const lineStyle:ExtendedLineStyle = Weave.linkableChild(this, ExtendedLineStyle);
 		
-		public const columns:LinkableHashMap = registerLinkableChild(this, new LinkableHashMap(IAttributeColumn));
-		public const xColumns:LinkableHashMap = registerLinkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public const columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public const xColumns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 		
-		public const enableGroupBy:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false), updateFilterEquationColumns);
-		public const groupBy:DynamicColumn = newLinkableChild(this, DynamicColumn, updateFilterEquationColumns);
-		public const groupKeyType:LinkableString = newLinkableChild(this, LinkableString, updateFilterEquationColumns);
+		public const enableGroupBy:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), updateFilterEquationColumns);
+		public const groupBy:DynamicColumn = Weave.linkableChild(this, DynamicColumn, updateFilterEquationColumns);
+		public const groupKeyType:LinkableString = Weave.linkableChild(this, LinkableString, updateFilterEquationColumns);
 		public function get xData():DynamicColumn { return _filteredXData.internalDynamicColumn; }
 		public function get yData():DynamicColumn { return _filteredYData.internalDynamicColumn; }
-		public const xValues:LinkableString = newLinkableChild(this, LinkableString, updateFilterEquationColumns);
+		public const xValues:LinkableString = Weave.linkableChild(this, LinkableString, updateFilterEquationColumns);
 		
-		private const _filteredXData:FilteredColumn = newLinkableChild(this, FilteredColumn);
-		private const _filteredYData:FilteredColumn = newLinkableChild(this, FilteredColumn);
-		private const _keySet_groupBy:KeySet = newDisposableChild(this, KeySet);
+		private const _filteredXData:FilteredColumn = Weave.linkableChild(this, FilteredColumn);
+		private const _filteredYData:FilteredColumn = Weave.linkableChild(this, FilteredColumn);
+		private const _keySet_groupBy:KeySet = Weave.disposableChild(this, KeySet);
 		
 		private var _yColumns:Array = [];
 		private var _xColumns:Array = [];
 		
-		private const colorDataWatcher:LinkableWatcher = newDisposableChild(this, LinkableWatcher);
+		private const colorDataWatcher:LinkableWatcher = Weave.disposableChild(this, LinkableWatcher);
 		private function handleColor():void
 		{
 			var cc:ColorColumn = lineStyle.color.getInternalColumn() as ColorColumn;
@@ -172,7 +164,7 @@ package weave.visualization.plotters
 		private var _xValues:Array;
 		public function getXValues():Array
 		{
-			if (!detectLinkableObjectChange(getXValues, xValues, xData))
+			if (!Weave.detectChange(getXValues, xValues, xData))
 				return _xValues;
 			
 			var values:Array;
@@ -301,15 +293,15 @@ package weave.visualization.plotters
 			_in_updateFilterEquationColumns = false;
 		}
 		
-		public const normalize:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
-		public const curveType:LinkableString = registerLinkableChild(this, new LinkableString(CURVE_NONE, curveTypeVerifier));
-		public const zoomToSubset:LinkableBoolean = newLinkableChild(this, LinkableBoolean);
+		public const normalize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public const curveType:LinkableString = Weave.linkableChild(this, new LinkableString(CURVE_NONE, curveTypeVerifier));
+		public const zoomToSubset:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 
-		public const shapeSize:LinkableNumber = registerLinkableChild(this, new LinkableNumber(5));
-		public const shapeToDraw:LinkableString = registerLinkableChild(this, new LinkableString(SOLID_CIRCLE, shapeTypeVerifier));
-		public const shapeBorderThickness:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1));
-		public const shapeBorderColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0x000000));
-		public const shapeBorderAlpha:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0.5));
+		public const shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
+		public const shapeToDraw:LinkableString = Weave.linkableChild(this, new LinkableString(SOLID_CIRCLE, shapeTypeVerifier));
+		public const shapeBorderThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public const shapeBorderColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		public const shapeBorderAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0.5));
 		
 		public static const CURVE_NONE:String = 'none';
 		public static const CURVE_TOWARDS:String = 'towards';
@@ -366,7 +358,7 @@ package weave.visualization.plotters
 			{
 				getCoords(recordKey, i, tempPoint);
 				if (includeUndefinedBounds || isFinite(tempPoint.x) && isFinite(tempPoint.y))
-					(output[outIndex] as IBounds2D).includePoint(tempPoint);
+					(output[outIndex] as Bounds2D).includePoint(tempPoint);
 				// when geom probing is enabled, report a single data bounds
 				if (includeUndefinedBounds || !enableGeomProbing)
 					outIndex++;
@@ -377,7 +369,7 @@ package weave.visualization.plotters
 		
 		private var tempBoundsArray:Array = [];
 		
-		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, dataBounds:IBounds2D = null):Array
+		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, dataBounds:Bounds2D = null):Array
 		{
 			getBoundsCoords(recordKey, tempBoundsArray, true);
 			
@@ -386,8 +378,8 @@ package weave.visualization.plotters
 			
 			for (var i:int = 0; i < _yColumns.length; ++i)
 			{
-				var current:IBounds2D = tempBoundsArray[i] as IBounds2D;
-				var next:IBounds2D = tempBoundsArray[i + 1] as IBounds2D;
+				var current:Bounds2D = tempBoundsArray[i] as Bounds2D;
+				var next:Bounds2D = tempBoundsArray[i + 1] as Bounds2D;
 				
 				if (next && !next.isUndefined())
 				{
@@ -479,7 +471,7 @@ package weave.visualization.plotters
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:IBounds2D, screenBounds:IBounds2D, tempShape:Shape):void
+		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 
@@ -631,7 +623,7 @@ package weave.visualization.plotters
 				return false;
 		}
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			// normalized data coordinates
 			if (zoomToSubset.value)
@@ -708,11 +700,11 @@ package weave.visualization.plotters
 		
 		
 		// backwards compatibility
-		[Deprecated(replacement="enableGroupBy")] public function set displayFilterColumn(value:Object):void { setSessionState(enableGroupBy, value); }
-		[Deprecated(replacement="groupBy")] public function set keyColumn(value:Object):void { setSessionState(groupBy, value); }
-		[Deprecated(replacement="xData")] public function set filterColumn(value:Object):void { setSessionState(xData, value); }
-		[Deprecated(replacement="xValues")] public function set filterValues(value:Object):void { setSessionState(xValues, value); }
-		[Deprecated(replacement="xValues")] public function set groupByValues(value:Object):void { setSessionState(xValues, value); }
-		[Deprecated(replacement="xColumns")] public function set xAttributeColumns(value:Object):void { setSessionState(xColumns, value, true); }
+		[Deprecated(replacement="enableGroupBy")] public function set displayFilterColumn(value:Object):void { Weave.setState(enableGroupBy, value); }
+		[Deprecated(replacement="groupBy")] public function set keyColumn(value:Object):void { Weave.setState(groupBy, value); }
+		[Deprecated(replacement="xData")] public function set filterColumn(value:Object):void { Weave.setState(xData, value); }
+		[Deprecated(replacement="xValues")] public function set filterValues(value:Object):void { Weave.setState(xValues, value); }
+		[Deprecated(replacement="xValues")] public function set groupByValues(value:Object):void { Weave.setState(xValues, value); }
+		[Deprecated(replacement="xColumns")] public function set xAttributeColumns(value:Object):void { Weave.setState(xColumns, value, true); }
 	}
 }

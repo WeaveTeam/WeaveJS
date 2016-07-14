@@ -13,27 +13,23 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
-	import flash.display.Shape;
-	import flash.geom.Point;
+	import Graphics = PIXI.Graphics;
+	import Shape = flash.display.Shape;
+	import Point = weavejs.geom.Point;
 	
-	import weave.Weave;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotter;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableString;
-	import weave.data.AttributeColumns.AlwaysDefinedColumn;
-	import weave.visualization.plotters.styles.SolidFillStyle;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableString = weavejs.core.LinkableString;
+	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+	import SolidFillStyle = weavejs.geom.SolidFillStyle;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 
 	/**
 	 * Plots squares or circles.
-	 * 
-	 * @author adufilie
 	 */
 	public class SimpleGlyphPlotter extends AbstractGlyphPlotter
 	{
@@ -55,32 +51,32 @@ package weave.visualization.plotters
 		/**
 		 * This is the line style used to draw the outline of the rectangle.
 		 */
-		public const lineStyle:SolidLineStyle = registerLinkableChild(this, new SolidLineStyle());
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, new SolidLineStyle());
 		/**
 		 * This is the fill style used to fill the rectangle.
 		 */
-		public const fillStyle:SolidFillStyle = registerLinkableChild(this, new SolidFillStyle());
+		public const fillStyle:SolidFillStyle = Weave.linkableChild(this, new SolidFillStyle());
 		/**
 		 * This determines the screen size of the glyphs.
 		 */
-		public const screenSize:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn());
+		public const screenSize:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn());
 		/**
 		 * If this is true, ellipses will be drawn instead of rectangles.
 		 */
-		public const drawEllipse:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const drawEllipse:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		/**
 		 * This determines how the glyphs are aligned horizontally to the data coordinates.
 		 */		
-		public const horizontalPosition:LinkableString = registerLinkableChild(this, new LinkableString(CENTER, verifyHorizontal));
+		public const horizontalPosition:LinkableString = Weave.linkableChild(this, new LinkableString(CENTER, verifyHorizontal));
 		/**
 		 * This determines how the glyphs are aligned vertically to the data coordinates.
 		 */		
-		public const verticalPosition:LinkableString = registerLinkableChild(this, new LinkableString(MIDDLE, verifyVertical));
+		public const verticalPosition:LinkableString = Weave.linkableChild(this, new LinkableString(MIDDLE, verifyVertical));
 		
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:IBounds2D, screenBounds:IBounds2D, tempShape:Shape):void
+		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			getCoordsFromRecordKey(recordKey, tempPoint);
 			var size:Number = screenSize.getValueFromKey(recordKey, Number);

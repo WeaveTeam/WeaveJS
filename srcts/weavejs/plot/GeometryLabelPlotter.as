@@ -13,23 +13,19 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import weave.api.linkSessionState;
-	import weave.api.newLinkableChild;
-	import weave.api.setSessionState;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.ui.IObjectWithDescription;
-	import weave.api.ui.IPlotter;
-	import weave.core.SessionManager;
-	import weave.data.AttributeColumns.ReprojectedGeometryColumn;
-	import weave.data.KeySets.SortedKeySet;
-	import weave.primitives.GeneralizedGeometry;
+	import setSessionState = weavejs.api.setSessionState;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import SessionManager = weavejs.core.SessionManager;
+	import ReprojectedGeometryColumn = weavejs.data.column.ReprojectedGeometryColumn;
+	import SortedKeySet = weavejs.data.key.SortedKeySet;
+	import GeneralizedGeometry = weavejs.primitives.GeneralizedGeometry;
 
 	/**
 	 * This plotter is for drawing text labels on the map, corresponding to a geometry column.
-	 * 
-	 * @author adufilie
 	 */
 	public class GeometryLabelPlotter extends TextGlyphPlotter implements IObjectWithDescription
 	{
@@ -43,8 +39,8 @@ package weave.visualization.plotters
 			hideOverlappingText.value = true;
 
 			// set up x,y columns to be derived from the geometry column
-			linkSessionState(geometryColumn, dataX.requestLocalObject(ReprojectedGeometryColumn, true));
-			linkSessionState(geometryColumn, dataY.requestLocalObject(ReprojectedGeometryColumn, true));
+			Weave.linkState(geometryColumn, dataX.requestLocalObject(ReprojectedGeometryColumn, true));
+			Weave.linkState(geometryColumn, dataY.requestLocalObject(ReprojectedGeometryColumn, true));
 			
 			_sortCopyKeys = SortedKeySet.generateSortCopyFunction([getGeometryArea, sortColumn, text], [-1, 1, 1]);
 			_filteredKeySet.setColumnKeySources([geometryColumn, sortColumn, text], null, _sortCopyKeys);
@@ -56,7 +52,7 @@ package weave.visualization.plotters
 			return geometryColumn.getDescription();
 		}
 		
-		public const geometryColumn:ReprojectedGeometryColumn = newLinkableChild(this, ReprojectedGeometryColumn);
+		public const geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
 		
 		private var _sortCopyKeys:Function;
 		
@@ -77,7 +73,7 @@ package weave.visualization.plotters
 		// backwards compatibility 0.9.6
 		[Deprecated(replacement="geometryColumn")] public function set geometry(value:Object):void
 		{
-			setSessionState(geometryColumn.internalDynamicColumn, value);
+			Weave.setState(geometryColumn.internalDynamicColumn, value);
 		}
 	}
 }

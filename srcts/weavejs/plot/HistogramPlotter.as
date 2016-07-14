@@ -13,41 +13,35 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
+	import Graphics = PIXI.Graphics;
 	
-	import weave.api.copySessionState;
-	import weave.api.getCallbackCollection;
-	import weave.api.linkSessionState;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.setSessionState;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.compiler.StandardLib;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.data.AttributeColumns.BinnedColumn;
-	import weave.data.AttributeColumns.ColorColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.data.AttributeColumns.FilteredColumn;
-	import weave.primitives.Bounds2D;
-	import weave.utils.BitmapText;
-	import weave.utils.ColumnUtils;
-	import weave.utils.LinkableTextFormat;
-	import weave.visualization.plotters.styles.SolidFillStyle;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import copySessionState = weavejs.api.copySessionState;
+	import setSessionState = weavejs.api.setSessionState;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import StandardLib = weavejs.util.StandardLib;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import BinnedColumn = weavejs.data.column.BinnedColumn;
+	import ColorColumn = weavejs.data.column.ColorColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import FilteredColumn = weavejs.data.column.FilteredColumn;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import BitmapText = weavejs.util.BitmapText;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import SolidFillStyle = weavejs.geom.SolidFillStyle;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
 	/**
 	 * This plotter displays a histogram with optional colors.
-	 * 
-	 * @author adufilie
 	 */
 	public class HistogramPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
@@ -68,10 +62,10 @@ package weave.visualization.plotters
 			// the data inside the binned column needs to be filtered by the subset
 			var filteredColumn:FilteredColumn = _binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn, true);
 			
-			linkSessionState(filteredKeySet.keyFilter, filteredColumn.filter);
+			Weave.linkState(filteredKeySet.keyFilter, filteredColumn.filter);
 			
 			// make the colors spatial properties because the binned column is inside
-			getCallbackCollection(fillStyle.color.internalDynamicColumn).addGroupedCallback(this, this.setBinnedColumn, true);
+			Weave.getCallbacks(fillStyle.color.internalDynamicColumn).addGroupedCallback(this, this.setBinnedColumn, true);
 
 			setSingleKeySource(fillStyle.color.internalDynamicColumn); // use record keys, not bin keys!
 			
@@ -87,7 +81,7 @@ package weave.visualization.plotters
 			return [fillStyle.color, columnToAggregate];
 		}
 		
-		public const binnedColumn:BinnedColumn = newLinkableChild(this, BinnedColumn, setColorColumn, true);
+		public const binnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn, setColorColumn, true);
 		private function setColorColumn():void
 		{
 			var colorBinCol:BinnedColumn = internalColorColumn ? internalColorColumn.getInternalColumn() as BinnedColumn : null;
@@ -119,19 +113,19 @@ package weave.visualization.plotters
 		{
 			return fillStyle.color.getInternalColumn() as ColorColumn;
 		}
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
-		public const fillStyle:SolidFillStyle = newLinkableChild(this, SolidFillStyle);
-		public const drawPartialBins:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
-		public const columnToAggregate:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const aggregationMethod:LinkableString = registerLinkableChild(this, new LinkableString(AG_COUNT, verifyAggregationMethod));
-		public const horizontalMode:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public const fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+		public const drawPartialBins:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public const columnToAggregate:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const aggregationMethod:LinkableString = Weave.linkableChild(this, new LinkableString(AG_COUNT, verifyAggregationMethod));
+		public const horizontalMode:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const showValueLabels:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const valueLabelHorizontalAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT));
-		public const valueLabelVerticalAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
-		public const valueLabelRelativeAngle:LinkableNumber = registerLinkableChild(this, new LinkableNumber(NaN));		
-		public const valueLabelColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0));
-		public const valueLabelMaxWidth:LinkableNumber = registerLinkableChild(this, new LinkableNumber(200, verifyLabelMaxWidth));
+		public const showValueLabels:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const valueLabelHorizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT));
+		public const valueLabelVerticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
+		public const valueLabelRelativeAngle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public const valueLabelColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public const valueLabelMaxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(200, verifyLabelMaxWidth));
 		private function verifyLabelMaxWidth(value:Number):Boolean { return value > 0; }
 		private const _bitmapText:BitmapText = new BitmapText();		
 		
@@ -172,7 +166,7 @@ package weave.visualization.plotters
 		/**
 		 * This function returns the collective bounds of all the bins.
 		 */
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.reset();
 			
@@ -203,7 +197,7 @@ package weave.visualization.plotters
 			else
 				initBoundsArray(output).setBounds(binIndex - 0.5, 0, binIndex + 0.5, binHeight);
 			
-			var bounds:IBounds2D = output[0];
+			var bounds:Bounds2D = output[0];
 			if (debug)
 				debugTrace(recordKey.localName, bounds.getWidth(), bounds.getHeight())
 		}
@@ -319,17 +313,17 @@ package weave.visualization.plotters
 			return 1;
 		}
 		
-		private const tempBounds:IBounds2D = new Bounds2D(); // reusable temporary object
+		private const tempBounds:Bounds2D = new Bounds2D(); // reusable temporary object
 
 		//------------------------
 		// backwards compatibility
 		[Deprecated(replacement="fillStyle.color.internalDynamicColumn")] public function set dynamicColorColumn(value:Object):void
 		{
-			setSessionState(fillStyle.color.internalDynamicColumn, value);
+			Weave.setState(fillStyle.color.internalDynamicColumn, value);
 		}
 		[Deprecated(replacement="columnToAggregate")] public function set sumColumn(value:Object):void
 		{
-			setSessionState(columnToAggregate, value);
+			Weave.setState(columnToAggregate, value);
 			if (columnToAggregate.getInternalColumn())
 				aggregationMethod.value = AG_SUM;
 		}

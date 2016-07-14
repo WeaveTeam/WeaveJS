@@ -13,35 +13,29 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.geom.Matrix;
-	import flash.geom.Point;
-	import flash.geom.Rectangle;
-	import flash.text.TextFormat;
+	import Matrix = flash.geom.Matrix;
+	import Point = weavejs.geom.Point;
+	import Rectangle = weavejs.geom.Rectangle;
+	import TextFormat = flash.text.TextFormat;
 	
-	import weave.Weave;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.IPlotter;
-	import weave.api.ui.ITextPlotter;
-	import weave.compiler.StandardLib;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableNumber;
-	import weave.data.AttributeColumns.AlwaysDefinedColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.primitives.Bounds2D;
-	import weave.utils.BitmapText;
-	import weave.utils.LinkableTextFormat;
-	import weave.utils.ObjectPool;
-	import weave.visualization.layers.PlotTask;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import ITextPlotter = weavejs.api.ui.ITextPlotter;
+	import StandardLib = weavejs.util.StandardLib;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import BitmapText = weavejs.util.BitmapText;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import ObjectPool = weavejs.util.ObjectPool;
+	import PlotTask = weavejs.visualization.layers.PlotTask;
 	
-	/**
-	 * @author adufilie
-	 */
 	public class TextGlyphPlotter extends AbstractGlyphPlotter implements ITextPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, TextGlyphPlotter, "Labels");
@@ -57,9 +51,9 @@ package weave.visualization.plotters
 		private const bitmapText:BitmapText = new BitmapText();
 		private const matrix:Matrix = new Matrix();
 
-		public const sortColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const sortColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 
-		public const text:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const text:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		
 		public function setDefaultTextFormat(ltf:LinkableTextFormat):void
 		{
@@ -70,20 +64,20 @@ package weave.visualization.plotters
 			italic.defaultValue.value = ltf.italic.value;
 			underline.defaultValue.value = ltf.underline.value;
 		}
-		public const font:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(LinkableTextFormat.DEFAULT_FONT));
-		public const size:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(LinkableTextFormat.DEFAULT_SIZE));
-		public const color:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0x000000));
-		public const bold:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(false));
-		public const italic:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(false));
-		public const underline:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(false));
+		public const font:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(LinkableTextFormat.DEFAULT_FONT));
+		public const size:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(LinkableTextFormat.DEFAULT_SIZE));
+		public const color:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0x000000));
+		public const bold:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(false));
+		public const italic:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(false));
+		public const underline:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(false));
 		
-		public const hAlign:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(BitmapText.HORIZONTAL_ALIGN_CENTER));
-		public const vAlign:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(BitmapText.VERTICAL_ALIGN_MIDDLE));
-		public const angle:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
-		public const hideOverlappingText:LinkableBoolean = newLinkableChild(this, LinkableBoolean);
-		public const xScreenOffset:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const yScreenOffset:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const maxWidth:LinkableNumber = registerLinkableChild(this, new LinkableNumber(100));
+		public const hAlign:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(BitmapText.HORIZONTAL_ALIGN_CENTER));
+		public const vAlign:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(BitmapText.VERTICAL_ALIGN_MIDDLE));
+		public const angle:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public const hideOverlappingText:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
+		public const xScreenOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const yScreenOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const maxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(100));
 
 		/**
 		 * Draws the graphics onto BitmapData.
@@ -98,7 +92,7 @@ package weave.visualization.plotters
 				
 				task.asyncState = function():Number
 				{
-					var bounds:IBounds2D;
+					var bounds:Bounds2D;
 					
 					if (task.iteration == 0)
 					{
@@ -145,7 +139,7 @@ package weave.visualization.plotters
 							// brute force check to see if this bounds overlaps with any previous bounds
 							for (var j:int = 0; j < task.iteration; j++)
 							{
-								if (textWasDrawn[j] && bounds.overlaps(reusableBoundsObjects[j] as IBounds2D))
+								if (textWasDrawn[j] && bounds.overlaps(reusableBoundsObjects[j] as Bounds2D))
 								{
 									shouldRender = false;
 									break;
@@ -178,7 +172,7 @@ package weave.visualization.plotters
 
 		// reusable temporary objects
 		private static const tempRectangle:Rectangle = new Rectangle();
-		private static const tempBounds:IBounds2D = new Bounds2D();
+		private static const tempBounds:Bounds2D = new Bounds2D();
 		private static const tempMatrix:Matrix = new Matrix();
 		private static const tempPoint:Point = new Point();
 		

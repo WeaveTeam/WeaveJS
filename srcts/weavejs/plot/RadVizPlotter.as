@@ -13,59 +13,53 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.display.Shape;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Matrix = flash.display.Shape;
 	import flash.geom.Matrix;
-	import flash.geom.Point;
-	import flash.text.TextFieldAutoSize;
+	import Point = weavejs.geom.Point;
+	import ImageSnapshot = flash.text.TextFieldAutoSize;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
 	
 	import mx.core.UITextField;
 	import mx.graphics.ImageSnapshot;
 	
-	import weave.Weave;
-	import weave.api.detectLinkableObjectChange;
-	import weave.api.disposeObject;
-	import weave.api.getCallbackCollection;
-	import weave.api.linkableObjectIsBusy;
-	import weave.api.newLinkableChild;
-	import weave.api.registerDisposableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.radviz.ILayoutAlgorithm;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.compiler.Compiler;
-	import weave.compiler.StandardLib;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableFunction;
-	import weave.core.LinkableHashMap;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.core.LinkableVariable;
-	import weave.data.AttributeColumns.AlwaysDefinedColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.data.DataSources.CSVDataSource;
-	import weave.primitives.Bounds2D;
-	import weave.primitives.ColorRamp;
-	import weave.radviz.BruteForceLayoutAlgorithm;
-	import weave.radviz.GreedyLayoutAlgorithm;
-	import weave.radviz.IncrementalLayoutAlgorithm;
-	import weave.radviz.NearestNeighborLayoutAlgorithm;
-	import weave.radviz.RandomLayoutAlgorithm;
-	import weave.utils.CachedBitmap;
-	import weave.utils.ColumnUtils;
-	import weave.utils.DrawUtils;
-	import weave.utils.RadVizUtils;
-	import weave.visualization.plotters.styles.SolidFillStyle;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import disposeObject = weavejs.api.disposeObject;
+	import registerDisposableChild = weavejs.api.registerDisposableChild;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ILayoutAlgorithm = weavejs.api.radviz.ILayoutAlgorithm;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import Compiler = weavejs.compiler.Compiler;
+	import StandardLib = weavejs.util.StandardLib;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableFunction = weavejs.core.LinkableFunction;
+	import LinkableHashMap = weavejs.core.LinkableHashMap;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import LinkableVariable = weavejs.core.LinkableVariable;
+	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import CSVDataSource = weavejs.data.DataSources.CSVDataSource;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ColorRamp = weavejs.util.ColorRamp;
+	import BruteForceLayoutAlgorithm = weavejs.radviz.BruteForceLayoutAlgorithm;
+	import GreedyLayoutAlgorithm = weavejs.radviz.GreedyLayoutAlgorithm;
+	import IncrementalLayoutAlgorithm = weavejs.radviz.IncrementalLayoutAlgorithm;
+	import NearestNeighborLayoutAlgorithm = weavejs.radviz.NearestNeighborLayoutAlgorithm;
+	import RandomLayoutAlgorithm = weavejs.radviz.RandomLayoutAlgorithm;
+	import CachedBitmap = weavejs.util.CachedBitmap;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import DrawUtils = weavejs.util.DrawUtils;
+	import RadVizUtils = weavejs.util.RadVizUtils;
+	import SolidFillStyle = weavejs.geom.SolidFillStyle;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
 	/**
 	 * RadVizPlotter
@@ -86,8 +80,8 @@ package weave.visualization.plotters
 			algorithms[INCREMENTAL_LAYOUT] = IncrementalLayoutAlgorithm;
 			algorithms[BRUTE_FORCE] = BruteForceLayoutAlgorithm;
 			columns.childListCallbacks.addImmediateCallback(this, handleColumnsListChange);
-			getCallbackCollection(filteredKeySet).addGroupedCallback(this, handleColumnsChange, true);
-			getCallbackCollection(this).addImmediateCallback(this, clearCoordCache);
+			Weave.getCallbacks(filteredKeySet).addGroupedCallback(this, handleColumnsChange, true);
+			Weave.getCallbacks(this).addImmediateCallback(this, clearCoordCache);
 			columns.addGroupedCallback(this, handleColumnsChange);
 			absNorm.addGroupedCallback(this, handleColumnsChange);
 			normMin.addGroupedCallback(this, handleColumnsChange);
@@ -116,7 +110,7 @@ package weave.visualization.plotters
 				// This will be cleaned up automatically when the column is disposed.
 				var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(newColumn);
 				this.addSpatialDependencies(stats);
-				getCallbackCollection(stats).addGroupedCallback(this, handleColumnsChange);
+				Weave.getCallbacks(stats).addGroupedCallback(this, handleColumnsChange);
 			}
 			var oldColumnName:String = columns.childListCallbacks.lastNameRemoved;
 			if(oldColumnName != null)
@@ -136,23 +130,23 @@ package weave.visualization.plotters
 			return [radiusColumn, fillStyle.color, columns];
 		}
 		
-		public const columns:LinkableHashMap = registerLinkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public const columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 		
-		public const pointSensitivitySelection:LinkableVariable = registerLinkableChild(this, new LinkableVariable(Array), updatePointSensitivityColumns);
+		public const pointSensitivitySelection:LinkableVariable = Weave.linkableChild(this, new LinkableVariable(Array), updatePointSensitivityColumns);
 				
-		public const localNormalization:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
-		public const probeLineNormalizedThreshold:LinkableNumber = registerLinkableChild(this,new LinkableNumber(0, verifyThresholdValue));
-		public const showValuesForAnchorProbeLines:LinkableBoolean= registerLinkableChild(this,new LinkableBoolean(false));
+		public const localNormalization:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public const probeLineNormalizedThreshold:LinkableNumber = Weave.linkableChild(this,new LinkableNumber(0, verifyThresholdValue));
+		public const showValuesForAnchorProbeLines:LinkableBoolean= Weave.linkableChild(this,new LinkableBoolean(false));
 		
-		public const showAnchorProbeLines:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const showAnchorProbeLines:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
 		private var pointSensitivityColumns:Array = [];
 		private var annCenterColumns:Array = [];
-		public const showAnnulusCenter:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const showAnnulusCenter:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const absNorm:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const normMin:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0));
-		public const normMax:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1));
+		public const absNorm:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const normMin:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public const normMax:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
 		
 		private function verifyThresholdValue(value:*):Boolean
 		{
@@ -183,20 +177,20 @@ package weave.visualization.plotters
 		 * LinkableHashMap of RadViz dimension locations: 
 		 * <br/>contains the location of each column as an AnchorPoint object
 		 */		
-		public const anchors:LinkableHashMap = registerLinkableChild(this, new LinkableHashMap(AnchorPoint));
+		public const anchors:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(AnchorPoint));
 		private var coordinate:Point = new Point();//reusable object
 		private const tempPoint:Point = new Point();//reusable object
 		
-		//public const drawAnnuliCenter:LinkableBoolean = newLinkableChild(this, LinkableBoolean(true));
+		//public const drawAnnuliCenter:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean(true));
 		
-		public const jitterLevel:LinkableNumber = registerLinkableChild(this, new LinkableNumber(-19));			
-		public const enableJitter:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const iterations:LinkableNumber = newLinkableChild(this,LinkableNumber);
+		public const jitterLevel:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(-19));
+		public const enableJitter:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const iterations:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
 		
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
-		public const fillStyle:SolidFillStyle = newLinkableChild(this,SolidFillStyle);
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public const fillStyle:SolidFillStyle = Weave.linkableChild(this,SolidFillStyle);
 		public function get alphaColumn():AlwaysDefinedColumn { return fillStyle.alpha; }
-		public const colorMap:ColorRamp = registerLinkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired"))) ;		
+		public const colorMap:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired"))) ;
 		
 		public var LayoutClasses:Dictionary = null;//(Set via the editor) needed for setting the Cd layout dimensional anchor  locations
 		
@@ -206,9 +200,9 @@ package weave.visualization.plotters
 		/**
 		 * This is the radius of the circle, in screen coordinates.
 		 */
-		public const radiusColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		private const radiusColumnStats:IColumnStatistics = registerLinkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(radiusColumn));
-		public const radiusConstant:LinkableNumber = registerLinkableChild(this, new LinkableNumber(5));
+		public const radiusColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		private const radiusColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(radiusColumn));
+		public const radiusConstant:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
 		
 		private var randomValueArray:Array = new Array();
 		private var randomArrayIndexMap:Dictionary = new Dictionary(true);
@@ -222,7 +216,7 @@ package weave.visualization.plotters
 		
 		private function handleColumnsChange():void
 		{
-			if (linkableObjectIsBusy(columns) || linkableObjectIsBusy(spatialCallbacks))
+			if (Weave.isBusy(columns) || Weave.isBusy(spatialCallbacks))
 				return;
 			
 			var i:int = 0;
@@ -367,7 +361,7 @@ package weave.visualization.plotters
 			anchors.resumeCallbacks();
 		}
 		
-		public const anchorLabelFunction:LinkableFunction = registerLinkableChild(this, new LinkableFunction("Class('weave.utils.ColumnUtils').getTitle(column)", true, false, ['column']), setClassDiscriminationAnchorsLocations);
+		public const anchorLabelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction("Class('weave.utils.ColumnUtils').getTitle(column)", true, false, ['column']), setClassDiscriminationAnchorsLocations);
 		
 		//this function sets the anchor locations for the Class Discrimination Layout algorithm and marks the Class locations
 		public function setClassDiscriminationAnchorsLocations():void
@@ -496,7 +490,7 @@ package weave.visualization.plotters
 			{
 				if (columns.getObjects().length != anchors.getObjects().length)
 					return 1;
-				if (detectLinkableObjectChange(drawPlotAsyncIteration, lineStyle, fillStyle, radiusConstant, radiusColumn))
+				if (Weave.detectChange(drawPlotAsyncIteration, lineStyle, fillStyle, radiusConstant, radiusColumn))
 					keyToGlyph = new Dictionary(true);
 				task.asyncState = 0;
 			}
@@ -598,7 +592,7 @@ package weave.visualization.plotters
 		 * 
 		 * This function returns a Bounds2D object set to the data bounds associated with the given record key.
 		 * @param key The key of a data record.
-		 * @param output An Array of IBounds2D objects to store the result in.
+		 * @param output An Array of Bounds2D objects to store the result in.
 		 */
 		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
 		{
@@ -611,9 +605,9 @@ package weave.visualization.plotters
 		
 		/**
 		 * This function returns a Bounds2D object set to the data bounds associated with the background.
-		 * @param An IBounds2D object used to store the background data bounds.
+		 * @param An Bounds2D object used to store the background data bounds.
 		 */
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(-1, -1, 1, 1);
 		}		
@@ -921,19 +915,19 @@ package weave.visualization.plotters
 			
 			disposeObject(_algorithm); // clean up previous algorithm
 			
-			_algorithm = newLinkableChild(this, newAlgorithm);
+			_algorithm = Weave.linkableChild(this, newAlgorithm);
 			this.addSpatialDependencies(_algorithm);
 			var array:Array = _algorithm.run(columns.getObjects(IAttributeColumn), keyNumberMap);
 			
 			RadVizUtils.reorderColumns(columns, array);
 		}
 		
-		public const sampleTitle:LinkableString = registerLinkableChild(this, new LinkableString(""));
-		public const dataSetName:LinkableString = registerLinkableChild(this, new LinkableString());
-		public const regularSampling:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
-		public const RSampling:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const sampleSizeRows:LinkableNumber = registerLinkableChild(this, new LinkableNumber(300));
-		public const sampleSizeColumns:LinkableNumber = registerLinkableChild(this, new LinkableNumber(20));
+		public const sampleTitle:LinkableString = Weave.linkableChild(this, new LinkableString(""));
+		public const dataSetName:LinkableString = Weave.linkableChild(this, new LinkableString());
+		public const regularSampling:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public const RSampling:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const sampleSizeRows:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(300));
+		public const sampleSizeColumns:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(20));
 		public function sampleDataSet():void
 		{
 			// we use the CSVDataSource so we can get the rows.
@@ -1064,11 +1058,11 @@ package weave.visualization.plotters
 			return transposed;
 		}
 		
-		private var _algorithm:ILayoutAlgorithm = newLinkableChild(this, GreedyLayoutAlgorithm);
+		private var _algorithm:ILayoutAlgorithm = Weave.linkableChild(this, GreedyLayoutAlgorithm);
 		
 		// algorithms
 		[Bindable] public var algorithms:Array = [RANDOM_LAYOUT, GREEDY_LAYOUT, NEAREST_NEIGHBOR, INCREMENTAL_LAYOUT, BRUTE_FORCE];
-		public const currentAlgorithm:LinkableString = registerLinkableChild(this, new LinkableString(GREEDY_LAYOUT), changeAlgorithm);
+		public const currentAlgorithm:LinkableString = Weave.linkableChild(this, new LinkableString(GREEDY_LAYOUT), changeAlgorithm);
 		public static const RANDOM_LAYOUT:String = "Random layout";
 		public static const GREEDY_LAYOUT:String = "Greedy layout";
 		public static const NEAREST_NEIGHBOR:String = "Nearest neighbor";

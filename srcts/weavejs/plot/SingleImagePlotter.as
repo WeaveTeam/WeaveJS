@@ -13,39 +13,31 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Bitmap;
+	import Matrix = flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.Matrix;
-	import flash.geom.Point;
-	import flash.net.URLRequest;
+	import Point = weavejs.geom.Point;
+	import URLRequest = weavejs.net.URLRequest;
 	
-	import mx.rpc.events.FaultEvent;
+	import ResultEvent = mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
-	import weave.api.detectLinkableObjectChange;
-	import weave.api.getCallbackCollection;
-	import weave.api.newLinkableChild;
-	import weave.api.objectWasDisposed;
-	import weave.api.registerLinkableChild;
-	import weave.api.reportError;
-	import weave.api.core.ILinkableObjectWithNewProperties;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotter;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.primitives.Bounds2D;
-	import weave.utils.BitmapText;
-	import weave.utils.BitmapUtils;
+	import objectWasDisposed = weavejs.api.objectWasDisposed;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import BitmapText = weavejs.util.BitmapText;
+	import BitmapUtils = weavejs.util.BitmapUtils;
 
 	/**
 	 * A plotter for drawing a single image onto a tool.
-	 *  
-	 * @author skolman
-	 * @author kmonico
-	 */	
+	 */
 	public class SingleImagePlotter extends AbstractPlotter implements ILinkableObjectWithNewProperties
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, SingleImagePlotter, "Single image");
@@ -83,16 +75,16 @@ package weave.visualization.plotters
 		/**
 		 * The URL of the image to download.
 		 */
-		public const imageURL:LinkableString = newLinkableChild(this, LinkableString);
+		public const imageURL:LinkableString = Weave.linkableChild(this, LinkableString);
 		
-		public const dataX:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const dataY:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const dataWidth:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const dataHeight:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const useImageSize:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const dataX:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const dataY:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const dataWidth:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const dataHeight:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const useImageSize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		public const horizontalAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER, verifyHAlign));
-		public const verticalAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE, verifyVAlign));
+		public const horizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER, verifyHAlign));
+		public const verticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE, verifyVAlign));
 		
 		private function verifyHAlign(value:String):Boolean
 		{
@@ -121,7 +113,7 @@ package weave.visualization.plotters
 			return dataHeight.value || 0
 		}
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			var x:Number = dataX.value;
 			var y:Number = dataY.value;
@@ -143,9 +135,9 @@ package weave.visualization.plotters
 				output.setYRange(y, y + h);
 		}
 		
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
-			if (detectLinkableObjectChange(drawBackground, imageURL))
+			if (Weave.detectChange(drawBackground, imageURL))
 			{
 				if (imageURL.value)
 				{
@@ -228,11 +220,11 @@ package weave.visualization.plotters
 			try
 			{
 				_bitmapData = Bitmap(event.result).bitmapData;
-				getCallbackCollection(this).triggerCallbacks();
+				Weave.getCallbacks(this).triggerCallbacks();
 			}
 			catch (e:Error)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 		
@@ -242,7 +234,7 @@ package weave.visualization.plotters
 				return;
 			
 			_bitmapData = BitmapUtils.MISSING_IMAGE;
-			reportError(event);
+			JS.error(event);
 		}
 		
 		public function handleMissingSessionStateProperty(newState:Object, missingProperty:String):void

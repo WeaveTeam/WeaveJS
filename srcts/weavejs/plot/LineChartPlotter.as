@@ -13,18 +13,16 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.IPlotter;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.core.LinkableBoolean;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.data.KeySets.FilteredKeySet;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import FilteredKeySet = weavejs.data.key.FilteredKeySet;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
 	public class LineChartPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
@@ -46,14 +44,14 @@ package weave.visualization.plotters
 			return [dataX, dataY, order, group];
 		}
 		
-		private const sortedUnfilteredKeys:FilteredKeySet = newLinkableChild(this, FilteredKeySet);
+		private const sortedUnfilteredKeys:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 		
-		public const dataX:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const dataY:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const group:DynamicColumn = newLinkableChild(this, DynamicColumn);
- 		public const order:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
-		public const useFilteredDataGaps:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const dataX:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const dataY:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const group:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+ 		public const order:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public const useFilteredDataGaps:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
 		override public function drawPlotAsyncIteration(task:IPlotTask):Number
 		{
@@ -71,22 +69,20 @@ package weave.visualization.plotters
 	}
 }
 
-import flash.display.BitmapData;
-import flash.display.Graphics;
-import flash.display.Shape;
-import flash.geom.Point;
-import flash.utils.getTimer;
+import BitmapData = flash.display.BitmapData;
+import Graphics = PIXI.Graphics;
+import Shape = flash.display.Shape;
+import Point = weavejs.geom.Point;
+import ObjectUtil = flash.utils.getTimer;
 
 import mx.utils.ObjectUtil;
 
-import weave.api.newDisposableChild;
-import weave.api.reportError;
-import weave.api.data.IKeySet;
-import weave.api.data.IQualifiedKey;
-import weave.api.ui.IPlotTask;
-import weave.data.KeySets.KeySet;
-import weave.visualization.layers.PlotTask;
-import weave.visualization.plotters.LineChartPlotter;
+import IKeySet = weavejs.api.data.IKeySet;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import IPlotTask = weavejs.api.ui.IPlotTask;
+import KeySet = weavejs.data.key.KeySet;
+import PlotTask = weavejs.visualization.layers.PlotTask;
+import LineChartPlotter = weavejs.visualization.plotters.LineChartPlotter;
 
 internal class AsyncState
 {
@@ -98,7 +94,7 @@ internal class AsyncState
 		this.renderer = new AsyncLineRenderer();
 		
 		if ((task as PlotTask).taskType != PlotTask.TASK_TYPE_SUBSET)
-			this.taskKeySet = newDisposableChild(plotter, KeySet);
+			this.taskKeySet = Weave.disposableChild(plotter, KeySet);
 	}
 	
 	public var renderer:AsyncLineRenderer;
@@ -162,7 +158,7 @@ internal class AsyncState
 		}
 		catch (e:Error)
 		{
-			reportError(e);
+			JS.error(e);
 		}
 		
 		renderer.flush(task.buffer);

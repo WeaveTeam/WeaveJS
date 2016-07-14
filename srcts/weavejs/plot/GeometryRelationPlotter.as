@@ -13,26 +13,24 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.geom.Point;
-	import flash.text.TextFormat;
+	import Point = weavejs.geom.Point;
+	import TextFormat = flash.text.TextFormat;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IObjectWithDescription;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.IPlotter;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableNumber;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.data.AttributeColumns.ReprojectedGeometryColumn;
-	import weave.primitives.GeneralizedGeometry;
-	import weave.utils.BitmapText;
-	import weave.utils.EquationColumnLib;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import ReprojectedGeometryColumn = weavejs.data.column.ReprojectedGeometryColumn;
+	import GeneralizedGeometry = weavejs.primitives.GeneralizedGeometry;
+	import BitmapText = weavejs.util.BitmapText;
+	import EquationColumnLib = weavejs.util.EquationColumnLib;
 
 	public class GeometryRelationPlotter extends AbstractPlotter implements IObjectWithDescription
 	{
@@ -40,7 +38,7 @@ package weave.visualization.plotters
 
 		public function GeometryRelationPlotter()
 		{
-			valueStats = registerLinkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(valueColumn));
+			valueStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(valueColumn));
 			
 			setColumnKeySources([geometryColumn]);
 			this.addSpatialDependencies(this.geometryColumn, this.sourceKeyColumn, this.destinationKeyColumn);
@@ -51,16 +49,16 @@ package weave.visualization.plotters
 			return geometryColumn.getDescription();
 		}
 		
-		public const geometryColumn:ReprojectedGeometryColumn = newLinkableChild(this, ReprojectedGeometryColumn);
-		public const sourceKeyColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const destinationKeyColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const valueColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const lineWidth:LinkableNumber = registerLinkableChild(this, new LinkableNumber(5));
-		public const posLineColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0xFF0000));
-		public const negLineColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0x0000FF));
-		public const showValue:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const fontSize:LinkableNumber = registerLinkableChild(this, new LinkableNumber(11));
-		public const fontColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0x000000));
+		public const geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
+		public const sourceKeyColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const destinationKeyColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const valueColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const lineWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
+		public const posLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0xFF0000));
+		public const negLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x0000FF));
+		public const showValue:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const fontSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(11));
+		public const fontColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
 		private var valueStats:IColumnStatistics;
 		
 		private const bitmapText:BitmapText = new BitmapText();
@@ -104,7 +102,7 @@ package weave.visualization.plotters
 				for (var i:int = 0; i < n; i++)
 				{
 					getGeomCoords(destinationKeyColumn.getValueFromKey(rowKeys[i], IQualifiedKey), tempPoint);
-					(output[i + 1] as IBounds2D).includePoint(tempPoint);
+					(output[i + 1] as Bounds2D).includePoint(tempPoint);
 				}
 			}
 			else

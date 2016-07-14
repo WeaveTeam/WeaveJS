@@ -13,25 +13,22 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.geom.Point;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
 	
-	import weave.Weave;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.primitives.IBounds2D;
-	import weave.compiler.StandardLib;
-	import weave.core.LinkableDynamicObject;
-	import weave.primitives.Bounds2D;
-	import weave.utils.BitmapText;
-	import weave.utils.ColumnUtils;
-	import weave.utils.LinkableTextFormat;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import StandardLib = weavejs.util.StandardLib;
+	import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import BitmapText = weavejs.util.BitmapText;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
 	public class SimpleParallelCoordinatesAxesPlotter extends AbstractPlotter
 	{
@@ -39,16 +36,16 @@ package weave.visualization.plotters
 		{
 		}
 		
-		public const mainPlotter:LinkableDynamicObject = registerLinkableChild(this, new LinkableDynamicObject(SimpleParallelCoordinatesPlotter));
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
-		private const textFormat:LinkableTextFormat = registerLinkableChild(this, Weave.properties.visTextFormat);
+		public const mainPlotter:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(SimpleParallelCoordinatesPlotter));
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		private const textFormat:LinkableTextFormat = Weave.linkableChild(this, Weave.properties.visTextFormat);
 		
 		private const bitmapText:BitmapText = new BitmapText();
 		private static const minPoint:Point = new Point();
 		private static const maxPoint:Point = new Point();
 		private static const bitmapBounds:Bounds2D = new Bounds2D();
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			var plotter:SimpleParallelCoordinatesPlotter = mainPlotter.target as SimpleParallelCoordinatesPlotter;
 			if (plotter)
@@ -62,7 +59,7 @@ package weave.visualization.plotters
 			}
 		}
 		
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 			var plotter:SimpleParallelCoordinatesPlotter = mainPlotter.target as SimpleParallelCoordinatesPlotter;

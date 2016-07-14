@@ -13,54 +13,44 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Bitmap;
+	import Matrix = flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.LineScaleMode;
 	import flash.display.Shape;
 	import flash.display.TriangleCulling;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
-	import flash.geom.Point;
-	import flash.geom.Rectangle;
+	import Point = weavejs.geom.Point;
+	import Rectangle = weavejs.geom.Rectangle;
 	
-	import org.openscales.proj4as.ProjConstants;
+	import ProjConstants = org.openscales.proj4as.ProjConstants;
 	
-	import weave.Weave;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.core.IDisposableObject;
-	import weave.api.core.ILinkableObjectWithBusyStatus;
-	import weave.api.data.IProjectionManager;
-	import weave.api.data.IProjector;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.services.IWMSService;
-	import weave.api.ui.IObjectWithDescription;
-	import weave.api.ui.IPlotter;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableDynamicObject;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.primitives.Bounds2D;
-	import weave.primitives.Dictionary2D;
-	import weave.primitives.ZoomBounds;
-	import weave.services.wms.CustomWMS;
-	import weave.services.wms.ModestMapsWMS;
-	import weave.services.wms.OnEarthProvider;
-	import weave.services.wms.WMSProviders;
-	import weave.services.wms.WMSTile;
-	import weave.utils.BitmapText;
-	import weave.utils.DrawUtils;
-	import weave.utils.ZoomUtils;
+	import IDisposableObject = weavejs.api.core.IDisposableObject;
+	import ILinkableObjectWithBusyStatus = weavejs.api.core.ILinkableObjectWithBusyStatus;
+	import IProjectionManager = weavejs.api.data.IProjectionManager;
+	import IProjector = weavejs.api.data.IProjector;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IWMSService = weavejs.api.services.IWMSService;
+	import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import Dictionary2D = weavejs.primitives.Dictionary2D;
+	import ZoomBounds = weavejs.primitives.ZoomBounds;
+	import CustomWMS = weavejs.services.wms.CustomWMS;
+	import ModestMapsWMS = weavejs.services.wms.ModestMapsWMS;
+	import OnEarthProvider = weavejs.services.wms.OnEarthProvider;
+	import WMSProviders = weavejs.services.wms.WMSProviders;
+	import WMSTile = weavejs.services.wms.WMSTile;
+	import BitmapText = weavejs.util.BitmapText;
+	import DrawUtils = weavejs.util.DrawUtils;
+	import ZoomUtils = weavejs.util.ZoomUtils;
 
-	/**
-	 * WMSPlotter
-	 *  
-	 * @author adufilie
-	 * @author kmonico
-	 * @author skolman
-	 */
 	public class WMSPlotter extends AbstractPlotter implements ILinkableObjectWithBusyStatus, IDisposableObject, IObjectWithDescription
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, WMSPlotter, "WMS images");
@@ -111,18 +101,18 @@ package weave.visualization.plotters
 			return null;
 		}
 		
-		public const service:LinkableDynamicObject = registerLinkableChild(this, new LinkableDynamicObject(IWMSService));
+		public const service:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(IWMSService));
 		
-		public const preferLowerQuality:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const srs:LinkableString = newLinkableChild(this, LinkableString); // needed for linking MapTool settings
-		public const styles:LinkableString = newLinkableChild(this, LinkableString, setStyle); // needed for changing seasons
-		public const displayMissingImage:LinkableBoolean = newLinkableChild(this, LinkableBoolean);
+		public const preferLowerQuality:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const srs:LinkableString = Weave.linkableChild(this, LinkableString); // needed for linking MapTool settings
+		public const styles:LinkableString = Weave.linkableChild(this, LinkableString, setStyle); // needed for changing seasons
+		public const displayMissingImage:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 		
 		// reusable objects
 		private const _tempMatrix:Matrix = new Matrix(); 
-		private const _tempDataBounds:IBounds2D = new Bounds2D();
-		private const _tempScreenBounds:IBounds2D = new Bounds2D();
-		private const _tempBackgroundDataBounds:IBounds2D = new Bounds2D();
+		private const _tempDataBounds:Bounds2D = new Bounds2D();
+		private const _tempScreenBounds:Bounds2D = new Bounds2D();
+		private const _tempBackgroundDataBounds:Bounds2D = new Bounds2D();
 		private const _clipRectangle:Rectangle = new Rectangle();
 		
 		// used to show a missing image
@@ -132,12 +122,12 @@ package weave.visualization.plotters
 		private static const _missingImageColorTransform:ColorTransform = new ColorTransform(1, 1, 1, 0.25);
 		
 		// reprojecting bitmaps 
-		public const gridSpacing:LinkableNumber = registerLinkableChild(this, new LinkableNumber(12)); // number of pixels between grid points
-		private const _tempBounds:IBounds2D = new Bounds2D();
-		private const _tempImageBounds:IBounds2D = new Bounds2D(); // bounds of the image
-		private const _latLonBounds:IBounds2D = new Bounds2D(-180 + ProjConstants.EPSLN, -90 + ProjConstants.EPSLN, 180 - ProjConstants.EPSLN, 90 - ProjConstants.EPSLN);
-		private const _allowedTileReprojBounds:IBounds2D = new Bounds2D(); // allowed bounds for point to point reprojections
-		private const _normalizedGridBounds:IBounds2D = new Bounds2D();
+		public const gridSpacing:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(12)); // number of pixels between grid points
+		private const _tempBounds:Bounds2D = new Bounds2D();
+		private const _tempImageBounds:Bounds2D = new Bounds2D(); // bounds of the image
+		private const _latLonBounds:Bounds2D = new Bounds2D(-180 + ProjConstants.EPSLN, -90 + ProjConstants.EPSLN, 180 - ProjConstants.EPSLN, 90 - ProjConstants.EPSLN);
+		private const _allowedTileReprojBounds:Bounds2D = new Bounds2D(); // allowed bounds for point to point reprojections
+		private const _normalizedGridBounds:Bounds2D = new Bounds2D();
 		private const _tempReprojPoint:Point = new Point(); // reusable object for reprojections
 		private const projManager:IProjectionManager = WeaveAPI.ProjectionManager; // reprojecting tiles
 		private const _tileSRSToShapeCache:Dictionary2D = new Dictionary2D(true, true); // use WeakReferences to be GC friendly
@@ -161,7 +151,7 @@ package weave.visualization.plotters
 				return cachedValue;
 			
 			// we need to create the cached shape
-			var reprojectedDataBounds:IBounds2D = new Bounds2D();
+			var reprojectedDataBounds:Bounds2D = new Bounds2D();
 			vertices.length = 0;
 			indices.length = 0;
 			uvtData.length = 0;
@@ -261,7 +251,7 @@ package weave.visualization.plotters
 			return projShape;
 		}
 		
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			// if there is no service to use, we can't draw anything
 			if (!_service)
@@ -331,7 +321,7 @@ package weave.visualization.plotters
 		/**
 		 * This function will draw tiles which do not need to be reprojected.
 		 */
-		private function drawUnProjectedTiles(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		private function drawUnProjectedTiles(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			if (!_service)
 				return;
@@ -354,7 +344,7 @@ package weave.visualization.plotters
 					tile.bitmapData = _missingImage.bitmapData;
 				}
 				
-				var imageBounds:IBounds2D = tile.bounds;
+				var imageBounds:Bounds2D = tile.bounds;
 				var imageBitmap:BitmapData = tile.bitmapData;
 				
 				// get screen coords from image data coords
@@ -395,7 +385,7 @@ package weave.visualization.plotters
 		private const ct:ColorTransform = new ColorTransform();
 		private const rect:Rectangle = new Rectangle();
 		private const tempBounds:Bounds2D = new Bounds2D();
-		private function debugTileBounds(tileBounds:IBounds2D, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData, url:String, drawRect:Boolean):void
+		private function debugTileBounds(tileBounds:Bounds2D, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData, url:String, drawRect:Boolean):void
 		{
 			_tempScreenBounds.copyFrom(tileBounds);
 			dataBounds.projectCoordsTo(_tempScreenBounds, screenBounds);
@@ -415,9 +405,9 @@ package weave.visualization.plotters
 			bt.draw(destination);
 		}
 		
-		public const creditInfoTextColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0x000000));
-		public const creditInfoBackgroundColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0xFFFFFF));
-		public const creditInfoAlpha:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0.5, isFinite));
+		public const creditInfoTextColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		public const creditInfoBackgroundColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0xFFFFFF));
+		public const creditInfoAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0.5, isFinite));
 		
 		private function drawCreditText(destination:BitmapData):void
 		{
@@ -482,7 +472,7 @@ package weave.visualization.plotters
 			spatialCallbacks.triggerCallbacks();
 		}
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.reset();
 			if (_service)
@@ -558,15 +548,15 @@ package weave.visualization.plotters
 	}
 }
 
-import flash.display.Shape;
+import Shape;
 
-import weave.api.primitives.IBounds2D;
+import Bounds2D;
 
 // an internal object used for reprojecting shapes
 internal class ProjectedShape
 {
 	public var shape:Shape;
-	public var bounds:IBounds2D;
+	public var bounds:Bounds2D;
 	public var imageWidth:int;
 	public var imageHeight:int;	
 }

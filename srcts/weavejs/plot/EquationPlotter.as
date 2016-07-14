@@ -13,33 +13,30 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
-	import flash.geom.Point;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.reportError;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.IPlotter;
-	import weave.core.LinkableFunction;
-	import weave.core.LinkableNumber;
-	import weave.visualization.layers.PlotTask;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import LinkableFunction = weavejs.core.LinkableFunction;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import PlotTask = weavejs.visualization.layers.PlotTask;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
 	public class EquationPlotter extends AbstractPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, EquationPlotter, "Equation");
 		
-		public const tStep:LinkableNumber = registerLinkableChild(this, new LinkableNumber(NaN));
-		public const tBegin:LinkableNumber = registerLinkableChild(this, new LinkableNumber(NaN));
-		public const tEnd:LinkableNumber = registerLinkableChild(this, new LinkableNumber(NaN));
+		public const tStep:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public const tBegin:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public const tEnd:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
 		
-		public const xEquation:LinkableFunction = registerLinkableChild(this, new LinkableFunction('t', true, false, ['t']));
-		public const yEquation:LinkableFunction = registerLinkableChild(this, new LinkableFunction('t', true, false, ['t']));
+		public const xEquation:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('t', true, false, ['t']));
+		public const yEquation:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('t', true, false, ['t']));
 		
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
 		override public function drawPlotAsyncIteration(task:IPlotTask):Number
 		{
@@ -53,14 +50,13 @@ package weave.visualization.plotters
 	}
 }
 
-import flash.display.Graphics;
-import flash.display.Shape;
-import flash.geom.Point;
-import flash.utils.getTimer;
+import Graphics = PIXI.Graphics;
+import Shape = flash.display.Shape;
+import Point = weavejs.geom.Point;
+import getTimer = flash.utils.getTimer;
 
-import weave.api.reportError;
-import weave.api.ui.IPlotTask;
-import weave.visualization.plotters.EquationPlotter;
+import IPlotTask = weavejs.api.ui.IPlotTask;
+import EquationPlotter = weavejs.visualization.plotters.EquationPlotter;
 
 internal class AsyncState
 {
@@ -160,7 +156,7 @@ internal class AsyncState
 		}
 		catch (e:Error)
 		{
-			reportError(e);
+			JS.error(e);
 		}
 		
 		task.buffer.draw(shape);

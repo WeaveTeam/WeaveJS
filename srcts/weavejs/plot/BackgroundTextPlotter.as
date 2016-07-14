@@ -13,30 +13,27 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
+	import BitmapData = flash.display.BitmapData;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.reportError;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotter;
-	import weave.core.LinkableDynamicObject;
-	import weave.core.LinkableFunction;
-	import weave.utils.BitmapText;
-	import weave.utils.LinkableTextFormat;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
+	import LinkableFunction = weavejs.core.LinkableFunction;
+	import BitmapText = weavejs.util.BitmapText;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
 	
 	public class BackgroundTextPlotter extends AbstractPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, BackgroundTextPlotter, "Background text");
 		
-		public const textFormat:LinkableTextFormat = newLinkableChild(this, LinkableTextFormat);
-		public const textFunction:LinkableFunction = registerLinkableChild(this, new LinkableFunction('target && target.getSessionState()', true, false, ['target']));
-		public const dependency:LinkableDynamicObject = newLinkableChild(this, LinkableDynamicObject);
+		public const textFormat:LinkableTextFormat = Weave.linkableChild(this, LinkableTextFormat);
+		public const textFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('target && target.getSessionState()', true, false, ['target']));
+		public const dependency:LinkableDynamicObject = Weave.linkableChild(this, LinkableDynamicObject);
 		private const bitmapText:BitmapText = new BitmapText();
 		
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			bitmapText.x = screenBounds.getXCenter();
 			bitmapText.y = screenBounds.getYCenter();
@@ -52,7 +49,7 @@ package weave.visualization.plotters
 			}
 			catch (e:Error)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 	}

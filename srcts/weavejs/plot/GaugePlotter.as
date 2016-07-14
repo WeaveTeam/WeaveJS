@@ -13,23 +13,22 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.geom.Point;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.registerLinkableChild;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.api.ui.IPlotTask;
-	import weave.compiler.StandardLib;
-	import weave.data.BinningDefinitions.DynamicBinningDefinition;
-	import weave.data.BinningDefinitions.SimpleBinningDefinition;
-	import weave.primitives.ColorRamp;
-	import weave.utils.PlotUtils;
-	import weave.utils.RadialAxis;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import StandardLib = weavejs.util.StandardLib;
+	import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
+	import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
+	import ColorRamp = weavejs.util.ColorRamp;
+	import PlotUtils = weavejs.util.PlotUtils;
+	import RadialAxis = weavejs.util.RadialAxis;
 
 	/**
 	 * This is the plotter for the semi-circular Gauge tool.
@@ -65,14 +64,14 @@ package weave.visualization.plotters
 		private const needleColor:Number = 0x000000;
 		
 		//wrapper for a SimpleBinningDefinition, which creates equally spaced bins
-		public const binningDefinition:DynamicBinningDefinition = registerLinkableChild(this, new DynamicBinningDefinition(true));
+		public const binningDefinition:DynamicBinningDefinition = Weave.linkableChild(this, new DynamicBinningDefinition(true));
 		
 		//the approximate desired number of tick marks
 		//TODO make this part of the session state
 		public const numberOfTickMarks:Number = 10;
 		
 		//the color ramp mapping bins to colors
-		public const colorRamp:ColorRamp = registerLinkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Traffic Light")));
+		public const colorRamp:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Traffic Light")));
 		
 		// reusable point objects
 		private const p1:Point = new Point(), p2:Point = new Point();
@@ -91,7 +90,7 @@ package weave.visualization.plotters
 			
 			meterColumn.addImmediateCallback(this, updateAxis);
 			binningDefinition.generateBinClassifiersForColumn(meterColumn);
-			registerLinkableChild(this, binningDefinition.asyncResultCallbacks);
+			Weave.linkableChild(this, binningDefinition.asyncResultCallbacks);
 		}
 		
 		public function getSelectableAttributeNames():Array
@@ -167,7 +166,7 @@ package weave.visualization.plotters
 		 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
 		 * @param destination The sprite to draw the graphics onto.
 		 */
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			//clear the graphics
 			var g:Graphics = tempShape.graphics;
@@ -188,7 +187,7 @@ package weave.visualization.plotters
 			destination.draw(tempShape);
 		}
 		
-		private function fillSectors(dataBounds:IBounds2D, screenBounds:IBounds2D,g:Graphics):void
+		private function fillSectors(dataBounds:Bounds2D, screenBounds:Bounds2D,g:Graphics):void
 		{
 			var binNames:Array = binningDefinition.getBinNames();
 			var numSectors:Number = binNames.length;
@@ -199,7 +198,7 @@ package weave.visualization.plotters
 			}
 		}
 		
-		private function drawMeterOutline(dataBounds:IBounds2D, screenBounds:IBounds2D,g:Graphics):void
+		private function drawMeterOutline(dataBounds:Bounds2D, screenBounds:Bounds2D,g:Graphics):void
 		{
 			g.lineStyle(outlineThickness,outlineColor,1.0);
 			var minAngle:Number = theta;
@@ -215,7 +214,7 @@ package weave.visualization.plotters
 		 * @param outputDataBounds A Bounds2D object to store the result in.
 		 * @return A Bounds2D object specifying the background data bounds.
 		 */
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			//TODO move these hard coded bounds to sessioned variables and make UI for editing them
 			output.setBounds(-1, -.3, 1, 1);
@@ -224,7 +223,7 @@ package weave.visualization.plotters
 		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
 		{
 			initBoundsArray(output);
-			(output[0] as IBounds2D).setBounds(-1, -.3, 1, 1);
+			(output[0] as Bounds2D).setBounds(-1, -.3, 1, 1);
 		}
 	}
 }

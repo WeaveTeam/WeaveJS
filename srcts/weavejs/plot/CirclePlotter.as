@@ -13,27 +13,20 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.geom.Point;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.registerLinkableChild;
-	import weave.api.setSessionState;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.data.ISimpleGeometry;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotterWithGeometries;
-	import weave.core.LinkableNumber;
-	import weave.primitives.GeometryType;
-	import weave.primitives.SimpleGeometry;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import ISimpleGeometry = weavejs.api.data.ISimpleGeometry;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotterWithGeometries = weavejs.api.ui.IPlotterWithGeometries;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import GeometryType = weavejs.primitives.GeometryType;
+	import SimpleGeometry = weavejs.primitives.SimpleGeometry;
 
-	/**
-	 * 
-	 * @author skolman
-	 * @author kmonico
-	 */	
 	public class CirclePlotter extends AbstractPlotter implements IPlotterWithGeometries
 	{
 		public function CirclePlotter()
@@ -43,67 +36,67 @@ package weave.visualization.plotters
 		/**
 		 * The x position of the circle. 
 		 */		
-		public const dataX:LinkableNumber = registerLinkableChild(this, new LinkableNumber());
+		public const dataX:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
 		
 		/**
 		 * The y position of the circle. 
 		 */		
-		public const dataY:LinkableNumber = registerLinkableChild(this, new LinkableNumber());
+		public const dataY:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
 		
 		/**
 		 * The radius of the circle. 
 		 */		
-		public const radius:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1));
+		public const radius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
 		
 		[Deprecated(replacement="lineColor")] public function set color(value:Object):void
 		{
-			setSessionState(lineColor, value);
+			Weave.setState(lineColor, value);
 		}
 		
 		/**
 		 * The color of the circle.
 		 * @default 0 
 		 */		
-		public const lineColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0, verifyColor));
+		public const lineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyColor));
 		/**
 		 * The alpha of the circle.
 		 * @default 1 
 		 */		
-		public const lineAlpha:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1, verifyAlpha));
+		public const lineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1, verifyAlpha));
 		/**
 		 * The color of the fill inside the circle.
 		 * @default 0 
 		 */		
-		public const fillColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0, verifyColor));
+		public const fillColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyColor));
 		/**
 		 * The alpha of the fill inside the circle.
 		 * @default 0 
 		 */		
-		public const fillAlpha:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0, verifyAlpha));
+		public const fillAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyAlpha));
 
 		/**
 		 * The thickness of the edge of the circle. 
 		 */		
-		public const thickness:LinkableNumber = registerLinkableChild(this, new LinkableNumber(2));
+		public const thickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
 		
 		/**
 		 * The projection of the map when this circle was created. 
 		 */		
-		//public const projectionSRS:LinkableString = registerLinkableChild(this, new LinkableString('', WeaveAPI.ProjectionManager.projectionExists));
+		//public const projectionSRS:LinkableString = Weave.linkableChild(this, new LinkableString('', WeaveAPI.ProjectionManager.projectionExists));
 		
 		/**
 		 * The number of vertices to use inside the polygon when selecting records. This must be at
 		 * least <code>3</code>. <br>
 		 * @default <code>25</code>
 		 */		
-		public const polygonVertexCount:LinkableNumber = registerLinkableChild(this, new LinkableNumber(25, verifyPolygonVertexCount));
+		public const polygonVertexCount:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25, verifyPolygonVertexCount));
 		private function verifyPolygonVertexCount(value:Number):Boolean
 		{
 			return value >= 3; 
 		}
 
 		
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			_tempDataBounds = dataBounds;
 			_tempScreenBounds = screenBounds;
@@ -133,7 +126,7 @@ package weave.visualization.plotters
 			destination.draw(tempShape);
 		}
 
-		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, bounds:IBounds2D = null):Array
+		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, bounds:Bounds2D = null):Array
 		{
 			// no keys in this plotter
 			return [];
@@ -182,8 +175,8 @@ package weave.visualization.plotters
 		}
 		// reusable objects
 		
-		private var _tempDataBounds:IBounds2D;
-		private var _tempScreenBounds:IBounds2D;
+		private var _tempDataBounds:Bounds2D;
+		private var _tempScreenBounds:Bounds2D;
 		private const _tempArray:Array = [];
 	}
 }

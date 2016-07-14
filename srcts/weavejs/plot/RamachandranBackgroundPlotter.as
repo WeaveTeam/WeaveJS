@@ -13,32 +13,27 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Bitmap;
+	import BitmapData = flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.geom.Matrix;
-	import flash.geom.Point;
+	import Graphics = PIXI.Graphics;
+	import Matrix = flash.geom.Matrix;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.primitives.IBounds2D;
-	import weave.primitives.Bounds2D;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import Bounds2D = weavejs.geom.Bounds2D;
 	
-	/**
-	 * RadVizPlotter
-	 * 
-	 * @author kmanohar
-	 */
 	public class RamachandranBackgroundPlotter extends AbstractPlotter
 	{
 		public function RamachandranBackgroundPlotter()
 		{
 		}
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(-180,-180,180,180);
 		}
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var g:Graphics = tempShape.graphics;
 			g.clear();
@@ -64,7 +59,7 @@ package weave.visualization.plotters
 			destination.draw(tempShape);
 		}
 		
-		private const tempBounds:IBounds2D = new Bounds2D();
+		private const tempBounds:Bounds2D = new Bounds2D();
 		private const tempPoint:Point = new Point();
 
 		// background image

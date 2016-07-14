@@ -13,40 +13,37 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.geom.Point;
-	import flash.text.TextFormatAlign;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
+	import NumberFormatter = flash.text.TextFormatAlign;
 	import flash.utils.getQualifiedClassName;
 	
 	import mx.formatters.NumberFormatter;
 	
-	import weave.api.getCallbackCollection;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.compiler.StandardLib;
-	import weave.core.CallbackCollection;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.data.KeySets.KeySet;
-	import weave.primitives.Bounds2D;
-	import weave.primitives.LinkableBounds2D;
-	import weave.primitives.LinkableNumberFormatter;
-	import weave.primitives.LooseAxisDescription;
-	import weave.utils.BitmapText;
-	import weave.utils.LinkableTextFormat;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import StandardLib = weavejs.util.StandardLib;
+	import CallbackCollection = weavejs.core.CallbackCollection;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import KeySet = weavejs.data.key.KeySet;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import LinkableBounds2D = weavejs.primitives.LinkableBounds2D;
+	import LinkableNumberFormatter = weavejs.primitives.LinkableNumberFormatter;
+	import LooseAxisDescription = weavejs.primitives.LooseAxisDescription;
+	import BitmapText = weavejs.util.BitmapText;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
 	
 	public class AxisPlotter extends AbstractPlotter
 	{
 		public function AxisPlotter()
 		{
-			registerLinkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
+			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			spatialCallbacks.addImmediateCallback(this, updateLabels);
 
 			// set defaults so something will show if these values are not set
@@ -68,47 +65,47 @@ package weave.visualization.plotters
 		}
 		
 		//TODO: put this huge list of properties into a separate object instead
-		public const axisLabelDistance:LinkableNumber = registerLinkableChild(this, new LinkableNumber(-10));
-		public const axisLabelRelativeAngle:LinkableNumber = registerLinkableChild(this, new LinkableNumber(-45));
-		public const axisGridLineThickness:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1));
-		public const axisGridLineColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0xDDDDDD));
-		public const axisGridLineAlpha:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1));
+		public const axisLabelDistance:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(-10));
+		public const axisLabelRelativeAngle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(-45));
+		public const axisGridLineThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public const axisGridLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0xDDDDDD));
+		public const axisGridLineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
 
 		// the axis line beginning and end data coordinates
-		public const axisLineDataBounds:LinkableBounds2D = newLinkableChild(this, LinkableBounds2D);
+		public const axisLineDataBounds:LinkableBounds2D = Weave.linkableChild(this, LinkableBounds2D);
 		// the value corresponding to the beginning of the axis line
-		public const axisLineMinValue:LinkableNumber = newLinkableChild(this, LinkableNumber);
+		public const axisLineMinValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		// the value corresponding to the end of the axis line
-		public const axisLineMaxValue:LinkableNumber = newLinkableChild(this, LinkableNumber);
+		public const axisLineMaxValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		// the value corresponding to the beginning of the axis line.  If not specified, axisLineMinValue will be used.
-		public const tickMinValue:LinkableNumber = newLinkableChild(this, LinkableNumber);
+		public const tickMinValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		// the value corresponding to the end of the axis line.  If not specified, axisLineMaxValue will be used.
-		public const tickMaxValue:LinkableNumber = newLinkableChild(this, LinkableNumber);
+		public const tickMaxValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
 		// show or hide the axis name
-		public const showAxisName:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
+		public const showAxisName:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
 		// number of requested tick marks
-		public const tickCountRequested:LinkableNumber = registerLinkableChild(this, new LinkableNumber(10));
+		public const tickCountRequested:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10));
 		// This option forces the axis to generate the exact number of requested tick marks between tick min and max values (inclusive)
-		public const forceTickCount:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const forceTickCount:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		public const axisTickLength:LinkableNumber = registerLinkableChild(this, new LinkableNumber(10));
-		public const axisTickThickness:LinkableNumber = registerLinkableChild(this, new LinkableNumber(2));
+		public const axisTickLength:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10));
+		public const axisTickThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
 		
-		public const axisLineColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0x000000));
-		public const axisLineAlpha:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1));
-		public const axisTickColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0x000000));
-		public const axisTickAlpha:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1));
-		public const axisLineThickness:LinkableNumber = registerLinkableChild(this, new LinkableNumber(2));
+		public const axisLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		public const axisLineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public const axisTickColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		public const axisTickAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public const axisLineThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
 		
 		// formatter to use when generating tick mark labels
-		public const labelNumberFormatter:LinkableNumberFormatter = newLinkableChild(this, LinkableNumberFormatter);
-		public const labelTextAlignment:LinkableString = newLinkableChild(this, LinkableString);
-		public const labelHorizontalAlign:LinkableString = newLinkableChild(this, LinkableString);
-		public const labelVerticalAlign:LinkableString = newLinkableChild(this, LinkableString);
-		public const labelDistanceIsVertical:LinkableBoolean = newLinkableChild(this, LinkableBoolean);
+		public const labelNumberFormatter:LinkableNumberFormatter = Weave.linkableChild(this, LinkableNumberFormatter);
+		public const labelTextAlignment:LinkableString = Weave.linkableChild(this, LinkableString);
+		public const labelHorizontalAlign:LinkableString = Weave.linkableChild(this, LinkableString);
+		public const labelVerticalAlign:LinkableString = Weave.linkableChild(this, LinkableString);
+		public const labelDistanceIsVertical:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 
-		private const _keySet:KeySet = newLinkableChild(this, KeySet); // stores tick mark keys
+		private const _keySet:KeySet = Weave.linkableChild(this, KeySet); // stores tick mark keys
 		private const _axisDescription:LooseAxisDescription = new LooseAxisDescription(); // calculates tick marks
 		private const _bitmapText:BitmapText = new BitmapText(); // for drawing text
 		private var _xDataTickDelta:Number; // x distance between ticks
@@ -124,7 +121,7 @@ package weave.visualization.plotters
 		public function updateLabels():void
 		{
 			var cc:CallbackCollection;
-			var callbackCollections:Array = [getCallbackCollection(this), spatialCallbacks];
+			var callbackCollections:Array = [Weave.getCallbacks(this), spatialCallbacks];
 
 			// make sure callbacks only run once
 			for each (cc in callbackCollections)
@@ -201,7 +198,7 @@ package weave.visualization.plotters
 		{
 			initBoundsArray(output);
 			getTickValueAndDataCoords(recordKey, tempPoint);
-			(output[0] as IBounds2D).includePoint(tempPoint);
+			(output[0] as Bounds2D).includePoint(tempPoint);
 		}
 		
 		// draws the tick marks
@@ -210,7 +207,7 @@ package weave.visualization.plotters
 			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private function drawAll(recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		private function drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 //			if (recordKeys.length == 0)
 //				trace(this,'drawPlot',arguments);
@@ -306,8 +303,8 @@ package weave.visualization.plotters
 			}
 		}
 		
-		private var _titleBounds:IBounds2D = null;
-		public function getTitleLabelBounds():IBounds2D
+		private var _titleBounds:Bounds2D = null;
+		public function getTitleLabelBounds():Bounds2D
 		{
 			return _titleBounds;
 		}
@@ -334,7 +331,7 @@ package weave.visualization.plotters
 			_labelAlignment = labelAlignment;
 			_maxLabelWidth = maxLabelWidth;
 			
-			getCallbackCollection(this).triggerCallbacks();
+			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		private var _axisName:String;
 		private var _axisNameAngle:Number;
@@ -347,7 +344,7 @@ package weave.visualization.plotters
 		// END TEMPORARY SOLUTION
 		
 		// draws the axis line
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			setupAxisNameBitmapText(dataBounds,screenBounds);
 			
@@ -379,7 +376,7 @@ package weave.visualization.plotters
 			_bitmapText.verticalAlign = labelVerticalAlign.value;
 		}
 		
-		protected function setupAxisNameBitmapText(dataBounds:IBounds2D, screenBounds:IBounds2D):void
+		protected function setupAxisNameBitmapText(dataBounds:Bounds2D, screenBounds:Bounds2D):void
 		{
 			initPrivateAxisLineBoundsVariables(dataBounds, screenBounds);
 
@@ -427,7 +424,7 @@ package weave.visualization.plotters
 			// END TEMPORARY SOLUTION
 		}
 		
-//		public function getAxisNameScreenBounds(dataBounds:IBounds2D, screenBounds:IBounds2D,outputScreenBounds:IBounds2D):void
+//		public function getAxisNameScreenBounds(dataBounds:Bounds2D, screenBounds:Bounds2D,outputScreenBounds:Bounds2D):void
 //		{
 //			setupAxisNameBitmapText(dataBounds,screenBounds);
 //			// this does not work when text is vertical
@@ -435,12 +432,12 @@ package weave.visualization.plotters
 //		}
 		
 		// gets the bounds of the axis line
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			axisLineDataBounds.copyTo(output);
 		}
 		
-		private function initPrivateAxisLineBoundsVariables(dataBounds:IBounds2D, screenBounds:IBounds2D):void
+		private function initPrivateAxisLineBoundsVariables(dataBounds:Bounds2D, screenBounds:Bounds2D):void
 		{
 			// get axis line data bounds and project to screen coordinates
 			axisLineDataBounds.copyTo(_axisLineDataBounds);
@@ -458,7 +455,7 @@ package weave.visualization.plotters
 		public function setLabelFunction(func:Function):void
 		{
 			_labelFunction = func;
-			getCallbackCollection(this).triggerCallbacks();
+			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		private var _labelFunction:Function = null;
 		// END TEMPORARY SOLUTION

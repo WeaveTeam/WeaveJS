@@ -13,46 +13,40 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
+	import Shape = flash.display.BitmapData;
 	import flash.display.LineScaleMode;
 	import flash.display.Shape;
-	import flash.geom.Point;
-	import flash.utils.Dictionary;
+	import Point = weavejs.geom.Point;
+	import getTimer = flash.utils.Dictionary;
 	import flash.utils.getTimer;
 	
-	import weave.Weave;
-	import weave.api.getCallbackCollection;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.graphs.IGraphAlgorithm;
-	import weave.api.graphs.IGraphNode;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.compiler.StandardLib;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableDynamicObject;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.data.AttributeColumns.AlwaysDefinedColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.graphs.ForceDirectedLayout;
-	import weave.graphs.GridForceDirectedLayout;
-	import weave.graphs.KamadaKawaiLayout;
-	import weave.graphs.LargeGraphLayout;
-	import weave.primitives.Bounds2D;
-	import weave.utils.LinkableTextFormat;
-	import weave.visualization.plotters.styles.SolidFillStyle;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import IGraphAlgorithm = weavejs.api.graphs.IGraphAlgorithm;
+	import IGraphNode = weavejs.api.graphs.IGraphNode;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import StandardLib = weavejs.util.StandardLib;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import ForceDirectedLayout = weavejs.graphs.ForceDirectedLayout;
+	import GridForceDirectedLayout = weavejs.graphs.GridForceDirectedLayout;
+	import KamadaKawaiLayout = weavejs.graphs.KamadaKawaiLayout;
+	import LargeGraphLayout = weavejs.graphs.LargeGraphLayout;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import SolidFillStyle = weavejs.geom.SolidFillStyle;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 
-	
 	/**
 	 * This is a plotter for a node edge chart, commonly referred to as a graph.
-	 * 
-	 * @author kmonico
-	 */	
+	 */
 	public class GraphPlotter extends AbstractPlotter
 	{
 		public function GraphPlotter()
@@ -62,7 +56,7 @@ package weave.visualization.plotters
 			lineStyle.weight.defaultValue.value = 1.5;
 
 			fillStyle.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
-			registerLinkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
+			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			setSingleKeySource(nodesColumn);
 
 			layoutAlgorithm.requestLocalObject(ForceDirectedLayout, true);
@@ -102,7 +96,7 @@ package weave.visualization.plotters
 			(layoutAlgorithm.internalObject as IGraphAlgorithm).getOutputBounds(null, tempBounds);
 			if (runSpatialCallbacks)
 				spatialCallbacks.triggerCallbacks();
-			getCallbackCollection(this).triggerCallbacks();
+			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
 		/**
@@ -144,7 +138,7 @@ package weave.visualization.plotters
 			}
 			(layoutAlgorithm.internalObject as IGraphAlgorithm).updateOutputBounds();
 			spatialCallbacks.triggerCallbacks();
-			getCallbackCollection(this).triggerCallbacks();
+			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
 		/**
@@ -226,7 +220,7 @@ package weave.visualization.plotters
 				edgeSourceColumn, 
 				edgeTargetColumn);
 			spatialCallbacks.triggerCallbacks();
-			getCallbackCollection(this).triggerCallbacks();
+			Weave.getCallbacks(this).triggerCallbacks();
 		}
 
 		private function changeStyle():void
@@ -235,24 +229,24 @@ package weave.visualization.plotters
 		}
 
 		// the styles
-		public const lineStyle:SolidLineStyle = registerLinkableChild(this, new SolidLineStyle());
-		public const fillStyle:SolidFillStyle = registerLinkableChild(this, new SolidFillStyle());
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, new SolidLineStyle());
+		public const fillStyle:SolidFillStyle = Weave.linkableChild(this, new SolidFillStyle());
 
 		// the columns
 		public function get colorColumn():AlwaysDefinedColumn { return fillStyle.color; }
 
-		public const sizeColumn:DynamicColumn = registerLinkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
-		public const nodesColumn:DynamicColumn = registerLinkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
-		public const edgeSourceColumn:DynamicColumn = registerLinkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
-		public const edgeTargetColumn:DynamicColumn = registerLinkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
-		public const labelColumn:DynamicColumn = registerLinkableChild(this, new DynamicColumn());
-		public const nodeRadiusColumn:DynamicColumn = registerLinkableChild(this, new DynamicColumn());
-		public const edgeThicknessColumn:DynamicColumn = registerLinkableChild(this, new DynamicColumn());
+		public const sizeColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
+		public const nodesColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
+		public const edgeSourceColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
+		public const edgeTargetColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
+		public const labelColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn());
+		public const nodeRadiusColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn());
+		public const edgeThicknessColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn());
 		public function get edgeColorColumn():AlwaysDefinedColumn { return lineStyle.color; }
 		
 		// the edge styles
 		[Bindable] public var edgeStyles:Array = [ EDGE_GRADIENT, EDGE_ARROW, EDGE_WEDGE, EDGE_LINE ];
-		public const edgeStyle:LinkableString = registerLinkableChild(this, new LinkableString(EDGE_LINE), changeStyle);
+		public const edgeStyle:LinkableString = Weave.linkableChild(this, new LinkableString(EDGE_LINE), changeStyle);
 		private static const EDGE_GRADIENT:String = "Gradient";
 		private static const EDGE_ARROW:String = "Arrow";
 		private static const EDGE_WEDGE:String = "Wedge";
@@ -261,18 +255,18 @@ package weave.visualization.plotters
 		// the algorithms
 		
 		[Bindable] public var algorithms:Array = [ FORCE_DIRECTED, GRID_FORCE_DIRECTED, LARGE_GRAPH_LAYOUT, KAMADA_KAWAI ];
-		public const layoutAlgorithm:LinkableDynamicObject = registerLinkableChild(this, new LinkableDynamicObject(IGraphAlgorithm));
-		public const currentAlgorithm:LinkableString = registerLinkableChild(this, new LinkableString(FORCE_DIRECTED), changeAlgorithm); // the algorithm
+		public const layoutAlgorithm:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(IGraphAlgorithm));
+		public const currentAlgorithm:LinkableString = Weave.linkableChild(this, new LinkableString(FORCE_DIRECTED), changeAlgorithm); // the algorithm
 		private static const FORCE_DIRECTED:String = "Force Directed";	
 		private static const LARGE_GRAPH_LAYOUT:String = "Large Graph Layout";
 		private static const GRID_FORCE_DIRECTED:String = "Grid Force Directed";
 		private static const KAMADA_KAWAI:String = "Kamada Kawai";
 
 		// properties
-		public const radius:LinkableNumber = registerLinkableChild(this, new LinkableNumber(2)); // radius of the circles
-		public const shouldStop:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false)); // should the algorithm halt on the next iteration? 
-		public const algorithmRunning:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false)); // is an algorithm running?
-		public const drawCurvedLines:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true)); // should we draw curved lines instead of a gradient?
+		public const radius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2)); // radius of the circles
+		public const shouldStop:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false)); // should the algorithm halt on the next iteration?
+		public const algorithmRunning:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false)); // is an algorithm running?
+		public const drawCurvedLines:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true)); // should we draw curved lines instead of a gradient?
 		
 		// dragged layer properties
 //		private var _draggedKeysLookup:Dictionary = new Dictionary(); 
@@ -332,7 +326,7 @@ package weave.visualization.plotters
 			return 1.0 - progress;
 		}
 
-		private function drawNode(node:IGraphNode, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		private function drawNode(node:IGraphNode, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var nodeRadius:Number = sizeColumn.getValueFromKey(node.key, Number);
 			if (StandardLib.isUndefined(nodeRadius))
@@ -354,7 +348,7 @@ package weave.visualization.plotters
 			return;
 		}
 
-		private function drawEdge(srcNode:IGraphNode, destNode:IGraphNode, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		private function drawEdge(srcNode:IGraphNode, destNode:IGraphNode, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			
 
@@ -429,12 +423,12 @@ package weave.visualization.plotters
 		/**
 		 * This function returns a Bounds2D object set to the data bounds associated with the given record key.
 		 * @param key The key of a data record.
-		 * @param output An Array of IBounds2D objects to store the result in.
+		 * @param output An Array of Bounds2D objects to store the result in.
 		 */
 		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
 		{
 			initBoundsArray(output);
-			var bounds:IBounds2D = output[0];
+			var bounds:Bounds2D = output[0];
 			var node:IGraphNode = (layoutAlgorithm.internalObject as IGraphAlgorithm).getNodeFromKey(recordKey);
 			var keyPoint:Point;
 			var edgePoint:Point;
@@ -449,7 +443,7 @@ package weave.visualization.plotters
 		 * This function returns a Bounds2D object set to the data bounds associated with the background.
 		 * @param output A Bounds2D object to store the result in.
 		 */
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			(layoutAlgorithm.internalObject as IGraphAlgorithm).getOutputBounds(null, output);
 		}
@@ -503,7 +497,7 @@ package weave.visualization.plotters
 		private const edgesShape:Shape = new Shape();
 		
 		private const screenPoint:Point = new Point(); // reusable object
-		private const tempBounds:IBounds2D = new Bounds2D(); // reusable object
+		private const tempBounds:Bounds2D = new Bounds2D(); // reusable object
 		
 
 	}

@@ -13,26 +13,20 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
+	import BitmapData = flash.display.BitmapData;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.reportError;
-	import weave.api.core.ILinkableHashMap;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.IPlotter;
-	import weave.api.ui.ITextPlotter;
-	import weave.core.LinkableFunction;
-	import weave.core.LinkableHashMap;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import ITextPlotter = weavejs.api.ui.ITextPlotter;
+	import LinkableFunction = weavejs.core.LinkableFunction;
+	import LinkableHashMap = weavejs.core.LinkableHashMap;
 
-	/**
-	 * @author adufilie
-	 */
 	public class CustomGlyphPlotter extends AbstractGlyphPlotter implements ITextPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, CustomGlyphPlotter, "ActionScript glyphs");
@@ -49,21 +43,21 @@ package weave.visualization.plotters
 			// This will be cleaned up automatically when the column is disposed.
 			var newColumn:IAttributeColumn = vars.childListCallbacks.lastObjectAdded as IAttributeColumn;
 			if (newColumn)
-				registerLinkableChild(vars, WeaveAPI.StatisticsCache.getColumnStatistics(newColumn));
+				Weave.linkableChild(vars, WeaveAPI.StatisticsCache.getColumnStatistics(newColumn));
 		}
 		
 		/**
 		 * This can hold any objects that should be stored in the session state.
 		 */
-		public const vars:ILinkableHashMap = newLinkableChild(this, LinkableHashMap);
+		public const vars:ILinkableHashMap = Weave.linkableChild(this, LinkableHashMap);
 		public const locals:Object = {};
 		
-		public const function_drawPlot:LinkableFunction = registerLinkableChild(this, new LinkableFunction(script_drawPlot, false, true, ['keys','dataBounds','screenBounds','destination']));
+		public const function_drawPlot:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_drawPlot, false, true, ['keys','dataBounds','screenBounds','destination']));
 		public static const script_drawPlot:String = <![CDATA[
-			// Parameter types: Array, IBounds2D, IBounds2D, BitmapData
+			// Parameter types: Array, Bounds2D, Bounds2D, BitmapData
 			function(keys, dataBounds, screenBounds, destination)
 			{
-				import 'weave.data.AttributeColumns.DynamicColumn';
+				import GraphicsBuffer' = 'weave.data.AttributeColumns.DynamicColumn';
 				import 'weave.utils.GraphicsBuffer';
 			
 				var getStats = WeaveAPI.StatisticsCache.getColumnStatistics;
@@ -119,18 +113,18 @@ package weave.visualization.plotters
 			}
 			catch (e:*)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 			return 1;
 		}
 		
-		public const function_drawBackground:LinkableFunction = registerLinkableChild(this, new LinkableFunction(script_drawBackground, false, true, ['dataBounds', 'screenBounds', 'destination']));
+		public const function_drawBackground:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_drawBackground, false, true, ['dataBounds', 'screenBounds', 'destination']));
 		public static const script_drawBackground:String = <![CDATA[
-			// Parameter types: IBounds2D, IBounds2D, BitmapData
+			// Parameter types: Bounds2D, Bounds2D, BitmapData
 			function(dataBounds, screenBounds, destination)
 			{
 				/*
-				import 'weave.utils.GraphicsBuffer';
+				import GraphicsBuffer' = 'weave.utils.GraphicsBuffer';
 			
 				var graphicBuffer = new GraphicsBuffer(destination);
 			
@@ -140,7 +134,7 @@ package weave.visualization.plotters
 				*/
 			}
 		]]>;
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			try
 			{
@@ -148,11 +142,11 @@ package weave.visualization.plotters
 			}
 			catch (e:*)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 		
-		public const function_getDataBoundsFromRecordKey:LinkableFunction = registerLinkableChild(this, new LinkableFunction(script_getDataBoundsFromRecordKey, false, true, ['key', 'output']));
+		public const function_getDataBoundsFromRecordKey:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_getDataBoundsFromRecordKey, false, true, ['key', 'output']));
 		public static const script_getDataBoundsFromRecordKey:String = <![CDATA[
 			// Parameter types: IQualifiedKey, Array
 			function(key, output)
@@ -175,13 +169,13 @@ package weave.visualization.plotters
 			}
 			catch (e:*)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 		
-		public const function_getBackgroundDataBounds:LinkableFunction = registerLinkableChild(this, new LinkableFunction(script_getBackgroundDataBounds, false, true, ['output']));
+		public const function_getBackgroundDataBounds:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_getBackgroundDataBounds, false, true, ['output']));
 		public static const script_getBackgroundDataBounds:String = <![CDATA[
-			// Parameter type: IBounds2D
+			// Parameter type: Bounds2D
 			function (output)
 			{
 				if (zoomToSubset.value)
@@ -203,7 +197,7 @@ package weave.visualization.plotters
 				}
 			}
 		]]>;
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			try
 			{
@@ -211,7 +205,7 @@ package weave.visualization.plotters
 			}
 			catch (e:*)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 	}

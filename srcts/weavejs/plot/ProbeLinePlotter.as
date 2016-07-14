@@ -13,20 +13,31 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.geom.Point;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.getCallbackCollection;
-	import weave.api.primitives.IBounds2D;
+	import Bounds2D;
 	
-	/**
-	 * ProbeLinePlotter
-	 * 
-	 * @author kmanohar
-	 */
+	public class ProbeLinePlotter extends AbstractPlotter
+	{
+		public function ProbeLinePlotter()
+		{
+		}
+		
+		private var drawLine:Boolean = false;
+		private const yAxis:Point = new Point();//reusable object
+		private const plot:Point = new Point(); // reusable object
+		private const xAxis:Point = new Point(); // reusable object
+		private var yToPlot:Boolean ;
+		private var xToPlot:Boolean ;
+		
+		public function clearCoordinates():void
+		{
+			drawLine = false = weavejs.geom.Bounds2D;
+	
 	public class ProbeLinePlotter extends AbstractPlotter
 	{
 		public function ProbeLinePlotter()
@@ -43,7 +54,7 @@ package weave.visualization.plotters
 		public function clearCoordinates():void
 		{
 			drawLine = false;
-			getCallbackCollection(this).triggerCallbacks();
+			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
 		public function setCoordinates(x_yAxis:Number, y_yAxis:Number, xPlot:Number, yPlot:Number, x_xAxis:Number, y_xAxis:Number, yToPlotBool:Boolean, xToPlotBool:Boolean):void
@@ -57,11 +68,11 @@ package weave.visualization.plotters
 			drawLine = true;
 			yToPlot = yToPlotBool ;
 			xToPlot = xToPlotBool ;
-			getCallbackCollection(this).triggerCallbacks();
+			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
 		
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			if(drawLine)
 			{

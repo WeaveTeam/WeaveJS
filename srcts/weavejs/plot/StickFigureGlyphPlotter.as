@@ -13,23 +13,35 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
-	import flash.display.Shape;
-	import flash.geom.Point;
+	import Graphics = PIXI.Graphics;
+	import Shape = flash.display.Shape;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.core.LinkableNumber;
-	import weave.data.AttributeColumns.AlwaysDefinedColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.utils.DrawUtils;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import DrawUtils = weavejs.util.DrawUtils;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	
+	public class StickFigureGlyphPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
+	{
+		public function StickFigureGlyphPlotter()
+		{
+		}
+		
+		public function getSelectableAttributeNames():Array
+		{
+			return ["X", "Y", "Theta 1", "Theta 2", "Theta 3", "Theta 4"];
+		}
+		public function getSelectableAttributes():Array
+		{
+			return [dataX, dataY, theta1, theta2, theta3, theta4] = weavejs.geom.SolidLineStyle;
 	
 	public class StickFigureGlyphPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
 	{
@@ -49,30 +61,30 @@ package weave.visualization.plotters
 		/**
 		 * This is the angle at which each line will be drawn from the vertical axis.
 		 */
-		public const theta1:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const theta2:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const theta3:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const theta4:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const theta1:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const theta2:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const theta3:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const theta4:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		
-		private const theta1stats:IColumnStatistics = registerLinkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta1));
-		private const theta2stats:IColumnStatistics = registerLinkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta2));
-		private const theta3stats:IColumnStatistics = registerLinkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta3));
-		private const theta4stats:IColumnStatistics = registerLinkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta4));
+		private const theta1stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta1));
+		private const theta2stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta2));
+		private const theta3stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta3));
+		private const theta4stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta4));
 		/**
 		 * This is the limb length.
 		 */
-		public const limbLength:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(10));
+		public const limbLength:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(10));
 		/**
 		 * This is the line style used to draw the outline of the rectangle.
 		 */
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
-		public const curvature:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0));
+		public const curvature:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
 
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:IBounds2D, screenBounds:IBounds2D, tempShape:Shape):void
+		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			// project data coordinates to screen coordinates and draw graphics
 			var theta1:Number = Math.PI*theta1stats.getNorm(recordKey);

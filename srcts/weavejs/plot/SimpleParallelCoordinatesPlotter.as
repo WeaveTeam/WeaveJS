@@ -13,29 +13,26 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
-	import flash.display.Shape;
-	import flash.geom.Point;
-	import flash.utils.Dictionary;
+	import Graphics = PIXI.Graphics;
+	import Shape = flash.display.Shape;
+	import Point = weavejs.geom.Point;
+	import Dictionary = flash.utils.Dictionary;
 	
-	import weave.Weave;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotter;
-	import weave.api.ui.IPlotterWithGeometries;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableHashMap;
-	import weave.primitives.GeometryType;
-	import weave.primitives.SimpleGeometry;
-	import weave.utils.DrawUtils;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import IPlotterWithGeometries = weavejs.api.ui.IPlotterWithGeometries;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableHashMap = weavejs.core.LinkableHashMap;
+	import GeometryType = weavejs.primitives.GeometryType;
+	import SimpleGeometry = weavejs.primitives.SimpleGeometry;
+	import DrawUtils = weavejs.util.DrawUtils;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
 	public class SimpleParallelCoordinatesPlotter extends AbstractPlotter implements IPlotterWithGeometries, ISelectableAttributes
 	{
@@ -44,12 +41,12 @@ package weave.visualization.plotters
 		private static const tempBoundsArray:Array = []; // Array of reusable Bounds2D objects
 		private static const tempPoint:Point = new Point(); // reusable Point object
 		
-		public const columns:LinkableHashMap = registerLinkableChild(this, new LinkableHashMap(IAttributeColumn));
-		public const normalize:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
-		public const selectableLines:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public const normalize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public const selectableLines:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
-		public const curvedLines:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public const curvedLines:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
 		private var _columns:Array = [];
 		private var _stats:Dictionary = new Dictionary(true);
@@ -77,7 +74,7 @@ package weave.visualization.plotters
 			if (newColumn)
 			{
 				_stats[newColumn] = WeaveAPI.StatisticsCache.getColumnStatistics(newColumn);
-				registerLinkableChild(spatialCallbacks, _stats[newColumn]);
+				Weave.linkableChild(spatialCallbacks, _stats[newColumn]);
 			}
 			
 			_columns = columns.getObjects();
@@ -129,7 +126,7 @@ package weave.visualization.plotters
 				var y:Number = values[x];
 				if (isFinite(y))
 				{
-					var bounds:IBounds2D = output[outputIndex] as IBounds2D;
+					var bounds:Bounds2D = output[outputIndex] as Bounds2D;
 					bounds.includeCoords(x, y);
 					if (drawStubs)
 					{
@@ -142,7 +139,7 @@ package weave.visualization.plotters
 			}
 		}
 		
-		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, dataBounds:IBounds2D = null):Array
+		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, dataBounds:Bounds2D = null):Array
 		{
 			var x:int;
 			var y:Number;
@@ -238,7 +235,7 @@ package weave.visualization.plotters
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:IBounds2D, screenBounds:IBounds2D, tempShape:Shape):void
+		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 			var prevScreenX:Number = NaN;
@@ -300,7 +297,7 @@ package weave.visualization.plotters
 			}
 		}
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setXRange(0, _columns.length - 1);
 			if (normalize.value)

@@ -13,32 +13,27 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {	
-	import weave.api.newLinkableChild;
-	import weave.api.core.ILinkableObject;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
 
-	/**
-	 * AnchorPoint
-	 * @author kmanohar
-	 */	
 	public class AnchorPoint implements ILinkableObject
 	{
-		public const x:LinkableNumber = newLinkableChild(this,LinkableNumber,convertCoords);
-		public const y:LinkableNumber = newLinkableChild(this,LinkableNumber,convertCoords);		
+		public const x:LinkableNumber = Weave.linkableChild(this,LinkableNumber,convertCoords);
+		public const y:LinkableNumber = Weave.linkableChild(this,LinkableNumber,convertCoords);
 		
-		public const polarRadians:LinkableNumber = newLinkableChild(this,LinkableNumber);
-		public const radius:LinkableNumber = newLinkableChild(this,LinkableNumber);
-		//public const anchorColor:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const title:LinkableString = newLinkableChild(this, LinkableString);
+		public const polarRadians:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
+		public const radius:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
+		//public const anchorColor:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const title:LinkableString = Weave.linkableChild(this, LinkableString);
 		
 		//metric used to calculate the class discrimiation for eg t-stat, p value, mean ratio etc
-		public const classDiscriminationMetric:LinkableNumber = newLinkableChild(this,LinkableNumber);
+		public const classDiscriminationMetric:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
 		
 		//is the class to which an anchor belongs after the class discimination algorithm is done
-		public const classType:LinkableString = newLinkableChild(this, LinkableString);
+		public const classType:LinkableString = Weave.linkableChild(this, LinkableString);
 		
 		public function AnchorPoint()
 		{

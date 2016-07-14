@@ -13,46 +13,39 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.utils.Dictionary;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Dictionary = flash.utils.Dictionary;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.core.ILinkableHashMap;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.primitives.IBounds2D;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableFunction;
-	import weave.core.LinkableHashMap;
-	import weave.core.LinkableNumber;
-	import weave.primitives.Bounds2D;
-	import weave.primitives.ColorRamp;
-	import weave.utils.ColumnUtils;
-	import weave.utils.LegendUtils;
-	import weave.utils.LinkableTextFormat;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableFunction = weavejs.core.LinkableFunction;
+	import LinkableHashMap = weavejs.core.LinkableHashMap;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ColorRamp = weavejs.util.ColorRamp;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import LegendUtils = weavejs.util.LegendUtils;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	/**
-	 * This plotter displays a colored circle and a label for a list of bins.
-	 * 
-	 * @author adufilie
-	 */
 	public class BarChartLegendPlotter extends AbstractPlotter
 	{
 		public function BarChartLegendPlotter()
 		{
-			registerLinkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
+			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			this.addSpatialDependencies(this.columns, this.chartColors, this.colorIndicatesDirection, this.maxColumns, this.reverseOrder, this.itemLabelFunction);
 		}
 		
-		public const columns:ILinkableHashMap = registerLinkableChild(this, new LinkableHashMap(IAttributeColumn), createColumnHashes);
-		public const chartColors:ColorRamp = newLinkableChild(this, ColorRamp);
-		public const colorIndicatesDirection:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false), createColumnHashes);
-		public const shapeSize:LinkableNumber = registerLinkableChild(this, new LinkableNumber(12));
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
+		public const columns:ILinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), createColumnHashes);
+		public const chartColors:ColorRamp = Weave.linkableChild(this, ColorRamp);
+		public const colorIndicatesDirection:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), createColumnHashes);
+		public const shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(12));
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		private var numColumns:int = 0;
 		private var _itemOrdering:Array = [];
 		private var _itemToTitle:Dictionary = new Dictionary();
@@ -62,17 +55,17 @@ package weave.visualization.plotters
 		 * This is the maximum number of items to draw in a single row.
 		 * @default 1
 		 */
-		public const maxColumns:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1), createColumnHashes);
+		public const maxColumns:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1), createColumnHashes);
 		
 		/**
 		 * This is an option to reverse the item order.
 		 */
-		public const reverseOrder:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false), createColumnHashes);
+		public const reverseOrder:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), createColumnHashes);
 		
 		/**
 		 * This is the compiled function to apply to the item labels.
 		 */
-		public const itemLabelFunction:LinkableFunction = registerLinkableChild(this, new LinkableFunction('string', true, false, ['number','string','column']), createColumnHashes);
+		public const itemLabelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number','string','column']), createColumnHashes);
 
 		// TODO This should go somewhere else...
 		/**
@@ -80,11 +73,11 @@ package weave.visualization.plotters
 		 * 
 		 * @default string  
 		 */		
-		public const legendTitleFunction:LinkableFunction = registerLinkableChild(this, new LinkableFunction('string', true, false, ['string']));
+		public const legendTitleFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['string']));
 		
 		private static const NEGATIVE_POSITIVE_ITEMS:Array = [lang('Negative'), lang('Positive')];
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(0, 0, 1, 1);
 		}
@@ -125,8 +118,8 @@ package weave.visualization.plotters
 				_itemOrdering = _itemOrdering.reverse(); 
 		}
 
-		private const _itemBounds:IBounds2D = new Bounds2D();
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		private const _itemBounds:Bounds2D = new Bounds2D();
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var g:Graphics = tempShape.graphics;
 			g.clear();

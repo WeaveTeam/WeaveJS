@@ -13,32 +13,22 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
-	import flash.display.Shape;
+	import Graphics = PIXI.Graphics;
+	import Shape = flash.display.Shape;
 	
-	import weave.Weave;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.reportError;
-	import weave.api.setSessionState;
-	import weave.api.core.DynamicState;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.compiler.StandardLib;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableNumber;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.visualization.plotters.styles.SolidFillStyle;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import DynamicState = weavejs.api.core.DynamicState;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import StandardLib = weavejs.util.StandardLib;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import SolidFillStyle = weavejs.geom.SolidFillStyle;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	/**
-	 * CirclePlotter
-	 * 
-	 * @author adufilie
-	 */
 	public class CircleGlyphPlotter extends AbstractGlyphPlotter
 	{
 		public function CircleGlyphPlotter()
@@ -46,42 +36,42 @@ package weave.visualization.plotters
 			fill.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
 		}
 
-		public const minScreenRadius:LinkableNumber = registerLinkableChild(this, new LinkableNumber(3, isFinite));
-		public const maxScreenRadius:LinkableNumber = registerLinkableChild(this, new LinkableNumber(12, isFinite));
-		public const defaultScreenRadius:LinkableNumber = registerLinkableChild(this, new LinkableNumber(5, isFinite));
-		public const enabledSizeBy:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const minScreenRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(3, isFinite));
+		public const maxScreenRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(12, isFinite));
+		public const defaultScreenRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5, isFinite));
+		public const enabledSizeBy:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		public const absoluteValueColorEnabled:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const absoluteValueColorMin:LinkableNumber = registerLinkableChild(this, new LinkableNumber());
-		public const absoluteValueColorMax:LinkableNumber = registerLinkableChild(this, new LinkableNumber());
+		public const absoluteValueColorEnabled:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const absoluteValueColorMin:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
+		public const absoluteValueColorMax:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
 		
 		/**
 		 * This is the radius of the circle, in screen coordinates.
 		 */
-		public const screenRadius:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const screenRadius:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		// delare dependency on statistics (for norm values)
-		private const _screenRadiusStats:IColumnStatistics = registerLinkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(screenRadius));
-		public const line:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
+		private const _screenRadiusStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(screenRadius));
+		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
 		// backwards compatibility
 		[Deprecated] public function set fillStyle(value:Object):void
 		{
 			try
 			{
-				setSessionState(fill, value[0][DynamicState.SESSION_STATE]);
+				Weave.setState(fill, value[0][DynamicState.SESSION_STATE]);
 			}
 			catch (e:Error)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 		
-		public const fill:SolidFillStyle = newLinkableChild(this, SolidFillStyle);
+		public const fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:IBounds2D, screenBounds:IBounds2D, tempShape:Shape):void
+		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 //			var hasPrevPoint:Boolean = (isFinite(tempPoint.x) && isFinite(tempPoint.y));
 			var graphics:Graphics = tempShape.graphics;
@@ -159,11 +149,11 @@ package weave.visualization.plotters
 		{
 			try
 			{
-				setSessionState(line, value[0][DynamicState.SESSION_STATE]);
+				Weave.setState(line, value[0][DynamicState.SESSION_STATE]);
 			}
 			catch (e:Error)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 	}

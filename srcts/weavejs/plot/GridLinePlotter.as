@@ -13,20 +13,19 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
+	import CapsStyle = flash.display.BitmapData;
 	import flash.display.CapsStyle;
-	import flash.display.Graphics;
-	import flash.geom.Point;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotter;
-	import weave.core.LinkableNumber;
-	import weave.primitives.Bounds2D;
-	import weave.primitives.LinkableBounds2D;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import LinkableBounds2D = weavejs.primitives.LinkableBounds2D;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
 	public class GridLinePlotter extends AbstractPlotter
 	{
@@ -38,23 +37,23 @@ package weave.visualization.plotters
 			this.addSpatialDependencies(this.bounds);
 		}
 		
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
-		public const bounds:LinkableBounds2D = newLinkableChild(this, LinkableBounds2D);
-		public const xInterval:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const yInterval:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const xOffset:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const yOffset:LinkableNumber = newLinkableChild(this, LinkableNumber);
+		public const bounds:LinkableBounds2D = Weave.linkableChild(this, LinkableBounds2D);
+		public const xInterval:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const yInterval:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const xOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const yOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
 		private const tempPoint:Point = new Point();
 		private const lineBounds:Bounds2D = new Bounds2D();
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			bounds.copyTo(output);
 		}
 		
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 			graphics.clear();
@@ -132,7 +131,7 @@ package weave.visualization.plotters
 			return userValue > systemValue ? userValue : systemValue; // if userValue is NaN, returns systemValue
 		}
 		
-		private function drawLine(xMin:Number, yMin:Number, xMax:Number, yMax:Number, graphics:Graphics, dataBounds:IBounds2D, screenBounds:IBounds2D):void
+		private function drawLine(xMin:Number, yMin:Number, xMax:Number, yMax:Number, graphics:Graphics, dataBounds:Bounds2D, screenBounds:Bounds2D):void
 		{
 			tempPoint.x = xMin;
 			tempPoint.y = yMin;

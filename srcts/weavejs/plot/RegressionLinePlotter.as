@@ -13,38 +13,28 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.geom.Point;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
 	
-	import mx.rpc.events.FaultEvent;
+	import ResultEvent = mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
-	import weave.Weave;
-	import weave.api.getCallbackCollection;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.reportError;
-	import weave.api.core.IDisposableObject;
-	import weave.api.primitives.IBounds2D;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.primitives.Range;
-	import weave.services.WeaveRServlet;
-	import weave.services.addAsyncResponder;
-	import weave.services.beans.LinearRegressionResult;
-	import weave.utils.ColumnUtils;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IDisposableObject = weavejs.api.core.IDisposableObject;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import Range = weavejs.primitives.Range;
+	import WeaveRServlet = weavejs.services.WeaveRServlet;
+	import addAsyncResponder = weavejs.services.addAsyncResponder;
+	import LinearRegressionResult = weavejs.services.beans.LinearRegressionResult;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	/**
-	 * RegressionLinePlotter
-	 * 
-	 * @author kmanohar
-	 */
 	public class RegressionLinePlotter extends AbstractPlotter implements IDisposableObject
 	{
 		public function RegressionLinePlotter()
@@ -61,14 +51,14 @@ package weave.visualization.plotters
 			});
 		}
 		
-		public const drawLine:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const currentTrendline:LinkableString = registerLinkableChild(this, new LinkableString(LINEAR));
-		public const polynomialDegree:LinkableNumber = registerLinkableChild(this, new LinkableNumber(2));
+		public const drawLine:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const currentTrendline:LinkableString = Weave.linkableChild(this, new LinkableString(LINEAR));
+		public const polynomialDegree:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
 		
-		public const xColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const yColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const xColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const yColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
 		public static const trendlines:Array = [LINEAR, POLYNOMIAL, LOGARITHMIC, EXPONENTIAL, POWER];
 		public static const LINEAR:String = "Linear";
@@ -116,7 +106,7 @@ package weave.visualization.plotters
 			}
 			
 			result = new LinearRegressionResult(event.result);
-			getCallbackCollection(this).triggerCallbacks();
+			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
 		private function handleLinearRegressionFault(event:FaultEvent, token:Object = null):void
@@ -128,8 +118,8 @@ package weave.visualization.plotters
 			}
 			
 			result = null;
-			reportError(event);
-			getCallbackCollection(this).triggerCallbacks();
+			JS.error(event);
+			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
 		public function get coefficients():Array
@@ -145,7 +135,7 @@ package weave.visualization.plotters
 		private var tempPoint:Point = new Point();
 		private var tempPoint2:Point = new Point();
 
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var g:Graphics = tempShape.graphics;
 			g.clear();

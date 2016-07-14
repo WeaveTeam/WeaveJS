@@ -13,30 +13,23 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.geom.Point;
-	import flash.text.TextFormat;
+	import BitmapData = flash.display.BitmapData;
+	import Point = weavejs.geom.Point;
+	import TextFormat = flash.text.TextFormat;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.primitives.Bounds2D;
-	import weave.utils.BitmapText;
-	import weave.utils.ObjectPool;
-	import weave.visualization.plotters.styles.SolidFillStyle;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import BitmapText = weavejs.util.BitmapText;
+	import ObjectPool = weavejs.util.ObjectPool;
+	import SolidFillStyle = weavejs.geom.SolidFillStyle;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	/**
-	 * WeaveWorldePlotter
-	 * 
-	 * @author jfallon
-	 */
 	public class WeaveWordlePlotter extends AbstractPlotter
 	{
 		
@@ -49,15 +42,15 @@ package weave.visualization.plotters
 			// set up session state
 			setColumnKeySources([wordColumn], [-1]);
 			
-			registerLinkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(wordColumn));
+			Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(wordColumn));
 			this.addSpatialDependencies(this.wordColumn);
 		}	
 		
-		public const wordColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
-		public const fillStyle:SolidFillStyle = newLinkableChild(this, SolidFillStyle);
+		public const wordColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public const fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			var words:Array = wordColumn.keys;
 			var i:int;
@@ -108,7 +101,7 @@ package weave.visualization.plotters
 			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private function drawAll(recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		private function drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var normalized:Number;
 			var j:int;
@@ -365,7 +358,7 @@ package weave.visualization.plotters
 		private const tempBounds:Bounds2D = new Bounds2D(); // reusable temporary object	
 		private static const randPoints:Object = new Object();
 		private var boundaries:Array = new Array();
-		private var screenBoundaries:IBounds2D = new Bounds2D();
+		private var screenBoundaries:Bounds2D = new Bounds2D();
 		private var tooLong:Boolean = false;
 		private var added:int = 0;
 		private var orientation:int = 0;

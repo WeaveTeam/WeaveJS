@@ -13,25 +13,29 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.geom.Point;
+	import BitmapData = flash.display.BitmapData;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.ITextPlotter;
-	import weave.compiler.StandardLib;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.utils.BitmapText;
-	import weave.utils.ColumnUtils;
-	import weave.utils.LinkableTextFormat;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ITextPlotter = weavejs.api.ui.ITextPlotter;
+	import StandardLib = weavejs.util.StandardLib;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import BitmapText = weavejs.util.BitmapText;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	
+	public class SizeBinLegendPlotter extends AbstractPlotter implements ITextPlotter
+	{
+		public function SizeBinLegendPlotter()
+		{
+			init() = weavejs.geom.SolidLineStyle;
 	
 	/**
 	 * 
@@ -49,28 +53,28 @@ package weave.visualization.plotters
 			maxScreenRadius.value = 10;
 			defaultScreenRadius.value = 5;
 			
-			registerLinkableChild(this, LinkableTextFormat.defaultTextFormat);
+			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat);
 			this.addSpatialDependencies(this.radiusColumn, this.minScreenRadius, this.maxScreenRadius, this.defaultScreenRadius);
 		}
 		
-		public const radiusColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		private const radiusColumnStats:IColumnStatistics = registerLinkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(radiusColumn));
-		public const minScreenRadius:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const maxScreenRadius:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const defaultScreenRadius:LinkableNumber = newLinkableChild(this, LinkableNumber);
+		public const radiusColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		private const radiusColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(radiusColumn));
+		public const minScreenRadius:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const maxScreenRadius:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const defaultScreenRadius:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
-		public const colorBySize:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const colorNegative:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0x800000));
-		public const colorPositive:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0x008000));
+		public const colorBySize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const colorNegative:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x800000));
+		public const colorPositive:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x008000));
 		
 		public static const simpleRadio:String = "simple";
 		public static const customRadio:String = "custom";
-		public const numberOfCircles:LinkableNumber = registerLinkableChild(this, new LinkableNumber(10, verifyNumberOfCircles));
-		public const customCircleRadiuses:LinkableString = newLinkableChild(this, LinkableString);
-		public const typeRadio:LinkableString = registerLinkableChild(this, new LinkableString(simpleRadio));
+		public const numberOfCircles:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10, verifyNumberOfCircles));
+		public const customCircleRadiuses:LinkableString = Weave.linkableChild(this, LinkableString);
+		public const typeRadio:LinkableString = Weave.linkableChild(this, new LinkableString(simpleRadio));
 		
 		private const bitmapText:BitmapText = new BitmapText(); // This is used to draw text on bitmaps
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle); // This is the line style used to draw the outline of the shape.
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle); // This is the line style used to draw the outline of the shape.
 		
 		private function verifyNumberOfCircles(value:Number):Boolean {
 			if (value < 2)
@@ -80,7 +84,7 @@ package weave.visualization.plotters
 		}
 		
 		private var XMIN:Number = 0, YMIN:Number = 0, XMAX:Number = 1, YMAX:Number = 1;		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(XMIN, YMIN, XMAX, YMAX);
 		}
@@ -95,7 +99,7 @@ package weave.visualization.plotters
 		private var xMin:Number;
 		private var yPosition:Number;
 		private var fillColor:Number;
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var i:int;
 			var j:int;

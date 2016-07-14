@@ -13,30 +13,21 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
-	import flash.display.Shape;
-	import flash.geom.Point;
+	import Graphics = PIXI.Graphics;
+	import Shape = flash.display.Shape;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.reportError;
-	import weave.api.setSessionState;
-	import weave.api.core.DynamicState;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.primitives.Bounds2D;
-	import weave.utils.DrawUtils;
-	import weave.visualization.plotters.styles.SolidFillStyle;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import DynamicState = weavejs.api.core.DynamicState;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import DrawUtils = weavejs.util.DrawUtils;
+	import SolidFillStyle = weavejs.geom.SolidFillStyle;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	/**
-	 * WedgePlotter
-	 * 
-	 * @author skota
-	 * @author adufilie
-	 */
 	public class WedgePlotter extends AbstractPlotter
 	{
 		public function WedgePlotter()
@@ -45,16 +36,16 @@ package weave.visualization.plotters
 			this.addSpatialDependencies(this.beginRadians, this.spanRadians);
 		}
 		
-		public const beginRadians:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const spanRadians:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const beginRadians:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const spanRadians:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		
-		public const line:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
-		public const fill:SolidFillStyle = newLinkableChild(this, SolidFillStyle);		
+		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public const fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:IBounds2D, screenBounds:IBounds2D, tempShape:Shape):void
+		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			// project data coordinates to screen coordinates and draw graphics
 			var _beginRadians:Number = beginRadians.getValueFromKey(recordKey, Number);
@@ -69,14 +60,14 @@ package weave.visualization.plotters
 			// end fill
 			graphics.endFill();
 		}
-		private static const tempBounds:IBounds2D = new Bounds2D();
+		private static const tempBounds:Bounds2D = new Bounds2D();
 		private static const tempPoint:Point = new Point(); // reusable object, output of projectPoints()
 		
 		/**
 		 * The data bounds for a glyph has width and height equal to zero.
 		 * This function returns a Bounds2D object set to the data bounds associated with the given record key.
 		 * @param key The key of a data record.
-		 * @param output An Array of IBounds2D objects to store the result in.
+		 * @param output An Array of Bounds2D objects to store the result in.
 		 */
 		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
 		{
@@ -86,7 +77,7 @@ package weave.visualization.plotters
 		}
 		
 		// gets data bounds for a wedge
-		public static function getWedgeBounds(outputDataBounds:IBounds2D, beginRadians:Number, spanRadians:Number, xDataCenter:Number = 0, yDataCenter:Number = 0, dataRadius:Number = 1):void
+		public static function getWedgeBounds(outputDataBounds:Bounds2D, beginRadians:Number, spanRadians:Number, xDataCenter:Number = 0, yDataCenter:Number = 0, dataRadius:Number = 1):void
 		{
 			///////////////////
 			//TODO: change this to include begin & end arc points, then any arc points at intervals of pi/2 radians between begin & end arc points
@@ -109,7 +100,7 @@ package weave.visualization.plotters
 		}
 
 		// projects data coordinates to screen coordinates and draws wedge
-		public static function drawProjectedWedge(destination:Graphics, dataBounds:IBounds2D, screenBounds:IBounds2D, beginRadians:Number, spanRadians:Number, xDataCenter:Number = 0, yDataCenter:Number = 0, dataOuterRadius:Number = 1, dataInnerRadius:Number = 0):void
+		public static function drawProjectedWedge(destination:Graphics, dataBounds:Bounds2D, screenBounds:Bounds2D, beginRadians:Number, spanRadians:Number, xDataCenter:Number = 0, yDataCenter:Number = 0, dataOuterRadius:Number = 1, dataInnerRadius:Number = 0):void
 		{
 			tempPoint.x = xDataCenter;
 			tempPoint.y = yDataCenter;
@@ -142,22 +133,22 @@ package weave.visualization.plotters
 		{
 			try
 			{
-				setSessionState(line, value[0][DynamicState.SESSION_STATE]);
+				Weave.setState(line, value[0][DynamicState.SESSION_STATE]);
 			}
 			catch (e:Error)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 		[Deprecated(replacement="fill")] public function set fillStyle(value:Object):void
 		{
 			try
 			{
-				setSessionState(fill, value[0][DynamicState.SESSION_STATE]);
+				Weave.setState(fill, value[0][DynamicState.SESSION_STATE]);
 			}
 			catch (e:Error)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 	}

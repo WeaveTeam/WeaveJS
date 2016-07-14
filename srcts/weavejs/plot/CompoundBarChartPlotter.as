@@ -13,57 +13,44 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
-	import flash.geom.Point;
-	import flash.geom.Rectangle;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
+	import Rectangle = weavejs.geom.Rectangle;
 	
-	import weave.Weave;
-	import weave.api.detectLinkableObjectChange;
-	import weave.api.linkSessionState;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.reportError;
-	import weave.api.setSessionState;
-	import weave.api.core.DynamicState;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IColumnWrapper;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.compiler.StandardLib;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableFunction;
-	import weave.core.LinkableHashMap;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.core.LinkableWatcher;
-	import weave.data.AttributeColumns.AlwaysDefinedColumn;
-	import weave.data.AttributeColumns.BinnedColumn;
-	import weave.data.AttributeColumns.ColorColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.data.AttributeColumns.FilteredColumn;
-	import weave.data.AttributeColumns.SortedIndexColumn;
-	import weave.data.BinningDefinitions.CategoryBinningDefinition;
-	import weave.data.KeySets.SortedKeySet;
-	import weave.primitives.Bounds2D;
-	import weave.primitives.ColorRamp;
-	import weave.primitives.Range;
-	import weave.utils.BitmapText;
-	import weave.utils.ColumnUtils;
-	import weave.utils.DrawUtils;
-	import weave.utils.LinkableTextFormat;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import DynamicState = weavejs.api.core.DynamicState;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import StandardLib = weavejs.util.StandardLib;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableFunction = weavejs.core.LinkableFunction;
+	import LinkableHashMap = weavejs.core.LinkableHashMap;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import LinkableWatcher = weavejs.core.LinkableWatcher;
+	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+	import BinnedColumn = weavejs.data.column.BinnedColumn;
+	import ColorColumn = weavejs.data.column.ColorColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import FilteredColumn = weavejs.data.column.FilteredColumn;
+	import SortedIndexColumn = weavejs.data.column.SortedIndexColumn;
+	import CategoryBinningDefinition = weavejs.data.bin.CategoryBinningDefinition;
+	import SortedKeySet = weavejs.data.key.SortedKeySet;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ColorRamp = weavejs.util.ColorRamp;
+	import Range = weavejs.primitives.Range;
+	import BitmapText = weavejs.util.BitmapText;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import DrawUtils = weavejs.util.DrawUtils;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	/**
-	 * CompoundBarChartPlotter
-	 * 
-	 * @author adufilie
-	 * @author kmanohar
-	 */
 	public class CompoundBarChartPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
 		public function CompoundBarChartPlotter()
@@ -77,11 +64,11 @@ package weave.visualization.plotters
 			
 			// Link the subset key filter to the filter of the private _filteredSortColumn.
 			// This is so the records will be filtered before they are sorted in the _sortColumn.
-			linkSessionState(_filteredKeySet.keyFilter, _filteredSortColumn.filter);
+			Weave.linkState(_filteredKeySet.keyFilter, _filteredSortColumn.filter);
 			
 			heightColumns.addGroupedCallback(this, heightColumnsGroupCallback);
-			registerLinkableChild(this, this.sortColumn);
-			registerLinkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
+			Weave.linkableChild(this, this.sortColumn);
+			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			
 			_binnedSortColumn.binningDefinition.requestLocalObject(CategoryBinningDefinition, true); // creates one bin per unique value in the sort column
 			
@@ -139,19 +126,19 @@ package weave.visualization.plotters
 		/**
 		 * This is the line style used to draw the outline of the rectangle.
 		 */
-		public const line:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
+		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
-		public const groupBySortColumn:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false)); // when this is true, we use _binnedSortColumn
-		private const _binnedSortColumn:BinnedColumn = newLinkableChild(this, BinnedColumn); // only used when groupBySortColumn is true
+		public const groupBySortColumn:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false)); // when this is true, we use _binnedSortColumn
+		private const _binnedSortColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn); // only used when groupBySortColumn is true
 		private const _sortedIndexColumn:SortedIndexColumn = _binnedSortColumn.internalDynamicColumn.requestLocalObject(SortedIndexColumn, true); // this sorts the records
 		private const _filteredSortColumn:FilteredColumn = _sortedIndexColumn.requestLocalObject(FilteredColumn, true); // filters before sorting
 		public function get sortColumn():DynamicColumn { return _filteredSortColumn.internalDynamicColumn; }
-		public const colorColumn:AlwaysDefinedColumn = newLinkableChild(this, AlwaysDefinedColumn);
-		public const labelColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const stackedMissingDataGap:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
-		public const colorIndicatesDirection:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const colorColumn:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+		public const labelColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const stackedMissingDataGap:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public const colorIndicatesDirection:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		private const _colorColumnStatsWatcher:LinkableWatcher = newLinkableChild(this, LinkableWatcher);
+		private const _colorColumnStatsWatcher:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher);
 		private var _sortedKeysByBinIndex:Array = [];
 		private var _sortCopyByColor:Function;
 		
@@ -174,36 +161,36 @@ package weave.visualization.plotters
 			return labelColumn.getValueFromKey(sortedKeys[sortedKeyIndex], String);
 		}
 		
-		public const chartColors:ColorRamp = registerLinkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired"))); // bars get their color from here
+		public const chartColors:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired"))); // bars get their color from here
 
-		public const showValueLabels:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const valueLabelDataCoordinate:LinkableNumber = registerLinkableChild(this, new LinkableNumber(NaN));
-		public const valueLabelHorizontalAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT));
-		public const valueLabelVerticalAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
-		public const valueLabelRelativeAngle:LinkableNumber = registerLinkableChild(this, new LinkableNumber(NaN));		
-		public const valueLabelColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0));
-		public const valueLabelMaxWidth:LinkableNumber = registerLinkableChild(this, new LinkableNumber(200, verifyLabelMaxWidth));
-		public const recordValueLabelColoring:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const showValueLabels:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const valueLabelDataCoordinate:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public const valueLabelHorizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT));
+		public const valueLabelVerticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
+		public const valueLabelRelativeAngle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public const valueLabelColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public const valueLabelMaxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(200, verifyLabelMaxWidth));
+		public const recordValueLabelColoring:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const showLabels:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const labelFormatter:LinkableFunction = registerLinkableChild(this, new LinkableFunction('string', true, false, ['string', 'column']));
-		public const labelDataCoordinate:LinkableNumber = registerLinkableChild(this, new LinkableNumber(NaN));
-		public const labelHorizontalAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_RIGHT));
-		public const labelVerticalAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
-		public const labelRelativeAngle:LinkableNumber = registerLinkableChild(this, new LinkableNumber(NaN));		
-		public const labelColor:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0));
-		public const labelMaxWidth:LinkableNumber = registerLinkableChild(this, new LinkableNumber(200, verifyLabelMaxWidth));
-		public const recordLabelColoring:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const showLabels:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const labelFormatter:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['string', 'column']));
+		public const labelDataCoordinate:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public const labelHorizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_RIGHT));
+		public const labelVerticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
+		public const labelRelativeAngle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public const labelColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public const labelMaxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(200, verifyLabelMaxWidth));
+		public const recordLabelColoring:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const heightColumns:LinkableHashMap = registerLinkableChild(this, new LinkableHashMap(IAttributeColumn));
-		public const positiveErrorColumns:LinkableHashMap = registerLinkableChild(this, new LinkableHashMap(IAttributeColumn));
-		public const negativeErrorColumns:LinkableHashMap = registerLinkableChild(this, new LinkableHashMap(IAttributeColumn));
-		public const errorIsRelative:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
-		public const horizontalMode:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const zoomToSubset:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
-		public const zoomToSubsetBars:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const barSpacing:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0));
-		public const groupingMode:LinkableString = registerLinkableChild(this, new LinkableString(STACK, verifyGroupingMode));
+		public const heightColumns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public const positiveErrorColumns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public const negativeErrorColumns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public const errorIsRelative:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public const horizontalMode:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const zoomToSubset:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public const zoomToSubsetBars:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const barSpacing:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public const groupingMode:LinkableString = Weave.linkableChild(this, new LinkableString(STACK, verifyGroupingMode));
 		public static const GROUP:String = 'group';
 		public static const STACK:String = 'stack';
 		public static const PERCENT_STACK:String = 'percentStack';
@@ -238,8 +225,8 @@ package weave.visualization.plotters
 		{
 			if (!groupBySortColumn.value)
 				return;
-			var colorChanged:Boolean = detectLinkableObjectChange(sortBins, colorColumn, _colorColumnStatsWatcher);
-			var binsChanged:Boolean = detectLinkableObjectChange(sortBins, _binnedSortColumn);
+			var colorChanged:Boolean = Weave.detectChange(sortBins, colorColumn, _colorColumnStatsWatcher);
+			var binsChanged:Boolean = Weave.detectChange(sortBins, _binnedSortColumn);
 			
 			if (colorChanged)
 			{
@@ -749,7 +736,7 @@ package weave.visualization.plotters
 		
 		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
 		{
-			var bounds:IBounds2D = initBoundsArray(output);
+			var bounds:Bounds2D = initBoundsArray(output);
 			var _groupingMode:String = getActualGroupingMode();
 			var _groupBySortColumn:Boolean = groupBySortColumn.value;
 			var _heightColumns:Array = heightColumns.getObjects();
@@ -863,7 +850,7 @@ package weave.visualization.plotters
 			}
 		}
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			if (zoomToSubset.value)
 			{
@@ -936,7 +923,7 @@ package weave.visualization.plotters
 		
 		private const tempRange:Range = new Range(); // reusable temporary object
 		private const tempPoint:Point = new Point(); // reusable temporary object
-		private const tempBounds:IBounds2D = new Bounds2D(); // reusable temporary object
+		private const tempBounds:Bounds2D = new Bounds2D(); // reusable temporary object
 		
 		// backwards compatibility
 		[Deprecated(replacement='groupingMode')] public function set groupMode(value:Boolean):void { groupingMode.value = value ? GROUP : STACK; }
@@ -954,11 +941,11 @@ package weave.visualization.plotters
 		{
 			try
 			{
-				setSessionState(line, value[0][DynamicState.SESSION_STATE]);
+				Weave.setState(line, value[0][DynamicState.SESSION_STATE]);
 			}
 			catch (e:Error)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 	}

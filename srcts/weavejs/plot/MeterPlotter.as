@@ -13,20 +13,15 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import weave.Weave;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IColumnStatistics;
-	import weave.core.LinkableNumber;
-	import weave.data.AttributeColumns.DynamicColumn;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	
 	/**
 	 * This abstract class contains functionality common to any "meter tool" such as the thermometer and the gauge.
 	 * This functionality includes the ability to select which input drives the single value shown by the tool plotter.
-	 * 
-	 * @author Curran Kelleher
 	 */
 	public class MeterPlotter extends AbstractPlotter
 	{
@@ -35,11 +30,11 @@ package weave.visualization.plotters
 		public const COLUMN_AVERAGE_MODE:Number = 1;
 		
 		//the sessioned number controlling the input mode
-		private const inputMode:LinkableNumber = newLinkableChild(this, LinkableNumber);
+		private const inputMode:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
 		//the column whose value drives this meter 
-		public const meterColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		protected const meterColumnStats:IColumnStatistics = registerLinkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(meterColumn));
+		public const meterColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		protected const meterColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(meterColumn));
 		
 //		private var mode:Number = PROBE_MODE;
 		public function MeterPlotter()

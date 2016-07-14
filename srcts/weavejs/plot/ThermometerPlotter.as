@@ -13,17 +13,51 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
+	import CapsStyle = flash.display.BitmapData;
 	import flash.display.CapsStyle;
-	import flash.display.Graphics;
-	import flash.geom.Point;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.ISelectableAttributes;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import ISelectableAttributes;
+	
+	public class ThermometerPlotter extends MeterPlotter implements ISelectableAttributes
+	{
+		public function getSelectableAttributeNames():Array
+		{
+			return ["Meter"];
+		}
+		public function getSelectableAttributes():Array
+		{
+			return [meterColumn];
+		}
+		
+		// reusable point objects
+		private const bottom:Point = new Point(), top:Point = new Point();
+		
+		//the radius of the thermometer bulb (circle at bottom) in pixels
+		private const bulbRadius:Number = 30;
+		
+		//the thickness of the thermometer red center line
+		private const centerLineThickness:Number = 20;
+		
+		//the thickness of the thermometer background center line
+		private const backgroundCenterLineThickness:Number = 30;
+		
+		//the color to use for background elements
+		private const backgroundCenterLineColor:uint = 0x777777;
+		
+		//the x offset (in pixels) used when drawing all shapes (so axis line is fully visible) 
+		private const xOffset:Number = backgroundCenterLineThickness/2+1;
+		
+		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		{
+			//compute the meter value by averaging all record values
+			var meterValue:Number = 0 = weavejs.api.data.ISelectableAttributes;
 	
 	public class ThermometerPlotter extends MeterPlotter implements ISelectableAttributes
 	{
@@ -98,7 +132,7 @@ package weave.visualization.plotters
 		 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
 		 * @param destination The sprite to draw the graphics onto.
 		 */
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 			graphics.clear();
@@ -130,9 +164,9 @@ package weave.visualization.plotters
 		
 		/**
 		 * This function returns a Bounds2D object set to the data bounds associated with the background.
-		 * @param output An IBounds2D object to store the result in.
+		 * @param output An Bounds2D object to store the result in.
 		 */
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(0, 0, 1, meterColumnStats.getMax());
 		}

@@ -13,36 +13,30 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.geom.Point;
-	import flash.utils.Dictionary;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
+	import Dictionary = flash.utils.Dictionary;
 	
-	import weave.Weave;
-	import weave.api.detectLinkableObjectChange;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.IPlotter;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.core.LinkableBoolean;
-	import weave.data.AttributeColumns.BinnedColumn;
-	import weave.data.AttributeColumns.ColorColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.primitives.Bounds2D;
-	import weave.primitives.ColorRamp;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import BinnedColumn = weavejs.data.column.BinnedColumn;
+	import ColorColumn = weavejs.data.column.ColorColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ColorRamp = weavejs.util.ColorRamp;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
 	/**
 	 * This plotter displays a 2D histogram with optional colors.
-	 * 
-	 * @author skolman
 	 */
 	public class Histogram2DPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
@@ -71,17 +65,17 @@ package weave.visualization.plotters
 			return array;
 		}
 		
-		public const lineStyle:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
-		public const binColors:ColorRamp = registerLinkableChild(this, new ColorRamp("0xFFFFFF,0x000000"));
+		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public const binColors:ColorRamp = Weave.linkableChild(this, new ColorRamp("0xFFFFFF,0x000000"));
 		
-		public const xBinnedColumn:BinnedColumn = newLinkableChild(this, BinnedColumn);
-		public const yBinnedColumn:BinnedColumn = newLinkableChild(this, BinnedColumn);
+		public const xBinnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn);
+		public const yBinnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn);
 		private const xDataStats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(xBinnedColumn.internalDynamicColumn);
 		private const yDataStats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(yBinnedColumn.internalDynamicColumn);
 
-		public const showAverageColorData:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const showAverageColorData:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const colorColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const colorColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 
 		public function get xColumn():DynamicColumn { return xBinnedColumn.internalDynamicColumn; }
 		public function get yColumn():DynamicColumn { return yBinnedColumn.internalDynamicColumn; }
@@ -92,11 +86,11 @@ package weave.visualization.plotters
 		private var maxBinSize:int;
 		
 		private const tempPoint:Point = new Point();
-		private const tempBounds:IBounds2D = new Bounds2D();
+		private const tempBounds:Bounds2D = new Bounds2D();
 
 		private function validate():void
 		{
-			if (detectLinkableObjectChange(validate, filteredKeySet, xBinnedColumn, yBinnedColumn, xDataStats, yDataStats))
+			if (Weave.detectChange(validate, filteredKeySet, xBinnedColumn, yBinnedColumn, xDataStats, yDataStats))
 			{
 				var cellSizes:Object = {};
 				keyToCellMap = new Dictionary(true);
@@ -128,7 +122,7 @@ package weave.visualization.plotters
 			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private function drawAll(recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		private function drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			validate();
 			if (isNaN(xBinWidth) || isNaN(yBinWidth))
@@ -203,7 +197,7 @@ package weave.visualization.plotters
 		/**
 		 * This function returns the collective bounds of all the bins.
 		 */
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			if (xBinnedColumn.getInternalColumn() != null && yBinnedColumn.getInternalColumn() != null)
 				output.setBounds(-0.5, -0.5, xBinnedColumn.numberOfBins - 0.5, yBinnedColumn.numberOfBins -0.5);
@@ -237,7 +231,7 @@ package weave.visualization.plotters
 			var xMax:Number = xKey + 0.5; 
 			var yMax:Number = yKey + 0.5;
 			
-			(output[0] as IBounds2D).setBounds(xMin,yMin,xMax,yMax);
+			(output[0] as Bounds2D).setBounds(xMin,yMin,xMax,yMax);
 		}
 		
 	}

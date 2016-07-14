@@ -13,33 +13,26 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
+	import Matrix = flash.display.BitmapData;
 	import flash.geom.Matrix;
-	import flash.geom.Point;
-	import flash.text.TextFormatAlign;
+	import Point = weavejs.geom.Point;
+	import TextFormatAlign = flash.text.TextFormatAlign;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotter;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.compiler.StandardLib;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableFunction;
-	import weave.core.LinkableNumber;
-	import weave.core.LinkableString;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.utils.BitmapText;
-	import weave.utils.ColumnUtils;
-	import weave.utils.LinkableTextFormat;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import StandardLib = weavejs.util.StandardLib;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableFunction = weavejs.core.LinkableFunction;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import LinkableString = weavejs.core.LinkableString;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import BitmapText = weavejs.util.BitmapText;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
 	
-	/**
-	 * AxisLabelPlotter
-	 * 
-	 * @author kmanohar
-	 */
 	public class AxisLabelPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, AxisLabelPlotter, "Axis labels");
@@ -47,7 +40,7 @@ package weave.visualization.plotters
 		public function AxisLabelPlotter()
 		{
 			setSingleKeySource(text);
-			registerLinkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
+			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			this.addSpatialDependencies(this.alongXAxis, this.begin, this.end);
 		}
 		
@@ -66,26 +59,26 @@ package weave.visualization.plotters
 
 		private static const tempPoint:Point = new Point(); // reusable object
 
-		public const alongXAxis:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true));
-		public const begin:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const end:LinkableNumber = newLinkableChild(this, LinkableNumber);
+		public const alongXAxis:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public const begin:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const end:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
-		public const interval:LinkableNumber = newLinkableChild(this, LinkableNumber);
-		public const offset:LinkableNumber = newLinkableChild(this, LinkableNumber);
+		public const interval:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public const offset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
-		public const color:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0x000000));
-		public const text:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const textFormatAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT, verifyTextFormatAlign));
-		public const hAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER));
-		public const vAlign:LinkableString = registerLinkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
-		public const angle:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0));
-		public const hideOverlappingText:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const xScreenOffset:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0));
-		public const yScreenOffset:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0));
-		public const maxWidth:LinkableNumber = registerLinkableChild(this, new LinkableNumber(80));
-		public const alignToDataMax:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const color:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		public const text:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const textFormatAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT, verifyTextFormatAlign));
+		public const hAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER));
+		public const vAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
+		public const angle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public const hideOverlappingText:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const xScreenOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public const yScreenOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public const maxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(80));
+		public const alignToDataMax:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const labelFunction:LinkableFunction = registerLinkableChild(this, new LinkableFunction('string', true, false, ['number', 'string', 'column']));
+		public const labelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number', 'string', 'column']));
 		
 		private function verifyTextFormatAlign(value:String):Boolean
 		{
@@ -100,11 +93,11 @@ package weave.visualization.plotters
 		/**
 		 * Draws the graphics onto BitmapData.
 		 */
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var textWasDrawn:Array = [];
 			var reusableBoundsObjects:Array = [];
-			var bounds:IBounds2D;
+			var bounds:Bounds2D;
 			
 			LinkableTextFormat.defaultTextFormat.copyTo(bitmapText.textFormat);
 			bitmapText.textFormat.color = color.value;
@@ -141,7 +134,7 @@ package weave.visualization.plotters
 				drawLabel(_end, dataBounds, screenBounds, destination);
 		}
 		
-		private function drawLabel(number:Number, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		private function drawLabel(number:Number, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			bitmapText.text = ColumnUtils.deriveStringFromNumber(text, number) || StandardLib.formatNumber(number);
 			try
@@ -171,7 +164,7 @@ package weave.visualization.plotters
 			bitmapText.draw(destination);
 		}
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.reset();
 			if (alongXAxis.value)

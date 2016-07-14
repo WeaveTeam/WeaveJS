@@ -13,52 +13,45 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {	
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.display.Shape;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Matrix = flash.display.Shape;
 	import flash.geom.Matrix;
-	import flash.geom.Point;
-	import flash.geom.Rectangle;
-	import flash.utils.Dictionary;
+	import Point = weavejs.geom.Point;
+	import Rectangle = weavejs.geom.Rectangle;
+	import Voronoi = flash.utils.Dictionary;
 	
 	import net.ivank.voronoi.VEdge;
 	import net.ivank.voronoi.Voronoi;
 	
-	import weave.Weave;
-	import weave.api.newDisposableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.ILineStyle;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.IPlotter;
-	import weave.api.ui.ITextPlotter;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableHashMap;
-	import weave.core.LinkableNumber;
-	import weave.data.AttributeColumns.BinnedColumn;
-	import weave.data.AttributeColumns.ColorColumn;
-	import weave.data.BinningDefinitions.CategoryBinningDefinition;
-	import weave.data.KeySets.KeySet;
-	import weave.primitives.Bounds2D;
-	import weave.primitives.ColorRamp;
-	import weave.utils.BitmapText;
-	import weave.utils.LinkableTextFormat;
-	import weave.visualization.plotters.styles.SolidFillStyle;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ILineStyle = weavejs.api.ui.ILineStyle;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import ITextPlotter = weavejs.api.ui.ITextPlotter;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableHashMap = weavejs.core.LinkableHashMap;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import BinnedColumn = weavejs.data.column.BinnedColumn;
+	import ColorColumn = weavejs.data.column.ColorColumn;
+	import CategoryBinningDefinition = weavejs.data.bin.CategoryBinningDefinition;
+	import KeySet = weavejs.data.key.KeySet;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ColorRamp = weavejs.util.ColorRamp;
+	import BitmapText = weavejs.util.BitmapText;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import SolidFillStyle = weavejs.geom.SolidFillStyle;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 
-	/**
-	 * AnchorPlotter
-	 * @author kmanohar
-	 */	
 	public class AnchorPlotter extends AbstractPlotter implements ITextPlotter
 	{
 		public function AnchorPlotter()	
 		{
-			registerLinkableChild(this, LinkableTextFormat.defaultTextFormat); // this causes a redraw when text format changes
-			registerLinkableChild(this, Weave.defaultColorColumn);			
+			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // this causes a redraw when text format changes
+			Weave.linkableChild(this, Weave.defaultColorColumn);
 			setSingleKeySource(_keySet);
 		}
 		
@@ -80,16 +73,16 @@ package weave.visualization.plotters
 		private var _radviz:IPlotter;
 		private var anchors:LinkableHashMap = null;
 		
-		public const labelAngleRatio:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0, verifyLabelAngleRatio));
+		public const labelAngleRatio:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyLabelAngleRatio));
 		
-		private const _keySet:KeySet = newDisposableChild(this, KeySet);
+		private const _keySet:KeySet = Weave.disposableChild(this, KeySet);
 		private const tempPoint:Point = new Point();
 		private const _bitmapText:BitmapText = new BitmapText();
 		private var coordinate:Point = new Point();//reusable object
-		public const enableWedgeColoring:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false), fillColorMap);
-		public const colorMap:ColorRamp = registerLinkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired")),fillColorMap);
+		public const enableWedgeColoring:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), fillColorMap);
+		public const colorMap:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired")),fillColorMap);
 		public var anchorColorMap:Dictionary;
-		public const wordWrap:LinkableNumber = registerLinkableChild(this, new LinkableNumber(200));
+		public const wordWrap:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(200));
 		
 		
 		public var drawingClassLines:Boolean = false;//this divides the circle into sectors which represent classes (number of sectors = number of classes)
@@ -118,20 +111,20 @@ package weave.visualization.plotters
 		private const _currentScreenBounds:Bounds2D = new Bounds2D();
 		private const _currentDataBounds:Bounds2D = new Bounds2D();
 		
-		public const circleLineStyle:SolidLineStyle = registerLinkableChild(this, new SolidLineStyle());
-		public const anchorLineStyle:SolidLineStyle = registerLinkableChild(this, new SolidLineStyle());
-		public const anchorFillStyle:SolidFillStyle = registerLinkableChild(this, new SolidFillStyle());
-		public const anchorRadius:LinkableNumber = registerLinkableChild(this, new LinkableNumber(5));
+		public const circleLineStyle:SolidLineStyle = Weave.linkableChild(this, new SolidLineStyle());
+		public const anchorLineStyle:SolidLineStyle = Weave.linkableChild(this, new SolidLineStyle());
+		public const anchorFillStyle:SolidFillStyle = Weave.linkableChild(this, new SolidFillStyle());
+		public const anchorRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
 		
-		public const unrestrictAnchors:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const unrestrictAnchors:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const showBarycenter:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const barycenterRadius:LinkableNumber = registerLinkableChild(this, new LinkableNumber(5));
-		public const barycenterFillStyle:SolidFillStyle = registerLinkableChild(this, new SolidFillStyle());
-		public const barycenterLineStyle:SolidLineStyle = registerLinkableChild(this, new SolidLineStyle());
+		public const showBarycenter:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const barycenterRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
+		public const barycenterFillStyle:SolidFillStyle = Weave.linkableChild(this, new SolidFillStyle());
+		public const barycenterLineStyle:SolidLineStyle = Weave.linkableChild(this, new SolidLineStyle());
 		
-		public const showVoronoi:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
-		public const showConvexHull:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const showVoronoi:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public const showConvexHull:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
 		public function handleAnchorsChange():void
 		{
@@ -159,7 +152,7 @@ package weave.visualization.plotters
 			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private function drawAll(recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		private function drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var x:Number; 
 			var y:Number;
@@ -284,7 +277,7 @@ package weave.visualization.plotters
 		 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
 		 * @param destination The sprite to draw the graphics onto.
 		 */
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			super.drawBackground(dataBounds,screenBounds,destination);
 			var g:Graphics = tempShape.graphics;
@@ -320,7 +313,7 @@ package weave.visualization.plotters
 			_currentDataBounds.copyFrom(dataBounds);
 		}
 		
-		public function drawClassLines(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		public function drawClassLines(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var graphics:Graphics = static_tempShape.graphics;
 			graphics.clear();
@@ -374,7 +367,7 @@ package weave.visualization.plotters
 			destination.draw(static_tempShape);
 		}
 		
-		public function drawBarycenter(recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		public function drawBarycenter(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var graphics:Graphics = static_tempShape.graphics;
 			graphics.clear();
@@ -412,13 +405,13 @@ package weave.visualization.plotters
 			destination.draw(static_tempShape);
 		}
 		
-		public function drawConvexHull(recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		public function drawConvexHull(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			static_drawConvexHull(anchors, circleLineStyle, recordKeys, dataBounds, screenBounds, destination);
 		}
 		
 		private static const static_tempShape:Shape = new Shape();
-		public static function static_drawConvexHull(anchors:LinkableHashMap, lineStyle:ILineStyle, recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		public static function static_drawConvexHull(anchors:LinkableHashMap, lineStyle:ILineStyle, recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var graphics:Graphics = static_tempShape.graphics;
 			var anchor1:AnchorPoint;
@@ -497,7 +490,7 @@ package weave.visualization.plotters
 		
 		
 		
-		public function drawVoronoi(recordKeys:Array, dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		public function drawVoronoi(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			// http://blog.ivank.net/voronoi-diagram-in-as3.html
 			var graphics:Graphics = static_tempShape.graphics;
@@ -555,7 +548,7 @@ package weave.visualization.plotters
 		{
 			if (anchors)
 			{
-				var bounds:IBounds2D = initBoundsArray(output);
+				var bounds:Bounds2D = initBoundsArray(output);
 				var anchor:AnchorPoint = anchors.getObject(recordKey.localName) as AnchorPoint;
 				if (anchor)
 					bounds.includeCoords(anchor.x.value, anchor.y.value);
@@ -564,7 +557,7 @@ package weave.visualization.plotters
 				initBoundsArray(output, 0);
 		}
 		
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(-1, -1.1, 1, 1.1);
 		}

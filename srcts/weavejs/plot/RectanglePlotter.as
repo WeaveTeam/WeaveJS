@@ -13,37 +13,30 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
-	import flash.display.Shape;
-	import flash.geom.Point;
+	import Graphics = PIXI.Graphics;
+	import Shape = flash.display.Shape;
+	import Point = weavejs.geom.Point;
 	
-	import weave.Weave;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.reportError;
-	import weave.api.setSessionState;
-	import weave.api.core.DynamicState;
-	import weave.api.data.ColumnMetadata;
-	import weave.api.data.DataType;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotter;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.core.LinkableBoolean;
-	import weave.data.AttributeColumns.AlwaysDefinedColumn;
-	import weave.primitives.Bounds2D;
-	import weave.primitives.GeneralizedGeometry;
-	import weave.visualization.plotters.styles.SolidFillStyle;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import DynamicState = weavejs.api.core.DynamicState;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import DataType = weavejs.api.data.DataType;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import GeneralizedGeometry = weavejs.primitives.GeneralizedGeometry;
+	import SolidFillStyle = weavejs.geom.SolidFillStyle;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 
 	/**
 	 * This plotter plots rectangles using xMin,yMin,xMax,yMax values.
 	 * There is a set of data coordinates and a set of screen offset coordinates.
-	 * 
-	 * @author adufilie
 	 */
 	public class RectanglePlotter extends AbstractPlotter implements ISelectableAttributes
 	{
@@ -75,58 +68,58 @@ package weave.visualization.plotters
 		/**
 		 * This is the minimum X data value associated with the rectangle.
 		 */
-		public const xData:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn());
+		public const xData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn());
 		/**
 		 * This is the minimum Y data value associated with the rectangle.
 		 */
-		public const yData:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn());
+		public const yData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn());
 		/**
 		 * This is the maximum X data value associated with the rectangle.
 		 */
-		public const widthData:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
+		public const widthData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is the maximum Y data value associated with the rectangle.
 		 */
-		public const heightData:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
+		public const heightData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		
 		/**
 		 * If this is true, the rectangle will be centered on xData coordinates.
 		 */
-		public const centerX:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const centerX:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		/**
 		 * If this is true, the rectangle will be centered on yData coordinates.
 		 */
-		public const centerY:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const centerY:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
 		// visual properties
 		/**
 		 * This is an offset in screen coordinates when projecting the data rectangle onto the screen.
 		 */
-		public const xMinScreenOffset:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
+		public const xMinScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the data rectangle onto the screen.
 		 */
-		public const yMinScreenOffset:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
+		public const yMinScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the data rectangle onto the screen.
 		 */
-		public const xMaxScreenOffset:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
+		public const xMaxScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the data rectangle onto the screen.
 		 */
-		public const yMaxScreenOffset:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
+		public const yMaxScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is the line style used to draw the outline of the rectangle.
 		 */
-		public const line:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
+		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		/**
 		 * This is the fill style used to fill the rectangle.
 		 */
-		public const fill:SolidFillStyle = newLinkableChild(this, SolidFillStyle);
+		public const fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 		/**
 		 * If this is true, ellipses will be drawn instead of rectangles.
 		 */
-		public const drawEllipse:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const drawEllipse:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
 		protected function getCoordFromRecordKey(recordKey:IQualifiedKey, trueXfalseY:Boolean):Number
 		{
@@ -146,14 +139,14 @@ package weave.visualization.plotters
 		/**
 		 * This function returns a Bounds2D object set to the data bounds associated with the given record key.
 		 * @param key The key of a data record.
-		 * @param outputDataBounds An Array of IBounds2D objects to store the result in.
+		 * @param outputDataBounds An Array of Bounds2D objects to store the result in.
 		 */
 		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
 		{
 			getBounds(recordKey, initBoundsArray(output));
 		}
 		
-		private function getBounds(recordKey:IQualifiedKey, output:IBounds2D):void
+		private function getBounds(recordKey:IQualifiedKey, output:Bounds2D):void
 		{
 			var x:Number = getCoordFromRecordKey(recordKey, true);
 			var y:Number = getCoordFromRecordKey(recordKey, false);
@@ -174,7 +167,7 @@ package weave.visualization.plotters
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:IBounds2D, screenBounds:IBounds2D, tempShape:Shape):void
+		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 
@@ -210,29 +203,29 @@ package weave.visualization.plotters
 			graphics.endFill();
 		}
 		
-		private static const tempBounds:IBounds2D = new Bounds2D(); // reusable object
+		private static const tempBounds:Bounds2D = new Bounds2D(); // reusable object
 		private static const tempPoint:Point = new Point(); // reusable object
 		
 		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void
 		{
 			try
 			{
-				setSessionState(line, value[0][DynamicState.SESSION_STATE]);
+				Weave.setState(line, value[0][DynamicState.SESSION_STATE]);
 			}
 			catch (e:Error)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 		[Deprecated(replacement="fill")] public function set fillStyle(value:Object):void
 		{
 			try
 			{
-				setSessionState(fill, value[0][DynamicState.SESSION_STATE]);
+				Weave.setState(fill, value[0][DynamicState.SESSION_STATE]);
 			}
 			catch (e:Error)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 	}

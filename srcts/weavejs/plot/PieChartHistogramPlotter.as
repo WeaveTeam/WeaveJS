@@ -13,42 +13,35 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.geom.Point;
-	import flash.utils.Dictionary;
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
+	import Dictionary = flash.utils.Dictionary;
 	
-	import weave.api.linkSessionState;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.setSessionState;
-	import weave.api.data.ColumnMetadata;
-	import weave.api.data.IColumnStatistics;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.core.LinkableNumber;
-	import weave.data.AttributeColumns.BinnedColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.data.AttributeColumns.EquationColumn;
-	import weave.data.AttributeColumns.FilteredColumn;
-	import weave.data.AttributeColumns.StringLookupColumn;
-	import weave.primitives.ColorRamp;
-	import weave.utils.BitmapText;
-	import weave.utils.LinkableTextFormat;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import BinnedColumn = weavejs.data.column.BinnedColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import EquationColumn = weavejs.data.column.EquationColumn;
+	import FilteredColumn = weavejs.data.column.FilteredColumn;
+	import StringLookupColumn = weavejs.data.column.StringLookupColumn;
+	import ColorRamp = weavejs.util.ColorRamp;
+	import BitmapText = weavejs.util.BitmapText;
+	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	/**
-	 * @author adufilie
-	 */
 	public class PieChartHistogramPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
 		public function PieChartHistogramPlotter()
 		{
-			_beginRadians = newLinkableChild(this, EquationColumn);
+			_beginRadians = Weave.linkableChild(this, EquationColumn);
 			_beginRadians.equation.value = "0.5 * PI + getRunningTotal(spanRadians) - getNumber(spanRadians)";
 			_spanRadians = _beginRadians.requestVariable("spanRadians", EquationColumn, true);
 			_spanRadians.equation.value = "getNumber(binSize) / getSum(binSize) * 2 * PI";
@@ -58,8 +51,8 @@ package weave.visualization.plotters
 			_binLookupStats = WeaveAPI.StatisticsCache.getColumnStatistics(_binLookup);
 			_binnedData = _binLookup.requestLocalObject(BinnedColumn, true);
 			_filteredData = binnedData.internalDynamicColumn.requestLocalObject(FilteredColumn, true);
-			linkSessionState(filteredKeySet.keyFilter, _filteredData.filter);
-			registerLinkableChild(this, _binnedData);
+			Weave.linkState(filteredKeySet.keyFilter, _filteredData.filter);
+			Weave.linkableChild(this, _binnedData);
 			setSingleKeySource(_filteredData);
 			
 			var ecArray:Array = [_beginRadians, _spanRadians, binSize];
@@ -71,7 +64,7 @@ package weave.visualization.plotters
 				(ecArray.pop() as EquationColumn).metadata.value = metadata;
 			}
 			
-			registerLinkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
+			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			
 			this.addSpatialDependencies(this._beginRadians);
 		}
@@ -92,14 +85,14 @@ package weave.visualization.plotters
 		public var _binnedData:BinnedColumn;
 		public var _filteredData:FilteredColumn;
 		
-		public const chartColors:ColorRamp = registerLinkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired"))); // bars get their color from here
+		public const chartColors:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired"))); // bars get their color from here
 		
 		public function get binnedData():BinnedColumn { return _binnedData; }
 		
 		public function get unfilteredData():DynamicColumn { return _filteredData.internalDynamicColumn; }
-		public const line:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
-		public const labelAngleRatio:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0, verifyLabelAngleRatio));
-		public const innerRadius:LinkableNumber = registerLinkableChild(this, new LinkableNumber(0, verifyInnerRadius));
+		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public const labelAngleRatio:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyLabelAngleRatio));
+		public const innerRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyInnerRadius));
 		
 		private function verifyLabelAngleRatio(value:Number):Boolean
 		{
@@ -185,7 +178,7 @@ package weave.visualization.plotters
 			graphics.endFill();
 		}
 		
-		override public function drawBackground(dataBounds:IBounds2D, screenBounds:IBounds2D, destination:BitmapData):void
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			if (_filteredData.keys.length == 0)
 				return;
@@ -264,12 +257,12 @@ package weave.visualization.plotters
 		 * This function returns a Bounds2D object set to the data bounds associated with the background.
 		 * @param outputDataBounds A Bounds2D object to store the result in.
 		 */
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(-1, -1, 1, 1);
 		}
 
 		// backwards compatibility
-		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void { try { setSessionState(line, value[0].sessionState); } catch (e:Error) { } }
+		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void { try { Weave.setState(line, value[0].sessionState); } catch (e:Error) { } }
 	}
 }

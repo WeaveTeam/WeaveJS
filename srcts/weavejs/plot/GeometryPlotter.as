@@ -13,52 +13,45 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Bitmap;
+	import BitmapData = flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display.Graphics;
-	import flash.display.LineScaleMode;
+	import Graphics = PIXI.Graphics;
+	import Matrix = flash.display.LineScaleMode;
 	import flash.geom.Matrix;
-	import flash.geom.Point;
-	import flash.utils.Dictionary;
+	import Point = weavejs.geom.Point;
+	import getTimer = flash.utils.Dictionary;
 	import flash.utils.getTimer;
 	
-	import weave.Weave;
-	import weave.api.linkSessionState;
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.setSessionState;
-	import weave.api.core.DynamicState;
-	import weave.api.core.ILinkableHashMap;
-	import weave.api.data.IAttributeColumn;
-	import weave.api.data.IColumnWrapper;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.api.ui.IObjectWithDescription;
-	import weave.api.ui.IPlotTask;
-	import weave.api.ui.IPlotter;
-	import weave.api.ui.IPlotterWithGeometries;
-	import weave.api.ui.ISelectableAttributes;
-	import weave.compiler.Compiler;
-	import weave.core.LinkableBoolean;
-	import weave.core.LinkableHashMap;
-	import weave.core.LinkableNumber;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.data.AttributeColumns.ImageColumn;
-	import weave.data.AttributeColumns.ReprojectedGeometryColumn;
-	import weave.data.AttributeColumns.StreamedGeometryColumn;
-	import weave.primitives.Bounds2D;
-	import weave.primitives.GeneralizedGeometry;
-	import weave.primitives.GeometryType;
-	import weave.utils.CachedBitmap;
-	import weave.visualization.plotters.styles.ExtendedFillStyle;
-	import weave.visualization.plotters.styles.ExtendedLineStyle;
+	import DynamicState = weavejs.api.core.DynamicState;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import IPlotterWithGeometries = weavejs.api.ui.IPlotterWithGeometries;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import Compiler = weavejs.compiler.Compiler;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableHashMap = weavejs.core.LinkableHashMap;
+	import LinkableNumber = weavejs.core.LinkableNumber;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import ImageColumn = weavejs.data.column.ImageColumn;
+	import ReprojectedGeometryColumn = weavejs.data.column.ReprojectedGeometryColumn;
+	import StreamedGeometryColumn = weavejs.data.column.StreamedGeometryColumn;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import GeneralizedGeometry = weavejs.primitives.GeneralizedGeometry;
+	import GeometryType = weavejs.primitives.GeometryType;
+	import CachedBitmap = weavejs.util.CachedBitmap;
+	import ExtendedFillStyle = weavejs.geom.ExtendedFillStyle;
+	import ExtendedLineStyle = weavejs.geom.ExtendedLineStyle;
 	
 	/**
 	 * GeometryPlotter
-	 * 
-	 * @author adufilie
 	 */
 	public class GeometryPlotter extends AbstractPlotter implements IPlotterWithGeometries, ISelectableAttributes, IObjectWithDescription
 	{
@@ -71,7 +64,7 @@ package weave.visualization.plotters
 			fill.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
 			line.color.defaultValue.value = 0x000000;
 
-			linkSessionState(StreamedGeometryColumn.geometryMinimumScreenArea, pixellation);
+			Weave.linkState(StreamedGeometryColumn.geometryMinimumScreenArea, pixellation);
 
 			updateKeySources();
 			
@@ -97,18 +90,18 @@ package weave.visualization.plotters
 			return [fill.color, geometryColumn];
 		}
 		
-		public const symbolPlotters:ILinkableHashMap = registerLinkableChild(this, new LinkableHashMap(IPlotter));
+		public const symbolPlotters:ILinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IPlotter));
 
 		/**
 		 * This is the reprojected geometry column to draw.
 		 */
-		public const geometryColumn:ReprojectedGeometryColumn = newLinkableChild(this, ReprojectedGeometryColumn);
+		public const geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
 		
 		/**
 		 * Determines the Z order of geometries
 		 */
-		public const zOrderColumn:DynamicColumn = newLinkableChild(this, DynamicColumn);
-		public const zOrderAscending:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(true), updateKeySources);
+		public const zOrderColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public const zOrderAscending:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true), updateKeySources);
 		
 		private function updateKeySources():void
 		{
@@ -118,8 +111,8 @@ package weave.visualization.plotters
 		/**
 		 *  This is the default URL path for images, when using images in place of points.
 		 */
-		public const pointDataImageColumn:ImageColumn = newLinkableChild(this, ImageColumn);
-		public const useFixedImageSize:LinkableBoolean = registerLinkableChild(this, new LinkableBoolean(false));
+		public const pointDataImageColumn:ImageColumn = Weave.linkableChild(this, ImageColumn);
+		public const useFixedImageSize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
 		[Embed(source="/weave/resources/images/missing.png")]
 		private static var _missingImageClass:Class;
@@ -128,16 +121,16 @@ package weave.visualization.plotters
 		/**
 		 * This is the line style used to draw the lines of the geometries.
 		 */
-		public const line:ExtendedLineStyle = newLinkableChild(this, ExtendedLineStyle);
+		public const line:ExtendedLineStyle = Weave.linkableChild(this, ExtendedLineStyle);
 		/**
 		 * This is the fill style used to fill the geometries.
 		 */
-		public const fill:ExtendedFillStyle = newLinkableChild(this, ExtendedFillStyle);
+		public const fill:ExtendedFillStyle = Weave.linkableChild(this, ExtendedFillStyle);
 
 		/**
 		 * This is the size of the points drawn when the geometry represents point data.
 		 **/
-		public const iconSize:LinkableNumber = registerLinkableChild(this, new LinkableNumber(10, validateIconSize));
+		public const iconSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10, validateIconSize));
 		private function validateIconSize(value:Number):Boolean { return 0.2 <= value && value <= 1024; };
 
 		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
@@ -170,7 +163,7 @@ package weave.visualization.plotters
 			output.length = i;
 		}
 		
-		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, bounds:IBounds2D = null):Array
+		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, bounds:Bounds2D = null):Array
 		{
 			var value:* = geometryColumn.getValueFromKey(recordKey, Array);
 			var geoms:Array = null;
@@ -208,7 +201,7 @@ package weave.visualization.plotters
 		 * This function returns a Bounds2D object set to the data bounds associated with the background.
 		 * @param outputDataBounds A Bounds2D object to store the result in.
 		 */
-		override public function getBackgroundDataBounds(output:IBounds2D):void
+		override public function getBackgroundDataBounds(output:Bounds2D):void
 		{
 			// try to find an internal StreamedGeometryColumn
 			var column:IAttributeColumn = geometryColumn;
@@ -224,13 +217,13 @@ package weave.visualization.plotters
 		}
 		
 		public var debugSimplify:Boolean = false;
-		private var _debugSimplifyDataBounds:IBounds2D;
-		private var _debugSimplifyScreenBounds:IBounds2D;
+		private var _debugSimplifyDataBounds:Bounds2D;
+		private var _debugSimplifyScreenBounds:Bounds2D;
 
 		/**
 		 * This function calculates the importance of a pixel.
 		 */
-		protected function getDataAreaPerPixel(dataBounds:IBounds2D, screenBounds:IBounds2D):Number
+		protected function getDataAreaPerPixel(dataBounds:Bounds2D, screenBounds:Bounds2D):Number
 		{
 			// get minimum importance value required to display the shape at this zoom level
 //			var dw:Number = dataBounds.getWidth();
@@ -270,7 +263,7 @@ package weave.visualization.plotters
 		private var keepTrack:Boolean = false;
 		public var totalVertices:int = 0;
 		
-		public const pixellation:LinkableNumber = registerLinkableChild(this, new LinkableNumber(1));
+		public const pixellation:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
 		
 		private const _destinationToPlotTaskMap:Dictionary = new Dictionary(true);
 		
@@ -282,8 +275,8 @@ package weave.visualization.plotters
 		private const D_ASYNCSTATE:String = 'd_asyncState';
 		override public function drawPlotAsyncIteration(task:IPlotTask):Number
 		{
-			var simplifyDataBounds:IBounds2D = task.dataBounds;
-			var simplifyScreenBounds:IBounds2D = task.screenBounds;
+			var simplifyDataBounds:Bounds2D = task.dataBounds;
+			var simplifyScreenBounds:Bounds2D = task.screenBounds;
 			if (debugSimplify)
 			{
 				if (!_debugSimplifyDataBounds)
@@ -421,7 +414,7 @@ package weave.visualization.plotters
 		 * This function draws a list of GeneralizedGeometry objects
 		 * @param geomParts A 2-dimensional Array or Vector of objects, each having x and y properties.
 		 */
-		private function drawMultiPartShape(key:IQualifiedKey, geom:GeneralizedGeometry, geomParts:Object, dataBounds:IBounds2D, screenBounds:IBounds2D, graphics:Graphics, bitmapData:BitmapData):void
+		private function drawMultiPartShape(key:IQualifiedKey, geom:GeneralizedGeometry, geomParts:Object, dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics, bitmapData:BitmapData):void
 		{
 			var geomType:String = geom.geomType;
 			for (var i:int = 0; i < geomParts.length; i++)
@@ -431,7 +424,7 @@ package weave.visualization.plotters
 		 * This function draws a single geometry.
 		 * @param points An Array or Vector of objects, each having x and y properties.
 		 */
-		private function drawShape(key:IQualifiedKey, points:Object, geomType:String, dataBounds:IBounds2D, screenBounds:IBounds2D, outputGraphics:Graphics, outputBitmapData:BitmapData):void
+		private function drawShape(key:IQualifiedKey, points:Object, geomType:String, dataBounds:Bounds2D, screenBounds:Bounds2D, outputGraphics:Graphics, outputBitmapData:BitmapData):void
 		{
 			if (points.length == 0)
 				return;
@@ -497,7 +490,7 @@ package weave.visualization.plotters
 					outputGraphics.lineTo(firstX, firstY);
 		}
 		
-		private function drawImage(key:IQualifiedKey, dataX:Number, dataY:Number, dataBounds:IBounds2D, screenBounds:IBounds2D, outputGraphics:Graphics, outputBitmapData:BitmapData):void
+		private function drawImage(key:IQualifiedKey, dataX:Number, dataY:Number, dataBounds:Bounds2D, screenBounds:Bounds2D, outputGraphics:Graphics, outputBitmapData:BitmapData):void
 		{
 			tempPoint.x = dataX;
 			tempPoint.y = dataY;
@@ -526,18 +519,18 @@ package weave.visualization.plotters
 		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void
 		{
 			try {
-				setSessionState(line, value[0][DynamicState.SESSION_STATE]);
+				Weave.setState(line, value[0][DynamicState.SESSION_STATE]);
 			} catch (e:Error) { }
 		}
 		[Deprecated(replacement="fill")] public function set fillStyle(value:Object):void
 		{
 			try {
-				setSessionState(fill, value[0][DynamicState.SESSION_STATE]);
+				Weave.setState(fill, value[0][DynamicState.SESSION_STATE]);
 			} catch (e:Error) { }
 		}
 		[Deprecated(replacement="geometryColumn")] public function set geometry(value:Object):void
 		{
-			setSessionState(geometryColumn.internalDynamicColumn, value);
+			Weave.setState(geometryColumn.internalDynamicColumn, value);
 		}
 		// backwards compatibility May 2012
 		[Deprecated(replacement="iconSize")] public function set pointShapeSize(value:Number):void { iconSize.value = value * 2; }

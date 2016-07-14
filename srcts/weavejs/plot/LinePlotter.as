@@ -13,28 +13,22 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weave.visualization.plotters
+namespace weavejs.plot
 {
-	import flash.display.Graphics;
-	import flash.display.Shape;
-	import flash.geom.Point;
+	import Graphics = PIXI.Graphics;
+	import Shape = flash.display.Shape;
+	import Point = weavejs.geom.Point;
 	
-	import weave.api.newLinkableChild;
-	import weave.api.registerLinkableChild;
-	import weave.api.reportError;
-	import weave.api.setSessionState;
-	import weave.api.core.DynamicState;
-	import weave.api.data.IQualifiedKey;
-	import weave.api.primitives.IBounds2D;
-	import weave.data.AttributeColumns.AlwaysDefinedColumn;
-	import weave.data.AttributeColumns.DynamicColumn;
-	import weave.visualization.plotters.styles.SolidLineStyle;
+	import DynamicState = weavejs.api.core.DynamicState;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 
 	/**
 	 * This plotter plots lines using x1,y1,x2,y2 values.
 	 * There is a set of data coordinates and a set of screen offset coordinates.
-	 * 
-	 * @author adufilie
 	 */
 	public class LinePlotter extends AbstractPlotter
 	{
@@ -48,41 +42,41 @@ package weave.visualization.plotters
 		/**
 		 * This is the beginning X data value associated with the line.
 		 */
-		public const x1Data:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const x1Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		/**
 		 * This is the beginning Y data value associated with the line.
 		 */
-		public const y1Data:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const y1Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		/**
 		 * This is the ending X data value associated with the line.
 		 */
-		public const x2Data:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const x2Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		/**
 		 * This is the ending Y data value associated with the line.
 		 */
-		public const y2Data:DynamicColumn = newLinkableChild(this, DynamicColumn);
+		public const y2Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 
 		// visual properties
 		/**
 		 * This is an offset in screen coordinates when projecting the line onto the screen.
 		 */
-		public const x1ScreenOffset:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
+		public const x1ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the line onto the screen.
 		 */
-		public const y1ScreenOffset:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
+		public const y1ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the line onto the screen.
 		 */
-		public const x2ScreenOffset:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
+		public const x2ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the line onto the screen.
 		 */
-		public const y2ScreenOffset:AlwaysDefinedColumn = registerLinkableChild(this, new AlwaysDefinedColumn(0));
+		public const y2ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is the line style used to draw the line.
 		 */
-		public const line:SolidLineStyle = newLinkableChild(this, SolidLineStyle);
+		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 
 		/**
 		 * This function returns a Bounds2D object set to the data bounds associated with the given record key.
@@ -92,11 +86,11 @@ package weave.visualization.plotters
 		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
 		{
 			initBoundsArray(output, 2);
-			(output[0] as IBounds2D).includeCoords(
+			(output[0] as Bounds2D).includeCoords(
 					x1Data.getValueFromKey(recordKey, Number),
 					y1Data.getValueFromKey(recordKey, Number)
 				);
-			(output[1] as IBounds2D).includeCoords(
+			(output[1] as Bounds2D).includeCoords(
 					x2Data.getValueFromKey(recordKey, Number),
 					y2Data.getValueFromKey(recordKey, Number)
 				);
@@ -105,7 +99,7 @@ package weave.visualization.plotters
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:IBounds2D, screenBounds:IBounds2D, tempShape:Shape):void
+		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 
@@ -136,11 +130,11 @@ package weave.visualization.plotters
 		{
 			try
 			{
-				setSessionState(line, value[0][DynamicState.SESSION_STATE]);
+				Weave.setState(line, value[0][DynamicState.SESSION_STATE]);
 			}
 			catch (e:Error)
 			{
-				reportError(e);
+				JS.error(e);
 			}
 		}
 	}
