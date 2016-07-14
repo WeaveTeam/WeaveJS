@@ -1,3 +1,5 @@
+var debug = false;
+
 var parseArgs = require('minimist');
 var fs = require('fs');
 var path = require('path').posix;
@@ -141,7 +143,15 @@ filePaths.forEach(f => {
 	if (chain)
 		console.error(`Found circular dependency: ${formatDepChain(chain)}`);
 });
-filePaths.sort((f1, f2) => !!checkDependency(f1, f2) - !!checkDependency(f2, f1) || (f1>f2)-(f1<f2));
+filePaths.sort((f1, f2) => {
+	var result = !!checkDependency(f1, f2) - !!checkDependency(f2, f1);
+	if (result && debug)
+	{
+		[f1, f2] = [path.basename(f1), path.basename(f2)];
+		console.log(result < 0 ? f1 : f2, '<', result < 0 ? f2 : f1);
+	}
+	return result;
+});
 
 filePaths = filePaths.map(function (filePath) {
 	return "./" + path.relative(path.dirname(importFileName), filePath);
