@@ -15,10 +15,17 @@ targets = {
 };
 
 fse = require("fs-extra");
-fs = require("fs");
 glob = require("glob");
 path = require("path");
 minimist = require('minimist');
+
+argv = minimist(process.argv.slice(2));
+target_names = argv._;
+
+if (!target_names.length)
+{
+	target_names = Object.keys(targets);
+}
 
 function copy_target(target)
 {
@@ -28,17 +35,10 @@ function copy_target(target)
 		{
 			let dest;
 			dest = path.join(target.dest, target.flatten ? path.basename(match) : match);
-			console.log(path.join(target.cwd, match), dest);
+			if (argv.v) console.log(path.join(target.cwd, match), dest);
 			fse.copySync(path.join(target.cwd, match), dest);
 		})
 	});
-}
-
-argv = minimist(process.argv.slice(2));
-target_names = argv._;
-if (!target_names.length)
-{
-	target_names = Object.keys(targets);
 }
 
 for (let target_name of target_names)
