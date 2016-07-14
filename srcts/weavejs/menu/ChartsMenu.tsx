@@ -21,12 +21,12 @@ namespace weavejs.menu
 
 	export class ChartsMenu implements MenuBarItemProps
 	{
-		constructor(owner:WeaveMenus)
+		constructor(owner:IWeaveMenus)
 		{
 			this.owner = owner;
 		}
 
-		owner:WeaveMenus;
+		owner:IWeaveMenus;
 		label:string = "Charts";
 
 		get menu():MenuItemProps[]

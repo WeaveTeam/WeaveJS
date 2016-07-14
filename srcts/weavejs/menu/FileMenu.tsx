@@ -10,7 +10,7 @@ namespace weavejs.menu
 	import CheckBoxList = weavejs.ui.CheckBoxList;
 	import Input = weavejs.ui.Input;
 	import WeaveArchive = weavejs.core.WeaveArchive;
-	import WeaveMenus = weavejs.menu.WeaveMenus;
+	import IWeaveMenus = weavejs.menu.IWeaveMenus;
 	import FileDialog = weavejs.dialog.FileDialog;
 
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
@@ -29,12 +29,12 @@ namespace weavejs.menu
 
 	export class FileMenu implements MenuBarItemProps
 	{
-		constructor(owner:WeaveMenus)
+		constructor(owner:IWeaveMenus)
 		{
 			this.owner = owner;
 		}
 
-		owner:WeaveMenus;
+		owner:IWeaveMenus;
 		label = "File";
 		bold = false;
 		fileName:string;

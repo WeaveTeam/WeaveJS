@@ -3,6 +3,7 @@ namespace weavejs.ui
 	import HBox = weavejs.ui.flexbox.HBox;
 	import VBox = weavejs.ui.flexbox.VBox;
 	import ButtonGroupBar = weavejs.ui.ButtonGroupBar;
+	import ColumnSelector = weavejs.ui.ColumnSelector;
 	import HierarchyExplorer = weavejs.ui.HierarchyExplorer;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -17,7 +18,6 @@ namespace weavejs.ui
 	import IDataSource = weavejs.api.data.IDataSource;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 	import ControlPanel = weavejs.editor.ControlPanel;
-	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
 
 	export interface IAttributeSelectorProps
 	{
@@ -219,9 +219,8 @@ namespace weavejs.ui
 							/>
 						:	null
 					}
-					<SelectableAttributeComponent
+					<ColumnSelector
 						key={this.selectableAttributeComponentKey++}
-						hideButton
 						style={{flex: null}}
 						attributeName={ this.state.selectedAttributeName }
 						attributes={ this.props.attributes }

@@ -5,16 +5,16 @@ namespace weavejs.menu
 	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
 	import ServiceLogin = weavejs.admin.ServiceLogin;
 	import PopupWindow = weavejs.dialog.PopupWindow;
-	import WeaveMenus = weavejs.menu.WeaveMenus;
+	import IWeaveMenus = weavejs.menu.IWeaveMenus;
 
 	export class SystemMenu implements MenuBarItemProps
 	{
-		constructor(owner:WeaveMenus)
+		constructor(owner:IWeaveMenus)
 		{
 			this.owner = owner;
 		}
 
-		owner:WeaveMenus;
+		owner:IWeaveMenus;
 		label = "Weave";
 		bold = true;
 		

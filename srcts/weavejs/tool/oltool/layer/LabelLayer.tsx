@@ -1,14 +1,13 @@
 namespace weavejs.tool.oltool.layer
 {
 	import DOMUtils = weavejs.util.DOMUtils;
-	import OpenLayersMapTool = weavejs.tool.oltool.OpenLayersMapTool;
-
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import AbstractGlyphLayer = weavejs.tool.oltool.layer.AbstractGlyphLayer;
+
 	interface LabelRecord
 	{
 		feature: ol.Feature;

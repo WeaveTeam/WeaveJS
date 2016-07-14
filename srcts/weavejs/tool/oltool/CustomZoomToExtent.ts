@@ -1,7 +1,6 @@
 namespace weavejs.tool.oltool
 {
-	import OpenLayersMapTool = weavejs.tool.oltool.OpenLayersMapTool;
-
+	import IOpenLayers = weavejs.tool.oltool.IOpenLayersMap;
 	export class CustomZoomToExtent extends ol.control.Control
 	{
 		private extent: ol.Extent;
@@ -34,7 +33,7 @@ namespace weavejs.tool.oltool
 		{
 			let map: ol.Map = this.getMap();
 			let view: ol.View = map.getView();
-			let tool = this.getMap().get("mapTool") as OpenLayersMapTool;
+			let tool = this.getMap().get("mapTool") as IOpenLayersMap;
 			let toolBounds = tool.getExtent();
 			let extent: ol.Extent;
 			if (!toolBounds.isEmpty())

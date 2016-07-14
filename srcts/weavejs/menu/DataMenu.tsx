@@ -2,11 +2,10 @@ namespace weavejs.menu
 {
 	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
 	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
-	import DataSourceManager = weavejs.editor.manager.DataSourceManager;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import IDataSource_File = weavejs.api.data.IDataSource_File;
 	import IDataSource_Service = weavejs.api.data.IDataSource_Service;
-	import WeaveMenus = weavejs.menu.WeaveMenus;
+	import IWeaveMenus = weavejs.menu.IWeaveMenus;
 
 	/* Import editors and their data sources */
 	import WeaveDataSource = weavejs.data.source.WeaveDataSource;
@@ -42,12 +41,12 @@ namespace weavejs.menu
 
 	export class DataMenu implements MenuBarItemProps
 	{
-		constructor(owner:WeaveMenus)
+		constructor(owner:IWeaveMenus)
 		{
 			this.owner = owner;
 		}
 
-		owner:WeaveMenus;
+		owner:IWeaveMenus;
 		label:string = "Data";
 
 		get menu():MenuItemProps[]

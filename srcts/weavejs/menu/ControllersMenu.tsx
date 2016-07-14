@@ -5,7 +5,7 @@ namespace weavejs.menu
 	import PopupWindow = weavejs.dialog.PopupWindow;
 	import IVisTool = weavejs.api.ui.IVisTool;
 	import MouseoverController = weavejs.editor.MouseoverController;
-	import WeaveMenus = weavejs.menu.WeaveMenus;
+	import IWeaveMenus = weavejs.menu.IWeaveMenus;
 
 	import AttributeMenuTool = weavejs.tool.AttributeMenuTool;
 	import DataFilterTool = weavejs.tool.DataFilterTool;
@@ -19,13 +19,13 @@ namespace weavejs.menu
 
 	export class ControllersMenu implements MenuBarItemProps
 	{
-		constructor(owner:WeaveMenus)
+		constructor(owner:IWeaveMenus)
 		{
 			this.owner = owner;
 			
 		}
 
-		owner:WeaveMenus;
+		owner:IWeaveMenus;
 		label:string = "Controllers";
 		
 		openColorController = PopupWindow.generateOpener(() => ({

@@ -1,12 +1,17 @@
 namespace weavejs.menu
 {
-	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
-	import SystemMenu = weavejs.menu.SystemMenu;
+	import IWeaveMenus = weavejs.menu.IWeaveMenus;
 	import ServiceLogin = weavejs.admin.ServiceLogin;
+	import FileMenu = weavejs.menu.FileMenu;
+	import SystemMenu = weavejs.menu.SystemMenu;
+	import DataMenu = weavejs.menu.DataMenu;
+	import ChartsMenu = weavejs.menu.ChartsMenu;
+	import ControllersMenu = weavejs.menu.ControllersMenu;
+	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
 
 	export type CreateObjectFunction = (type:new(..._:any[])=>any)=>void;
 
-	export class WeaveMenus
+	export class WeaveMenus implements IWeaveMenus
 	{
 		context:React.ReactInstance;
 		weave:Weave;
@@ -14,16 +19,14 @@ namespace weavejs.menu
 		onFileLoaded:()=>void;
 		openDataManager:()=>void;
 		enableDataManagerItem:()=>boolean;
-		showFileMenu:boolean = false;
-
+		showFileMenu:boolean;
 		login:ServiceLogin;
-		
 		systemMenu:SystemMenu;
 		fileMenu:FileMenu;
 		chartsMenu:ChartsMenu;
 		dataMenu:DataMenu;
 		controllersMenu:ControllersMenu;
-		
+
 		constructor(context:React.ReactInstance, weave:Weave, createObject:CreateObjectFunction, onFileLoaded:()=>void, openDataManager:()=>void, enableDataManagerItem:()=>boolean)
 		{
 			this.context = context;

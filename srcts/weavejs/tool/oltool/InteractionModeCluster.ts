@@ -1,6 +1,6 @@
 namespace weavejs.tool.oltool
 {
-	import OpenLayersMapTool = weavejs.tool.oltool.OpenLayersMapTool;
+	import IOpenLayers = weavejs.tool.oltool.IOpenLayersMap;
 	import LinkableString = weavejs.core.LinkableString;
 
 	export class InteractionModeCluster extends ol.control.Control
@@ -68,7 +68,7 @@ namespace weavejs.tool.oltool
 			if (!map)
 				return;
 
-			let mapTool: OpenLayersMapTool = map.get("mapTool") as OpenLayersMapTool;
+			let mapTool = map.get("mapTool") as IOpenLayersMap;
 			this.interactionMode = mapTool.interactionMode;
 
 			this.interactionMode.addGroupedCallback(mapTool, this.updateInteractionMode_weaveToControl, true);

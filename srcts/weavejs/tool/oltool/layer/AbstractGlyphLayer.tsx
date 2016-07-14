@@ -1,6 +1,5 @@
 namespace weavejs.tool.oltool.layer
 {
-	import OpenLayersMapTool = weavejs.tool.oltool.OpenLayersMapTool;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import LinkableString = weavejs.core.LinkableString;
