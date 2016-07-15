@@ -12,8 +12,9 @@ namespace weavejs.app
 
 	Weave.registerClass(AccessibilityProperties, "weavejs.ui.properties.accessibilty");
 
-	export class WeaveProperties implements ILinkableObject, ILinkableObjectWithNewProperties {
-
+	export class WeaveProperties implements ILinkableObject, ILinkableObjectWithNewProperties
+	{
+		notificationSystem:NotificationSystem.System;
 		enableMenuBar = Weave.linkableChild(this, new LinkableBoolean(true));
 		showSessionHistorySlider = Weave.linkableChild(this, new LinkableBoolean(false));
 		enableSessionHistoryControls = Weave.linkableChild(this, new LinkableBoolean(true));
@@ -29,6 +30,15 @@ namespace weavejs.app
 		static getProperties(weave:Weave):WeaveProperties
 		{
 			return weave.root.requestObject("WeaveProperties", WeaveProperties, true);
+		}
+
+		static notify(weave:Weave, level:"error"|"warning"|"info"|"success", message:string)
+		{
+			WeaveProperties.getProperties(weave).notificationSystem.addNotification({
+				level,
+				message,
+				position: 'br'
+			});
 		}
 	}
 

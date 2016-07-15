@@ -63,7 +63,6 @@ namespace weavejs.app
 	{
 		enableMenuBarWatcher:LinkableWatcher = WeaveReactUtils.forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
 		menus:WeaveMenus;
-		static notificationSystem:NotificationSystem.System;
 		_popout_windows = new Set<Window>();
 
 		get popout_windows()
@@ -650,6 +649,7 @@ namespace weavejs.app
 			 	interactiveTourComponent = <InteractiveTour onClose={this.props.onClose}/>;
 			}
 
+			let NotificationSystem_System = NotificationSystem.System;
 			return (
 				<VBox
 					className="weave-app"
@@ -660,7 +660,11 @@ namespace weavejs.app
 					{progressBarUI}
 					{weaveTabbedComponent}
 					{interactiveTourComponent}
-					<NotificationSystem ref={(c:NotificationSystem.System) => {WeaveApp.notificationSystem = c;}}/>
+					<NotificationSystem_System
+						ref={(c:NotificationSystem.System) => {
+							WeaveProperties.getProperties(this.props.weave).notificationSystem = c;
+						}}
+					/>
 				</VBox>
 			);
 		}

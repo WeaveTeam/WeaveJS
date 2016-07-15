@@ -106,7 +106,9 @@
 /// <reference path="./weavejs/editor/SessionStateEditor.tsx"/>
 /// <reference path="./weavejs/editor/SessionHistorySlider.tsx"/>
 /// <reference path="./weavejs/editor/NumericRangeDataFilterEditor.tsx"/>
+/// <reference path="./weavejs/editor/MetadataGrid.tsx"/>
 /// <reference path="./weavejs/editor/DiscreteValuesDataFilterEditor.tsx"/>
+/// <reference path="./weavejs/editor/CSVMetadataEditor.tsx"/>
 /// <reference path="./weavejs/editor/ColorRampEditor.tsx"/>
 /// <reference path="./weavejs/editor/CensusGeographyFilter.tsx"/>
 /// <reference path="./weavejs/dialog/PopupWindow.tsx"/>
