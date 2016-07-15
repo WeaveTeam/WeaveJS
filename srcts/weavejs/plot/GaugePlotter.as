@@ -1,231 +1,231 @@
-	/* ***** BEGIN LICENSE BLOCK *****
-	 *
-	 * This file is part of Weave.
-	 *
-	 * The Initial Developer of Weave is the Institute for Visualization
-	 * and Perception Research at the University of Massachusetts Lowell.
-	 * Portions created by the Initial Developer are Copyright (C) 2008-2015
-	 * the Initial Developer. All Rights Reserved.
-	 *
-	 * This Source Code Form is subject to the terms of the Mozilla Public
-	 * License, v. 2.0. If a copy of the MPL was not distributed with this file,
-	 * You can obtain one at http://mozilla.org/MPL/2.0/.
-	 * 
-	 * ***** END LICENSE BLOCK ***** */
+/* ***** BEGIN LICENSE BLOCK *****
+ *
+ * This file is part of Weave.
+ *
+ * The Initial Developer of Weave is the Institute for Visualization
+ * and Perception Research at the University of Massachusetts Lowell.
+ * Portions created by the Initial Developer are Copyright (C) 2008-2015
+ * the Initial Developer. All Rights Reserved.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ * 
+ * ***** END LICENSE BLOCK ***** */
 
-	namespace weavejs.plot
+namespace weavejs.plot
+{
+	import BitmapData = flash.display.BitmapData;
+	import Graphics = PIXI.Graphics;
+	import Point = weavejs.geom.Point;
+	
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import StandardLib = weavejs.util.StandardLib;
+	import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
+	import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
+	import ColorRamp = weavejs.util.ColorRamp;
+	import PlotUtils = weavejs.util.PlotUtils;
+	import RadialAxis = weavejs.util.RadialAxis;
+
+	/**
+	 * This is the plotter for the semi-circular Gauge tool.
+	 */
+	public class GaugePlotter extends MeterPlotter implements ISelectableAttributes
 	{
-		import BitmapData = flash.display.BitmapData;
-		import Graphics = PIXI.Graphics;
-		import Point = weavejs.geom.Point;
 		
-		import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-		import Bounds2D = weavejs.geom.Bounds2D;
-		import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-		import IPlotTask = weavejs.api.ui.IPlotTask;
-		import StandardLib = weavejs.util.StandardLib;
-		import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
-		import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
-		import ColorRamp = weavejs.util.ColorRamp;
-		import PlotUtils = weavejs.util.PlotUtils;
-		import RadialAxis = weavejs.util.RadialAxis;
+		//the radius of the Gauge (from 0 to 1)
+		//TODO make this part of the session state
+		private const outerRadius:Number = 0.8;
+		
+		//the radius of the Gauge (from 0 to 1)
+		//TODO make this part of the session state
+		private const innerRadius:Number = 0.3;
+		
+		//the radius at which the tick mark labels are drawn
+		//TODO make this part of the session state
+		private const tickMarkLabelsRadius:Number = outerRadius+0.08;
 
+		//the angle offset determining the size of the gauge wedge.
+		//Range is 0 to PI/2. 0 means full semicircle, PI/2 means 1 pixel wide vertical wedge.
+		//TODO make this part of the session state
+		private const theta:Number = Math.PI/4;
+		
+		//the thickness and color of the outer line
+		//TODO make this part of the session state
+		private const outlineThickness:Number = 2;
+		private const outlineColor:Number = 0x000000;
+		
+		//the thickness and color of the outer line
+		//TODO make this part of the session state
+		private const needleThickness:Number = 2;
+		private const needleColor:Number = 0x000000;
+		
+		//wrapper for a SimpleBinningDefinition, which creates equally spaced bins
+		public const binningDefinition:DynamicBinningDefinition = Weave.linkableChild(this, new DynamicBinningDefinition(true));
+		
+		//the approximate desired number of tick marks
+		//TODO make this part of the session state
+		public const numberOfTickMarks:Number = 10;
+		
+		//the color ramp mapping bins to colors
+		public const colorRamp:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Traffic Light")));
+		
+		// reusable point objects
+		private const p1:Point = new Point(), p2:Point = new Point();
+		
+		// the radial axis of the gauge
+		private const axis:RadialAxis = new RadialAxis();
+		
 		/**
-		 * This is the plotter for the semi-circular Gauge tool.
+		 * Creates a new gauge plotter with default settings
 		 */
-		public class GaugePlotter extends MeterPlotter implements ISelectableAttributes
+		public function GaugePlotter()
 		{
+			//initializes the binning definition which defines a number of evenly spaced bins
+			binningDefinition.requestLocalObject(SimpleBinningDefinition, false);
+			(binningDefinition.internalObject as SimpleBinningDefinition).numberOfBins.value = 3;
 			
-			//the radius of the Gauge (from 0 to 1)
-			//TODO make this part of the session state
-			private const outerRadius:Number = 0.8;
-			
-			//the radius of the Gauge (from 0 to 1)
-			//TODO make this part of the session state
-			private const innerRadius:Number = 0.3;
-			
-			//the radius at which the tick mark labels are drawn
-			//TODO make this part of the session state
-			private const tickMarkLabelsRadius:Number = outerRadius+0.08;
-
-			//the angle offset determining the size of the gauge wedge.
-			//Range is 0 to PI/2. 0 means full semicircle, PI/2 means 1 pixel wide vertical wedge.
-			//TODO make this part of the session state
-			private const theta:Number = Math.PI/4;
-			
-			//the thickness and color of the outer line
-			//TODO make this part of the session state
-			private const outlineThickness:Number = 2;
-			private const outlineColor:Number = 0x000000;
-			
-			//the thickness and color of the outer line
-			//TODO make this part of the session state
-			private const needleThickness:Number = 2;
-			private const needleColor:Number = 0x000000;
-			
-			//wrapper for a SimpleBinningDefinition, which creates equally spaced bins
-			public const binningDefinition:DynamicBinningDefinition = Weave.linkableChild(this, new DynamicBinningDefinition(true));
-			
-			//the approximate desired number of tick marks
-			//TODO make this part of the session state
-			public const numberOfTickMarks:Number = 10;
-			
-			//the color ramp mapping bins to colors
-			public const colorRamp:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Traffic Light")));
-			
-			// reusable point objects
-			private const p1:Point = new Point(), p2:Point = new Point();
-			
-			// the radial axis of the gauge
-			private const axis:RadialAxis = new RadialAxis();
-			
-			/**
-			 * Creates a new gauge plotter with default settings
-			 */
-			public function GaugePlotter()
-			{
-				//initializes the binning definition which defines a number of evenly spaced bins
-				binningDefinition.requestLocalObject(SimpleBinningDefinition, false);
-				(binningDefinition.internalObject as SimpleBinningDefinition).numberOfBins.value = 3;
-				
-				meterColumn.addImmediateCallback(this, updateAxis);
-				binningDefinition.generateBinClassifiersForColumn(meterColumn);
-				Weave.linkableChild(this, binningDefinition.asyncResultCallbacks);
-			}
-			
-			public function getSelectableAttributeNames():Array
-			{
-				return ["Gauge Column"];
-			}
-			public function getSelectableAttributes():Array
-			{
-				return [meterColumn]
-			}
-			
-			/**
-			 * Updates the internal axis representation with the latest min, max, and 
-			 * numberOfTickMarks. This should be called whenever any one of those changes.
-			 */ 
-			private function updateAxis():void
-			{
-				var max:Number = meterColumnStats.getMax();
-				var min:Number = meterColumnStats.getMin();
-				axis.setParams(min,max,numberOfTickMarks);
-			}
-			
-			private function getMeterValue(recordKeys:Array):Number
-			{
-				var n:Number = recordKeys.length;
-				if(n == 1)
-					return meterColumn.getValueFromKey(recordKeys[i] as IQualifiedKey, Number)
-				else{
-					//compute the meter value by averaging record values
-					var meterValueSum:Number = 0;
-					for (var i:int = 0; i < n; i++)//TODO handle missing values
-						meterValueSum += meterColumn.getValueFromKey(recordKeys[i] as IQualifiedKey, Number);
-					return meterValueSum / n;
-				}
-			}
-			
-			override public function drawPlotAsyncIteration(task:IPlotTask):Number
-			{
-				if (task.recordKeys.length > 0)
-				{
-					//project center point
-					p1.x = p1.y = 0;
-					task.dataBounds.projectPointTo(p1, task.screenBounds);
-					
-					//project tip point (angle driven by data value)
-					var meterValue:Number = getMeterValue(task.recordKeys);
-					var meterValueMax:Number = meterColumnStats.getMax();
-					var meterValueMin:Number = meterColumnStats.getMin();
-					var norm:Number = StandardLib.normalize(meterValue, meterValueMin, meterValueMax);
+			meterColumn.addImmediateCallback(this, updateAxis);
+			binningDefinition.generateBinClassifiersForColumn(meterColumn);
+			Weave.linkableChild(this, binningDefinition.asyncResultCallbacks);
+		}
 		
-					//compute the angle and project to screen coordinates
-					var angle:Number = theta+(1-norm)*(Math.PI-2*theta)
-					p2.x = Math.cos(angle)*outerRadius;
-					p2.y = Math.sin(angle)*outerRadius;
-					task.dataBounds.projectPointTo(p2, task.screenBounds);
-					
-					//draw the needle line (from center to tip)
-					var g:Graphics = tempShape.graphics;
-					g.clear();
-					g.lineStyle(needleThickness,needleColor,1.0);
-					g.moveTo(p1.x, p1.y+outerRadius);
-					g.lineTo(p2.x, p2.y);
-					//flush the graphics buffer
-					task.buffer.draw(tempShape);
-				}
-				return 1;
-			}
-			
-			/**
-			 * This function draws the background graphics for this plotter, if applicable.
-			 * An example background would be the origin lines of an axis.
-			 * @param dataBounds The data coordinates that correspond to the given screenBounds.
-			 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
-			 * @param destination The sprite to draw the graphics onto.
-			 */
-			override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
-			{
-				//clear the graphics
-				var g:Graphics = tempShape.graphics;
-				g.clear();
-				
-				//fill the colored sectors
-				fillSectors(dataBounds, screenBounds, g);
-				
-				//draw the meter outline
-				drawMeterOutline(dataBounds, screenBounds, g);
-
-				//TODO incorporate the bin names, use as labels
-				//call getNames(),getObjects() on bins
-				
-				axis.draw(outerRadius,theta,tickMarkLabelsRadius,dataBounds, screenBounds,g,destination);
-				
-				//flush the graphics buffer
-				destination.draw(tempShape);
-			}
-			
-			private function fillSectors(dataBounds:Bounds2D, screenBounds:Bounds2D,g:Graphics):void
-			{
-				var binNames:Array = binningDefinition.getBinNames();
-				var numSectors:Number = binNames.length;
-				var sectorSize:Number = (Math.PI-2*theta)/numSectors;
-				for(var i:Number = 0;i<numSectors;i++){
-					var color:uint = colorRamp.getColorFromNorm(i/(numSectors-1));
-					PlotUtils.fillSector(innerRadius,outerRadius,theta+i*sectorSize,theta+(i+1)*sectorSize,color,dataBounds, screenBounds, g);
-				}
-			}
-			
-			private function drawMeterOutline(dataBounds:Bounds2D, screenBounds:Bounds2D,g:Graphics):void
-			{
-				g.lineStyle(outlineThickness,outlineColor,1.0);
-				var minAngle:Number = theta;
-				var maxAngle:Number = Math.PI-theta;
-				PlotUtils.drawArc(outerRadius,minAngle,maxAngle,dataBounds, screenBounds, g);
-				PlotUtils.drawArc(innerRadius,minAngle,maxAngle,dataBounds, screenBounds, g);
-				PlotUtils.drawRadialLine(innerRadius,outerRadius,minAngle,dataBounds, screenBounds, g);
-				PlotUtils.drawRadialLine(innerRadius,outerRadius,maxAngle,dataBounds, screenBounds, g);
-			}
-			
-			/**
-			 * This function returns a Bounds2D object set to the data bounds associated with the background.
-			 * @param outputDataBounds A Bounds2D object to store the result in.
-			 * @return A Bounds2D object specifying the background data bounds.
-			 */
-			override public function getBackgroundDataBounds(output:Bounds2D):void
-			{
-				//TODO move these hard coded bounds to sessioned variables and make UI for editing them
-				output.setBounds(-1, -.3, 1, 1);
-			}
-			
-			override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
-			{
-				initBoundsArray(output);
-				(output[0] as Bounds2D).setBounds(-1, -.3, 1, 1);
+		public function getSelectableAttributeNames():Array
+		{
+			return ["Gauge Column"];
+		}
+		public function getSelectableAttributes():Array
+		{
+			return [meterColumn]
+		}
+		
+		/**
+		 * Updates the internal axis representation with the latest min, max, and 
+		 * numberOfTickMarks. This should be called whenever any one of those changes.
+		 */ 
+		private function updateAxis():void
+		{
+			var max:Number = meterColumnStats.getMax();
+			var min:Number = meterColumnStats.getMin();
+			axis.setParams(min,max,numberOfTickMarks);
+		}
+		
+		private function getMeterValue(recordKeys:Array):Number
+		{
+			var n:Number = recordKeys.length;
+			if(n == 1)
+				return meterColumn.getValueFromKey(recordKeys[i] as IQualifiedKey, Number)
+			else{
+				//compute the meter value by averaging record values
+				var meterValueSum:Number = 0;
+				for (var i:int = 0; i < n; i++)//TODO handle missing values
+					meterValueSum += meterColumn.getValueFromKey(recordKeys[i] as IQualifiedKey, Number);
+				return meterValueSum / n;
 			}
 		}
+		
+		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		{
+			if (task.recordKeys.length > 0)
+			{
+				//project center point
+				p1.x = p1.y = 0;
+				task.dataBounds.projectPointTo(p1, task.screenBounds);
+				
+				//project tip point (angle driven by data value)
+				var meterValue:Number = getMeterValue(task.recordKeys);
+				var meterValueMax:Number = meterColumnStats.getMax();
+				var meterValueMin:Number = meterColumnStats.getMin();
+				var norm:Number = StandardLib.normalize(meterValue, meterValueMin, meterValueMax);
+	
+				//compute the angle and project to screen coordinates
+				var angle:Number = theta+(1-norm)*(Math.PI-2*theta)
+				p2.x = Math.cos(angle)*outerRadius;
+				p2.y = Math.sin(angle)*outerRadius;
+				task.dataBounds.projectPointTo(p2, task.screenBounds);
+				
+				//draw the needle line (from center to tip)
+				var g:Graphics = tempShape.graphics;
+				g.clear();
+				g.lineStyle(needleThickness,needleColor,1.0);
+				g.moveTo(p1.x, p1.y+outerRadius);
+				g.lineTo(p2.x, p2.y);
+				//flush the graphics buffer
+				task.buffer.draw(tempShape);
+			}
+			return 1;
+		}
+		
+		/**
+		 * This function draws the background graphics for this plotter, if applicable.
+		 * An example background would be the origin lines of an axis.
+		 * @param dataBounds The data coordinates that correspond to the given screenBounds.
+		 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
+		 * @param destination The sprite to draw the graphics onto.
+		 */
+		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		{
+			//clear the graphics
+			var g:Graphics = tempShape.graphics;
+			g.clear();
+			
+			//fill the colored sectors
+			fillSectors(dataBounds, screenBounds, g);
+			
+			//draw the meter outline
+			drawMeterOutline(dataBounds, screenBounds, g);
+
+			//TODO incorporate the bin names, use as labels
+			//call getNames(),getObjects() on bins
+			
+			axis.draw(outerRadius,theta,tickMarkLabelsRadius,dataBounds, screenBounds,g,destination);
+			
+			//flush the graphics buffer
+			destination.draw(tempShape);
+		}
+		
+		private function fillSectors(dataBounds:Bounds2D, screenBounds:Bounds2D,g:Graphics):void
+		{
+			var binNames:Array = binningDefinition.getBinNames();
+			var numSectors:Number = binNames.length;
+			var sectorSize:Number = (Math.PI-2*theta)/numSectors;
+			for(var i:Number = 0;i<numSectors;i++){
+				var color:uint = colorRamp.getColorFromNorm(i/(numSectors-1));
+				PlotUtils.fillSector(innerRadius,outerRadius,theta+i*sectorSize,theta+(i+1)*sectorSize,color,dataBounds, screenBounds, g);
+			}
+		}
+		
+		private function drawMeterOutline(dataBounds:Bounds2D, screenBounds:Bounds2D,g:Graphics):void
+		{
+			g.lineStyle(outlineThickness,outlineColor,1.0);
+			var minAngle:Number = theta;
+			var maxAngle:Number = Math.PI-theta;
+			PlotUtils.drawArc(outerRadius,minAngle,maxAngle,dataBounds, screenBounds, g);
+			PlotUtils.drawArc(innerRadius,minAngle,maxAngle,dataBounds, screenBounds, g);
+			PlotUtils.drawRadialLine(innerRadius,outerRadius,minAngle,dataBounds, screenBounds, g);
+			PlotUtils.drawRadialLine(innerRadius,outerRadius,maxAngle,dataBounds, screenBounds, g);
+		}
+		
+		/**
+		 * This function returns a Bounds2D object set to the data bounds associated with the background.
+		 * @param outputDataBounds A Bounds2D object to store the result in.
+		 * @return A Bounds2D object specifying the background data bounds.
+		 */
+		override public function getBackgroundDataBounds(output:Bounds2D):void
+		{
+			//TODO move these hard coded bounds to sessioned variables and make UI for editing them
+			output.setBounds(-1, -.3, 1, 1);
+		}
+		
+		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		{
+			initBoundsArray(output);
+			(output[0] as Bounds2D).setBounds(-1, -.3, 1, 1);
+		}
 	}
+}
 
 

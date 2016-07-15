@@ -1,6 +1,7 @@
+namespace weavejs.plot
+{
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import Graphics = PIXI.Graphics;
-	import IPlotter
 	import IDisposableObject = weavejs.api.core.IDisposableObject;
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import IDynamicKeyFilter = weavejs.api.data.IDynamicKeyFilter;
@@ -10,7 +11,6 @@
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import AsyncSort = weavejs.util.AsyncSort;
 
-	from "./IPlotter";
 	import ZoomBounds = weavejs.geom.ZoomBounds;
 	import StandardLib = weavejs.util.StandardLib;
 	import IDynamicKeyFilter = weavejs.api.data.IDynamicKeyFilter;
@@ -21,7 +21,6 @@
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import CallbackCollection = weavejs.core.CallbackCollection;
 	import WeaveAPI = weavejs.WeaveAPI;
-	import IPlotTask from "./IPlotTask";
 	import IDisposableObject = weavejs.api.core.IDisposableObject;
 
 	/**
@@ -461,3 +460,4 @@
 	}
 
 	Weave.registerClass(PlotTask, "weavejs.plot.PlotTask");
+}

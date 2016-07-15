@@ -21,6 +21,7 @@
 /// <reference path="./weavejs/ui/ToolTip.tsx"/>
 /// <reference path="./weavejs/util/GraphicsUtils.ts"/>
 /// <reference path="./weavejs/api/ui/IPlotTask.ts"/>
+/// <reference path="./weavejs/plot/SimpleAxisPlotter.as"/>
 /// <reference path="./weavejs/api/ui/IPlotter.ts"/>
 /// <reference path="./weavejs/plot/AbstractPlotter.ts"/>
 /// <reference path="./weavejs/plot/AbstractGlyphPlotter.ts"/>
