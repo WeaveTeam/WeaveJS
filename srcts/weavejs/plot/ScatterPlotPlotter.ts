@@ -27,6 +27,7 @@ namespace weavejs.plot
 	{
 		public constructor()
 		{
+			super();
 			this.fill.color.internalDynamicColumn.globalName = 'defaultColorColumn';
 			this.fill.color.internalDynamicColumn.addImmediateCallback(this, this.handleColor, true);
 			Weave.getCallbacks(this.colorDataWatcher).addImmediateCallback(this, this.updateKeySources, true);
