@@ -202,7 +202,11 @@ export default class C3BarChart extends AbstractC3Tool
 
 	                        if(record)
 	                        {
-		                        let valFromKey = Weave.lang(this.labelColumn.getValueFromKey(record.id));
+		                        let valFromKey = this.labelColumn.getValueFromKey(record.id) ;
+		                        if(weavejs.WeaveAPI.Locale.reverseLayout){
+			                        valFromKey =  Weave.lang(valFromKey);
+		                        }
+
 		                        if(this.horizontalMode.value)
 			                        return this.formatYAxisLabel(valFromKey,this.xAxisLabelAngle.value);
 		                        return this.formatXAxisLabel(valFromKey,this.xAxisLabelAngle.value);// otherwise return the value from the labelColumn
@@ -307,7 +311,14 @@ export default class C3BarChart extends AbstractC3Tool
 		this.RECORD_DATATYPE.heights.xLabel = String;
 
         this.heightColumnNames = this.heightColumns.getNames();
-        this.heightColumnsLabels = columns.map(column => Weave.lang(column.getMetadata("title")));
+        this.heightColumnsLabels = columns.map(column => {
+	        let columnTitle:string = column.getMetadata("title");
+	        if(weavejs.WeaveAPI.Locale.reverseLayout)
+	        {
+		        columnTitle =  Weave.lang(columnTitle);
+	        }
+	        return columnTitle;
+        });
 
         this.yLabelColumnDataType = this.yLabelColumn.getMetadata("dataType");
 
@@ -449,7 +460,13 @@ export default class C3BarChart extends AbstractC3Tool
 	{
 		if (!this.showXAxisLabel.value)
 			return "";
-		return Weave.lang("Sorted by " + this.sortColumn.getMetadata('title'));
+		
+		let sortColumnTitle:string = "Sorted by " + this.sortColumn.getMetadata('title');
+		if(weavejs.WeaveAPI.Locale.reverseLayout)
+		{
+			sortColumnTitle =  Weave.lang(sortColumnTitle);
+		}
+		return sortColumnTitle;
 	}
 
 	get defaultYAxisLabel():string
