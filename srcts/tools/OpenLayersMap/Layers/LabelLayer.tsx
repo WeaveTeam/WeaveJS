@@ -110,6 +110,10 @@ export default class LabelLayer extends AbstractGlyphLayer
 				text = _.trim(text);
 			}
 
+			if(text && weavejs.WeaveAPI.Locale.reverseLayout){
+				text = Weave.lang(text);
+			}
+
 			let bounds: Bounds2D = feature.get("Bounds2D") as Bounds2D;
 			if (!bounds)
 			{
