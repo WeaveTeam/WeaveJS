@@ -174,6 +174,11 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			className += " weave-tool-title-bar-highlighted";
 		var maximizeClassName = "fa fa-fw fa-" + (this.props.maximized ? "compress" : "expand");
 		var maximizeTitleText = this.props.maximized ? Weave.lang("Restore") : Weave.lang("Maximize");
+		
+		let toolTitle:string = this.state.title;
+		if(weavejs.WeaveAPI.Locale.reverseLayout){
+			toolTitle = Weave.lang(toolTitle);
+		}
 
 		return (
 			<HBox className={className} style={{alignItems: 'center'}} onDoubleClick={this.onMaximizeClick}>
@@ -188,7 +193,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 				</HBox>
 				<HBox draggable={true} style={{flex: 1, alignSelf: "stretch", cursor: "move", visibility: "visible", overflow: "hidden"}}>
 					<p className="weave-tool-title-bar-text" style={{width: "100%", padding: 5, textAlign: "center", overflow: "hidden", textOverflow: "ellipsis"}}>
-						{Weave.lang(this.state.title)}
+						{toolTitle}
 					</p>
 				</HBox>
 				<HBox overflow style={{display: showControls ? "flex" : "none", flexDirection: "row"}}>
