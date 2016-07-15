@@ -248,11 +248,11 @@ namespace weavejs.menu
 						})*/
 					},
 						(result)=> {
-							WeaveApp.notificationSystem.addNotification({
+							/*WeaveApp.notificationSystem.addNotification({
 								message: Weave.lang("Failed to open file"),
 								position: 'tr',
 								level: 'error'
-							})
+							})*/
 						});
 			}
 			else
@@ -418,21 +418,21 @@ namespace weavejs.menu
 				(result: Uint8Array)=>
 				{
 					weavejs.net.Admin.service.saveWeaveFileByteArray(result, newFileName, overwrite);
-					WeaveApp.notificationSystem.addNotification({
+					/*WeaveApp.notificationSystem.addNotification({
 						message: Weave.lang("Session saved to server"),
 						position: 'tr',
 						level: 'success'
-					})
+					})*/
 				},
 				(error:any)=>
 				{
 					/* Call login window from here if auth error and retry, otherwise, display error. */
 					console.error(error);
-					WeaveApp.notificationSystem.addNotification({
+					/*WeaveApp.notificationSystem.addNotification({
 						message: Weave.lang("Failed to save session to server"),
 						position: 'tr',
 						level: 'error'
-					})
+					})*/
 				}
 			);
 		};

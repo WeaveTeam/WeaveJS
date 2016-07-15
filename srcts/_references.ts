@@ -10,6 +10,9 @@
 /// <reference path="./weavejs/tool/oltool/layer/ImageGlyphCache.tsx"/>
 /// <reference path="./weavejs/ui/StatefulRangeSlider.tsx"/>
 /// <reference path="./weavejs/tool/oltool/Projections.ts"/>
+/// <reference path="./weavejs/tool/oltool/layer/AbstractGlyphLayer.tsx"/>
+/// <reference path="./weavejs/tool/oltool/layer/ScatterPlotLayer.tsx"/>
+/// <reference path="./weavejs/tool/oltool/layer/ImageGlyphLayer.tsx"/>
 /// <reference path="./weavejs/tool/oltool/IOpenLayersMapTool.ts"/>
 /// <reference path="./weavejs/tool/oltool/InteractionModeCluster.ts"/>
 /// <reference path="./weavejs/tool/oltool/CustomZoomToExtent.ts"/>
@@ -31,6 +34,7 @@
 /// <reference path="./weavejs/app/WeaveProperties.ts"/>
 /// <reference path="./weavejs/api/ui/IAltText.ts"/>
 /// <reference path="./weavejs/util/DOMUtils.ts"/>
+/// <reference path="./weavejs/tool/oltool/layer/LabelLayer.tsx"/>
 /// <reference path="./weavejs/ui/PanelOverlay.tsx"/>
 /// <reference path="./weavejs/ui/Div.tsx"/>
 /// <reference path="./weavejs/util/MouseUtils.ts"/>
@@ -107,7 +111,9 @@
 /// <reference path="./weavejs/editor/SessionStateEditor.tsx"/>
 /// <reference path="./weavejs/editor/SessionHistorySlider.tsx"/>
 /// <reference path="./weavejs/editor/NumericRangeDataFilterEditor.tsx"/>
+/// <reference path="./weavejs/editor/MetadataGrid.tsx"/>
 /// <reference path="./weavejs/editor/DiscreteValuesDataFilterEditor.tsx"/>
+/// <reference path="./weavejs/editor/CSVMetadataEditor.tsx"/>
 /// <reference path="./weavejs/editor/ColorRampEditor.tsx"/>
 /// <reference path="./weavejs/editor/CensusGeographyFilter.tsx"/>
 /// <reference path="./weavejs/dialog/PopupWindow.tsx"/>
@@ -120,10 +126,6 @@
 /// <reference path="./weavejs/tool/oltool/layer/AbstractFeatureLayer.tsx"/>
 /// <reference path="./weavejs/tool/oltool/ProbeInteraction.ts"/>
 /// <reference path="./weavejs/tool/oltool/layer/GeometryLayer.tsx"/>
-/// <reference path="./weavejs/tool/oltool/layer/AbstractGlyphLayer.tsx"/>
-/// <reference path="./weavejs/tool/oltool/layer/ScatterPlotLayer.tsx"/>
-/// <reference path="./weavejs/tool/oltool/layer/LabelLayer.tsx"/>
-/// <reference path="./weavejs/tool/oltool/layer/ImageGlyphLayer.tsx"/>
 /// <reference path="./weavejs/tool/oltool/LayerManager.tsx"/>
 /// <reference path="./weavejs/tool/oltool/DragSelection.ts"/>
 /// <reference path="./weavejs/editor/BinningDefinitionEditor.tsx"/>

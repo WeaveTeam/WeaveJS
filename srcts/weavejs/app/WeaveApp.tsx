@@ -661,7 +661,7 @@ namespace weavejs.app
 					{progressBarUI}
 					{weaveTabbedComponent}
 					{interactiveTourComponent}
-					<NotificationSystem ref={(c:NotificationSystem.System) => {WeaveApp.notificationSystem = c;}}/>
+					{/*<NotificationSystem ref={(c:NotificationSystem.System) => {WeaveApp.notificationSystem = c;}}/>*/}
 				</VBox>
 			);
 		}
