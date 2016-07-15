@@ -57,8 +57,8 @@
 				// Parameter types: Array, Bounds2D, Bounds2D, BitmapData
 				function(keys, dataBounds, screenBounds, destination)
 				{
-					import GraphicsBuffer' = 'weave.data.AttributeColumns.DynamicColumn';
-					import 'weave.utils.GraphicsBuffer';
+					import DynamicColumn' = 'weave.data.AttributeColumns.DynamicColumn';
+					import GraphicsBuffer' = 'weave.utils.GraphicsBuffer';
 				
 					var getStats = WeaveAPI.StatisticsCache.getColumnStatistics;
 					var colorColumn = vars.requestObject('color', DynamicColumn, false);

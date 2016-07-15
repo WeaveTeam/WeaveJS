@@ -17,15 +17,15 @@
 	{
 		import BitmapData = flash.display.BitmapData;
 		import Graphics = PIXI.Graphics;
-		import Matrix = flash.display.Shape;
-		import flash.geom.Matrix;
+		import Shape = flash.display.Shape;
+		import Matrix = flash.geom.Matrix;
 		import Point = weavejs.geom.Point;
-		import ImageSnapshot = flash.text.TextFieldAutoSize;
-		import flash.utils.Dictionary;
-		import flash.utils.getTimer;
+		import TextFieldAutoSize = flash.text.TextFieldAutoSize;
+		import Dictionary = flash.utils.Dictionary;
+		import getTimer = flash.utils.getTimer;
 		
-		import mx.core.UITextField;
-		import mx.graphics.ImageSnapshot;
+		import UITextField = mx.core.UITextField;
+		import ImageSnapshot = mx.graphics.ImageSnapshot;
 		
 		import disposeObject = weavejs.api.disposeObject;
 		import registerDisposableChild = weavejs.api.registerDisposableChild;

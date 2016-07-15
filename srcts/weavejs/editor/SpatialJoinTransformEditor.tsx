@@ -12,7 +12,7 @@ namespace weavejs.editor
 	import KeyTypeInput = weavejs.ui.KeyTypeInput;
 
 	import SpatialJoinTransform = weavejs.data.source.SpatialJoinTransform;
-	import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
+	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;

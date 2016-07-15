@@ -15,8 +15,8 @@
 
 	namespace weavejs.plot
 	{
-		import Matrix = flash.display.BitmapData;
-		import flash.geom.Matrix;
+		import BitmapData = flash.display.BitmapData;
+		import Matrix = flash.geom.Matrix;
 		import Point = weavejs.geom.Point;
 		import TextFormatAlign = flash.text.TextFormatAlign;
 		

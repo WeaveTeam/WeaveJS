@@ -15,7 +15,7 @@ namespace weavejs.editor
 
 	import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
 	import FilteredColumn = weavejs.data.column.FilteredColumn;
-	import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
+	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;

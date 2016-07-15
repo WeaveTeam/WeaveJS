@@ -1,14 +1,14 @@
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import Graphics = PIXI.Graphics;
 	import IPlotter
-	import weavejs.api.core.IDisposableObject;
-	import weavejs.api.core.ILinkableObject;
-	import weavejs.api.data.IDynamicKeyFilter;
-	import weavejs.api.data.IKeyFilter;
-	import weavejs.api.data.IQualifiedKey;
-	import weavejs.core.CallbackCollection;
-	import weavejs.geom.Bounds2D;
-	import weavejs.util.AsyncSort;
+	import IDisposableObject = weavejs.api.core.IDisposableObject;
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import IDynamicKeyFilter = weavejs.api.data.IDynamicKeyFilter;
+	import IKeyFilter = weavejs.api.data.IKeyFilter;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import CallbackCollection = weavejs.core.CallbackCollection;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import AsyncSort = weavejs.util.AsyncSort;
 
 	from "./IPlotter";
 	import ZoomBounds = weavejs.geom.ZoomBounds;

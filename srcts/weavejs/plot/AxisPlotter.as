@@ -18,10 +18,10 @@
 		import BitmapData = flash.display.BitmapData;
 		import Graphics = PIXI.Graphics;
 		import Point = weavejs.geom.Point;
-		import NumberFormatter = flash.text.TextFormatAlign;
-		import flash.utils.getQualifiedClassName;
+		import TextFormatAlign = flash.text.TextFormatAlign;
+		import getQualifiedClassName = flash.utils.getQualifiedClassName;
 		
-		import mx.formatters.NumberFormatter;
+		import NumberFormatter = mx.formatters.NumberFormatter;
 		
 		import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 		import Bounds2D = weavejs.geom.Bounds2D;

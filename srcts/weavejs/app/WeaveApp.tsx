@@ -9,7 +9,6 @@ namespace weavejs.app
 	import MiscUtils = weavejs.util.MiscUtils;
 	import WeaveTool = weavejs.layout.WeaveTool;
 	import LayoutPanelProps = weavejs.layout.LayoutPanelProps;
-	import PanelRender = weavejs.layout.PanelRenderer;
 	import AbstractLayout = weavejs.layout.AbstractLayout;
 	import AnyAbstractLayout = weavejs.layout.AnyAbstractLayout;
 	import DataSourceManager = weavejs.editor.manager.DataSourceManager;

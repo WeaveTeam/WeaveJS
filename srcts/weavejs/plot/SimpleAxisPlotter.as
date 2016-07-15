@@ -15,15 +15,15 @@
 
 	namespace weavejs.plot
 	{
-		import CapsStyle = flash.display.BitmapData;
-		import flash.display.CapsStyle;
+		import BitmapData = flash.display.BitmapData;
+		import CapsStyle = flash.display.CapsStyle;
 		import Graphics = PIXI.Graphics;
 		import LineScaleMode = flash.display.LineScaleMode;
 		import Point = weavejs.geom.Point;
-		import NumberFormatter = flash.text.TextFormatAlign;
-		import flash.utils.getQualifiedClassName;
+		import TextFormatAlign = flash.text.TextFormatAlign;
+		import getQualifiedClassName = flash.utils.getQualifiedClassName;
 		
-		import mx.formatters.NumberFormatter;
+		import NumberFormatter = mx.formatters.NumberFormatter;
 		
 		import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 		import IQualifiedKey = weavejs.api.data.IQualifiedKey;

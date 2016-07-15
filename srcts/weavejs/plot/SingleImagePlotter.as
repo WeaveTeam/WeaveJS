@@ -15,14 +15,14 @@
 
 	namespace weavejs.plot
 	{
-		import Matrix = flash.display.Bitmap;
-		import flash.display.BitmapData;
-		import flash.geom.Matrix;
+		import Bitmap = flash.display.Bitmap;
+		import BitmapData = flash.display.BitmapData;
+		import Matrix = flash.geom.Matrix;
 		import Point = weavejs.geom.Point;
 		import URLRequest = weavejs.net.URLRequest;
 		
-		import ResultEvent = mx.rpc.events.FaultEvent;
-		import mx.rpc.events.ResultEvent;
+		import FaultEvent = mx.rpc.events.FaultEvent;
+		import ResultEvent = mx.rpc.events.ResultEvent;
 		
 		import objectWasDisposed = weavejs.api.objectWasDisposed;
 		import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;

@@ -15,12 +15,12 @@
 
 	namespace weavejs.plot
 	{
-		import Shape = flash.display.BitmapData;
-		import flash.display.LineScaleMode;
-		import flash.display.Shape;
+		import BitmapData = flash.display.BitmapData;
+		import LineScaleMode = flash.display.LineScaleMode;
+		import Shape = flash.display.Shape;
 		import Point = weavejs.geom.Point;
-		import getTimer = flash.utils.Dictionary;
-		import flash.utils.getTimer;
+		import Dictionary = flash.utils.Dictionary;
+		import getTimer = flash.utils.getTimer;
 		
 		import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 		import IQualifiedKey = weavejs.api.data.IQualifiedKey;

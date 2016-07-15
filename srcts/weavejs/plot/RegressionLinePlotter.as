@@ -19,8 +19,8 @@
 		import Graphics = PIXI.Graphics;
 		import Point = weavejs.geom.Point;
 		
-		import ResultEvent = mx.rpc.events.FaultEvent;
-		import mx.rpc.events.ResultEvent;
+		import FaultEvent = mx.rpc.events.FaultEvent;
+		import ResultEvent = mx.rpc.events.ResultEvent;
 		
 		import IDisposableObject = weavejs.api.core.IDisposableObject;
 		import Bounds2D = weavejs.geom.Bounds2D;

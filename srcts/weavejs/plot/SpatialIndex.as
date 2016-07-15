@@ -15,38 +15,38 @@
 
 	package weave.utils
 	{
-		import flash.geom.Point;
-		import flash.utils.Dictionary;
-		import flash.utils.getTimer;
+		import Point = flash.geom.Point;
+		import Dictionary = flash.utils.Dictionary;
+		import getTimer = flash.utils.getTimer;
 		
-		import weave.Weave;
-		import weave.api.core.ICallbackCollection;
-		import weave.api.core.ILinkableObject;
-		import weave.api.data.IQualifiedKey;
-		import weave.api.data.ISimpleGeometry;
-		import weave.api.getCallbackCollection;
-		import weave.api.primitives.IBounds2D;
-		import weave.api.registerDisposableChild;
-		import weave.api.ui.IPlotter;
-		import weave.api.ui.IPlotterWithGeometries;
-		import weave.core.StageUtils;
-		import weave.primitives.BLGNode;
-		import weave.primitives.Bounds2D;
-		import weave.primitives.GeneralizedGeometry;
-		import weave.primitives.KDTree;
-		import weave.primitives.SimpleGeometry;
+		import Weave = weave.Weave;
+		import ICallbackCollection = weave.api.core.ICallbackCollection;
+		import ILinkableObject = weave.api.core.ILinkableObject;
+		import IQualifiedKey = weave.api.data.IQualifiedKey;
+		import ISimpleGeometry = weave.api.data.ISimpleGeometry;
+		import getCallbackCollection = weave.api.getCallbackCollection;
+		import IBounds2D = weave.api.primitives.IBounds2D;
+		import registerDisposableChild = weave.api.registerDisposableChild;
+		import IPlotter = weave.api.ui.IPlotter;
+		import IPlotterWithGeometries = weave.api.ui.IPlotterWithGeometries;
+		import StageUtils = weave.core.StageUtils;
+		import BLGNode = weave.primitives.BLGNode;
+		import Bounds2D = weave.primitives.Bounds2D;
+		import GeneralizedGeometry = weave.primitives.GeneralizedGeometry;
+		import KDTree = weave.primitives.KDTree;
+		import SimpleGeometry = weave.primitives.SimpleGeometry;
 
-		import weavejs.api.core.ICallbackCollection;
+		import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 
-		import weavejs.api.core.ILinkableObject;
-		import weavejs.api.data.IQualifiedKey;
-		import weavejs.api.data.ISimpleGeometry;
-		import weavejs.geom.BLGNode;
-		import weavejs.geom.Bounds2D;
-		import weavejs.geom.GeneralizedGeometry;
-		import weavejs.geom.KDTree;
-		import weavejs.geom.Point;
-		import weavejs.geom.SimpleGeometry;
+		import ILinkableObject = weavejs.api.core.ILinkableObject;
+		import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+		import ISimpleGeometry = weavejs.api.data.ISimpleGeometry;
+		import BLGNode = weavejs.geom.BLGNode;
+		import Bounds2D = weavejs.geom.Bounds2D;
+		import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
+		import KDTree = weavejs.geom.KDTree;
+		import Point = weavejs.geom.Point;
+		import SimpleGeometry = weavejs.geom.SimpleGeometry;
 
 		/**
 		 * This class provides an interface to a collection of spatially indexed IShape objects.

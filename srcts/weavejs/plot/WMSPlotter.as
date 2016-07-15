@@ -15,13 +15,13 @@
 
 	namespace weavejs.plot
 	{
-		import Matrix = flash.display.Bitmap;
-		import flash.display.BitmapData;
-		import flash.display.LineScaleMode;
-		import flash.display.Shape;
-		import flash.display.TriangleCulling;
-		import flash.geom.ColorTransform;
-		import flash.geom.Matrix;
+		import Bitmap = flash.display.Bitmap;
+		import BitmapData = flash.display.BitmapData;
+		import LineScaleMode = flash.display.LineScaleMode;
+		import Shape = flash.display.Shape;
+		import TriangleCulling = flash.display.TriangleCulling;
+		import ColorTransform = flash.geom.ColorTransform;
+		import Matrix = flash.geom.Matrix;
 		import Point = weavejs.geom.Point;
 		import Rectangle = weavejs.geom.Rectangle;
 		

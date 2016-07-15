@@ -7,7 +7,7 @@ namespace weavejs.editor
 	import Input = weavejs.ui.Input;
 	import Checkbox = weavejs.ui.Checkbox;
 	import WeaveReactUtils = weavejs.util.WeaveReactUtils
-	import FixedDataTable = weavejs.ui.DataTable;
+	import DataTable = weavejs.ui.DataTable;
 	import BinNamesList = weavejs.ui.BinNamesList;
 	import ReactUtils = weavejs.util.ReactUtils;
 	import Button = weavejs.ui.Button;
@@ -33,7 +33,6 @@ namespace weavejs.editor
 	import NaturalJenksBinningDefinition = weavejs.data.bin.NaturalJenksBinningDefinition;
 	import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
-	import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
 	import ColumnSelector = weavejs.ui.ColumnSelector;
 
 	// temporary hack

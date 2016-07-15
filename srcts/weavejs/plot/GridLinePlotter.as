@@ -15,8 +15,8 @@
 
 	namespace weavejs.plot
 	{
-		import CapsStyle = flash.display.BitmapData;
-		import flash.display.CapsStyle;
+		import BitmapData = flash.display.BitmapData;
+		import CapsStyle = flash.display.CapsStyle;
 		import Graphics = PIXI.Graphics;
 		import Point = weavejs.geom.Point;
 		

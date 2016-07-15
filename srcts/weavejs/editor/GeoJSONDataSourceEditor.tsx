@@ -20,7 +20,6 @@ namespace weavejs.editor
 	import EntityType = weavejs.api.data.EntityType;
 	import LinkableFile = weavejs.core.LinkableFile;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
-	import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 	import WeaveAPI = weavejs.WeaveAPI;
 
 	export class GeoJSONDataSourceEditor extends DataSourceEditor

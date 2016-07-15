@@ -3,7 +3,6 @@ namespace weavejs.tool
 	import Menu = weavejs.ui.menu.Menu;
 	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
 	import MiscUtils = weavejs.util.MiscUtils;
-	import FixedDataTable = weavejs.ui.DataTable;
 	import SortTypes = weavejs.ui.SortTypes;
 	import SortDirection = weavejs.ui.SortDirection;
 	import ReactUtils = weavejs.util.ReactUtils;

@@ -40,7 +40,7 @@ namespace weavejs.tool.c3tool
 	import StandardLib = weavejs.util.StandardLib;
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
-	import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
 

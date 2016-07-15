@@ -17,14 +17,14 @@
 	{	
 		import BitmapData = flash.display.BitmapData;
 		import Graphics = PIXI.Graphics;
-		import Matrix = flash.display.Shape;
-		import flash.geom.Matrix;
+		import Shape = flash.display.Shape;
+		import Matrix = flash.geom.Matrix;
 		import Point = weavejs.geom.Point;
 		import Rectangle = weavejs.geom.Rectangle;
-		import Voronoi = flash.utils.Dictionary;
+		import Dictionary = flash.utils.Dictionary;
 		
-		import net.ivank.voronoi.VEdge;
-		import net.ivank.voronoi.Voronoi;
+		import VEdge = net.ivank.voronoi.VEdge;
+		import Voronoi = net.ivank.voronoi.Voronoi;
 		
 		import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 		import Bounds2D = weavejs.geom.Bounds2D;

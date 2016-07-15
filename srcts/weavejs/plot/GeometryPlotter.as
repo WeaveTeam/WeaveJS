@@ -15,14 +15,14 @@
 
 	namespace weavejs.plot
 	{
-		import BitmapData = flash.display.Bitmap;
-		import flash.display.BitmapData;
+		import Bitmap = flash.display.Bitmap;
+		import BitmapData = flash.display.BitmapData;
 		import Graphics = PIXI.Graphics;
-		import Matrix = flash.display.LineScaleMode;
-		import flash.geom.Matrix;
+		import LineScaleMode = flash.display.LineScaleMode;
+		import Matrix = flash.geom.Matrix;
 		import Point = weavejs.geom.Point;
-		import getTimer = flash.utils.Dictionary;
-		import flash.utils.getTimer;
+		import Dictionary = flash.utils.Dictionary;
+		import getTimer = flash.utils.getTimer;
 		
 		import DynamicState = weavejs.api.core.DynamicState;
 		import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;

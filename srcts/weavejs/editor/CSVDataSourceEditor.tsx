@@ -18,7 +18,6 @@ namespace weavejs.editor
 	import EntityNode = weavejs.data.hierarchy.EntityNode;
 	import EntityType = weavejs.api.data.EntityType;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
-	import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 	import ColumnUtils = weavejs.data.ColumnUtils;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;

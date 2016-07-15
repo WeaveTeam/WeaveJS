@@ -10,7 +10,7 @@ namespace weavejs.tool
 	import EditableTextCell = weavejs.ui.EditableTextCell;
 	import MiscUtils = weavejs.util.MiscUtils;
 	import ComboBox = weavejs.ui.ComboBox;
-	import CheckBox = weavejs.ui.Checkbox;
+	import Checkbox = weavejs.ui.Checkbox;
 	import Button = weavejs.ui.Button;
 	import CenteredIcon = weavejs.ui.CenteredIcon;
 	import WeaveReactUtils = weavejs.util.WeaveReactUtils
@@ -486,7 +486,7 @@ namespace weavejs.tool
 			return[
 				[
 					Weave.lang("Auto-update active menu item"),
-					<CheckBox ref={ WeaveReactUtils.linkReactStateRef(this, {value: this.props.sessionStateMenuTool.autoRecord}) } label={" "}/>
+					<Checkbox ref={ WeaveReactUtils.linkReactStateRef(this, {value: this.props.sessionStateMenuTool.autoRecord}) } label={" "}/>
 				],
 				[//layout
 					Weave.lang("Layout mode"),

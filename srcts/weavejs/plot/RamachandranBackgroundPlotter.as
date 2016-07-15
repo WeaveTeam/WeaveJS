@@ -15,8 +15,8 @@
 
 	namespace weavejs.plot
 	{
-		import BitmapData = flash.display.Bitmap;
-		import flash.display.BitmapData;
+		import Bitmap = flash.display.Bitmap;
+		import BitmapData = flash.display.BitmapData;
 		import Graphics = PIXI.Graphics;
 		import Matrix = flash.geom.Matrix;
 		import Point = weavejs.geom.Point;

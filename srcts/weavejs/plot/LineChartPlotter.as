@@ -73,9 +73,9 @@
 	import Graphics = PIXI.Graphics;
 	import Shape = flash.display.Shape;
 	import Point = weavejs.geom.Point;
-	import ObjectUtil = flash.utils.getTimer;
+	import getTimer = flash.utils.getTimer;
 
-	import mx.utils.ObjectUtil;
+	import ObjectUtil = mx.utils.ObjectUtil;
 
 	import IKeySet = weavejs.api.data.IKeySet;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
