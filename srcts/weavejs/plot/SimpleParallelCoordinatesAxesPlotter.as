@@ -66,7 +66,7 @@ namespace weavejs.plot
 			if (!plotter)
 				return;
 			var columns:Array = plotter.columns.getObjects();
-			var normalize:Boolean = plotter.normalize.value;
+			var normalize:boolean = plotter.normalize.value;
 			
 			// set up bitmapBounds so the direction matches that of screenBounds
 			if (screenBounds.getXDirection() > 0)

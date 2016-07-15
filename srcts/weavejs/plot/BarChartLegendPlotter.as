@@ -160,6 +160,6 @@ namespace weavejs.plot
 		}
 		
 		// backwards compatibility
-		//[Deprecated(replacement="reverseOrder")] public set ascendingOrder(value:Boolean):void { reverseOrder.value = value; }
+		//[Deprecated(replacement="reverseOrder")] public set ascendingOrder(value:boolean):void { reverseOrder.value = value; }
 	}
 }

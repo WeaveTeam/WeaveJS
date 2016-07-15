@@ -43,7 +43,7 @@ namespace weavejs.plot
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, ImageGlyphPlotter, "Image glyphs");
 		
-		public static debug:Boolean = false;
+		public static debug:boolean = false;
 		
 		public constructor()
 		{

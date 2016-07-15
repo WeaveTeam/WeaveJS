@@ -91,7 +91,7 @@ namespace weavejs.plot
 		public static SHAPE_TYPE_SQUARE:string = 'square';
 		public static SHAPE_TYPE_LINE:string = 'line';
 		public static ENUM_SHAPE_TYPE:Array = [SHAPE_TYPE_CIRCLE, SHAPE_TYPE_SQUARE, SHAPE_TYPE_LINE];
-		private verifyShapeType(value:string):Boolean { return ENUM_SHAPE_TYPE.indexOf(value) >= 0; }
+		private verifyShapeType(value:string):boolean { return ENUM_SHAPE_TYPE.indexOf(value) >= 0; }
 		
 		/**
 		 * This is the radius of the circle, in screen coordinates.
@@ -179,7 +179,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		private _drawBackground:Boolean = false; // this is used to check if we should draw the bins with no records.
+		private _drawBackground:boolean = false; // this is used to check if we should draw the bins with no records.
 		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			// draw the bins that have no records in them in the background
@@ -345,6 +345,6 @@ namespace weavejs.plot
 		}
 		
 		// backwards compatibility
-		//[Deprecated(replacement="reverseOrder")] public set ascendingOrder(value:Boolean):void { reverseOrder.value = !value; }
+		//[Deprecated(replacement="reverseOrder")] public set ascendingOrder(value:boolean):void { reverseOrder.value = !value; }
 	}
 }

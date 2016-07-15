@@ -352,14 +352,14 @@ namespace weavejs.plot
 		}
 		
 		private count:number = 1;
-		private flag:Boolean = false;
+		private flag:boolean = false;
 		private bitMapper:BitmapText = new BitmapText();
 		private tempPoint:Point = new Point();
 		private tempBounds:Bounds2D = new Bounds2D(); // reusable temporary object	
 		private static randPoints:Object = new Object();
 		private boundaries:Array = new Array();
 		private screenBoundaries:Bounds2D = new Bounds2D();
-		private tooLong:Boolean = false;
+		private tooLong:boolean = false;
 		private added:int = 0;
 		private orientation:int = 0;
 		private increment:int = 4;

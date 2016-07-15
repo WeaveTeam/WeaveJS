@@ -121,7 +121,7 @@ namespace weavejs.plot
 		 */
 		public drawEllipse:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		protected function getCoordFromRecordKey(recordKey:IQualifiedKey, trueXfalseY:Boolean):number
+		protected function getCoordFromRecordKey(recordKey:IQualifiedKey, trueXfalseY:boolean):number
 		{
 			var dataCol:IAttributeColumn = trueXfalseY ? xData : yData;
 			if (dataCol.getMetadata(ColumnMetadata.DATA_TYPE) == DataType.GEOMETRY)

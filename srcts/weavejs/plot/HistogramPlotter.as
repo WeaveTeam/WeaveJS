@@ -45,7 +45,7 @@ namespace weavejs.plot
 	 */
 	export class HistogramPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
-		public debug:Boolean = false;
+		public debug:boolean = false;
 		
 		public constructor()
 		{
@@ -126,10 +126,10 @@ namespace weavejs.plot
 		public valueLabelRelativeAngle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
 		public valueLabelColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
 		public valueLabelMaxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(200, verifyLabelMaxWidth));
-		private verifyLabelMaxWidth(value:number):Boolean { return value > 0; }
+		private verifyLabelMaxWidth(value:number):boolean { return value > 0; }
 		private _bitmapText:BitmapText = new BitmapText();		
 		
-		private static verifyAggregationMethod(value:string):Boolean { return ENUM_AGGREGATION_METHODS.indexOf(value) >= 0; }
+		private static verifyAggregationMethod(value:string):boolean { return ENUM_AGGREGATION_METHODS.indexOf(value) >= 0; }
 		public static ENUM_AGGREGATION_METHODS:Array = [AG_COUNT, AG_SUM, AG_MEAN];
 		public static AG_COUNT:string = 'count';
 		public static AG_SUM:string = 'sum';

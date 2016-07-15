@@ -180,7 +180,7 @@ namespace weavejs.plot
 					var previousPoint:Point = null;
 					
 					// Use dataBounds to determine how many points should be drawn
-//					var flag:Boolean = true;
+//					var flag:boolean = true;
 //					 for (var x:int = dataBounds.getXMin(); x < dataBounds.getXMax(); x++)
 //					 {
 //						tempPoint.x = x;
@@ -207,7 +207,7 @@ namespace weavejs.plot
 					// Use screenBounds to determine how many points should be drawn ==> Draw lines for every 3 pixels
 					var numberOfPoint:number = Math.floor(screenBounds.getXCoverage() / 3);
 					var increment:number = dataBounds.getXCoverage() / numberOfPoint;
-					var flag:Boolean = true;
+					var flag:boolean = true;
 					for (var x:number = dataBounds.getXMin(); x <= dataBounds.getXMax(); x = x + increment)
 					{
 						tempPoint.x = x;

@@ -182,7 +182,7 @@ namespace weavejs.plot
 				StandardLib.sort(values);
 				ArrayUtils.removeDuplicatesFromSortedArray(values);
 			}
-			return _xValues = values.filter(function(value:string, ..._):Boolean { return value ? true : false; });
+			return _xValues = values.filter(function(value:string, ..._):boolean { return value ? true : false; });
 		}
 		
 		public getForeignKeyType():string
@@ -198,7 +198,7 @@ namespace weavejs.plot
 			return foreignKeyType;
 		}
 		
-		private _in_updateFilterEquationColumns:Boolean = false;
+		private _in_updateFilterEquationColumns:boolean = false;
 		private updateFilterEquationColumns():void
 		{
 			if (_in_updateFilterEquationColumns)
@@ -307,7 +307,7 @@ namespace weavejs.plot
 		public static CURVE_TOWARDS:string = 'towards';
 		public static CURVE_AWAY:string = 'away';
 		public static CURVE_DOUBLE:string = 'double';
-		private curveTypeVerifier(type:string):Boolean
+		private curveTypeVerifier(type:string):boolean
 		{
 			//BACKWARDS COMPATIBILITY 0.9.6
 			// technically, the verifier function is not supposed to do this.
@@ -331,7 +331,7 @@ namespace weavejs.plot
 		public static EMPTY_CIRCLE:string   = "Empty Circle";
 		public static SOLID_SQUARE:string   = "Solid Square";
 		public static EMPTY_SQUARE:string   = "Empty Square";
-		private shapeTypeVerifier(type:string):Boolean
+		private shapeTypeVerifier(type:string):boolean
 		{
 			return shapesAvailable.indexOf(type) >= 0;
 		}
@@ -347,9 +347,9 @@ namespace weavejs.plot
 		 * @param output Used to store the Bounds2D objects.
 		 * @param includeUndefinedBounds If this is set to true, the output is guaranteed to have the same length as _yColumns.
 		 */
-		protected function getBoundsCoords(recordKey:IQualifiedKey, output:Array, includeUndefinedBounds:Boolean):void
+		protected function getBoundsCoords(recordKey:IQualifiedKey, output:Array, includeUndefinedBounds:boolean):void
 		{
-			var enableGeomProbing:Boolean = Weave.properties.enableGeometryProbing.value;
+			var enableGeomProbing:boolean = Weave.properties.enableGeometryProbing.value;
 			
 			initBoundsArray(output, _yColumns.length);
 			
@@ -480,8 +480,8 @@ namespace weavejs.plot
 			var _shapeSize:number = this.shapeSize.value;
 			var _prevX:number = 0;
 			var _prevY:number = 0;
-			var continueLine:Boolean = false;
-			var skipLines:Boolean = enableGroupBy.value && groupBy.containsKey(recordKey);
+			var continueLine:boolean = false;
+			var skipLines:boolean = enableGroupBy.value && groupBy.containsKey(recordKey);
 			
 			for (i = 0; i < _yColumns.length; i++)
 			{
@@ -615,7 +615,7 @@ namespace weavejs.plot
 			return "";
 		}
 		
-		public get usingXAttributes():Boolean
+		public get usingXAttributes():boolean
 		{
 			if (_xColumns.length == _yColumns.length)
 				return true;

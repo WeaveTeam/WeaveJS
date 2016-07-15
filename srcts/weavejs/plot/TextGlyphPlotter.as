@@ -128,7 +128,7 @@ namespace weavejs.plot
 						f.italic = StandardLib.asBoolean(italic.getValueFromKey(recordKey, Number));
 						f.underline = StandardLib.asBoolean(underline.getValueFromKey(recordKey, Number));
 		
-						var shouldRender:Boolean = true;
+						var shouldRender:boolean = true;
 						
 						if (hideOverlappingText.value)
 						{

@@ -114,7 +114,7 @@ namespace weavejs.plot
 		private MAX_LABEL_KEY:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(KEY_TYPE, 'maxLabel');
 		private _numberFormatter:NumberFormatter = new NumberFormatter();
 		
-		public showRealMinAndMax:Boolean = false;
+		public showRealMinAndMax:boolean = false;
 
 		// validates tick mark variables		
 		public updateLabels():void
@@ -149,7 +149,7 @@ namespace weavejs.plot
 			if(showRealMinAndMax)
 				newKeys.push(MAX_LABEL_KEY);
 			
-			var keysChanged:Boolean = _keySet.replaceKeys(newKeys);
+			var keysChanged:boolean = _keySet.replaceKeys(newKeys);
 			
 			// allow callbacks to run now
 			for each (cc in callbackCollections)

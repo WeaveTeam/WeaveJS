@@ -55,7 +55,7 @@ package weave.utils
 	 */
 	export class SpatialIndex implements ILinkableObject
 	{
-		public debug:Boolean = false;
+		public debug:boolean = false;
 		
 		public constructor()
 		{
@@ -69,8 +69,8 @@ package weave.utils
 		private _keyToBoundsMap:Dictionary = new Dictionary(); // IQualifiedKey -> Array of IBounds2D
 		private _keyToGeometriesMap:Dictionary = new Dictionary(); // IQualifiedKey -> Array of GeneralizedGeometry or ISimpleGeometry
 		
-		private _restarted:Boolean = false; // used by async code
-		private _queryMissingBounds:Boolean; // used by async code
+		private _restarted:boolean = false; // used by async code
+		private _queryMissingBounds:boolean; // used by async code
 		private _keysArrayIndex:int; // used by async code
 		private _keysIndex:int; // used by async code
 		private _plotter:IPlotter;//used by async code
@@ -122,7 +122,7 @@ package weave.utils
 		 * 
 		 * @param plotter An IPlotter object to index.
 		 */
-		public createIndex(plotter:IPlotter, queryMissingBounds:Boolean = false):void
+		public createIndex(plotter:IPlotter, queryMissingBounds:boolean = false):void
 		{
 			if (debug)
 				debugTrace(plotter,this,'createIndex');
@@ -257,7 +257,7 @@ package weave.utils
 			callbacks.resumeCallbacks();
 		}
 		
-		private static polygonOverlapsPolyLine(polygon:Array, line:Object):Boolean
+		private static polygonOverlapsPolyLine(polygon:Array, line:Object):boolean
 		{
 			for (var i:int = 0; i < line.length - 1; ++i)
 			{
@@ -269,7 +269,7 @@ package weave.utils
 			
 			return false;		
 		}
-		private static polygonOverlapsPolyPoint(polygon:Array, points:Object):Boolean
+		private static polygonOverlapsPolyPoint(polygon:Array, points:Object):boolean
 		{
 			for (var i:int = 0; i < points.length; ++i)
 			{
@@ -348,7 +348,7 @@ package weave.utils
 		 * @param filterBoundingBoxesByImportance If true, bounding boxes will be pre-filtered by importance before checking geometry overlap.
 		 * @return An array of keys.
 		 */
-		public getKeysGeometryOverlap(queryBounds:IBounds2D, minImportance:number = 0, filterBoundingBoxesByImportance:Boolean = false, dataBounds:IBounds2D = null):Array
+		public getKeysGeometryOverlap(queryBounds:IBounds2D, minImportance:number = 0, filterBoundingBoxesByImportance:boolean = false, dataBounds:IBounds2D = null):Array
 		{
 			var keys:Array = getKeysBoundingBoxOverlap(queryBounds, filterBoundingBoxesByImportance ? minImportance : 0);
 			
@@ -386,9 +386,9 @@ package weave.utils
 					if (geom is GeneralizedGeometry)
 					{
 						var genGeom:GeneralizedGeometry = geom as GeneralizedGeometry;
-						var genGeomIsPoly:Boolean = genGeom.isPolygon();
-						var genGeomIsLine:Boolean = genGeom.isLine();
-						var genGeomIsPoint:Boolean = genGeom.isPoint();
+						var genGeomIsPoly:boolean = genGeom.isPolygon();
+						var genGeomIsLine:boolean = genGeom.isLine();
+						var genGeomIsPoint:boolean = genGeom.isPoint();
 						var simplifiedGeom:Vector.<Vector.<BLGNode>> = genGeom.getSimplifiedGeometry(minImportance, dataBounds);
 						
 						if (simplifiedGeom.length == 0 && genGeom.bounds.overlaps(queryBounds))
@@ -438,9 +438,9 @@ package weave.utils
 					else // NOT a generalized geometry
 					{
 						var simpleGeom:ISimpleGeometry = geom as ISimpleGeometry;
-						var simpleGeomIsPoly:Boolean = simpleGeom.isPolygon();
-						var simpleGeomIsLine:Boolean = simpleGeom.isLine();
-						var simpleGeomIsPoint:Boolean = simpleGeom.isPoint();
+						var simpleGeomIsPoly:boolean = simpleGeom.isPolygon();
+						var simpleGeomIsLine:boolean = simpleGeom.isLine();
+						var simpleGeomIsPoint:boolean = simpleGeom.isPoint();
 						// get its vertices
 						var vertices:Array = simpleGeom.getVertices();
 						
@@ -507,7 +507,7 @@ package weave.utils
 			var xRecordCenter:number;
 			var yRecordCenter:number;
 			var recordBounds:IBounds2D;
-			var foundQueryCenterOverlap:Boolean = false; // true when we found a key that overlaps the center of the given bounds
+			var foundQueryCenterOverlap:boolean = false; // true when we found a key that overlaps the center of the given bounds
 			var tempDistance:number;
 			// begin with a result of zero shapes
 			var result:Array = [];
@@ -515,7 +515,7 @@ package weave.utils
 			for (var iKey:int = 0; iKey < keys.length; ++iKey)
 			{
 				var key:IQualifiedKey = keys[iKey];
-				var overlapsQueryCenter:Boolean = false;
+				var overlapsQueryCenter:boolean = false;
 				var geoms:Array = null;
 				if (_keyToGeometriesMap && Weave.properties.enableGeometryProbing.value)
 					geoms = _keyToGeometriesMap[key] as Array; // may be null if async task hasn't completed
@@ -536,9 +536,9 @@ package weave.utils
 						if (geom is GeneralizedGeometry)
 						{
 							var genGeom:GeneralizedGeometry = geom as GeneralizedGeometry;
-							var genGeomIsPoly:Boolean = genGeom.isPolygon();
-							var genGeomIsLine:Boolean = genGeom.isLine();
-							var genGeomIsPoint:Boolean = genGeom.isPoint();
+							var genGeomIsPoly:boolean = genGeom.isPolygon();
+							var genGeomIsLine:boolean = genGeom.isLine();
+							var genGeomIsPoint:boolean = genGeom.isPoint();
 							var genGeomBounds:IBounds2D = genGeom.bounds;
 							var simplifiedGeom:Vector.<Vector.<BLGNode>> = (geom as GeneralizedGeometry).getSimplifiedGeometry(importance, dataBounds);
 							var overlapCount:int = 0;
@@ -603,9 +603,9 @@ package weave.utils
 						else  
 						{
 							var simpleGeom:ISimpleGeometry = geom as ISimpleGeometry;
-							var simpleGeomIsPoly:Boolean = simpleGeom.isPolygon();
-							var simpleGeomIsLine:Boolean = simpleGeom.isLine();
-							var simpleGeomIsPoint:Boolean = simpleGeom.isPoint();
+							var simpleGeomIsPoly:boolean = simpleGeom.isPolygon();
+							var simpleGeomIsLine:boolean = simpleGeom.isLine();
+							var simpleGeomIsPoint:boolean = simpleGeom.isPoint();
 							var vertices:Array = simpleGeom.getVertices();
 							
 							// calculate the distanceSq and overlapsQueryCenter
@@ -719,7 +719,7 @@ package weave.utils
 		 **/		
 	
 
-		public getKeysGeometryOverlapGeometries(geometries:Array, minImportance:number = 0, filterBoundingBoxesByImportance:Boolean = false):Array
+		public getKeysGeometryOverlapGeometries(geometries:Array, minImportance:number = 0, filterBoundingBoxesByImportance:boolean = false):Array
 		{
 			var queriedKeys:Array = [];
 			var keys:Dictionary = new Dictionary();
@@ -749,14 +749,14 @@ package weave.utils
 		 * @param filterBoundingBoxesByImportance If true, bounding boxes will be pre-filtered by importance before checking geometry overlap.
 		 * @return An array of IQualifiedKey objects.
 		 */
-		public getKeysGeometryOverlapGeometry(geometry:ISimpleGeometry, minImportance:number = 0, filterBoundingBoxesByImportance:Boolean = false):Array
+		public getKeysGeometryOverlapGeometry(geometry:ISimpleGeometry, minImportance:number = 0, filterBoundingBoxesByImportance:boolean = false):Array
 		{
 			// first filter by bounds
 			var point:Object;
 			var queryGeomVertices:Array = geometry.getVertices();
 			var keys:Array = getKeysBoundingBoxOverlap((geometry as SimpleGeometry).bounds, filterBoundingBoxesByImportance ? minImportance : 0);
 			
-			var geomEnabled:Boolean = _keyToGeometriesMap && Weave.properties.enableGeometryProbing.value;
+			var geomEnabled:boolean = _keyToGeometriesMap && Weave.properties.enableGeometryProbing.value;
 			
 			var result:Array = [];
 			var test:uint;
@@ -799,9 +799,9 @@ package weave.utils
 					if (geom is GeneralizedGeometry)
 					{
 						var genGeom:GeneralizedGeometry = geom as GeneralizedGeometry;
-						var genGeomIsPoly:Boolean = genGeom.isPolygon();
-						var genGeomIsLine:Boolean = genGeom.isLine();
-						var genGeomIsPoint:Boolean = genGeom.isPoint();
+						var genGeomIsPoly:boolean = genGeom.isPolygon();
+						var genGeomIsLine:boolean = genGeom.isLine();
+						var genGeomIsPoint:boolean = genGeom.isPoint();
 						var simplifiedGeom:Vector.<Vector.<BLGNode>> = genGeom.getSimplifiedGeometry(minImportance/*, dataBounds*/);
 						
 						if (simplifiedGeom.length == 0)
@@ -859,9 +859,9 @@ package weave.utils
 					else // NOT a generalized geometry
 					{
 						var simpleGeom:ISimpleGeometry = geom as ISimpleGeometry;
-						var simpleGeomIsPoly:Boolean = simpleGeom.isPolygon();
-						var simpleGeomIsLine:Boolean = simpleGeom.isLine();
-						var simpleGeomIsPoint:Boolean = simpleGeom.isPoint();
+						var simpleGeomIsPoly:boolean = simpleGeom.isPolygon();
+						var simpleGeomIsLine:boolean = simpleGeom.isLine();
+						var simpleGeomIsPoint:boolean = simpleGeom.isPoint();
 						// get its vertices
 						var vertices:Array = simpleGeom.getVertices();
 						

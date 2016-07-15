@@ -194,11 +194,11 @@ namespace weavejs.plot
 		public static GROUP:string = 'group';
 		public static STACK:string = 'stack';
 		public static PERCENT_STACK:string = 'percentStack';
-		private verifyGroupingMode(mode:string):Boolean
+		private verifyGroupingMode(mode:string):boolean
 		{
 			return [GROUP, STACK, PERCENT_STACK].indexOf(mode) >= 0;
 		}
-		private verifyLabelMaxWidth(value:number):Boolean
+		private verifyLabelMaxWidth(value:number):boolean
 		{
 			return value > 0;
 		}
@@ -225,8 +225,8 @@ namespace weavejs.plot
 		{
 			if (!groupBySortColumn.value)
 				return;
-			var colorChanged:Boolean = Weave.detectChange(sortBins, colorColumn, _colorColumnStatsWatcher);
-			var binsChanged:Boolean = Weave.detectChange(sortBins, _binnedSortColumn);
+			var colorChanged:boolean = Weave.detectChange(sortBins, colorColumn, _colorColumnStatsWatcher);
+			var binsChanged:boolean = Weave.detectChange(sortBins, _binnedSortColumn);
 			
 			if (colorChanged)
 			{
@@ -263,18 +263,18 @@ namespace weavejs.plot
 				var _heightColumns:Array;
 				var _posErrCols:Array;
 				var _negErrCols:Array;
-				var _errorIsRelative:Boolean;
+				var _errorIsRelative:boolean;
 				var _groupingMode:string;
-				var _horizontalMode:Boolean;
-				var _groupBySortColumn:Boolean;
-				var reverseOrder:Boolean;
-				var showErrorBars:Boolean;
+				var _horizontalMode:boolean;
+				var _groupBySortColumn:boolean;
+				var reverseOrder:boolean;
+				var showErrorBars:boolean;
 				var clipRectangle:Rectangle = new Rectangle();
 				var graphics:Graphics = tempShape.graphics;
 				var count:int;
 				var numHeightColumns:int;
-				var shouldDrawValueLabel:Boolean;
-				var shouldDrawLabel:Boolean;
+				var shouldDrawValueLabel:boolean;
+				var shouldDrawLabel:boolean;
 				
 				task.asyncState = function():number
 				{
@@ -378,7 +378,7 @@ namespace weavejs.plot
 							var heightColumn:IAttributeColumn = _heightColumns[i] as IAttributeColumn;
 							// add this height to the current bar
 							var height:number = heightColumn.getValueFromKey(recordKey, Number);
-							var heightMissing:Boolean = isNaN(height);
+							var heightMissing:boolean = isNaN(height);
 							if (heightMissing)
 							{
 								// if height is missing, use mean value unless we're in 100% stacked mode
@@ -738,13 +738,13 @@ namespace weavejs.plot
 		{
 			var bounds:Bounds2D = initBoundsArray(output);
 			var _groupingMode:string = getActualGroupingMode();
-			var _groupBySortColumn:Boolean = groupBySortColumn.value;
+			var _groupBySortColumn:boolean = groupBySortColumn.value;
 			var _heightColumns:Array = heightColumns.getObjects();
 			var _posErrCols:Array = positiveErrorColumns.getObjects();
 			var _negErrCols:Array = negativeErrorColumns.getObjects();
 			_posErrCols.length = _heightColumns.length;
 			_negErrCols.length = _heightColumns.length;
-			var showErrorBars:Boolean = _groupingMode == GROUP || _heightColumns.length == 1;
+			var showErrorBars:boolean = _groupingMode == GROUP || _heightColumns.length == 1;
 			sortBins(); // make sure group-by-sort will work properly
 			
 			// bar position depends on sorted index
@@ -780,7 +780,7 @@ namespace weavejs.plot
 			tempRange.setRange(0, 0); // bar starts at zero
 			
 			
-			var allMissing:Boolean = true;
+			var allMissing:boolean = true;
 			for (var i:int = 0; i < _heightColumns.length; i++)
 			{
 				var column:IAttributeColumn = _heightColumns[i] as IAttributeColumn;
@@ -865,7 +865,7 @@ namespace weavejs.plot
 				_posErrCols.length = _heightColumns.length;
 				_negErrCols.length = _heightColumns.length;
 				var _groupingMode:string = getActualGroupingMode();
-				var showErrorBars:Boolean = _groupingMode == GROUP || _heightColumns.length == 1;
+				var showErrorBars:boolean = _groupingMode == GROUP || _heightColumns.length == 1;
 				for (var i:int = 0; i < _heightColumns.length; i++)
 				{
 					var column:IAttributeColumn = _heightColumns[i] as IAttributeColumn;
@@ -926,7 +926,7 @@ namespace weavejs.plot
 		private tempBounds:Bounds2D = new Bounds2D(); // reusable temporary object
 		
 		// backwards compatibility
-		/*[Deprecated(replacement='groupingMode')] public set groupMode(value:Boolean):void { groupingMode.value = value ? GROUP : STACK; }
+		/*[Deprecated(replacement='groupingMode')] public set groupMode(value:boolean):void { groupingMode.value = value ? GROUP : STACK; }
 		[Deprecated(replacement="positiveErrorColumns")] public set positiveError(dynamicState:Object):void
 		{
 			dynamicState.objectName = positiveErrorColumns.generateUniqueName(dynamicState.className);

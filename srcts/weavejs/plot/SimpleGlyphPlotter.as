@@ -45,8 +45,8 @@ namespace weavejs.plot
 		private static TOP:string = 'top', MIDDLE:string = 'middle', BOTTOM:string = 'bottom';
 		private static HORIZONTAL_MODES:Array = [LEFT,CENTER,RIGHT];
 		private static VERTICAL_MODES:Array = [TOP,MIDDLE,BOTTOM];
-		private static verifyHorizontal(value:string):Boolean { return HORIZONTAL_MODES.indexOf(value) >= 0; }
-		private static verifyVertical(value:string):Boolean { return VERTICAL_MODES.indexOf(value) >= 0; }
+		private static verifyHorizontal(value:string):boolean { return HORIZONTAL_MODES.indexOf(value) >= 0; }
+		private static verifyVertical(value:string):boolean { return VERTICAL_MODES.indexOf(value) >= 0; }
 		
 		/**
 		 * This is the line style used to draw the outline of the rectangle.

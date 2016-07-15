@@ -70,7 +70,7 @@ namespace weavejs.plot
 		 * @param output
 		 * @return true on success 
 		 */
-		protected function getGeomCoords(geomKey:IQualifiedKey, output:Point):Boolean
+		protected function getGeomCoords(geomKey:IQualifiedKey, output:Point):boolean
 		{
 			var geoms:Array = geometryColumn.getValueFromKey(geomKey, Array) as Array;
 			var geom:GeneralizedGeometry;
@@ -88,7 +88,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		public includeDestPointsInDataBounds:Boolean = false; // for testing
+		public includeDestPointsInDataBounds:boolean = false; // for testing
 		
 		/*override*/ public getDataBoundsFromRecordKey(geomKey:IQualifiedKey, output:Array):void
 		{

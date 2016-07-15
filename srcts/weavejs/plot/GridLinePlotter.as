@@ -150,8 +150,8 @@ namespace weavejs.plot
 		/*[Deprecated] public set interval(value:number):void { handleDeprecated('interval', value); }
 		[Deprecated] public set start(value:number):void { handleDeprecated('start', value); }
 		[Deprecated] public set end(value:number):void { handleDeprecated('end', value); }
-		[Deprecated] public set horizontal(value:Boolean):void { handleDeprecated('alongXAxis', !value); }
-		[Deprecated] public set alongXAxis(value:Boolean):void { handleDeprecated('alongXAxis', value); }
+		[Deprecated] public set horizontal(value:boolean):void { handleDeprecated('alongXAxis', !value); }
+		[Deprecated] public set alongXAxis(value:boolean):void { handleDeprecated('alongXAxis', value); }
 		private _deprecated:Object;
 		private handleDeprecated(name:string, value:*):void
 		{

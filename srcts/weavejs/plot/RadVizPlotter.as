@@ -148,7 +148,7 @@ namespace weavejs.plot
 		public normMin:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
 		public normMax:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
 		
-		private verifyThresholdValue(value:*):Boolean
+		private verifyThresholdValue(value:*):boolean
 		{
 			if(0<=Number(value) && Number(value)<=1)
 				return true;
@@ -212,7 +212,7 @@ namespace weavejs.plot
 		
 		private _currentScreenBounds:Bounds2D = new Bounds2D();
 		
-		public doCDLayoutFlag:Boolean = false; // ToDo yenfu temporary flag to fix the code
+		public doCDLayoutFlag:boolean = false; // ToDo yenfu temporary flag to fix the code
 		
 		private handleColumnsChange():void
 		{
@@ -298,7 +298,7 @@ namespace weavejs.plot
 		private getNorm(column:IAttributeColumn, key:IQualifiedKey):number
 		{
 			var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(column);
-			var _absNorm:Boolean = absNorm.value;
+			var _absNorm:boolean = absNorm.value;
 			var _normMin:number = normMin.value;
 			var _normMax:number = normMax.value;
 			
@@ -552,7 +552,7 @@ namespace weavejs.plot
 		
 		private keyToGlyph:Dictionary = new Dictionary(true);
 		private tempMatrix:Matrix = new Matrix();
-		public useGlyphCache:Boolean = true;
+		public useGlyphCache:boolean = true;
 		
 		/**
 		 * A memoized version of drawGlyph() which returns a CachedBitmap object.
@@ -612,7 +612,7 @@ namespace weavejs.plot
 			output.setBounds(-1, -1, 1, 1);
 		}		
 		
-		public drawProbe:Boolean = false;
+		public drawProbe:boolean = false;
 		public probedKeys:Array = null;
 		
 		public drawProbeLines(keys:Array,dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
@@ -771,7 +771,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		public drawAnnuli:Boolean = false;
+		public drawAnnuli:boolean = false;
 		
 		public drawAnnuliCircles(keys:Array,dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{

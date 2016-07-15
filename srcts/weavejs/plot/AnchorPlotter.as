@@ -85,15 +85,15 @@ namespace weavejs.plot
 		public wordWrap:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(200));
 		
 		
-		public drawingClassLines:Boolean = false;//this divides the circle into sectors which represent classes (number of sectors = number of classes)
+		public drawingClassLines:boolean = false;//this divides the circle into sectors which represent classes (number of sectors = number of classes)
 
 
 		// anchorClasses key is String, value is array of AnchorPoint names
 		public anchorClasses:Dictionary = null;//this tells us the classes to which dimensional anchors belong to
 
 		public anchorThreshold:number;
-		public doCDLayout:Boolean = false;// this displays the tstat value with every dimensional anchor name (displayed only when CD layout is done)
-		public doCDLayoutMetric:Boolean = true; // ToDo yenfu whether display metric info
+		public doCDLayout:boolean = false;// this displays the tstat value with every dimensional anchor name (displayed only when CD layout is done)
+		public doCDLayoutMetric:boolean = true; // ToDo yenfu whether display metric info
 		
 		private getClassFromAnchor(anchorName:string):string
 		{
@@ -562,7 +562,7 @@ namespace weavejs.plot
 			output.setBounds(-1, -1.1, 1, 1.1);
 		}
 		
-		private verifyLabelAngleRatio(value:number):Boolean
+		private verifyLabelAngleRatio(value:number):boolean
 		{
 			return 0 <= value && value <= 1;
 		}

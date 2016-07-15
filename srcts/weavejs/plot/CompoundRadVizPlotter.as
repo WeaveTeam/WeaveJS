@@ -267,7 +267,7 @@ namespace weavejs.plot
 			var sum:number = 0;			
 			var value:number = 0;			
 			var name:string;
-			var keyMapExists:Boolean = true;
+			var keyMapExists:boolean = true;
 			var anchor:AnchorPoint;
 			var array:Array = (localNormalization.value) ? keyNormMap[recordKey] : keyGlobalNormMap[recordKey];
 			if(!array) keyMapExists = false;
@@ -469,7 +469,7 @@ namespace weavejs.plot
 			return output.setBounds(-1, -1.1, 1, 1.1);
 		}		
 		
-		public drawProbe:Boolean = false;
+		public drawProbe:boolean = false;
 		public probedKeys:Array = null;
 		private _destination:BitmapData = null;
 		

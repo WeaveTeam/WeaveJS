@@ -131,13 +131,13 @@ namespace weavejs.plot
 		 * This is the size of the points drawn when the geometry represents point data.
 		 **/
 		public iconSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10, validateIconSize));
-		private validateIconSize(value:number):Boolean { return 0.2 <= value && value <= 1024; };
+		private validateIconSize(value:number):boolean { return 0.2 <= value && value <= 1024; };
 
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			var geoms:Array = null;
 			var column:IAttributeColumn = geometryColumn; 
-			var notGeoms:Boolean = false;
+			var notGeoms:boolean = false;
 			
 			// the column value may contain a single geom or an array of geoms
 			var value:* = column.getValueFromKey(recordKey, Array);
@@ -167,7 +167,7 @@ namespace weavejs.plot
 		{
 			var value:* = geometryColumn.getValueFromKey(recordKey, Array);
 			var geoms:Array = null;
-			var notGeoms:Boolean = false;
+			var notGeoms:boolean = false;
 			
 			if (value is Array)
 			{
@@ -216,7 +216,7 @@ namespace weavejs.plot
 				output.reset(); // undefined
 		}
 		
-		public debugSimplify:Boolean = false;
+		public debugSimplify:boolean = false;
 		private _debugSimplifyDataBounds:Bounds2D;
 		private _debugSimplifyScreenBounds:Bounds2D;
 
@@ -258,9 +258,9 @@ namespace weavejs.plot
 			return cb;
 		}
 		
-		public debug:Boolean = false;
-		public debugGridSkip:Boolean = false;
-		private keepTrack:Boolean = false;
+		public debug:boolean = false;
+		public debugGridSkip:boolean = false;
+		private keepTrack:boolean = false;
 		public totalVertices:int = 0;
 		
 		public pixellation:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
@@ -307,7 +307,7 @@ namespace weavejs.plot
 			if (debugGridSkip)
 				simplifyDataBounds = null;
 
-			var drawImages:Boolean = pointDataImageColumn.getInternalColumn() != null;
+			var drawImages:boolean = pointDataImageColumn.getInternalColumn() != null;
 			var recordIndex:number = task.asyncState[RECORD_INDEX];
 			var minImportance:number = task.asyncState[MIN_IMPORTANCE];
 			var d_progress:Dictionary = task.asyncState[D_PROGRESS];
@@ -334,7 +334,7 @@ namespace weavejs.plot
 					if (geoms && geoms.length > 0)
 					{
 						var graphics:Graphics = tempShape.graphics;
-						var styleSet:Boolean = false;
+						var styleSet:boolean = false;
 						
 						// draw the geom
 						for (var i:int = 0; i < geoms.length; i++)

@@ -27,12 +27,12 @@ namespace weavejs.plot
 		{
 		}
 		
-		private drawLine:Boolean = false;
+		private drawLine:boolean = false;
 		private yAxis:Point = new Point();//reusable object
 		private plot:Point = new Point(); // reusable object
 		private xAxis:Point = new Point(); // reusable object
-		private yToPlot:Boolean ;
-		private xToPlot:Boolean ;
+		private yToPlot:boolean ;
+		private xToPlot:boolean ;
 		
 		public clearCoordinates():void
 		{
@@ -40,7 +40,7 @@ namespace weavejs.plot
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
-		public setCoordinates(x_yAxis:number, y_yAxis:number, xPlot:number, yPlot:number, x_xAxis:number, y_xAxis:number, yToPlotBool:Boolean, xToPlotBool:Boolean):void
+		public setCoordinates(x_yAxis:number, y_yAxis:number, xPlot:number, yPlot:number, x_xAxis:number, y_xAxis:number, yToPlotBool:boolean, xToPlotBool:boolean):void
 		{
 			yAxis.x = x_yAxis;
 			yAxis.y = y_yAxis;

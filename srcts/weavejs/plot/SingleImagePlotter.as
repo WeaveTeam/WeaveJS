@@ -86,13 +86,13 @@ namespace weavejs.plot
 		public horizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER, verifyHAlign));
 		public verticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE, verifyVAlign));
 		
-		private verifyHAlign(value:string):Boolean
+		private verifyHAlign(value:string):boolean
 		{
 			return value == BitmapText.HORIZONTAL_ALIGN_LEFT
 				|| value == BitmapText.HORIZONTAL_ALIGN_CENTER
 				|| value == BitmapText.HORIZONTAL_ALIGN_RIGHT;
 		}
-		private verifyVAlign(value:string):Boolean
+		private verifyVAlign(value:string):boolean
 		{
 			return value == BitmapText.VERTICAL_ALIGN_TOP
 				|| value == BitmapText.VERTICAL_ALIGN_MIDDLE

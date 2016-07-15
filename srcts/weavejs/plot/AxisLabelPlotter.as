@@ -80,7 +80,7 @@ namespace weavejs.plot
 		
 		public labelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number', 'string', 'column']));
 		
-		private verifyTextFormatAlign(value:string):Boolean
+		private verifyTextFormatAlign(value:string):boolean
 		{
 			return [
 				TextFormatAlign.CENTER,
@@ -185,6 +185,6 @@ namespace weavejs.plot
 		
 		// backwards compatibility
 		/*[Deprecated] public set start(value:number):void { begin.value = offset.value = value; }
-		[Deprecated] public set horizontal(value:Boolean):void { alongXAxis.value = value; }*/
+		[Deprecated] public set horizontal(value:boolean):void { alongXAxis.value = value; }*/
 	}
 }

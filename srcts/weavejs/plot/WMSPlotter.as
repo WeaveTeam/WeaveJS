@@ -57,7 +57,7 @@ namespace weavejs.plot
 		
 		// TODO: move the image reprojection code elsewhere
 		
-		public debug:Boolean = false;
+		public debug:boolean = false;
 		
 		public constructor()
 		{
@@ -258,8 +258,8 @@ namespace weavejs.plot
 				return;
 
 			var serviceSRS:string = _service.getProjectionSRS();			
-			var mapProjExists:Boolean = projManager.projectionExists(srs.value);
-			var areProjectionsDifferent:Boolean = serviceSRS != srs.value;
+			var mapProjExists:boolean = projManager.projectionExists(srs.value);
+			var areProjectionsDifferent:boolean = serviceSRS != srs.value;
 			if (!areProjectionsDifferent || !mapProjExists)
 			{
 				drawUnProjectedTiles(dataBounds, screenBounds, destination);
@@ -385,7 +385,7 @@ namespace weavejs.plot
 		private ct:ColorTransform = new ColorTransform();
 		private rect:Rectangle = new Rectangle();
 		private tempBounds:Bounds2D = new Bounds2D();
-		private debugTileBounds(tileBounds:Bounds2D, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData, url:string, drawRect:Boolean):void
+		private debugTileBounds(tileBounds:Bounds2D, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData, url:string, drawRect:boolean):void
 		{
 			_tempScreenBounds.copyFrom(tileBounds);
 			dataBounds.projectCoordsTo(_tempScreenBounds, screenBounds);
@@ -511,7 +511,7 @@ namespace weavejs.plot
 			nasaService.changeStyleToMonth(style);
 		}
 		
-		private verifyServiceName(s:string):Boolean
+		private verifyServiceName(s:string):boolean
 		{
 			if (!s)
 				return false;
@@ -519,7 +519,7 @@ namespace weavejs.plot
 			return WMSProviders.providers.indexOf(s) >= 0;
 		}
 		
-		public isBusy():Boolean
+		public isBusy():boolean
 		{
 			return false;
 		}

@@ -66,7 +66,7 @@ namespace weavejs.plot
 		private bitmapText:BitmapText = new BitmapText(); // This is used to draw text on bitmaps
 		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle); // This is the line style used to draw the outline of the shape.
 		
-		private verifyNumberOfCircles(value:number):Boolean {
+		private verifyNumberOfCircles(value:number):boolean {
 			if (value < 2)
 				return false;
 			else

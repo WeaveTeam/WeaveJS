@@ -29,9 +29,9 @@ namespace weavejs.plot
 	 */
 	export default  class PlotTask implements IPlotTask, ILinkableObject, IDisposableObject
 	{
-		public static debug:Boolean = false;
-		// public static debugMouseDownPause:Boolean = false;
-		public static debugIgnoreSpatialIndex:Boolean = false;
+		public static debug:boolean = false;
+		// public static debugMouseDownPause:boolean = false;
+		public static debugIgnoreSpatialIndex:boolean = false;
 
 		public toString():string
 		{
@@ -115,7 +115,7 @@ namespace weavejs.plot
 		/**
 		 * When this is set to true, the async task will be paused.
 		 */
-		delayAsyncTask:Boolean = false;
+		delayAsyncTask:boolean = false;
 		private _dependencies:CallbackCollection = Weave.disposableChild(this, CallbackCollection);
 
 		private _prevBusyGroupTriggerCounter:number = 0;
@@ -133,8 +133,8 @@ namespace weavejs.plot
 		private _iPendingKey:number;
 		private _asyncSort:AsyncSort = Weave.disposableChild(this, AsyncSort);
 		private _progress:number = 0;
-		private _delayInit:Boolean = false;
-		private _pendingInit:Boolean = false;
+		private _delayInit:boolean = false;
+		private _pendingInit:boolean = false;
 
 		/**
 		 * This function must be called to set the size of the BitmapData buffer.
@@ -155,9 +155,9 @@ namespace weavejs.plot
 		 * This returns true if the layer should be rendered and selectable/probeable
 		 * @return true if the layer should be rendered and selectable/probeable
 		 */
-		private shouldBeRendered():Boolean
+		private shouldBeRendered():boolean
 		{
-			var visible:Boolean = true;
+			var visible:boolean = true;
 			if (!this._layerSettings.visible.value)
 			{
 				if (PlotTask.debug)
@@ -227,9 +227,9 @@ namespace weavejs.plot
 		/**
 		 * @return true if shouldBeRendered() returns true.
 		 */
-		private asyncInit():Boolean
+		private asyncInit():boolean
 		{
-			var shouldRender:Boolean = this.shouldBeRendered();
+			var shouldRender:boolean = this.shouldBeRendered();
 			if (this._delayInit)
 			{
 				this._pendingInit = true;

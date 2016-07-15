@@ -78,11 +78,11 @@ namespace weavejs.plot
 		public labelAngleRatio:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyLabelAngleRatio));
 		public innerRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyInnerRadius));
 		
-		private verifyLabelAngleRatio(value:number):Boolean
+		private verifyLabelAngleRatio(value:number):boolean
 		{
 			return 0 <= value && value <= 1;
 		}
-		private verifyInnerRadius(value:number):Boolean
+		private verifyInnerRadius(value:number):boolean
 		{
 			return 0 <= value && value <= 1;
 		}

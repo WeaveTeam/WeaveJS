@@ -98,7 +98,7 @@ namespace weavejs.plot
 						//					bitmapText.y = bounds.getYMin();
 						
 						// brute force check to see if this bounds overlaps with any previous bounds
-						var overlaps:Boolean = false;
+						var overlaps:boolean = false;
 						var j:int;
 						for (j = 0; j < i; j++)
 						{

@@ -124,7 +124,7 @@ namespace weavejs.plot
 		private MAX_LABEL_KEY:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(this.KEY_TYPE, 'maxLabel');
 		private _numberFormatter:NumberFormatter = new NumberFormatter();
 		
-		public showRealMinAndMax:Boolean = false;
+		public showRealMinAndMax:boolean = false;
 		// validates tick mark variables
 		public updateLabels():void
 		{
@@ -157,7 +157,7 @@ namespace weavejs.plot
 			if (this.showRealMinAndMax)
 				newKeys.push(this.MAX_LABEL_KEY);
 			
-			var keysChanged:Boolean = this._keySet.replaceKeys(newKeys);
+			var keysChanged:boolean = this._keySet.replaceKeys(newKeys);
 			
 			// allow callbacks to run now
 			for (let cc of callbackCollections)
@@ -566,7 +566,7 @@ namespace weavejs.plot
 		// backwards compatibility
 		
 		/*[Deprecated] public set axisLabelDistance(value:number):void { handleDeprecated('distance', value); }
-		[Deprecated] public set labelDistanceIsVertical(value:Boolean):void { handleDeprecated('isVertical', value); }
+		[Deprecated] public set labelDistanceIsVertical(value:boolean):void { handleDeprecated('isVertical', value); }
 		private _deprecated:Object;
 		private handleDeprecated(name:string, value:*):void
 		{

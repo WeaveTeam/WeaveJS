@@ -90,7 +90,7 @@ namespace weavejs.plot
 		/**
 		 * Offset the x and y positions of the nodes with the corresponding keys in keys. 
 		 */		
-		public updateDraggedKeys(keys:Array, dx:number, dy:number, runSpatialCallbacks:Boolean = true):void
+		public updateDraggedKeys(keys:Array, dx:number, dy:number, runSpatialCallbacks:boolean = true):void
 		{
 			(layoutAlgorithm.internalObject as IGraphAlgorithm).updateDraggedKeys(keys, dx, dy, runSpatialCallbacks);
 			(layoutAlgorithm.internalObject as IGraphAlgorithm).getOutputBounds(null, tempBounds);
@@ -271,8 +271,8 @@ namespace weavejs.plot
 		// dragged layer properties
 //		private _draggedKeysLookup:Dictionary = new Dictionary(); 
 //		private _draggedKeysArray:Array = []; 
-//		public draggedLayerDrawn:Boolean = false;
-//		private _isDragging:Boolean = false;
+//		public draggedLayerDrawn:boolean = false;
+//		private _isDragging:boolean = false;
 		private RECORD_INDEX:string = "recordIndex";
 		private NEIGHBORS:string = "neighborKeys";
 		private FINISHED:string = "finishedKeys";
@@ -375,7 +375,7 @@ namespace weavejs.plot
 			return;
 		}
 
-		private lineEdge(srcX:number, srcY:number, destX:number, destY:number, isBidirectional:Boolean):void /* Expects screen coords */
+		private lineEdge(srcX:number, srcY:number, destX:number, destY:number, isBidirectional:boolean):void /* Expects screen coords */
 		{
 			
 			edgesShape.graphics.moveTo(srcX, srcY);

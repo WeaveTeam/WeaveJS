@@ -90,7 +90,7 @@ namespace weavejs.plot
 		 * @default <code>25</code>
 		 */		
 		public polygonVertexCount:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25, verifyPolygonVertexCount));
-		private verifyPolygonVertexCount(value:number):Boolean
+		private verifyPolygonVertexCount(value:number):boolean
 		{
 			return value >= 3; 
 		}
@@ -164,12 +164,12 @@ namespace weavejs.plot
 		}
 		
 				
-		private verifyColor(value:number):Boolean
+		private verifyColor(value:number):boolean
 		{
 			return value >= 0;
 		}
 		
-		private verifyAlpha(value:number):Boolean
+		private verifyAlpha(value:number):boolean
 		{
 			return value >= 0 && value <= 1;
 		}

@@ -51,7 +51,7 @@ namespace weavejs.plot
 		private _columns:Array = [];
 		private _stats:Dictionary = new Dictionary(true);
 		private extendPointBounds:number = 0.25; // extends point bounds when selectableLines is false
-		private drawStubs:Boolean = true; // draws stubbed line segments eminating from points with missing neighboring values
+		private drawStubs:boolean = true; // draws stubbed line segments eminating from points with missing neighboring values
 		
 		public constructor()
 		{
@@ -112,7 +112,7 @@ namespace weavejs.plot
 		
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			var enableGeomProbing:Boolean = Weave.properties.enableGeometryProbing.value;
+			var enableGeomProbing:boolean = Weave.properties.enableGeometryProbing.value;
 			
 			var values:Array = getValues(recordKey);
 			
@@ -147,7 +147,7 @@ namespace weavejs.plot
 			var values:Array = getValues(recordKey);
 			if (selectableLines.value)
 			{
-				var continueLine:Boolean = false;
+				var continueLine:boolean = false;
 				for (x = 0; x < values.length; x++)
 				{
 					y = values[x];
@@ -240,7 +240,7 @@ namespace weavejs.plot
 			var graphics:Graphics = tempShape.graphics;
 			var prevScreenX:number = NaN;
 			var prevScreenY:number = NaN;
-			var continueLine:Boolean = false;
+			var continueLine:boolean = false;
 			
 			lineStyle.beginLineStyle(recordKey, graphics);
 			
