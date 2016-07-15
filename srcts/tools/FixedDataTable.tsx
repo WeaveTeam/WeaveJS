@@ -527,7 +527,12 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 			cellStyle["background"] =  this.props.colorRamp.getHexColor(value as any, 0, 100)
 		}
 
-		let cellValue:number | string = typeof value == 'number' ? value as number : Weave.lang(value as string);
+		let cellValue:number | string = typeof value == 'number' ? value as number : value as string;
+
+		if(typeof cellValue == 'string' && weavejs.WeaveAPI.Locale.reverseLayout)
+		{
+			cellValue = Weave.lang(cellValue as string);
+		}
 
 		/* Inline style here is hack to make div actually fill whole cell for dblclick purposes since we can't attach event handlers to the Cell itself. */
 		return (
@@ -565,6 +570,11 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 			evenWidth = Math.max((this.state.width / columnIds.length), this.props.initialColumnWidth);
 
 		let columns = columnIds.map((id: string, index: number) => {
+			let columnTitle:string = this.getColumnTitle(id) as string
+			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			{
+				columnTitle = Weave.lang(columnTitle);
+			}
 			return (
 				<Column
 					allowCellsRecycling={true}
@@ -577,7 +587,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 							disableSort={this.props.disableSort}
 							columnKey={id}
 							>
-							{Weave.lang(this.getColumnTitle(id) as string)}
+							{columnTitle}
 						</SortHeaderCell>
 					}
 					cell={this.renderCell}

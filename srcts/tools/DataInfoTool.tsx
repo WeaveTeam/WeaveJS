@@ -225,9 +225,15 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 		let recordValueUI:JSX.Element = null;
 		let columnInfoUI:JSX.Element = null;
 
-		if(colName){
+		if(colName)
+		{
+			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			{
+				colName = Weave.lang(colName);
+			}
+
 			columnTitleUI = <div style={ {whiteSpace: "nowrap",overflow: "hidden",textOverflow: "ellipsis",padding:"2px",flex:"1 0"} }>
-								{Weave.lang(colName)}
+								{colName}
 							</div>
 		}
 
@@ -257,14 +263,21 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 					paddingBottom:"2px",marginTop:"2px",
 					fontSize:"12px"
 				};
+
 				
 				infoUIs = colMetaDataPropertyNames.map((metaDataPropertyName:string , index:number)=>{
 					let metadata = this.props.column.getMetadata(metaDataPropertyName);
 					if(metadata)
 					{
+						let propertyName = metaDataPropertyName;
+						if (weavejs.WeaveAPI.Locale.reverseLayout)
+						{
+							propertyName = Weave.lang(propertyName);
+							metadata = Weave.lang(metadata);
+						}
 						return  ( <HBox key={index} style={ infoStyle }>
-									<div style={ {flex:"1 0"} }>{Weave.lang(metaDataPropertyName)}</div>
-									<div>{Weave.lang(metadata)}</div>
+									<div style={ {flex:"1 0"} }>{propertyName}</div>
+									<div>{metadata}</div>
 								</HBox>);
 					}
 					else
