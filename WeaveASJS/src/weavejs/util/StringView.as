@@ -597,7 +597,8 @@ package weavejs.util
 				nChrLen = this.makeIndex(nStrLen, nStartOffset) - nStartOffset;
 			} else {
 				nStartOffset = nCharStart;
-				nChrLen = nStrLen - nCharStart;
+				//nChrLen = nStrLen - nCharStart;  // this can generate a negative length which blows up StringView ctor with Array index out of bounds error
+				nChrLen = nCharLength - nCharStart;
 			}
 			
 			if (this.encoding === "UTF-16") {
