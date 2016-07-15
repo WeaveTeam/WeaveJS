@@ -43,11 +43,11 @@ namespace weavejs.plot
 	/**
 	 * This plotter displays a histogram with optional colors.
 	 */
-	public class HistogramPlotter extends AbstractPlotter implements ISelectableAttributes
+	export class HistogramPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
-		public var debug:Boolean = false;
+		public debug:Boolean = false;
 		
-		public function HistogramPlotter()
+		public constructor()
 		{
 			clipDrawing = true;
 			
@@ -72,17 +72,17 @@ namespace weavejs.plot
 			this.addSpatialDependencies(this.aggregateStats, fillStyle.color.internalDynamicColumn, this.binnedColumn, this.columnToAggregate, this.aggregationMethod, this.horizontalMode);
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ["Grouping values", "Height values (Optional)"];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [fillStyle.color, columnToAggregate];
 		}
 		
-		public const binnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn, setColorColumn, true);
-		private function setColorColumn():void
+		public binnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn, setColorColumn, true);
+		private setColorColumn():void
 		{
 			var colorBinCol:BinnedColumn = internalColorColumn ? internalColorColumn.getInternalColumn() as BinnedColumn : null;
 			if (!colorBinCol)
@@ -93,7 +93,7 @@ namespace weavejs.plot
 			else
 				copySessionState(binnedColumn.internalDynamicColumn, colorBinCol.internalDynamicColumn);
 		}
-		private function setBinnedColumn():void
+		private setBinnedColumn():void
 		{
 			var colorBinCol:BinnedColumn = internalColorColumn ? internalColorColumn.getInternalColumn() as BinnedColumn : null;
 			if (!colorBinCol)
@@ -109,45 +109,45 @@ namespace weavejs.plot
 		 * This column object may change and it may be null, depending on the session state.
 		 * This function is provided for convenience.
 		 */
-		public function get internalColorColumn():ColorColumn
+		public get internalColorColumn():ColorColumn
 		{
 			return fillStyle.color.getInternalColumn() as ColorColumn;
 		}
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		public const fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
-		public const drawPartialBins:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
-		public const columnToAggregate:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const aggregationMethod:LinkableString = Weave.linkableChild(this, new LinkableString(AG_COUNT, verifyAggregationMethod));
-		public const horizontalMode:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+		public drawPartialBins:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public columnToAggregate:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public aggregationMethod:LinkableString = Weave.linkableChild(this, new LinkableString(AG_COUNT, verifyAggregationMethod));
+		public horizontalMode:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const showValueLabels:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-		public const valueLabelHorizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT));
-		public const valueLabelVerticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
-		public const valueLabelRelativeAngle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
-		public const valueLabelColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
-		public const valueLabelMaxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(200, verifyLabelMaxWidth));
-		private function verifyLabelMaxWidth(value:Number):Boolean { return value > 0; }
-		private const _bitmapText:BitmapText = new BitmapText();		
+		public showValueLabels:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public valueLabelHorizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT));
+		public valueLabelVerticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
+		public valueLabelRelativeAngle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public valueLabelColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public valueLabelMaxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(200, verifyLabelMaxWidth));
+		private verifyLabelMaxWidth(value:number):Boolean { return value > 0; }
+		private _bitmapText:BitmapText = new BitmapText();		
 		
-		private static function verifyAggregationMethod(value:String):Boolean { return ENUM_AGGREGATION_METHODS.indexOf(value) >= 0; }
-		public static const ENUM_AGGREGATION_METHODS:Array = [AG_COUNT, AG_SUM, AG_MEAN];
-		public static const AG_COUNT:String = 'count';
-		public static const AG_SUM:String = 'sum';
-		public static const AG_MEAN:String = 'mean';
+		private static verifyAggregationMethod(value:string):Boolean { return ENUM_AGGREGATION_METHODS.indexOf(value) >= 0; }
+		public static ENUM_AGGREGATION_METHODS:Array = [AG_COUNT, AG_SUM, AG_MEAN];
+		public static AG_COUNT:string = 'count';
+		public static AG_SUM:string = 'sum';
+		public static AG_MEAN:string = 'mean';
 		
-		private var aggregateStats:IColumnStatistics;
+		private aggregateStats:IColumnStatistics;
 
-		private function getAggregateValue(keys:Array):Number
+		private getAggregateValue(keys:Array):number
 		{
 			var agCol:IAttributeColumn = columnToAggregate.getInternalColumn();
 			if (!agCol)
 				return 0;
 			
 			var count:int = 0;
-			var sum:Number = 0;
+			var sum:number = 0;
 			for each (var key:IQualifiedKey in keys)
 			{
-				var value:Number = agCol.getValueFromKey(key, Number);
+				var value:number = agCol.getValueFromKey(key, Number);
 				if (isFinite(value))
 				{
 					sum += value;
@@ -166,7 +166,7 @@ namespace weavejs.plot
 		/**
 		 * This function returns the collective bounds of all the bins.
 		 */
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.reset();
 			
@@ -179,9 +179,9 @@ namespace weavejs.plot
 		/**
 		 * This gets the data bounds of the histogram bin that a record key falls into.
 		 */
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			var binIndex:Number = binnedColumn.getValueFromKey(recordKey, Number);
+			var binIndex:number = binnedColumn.getValueFromKey(recordKey, Number);
 			if (isNaN(binIndex))
 			{
 				initBoundsArray(output, 0);
@@ -190,7 +190,7 @@ namespace weavejs.plot
 			
 			var keysInBin:Array = binnedColumn.getKeysFromBinIndex(binIndex) || [];
 			var agCol:IAttributeColumn = columnToAggregate.getInternalColumn();
-			var binHeight:Number = agCol ? getAggregateValue(keysInBin) : keysInBin.length;
+			var binHeight:number = agCol ? getAggregateValue(keysInBin) : keysInBin.length;
 			
 			if (horizontalMode.value)
 				initBoundsArray(output).setBounds(0, binIndex - 0.5, binHeight, binIndex + 0.5);
@@ -205,13 +205,13 @@ namespace weavejs.plot
 		/**
 		 * This draws the histogram bins that a list of record keys fall into.
 		 */
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			var i:int;
 			
 			// convert record keys to bin keys
 			// save a mapping of each bin key found to a value of true
-			var binName:String;
+			var binName:string;
 			var _tempBinKeyToSingleRecordKeyMap:Object = new Object();
 			for (i = 0; i < task.recordKeys.length; i++)
 			{
@@ -244,7 +244,7 @@ namespace weavejs.plot
 					keys = binnedColumn.getKeysFromBinName(binName);
 				
 				var binIndex:int = allBinNames.indexOf(binName);
-				var binHeight:Number = agCol ? getAggregateValue(keys) : keys.length;
+				var binHeight:number = agCol ? getAggregateValue(keys) : keys.length;
 				
 				// bars are centered at their binIndex values and have width=1
 				if (horizontalMode.value)
@@ -313,19 +313,19 @@ namespace weavejs.plot
 			return 1;
 		}
 		
-		private const tempBounds:Bounds2D = new Bounds2D(); // reusable temporary object
+		private tempBounds:Bounds2D = new Bounds2D(); // reusable temporary object
 
 		//------------------------
 		// backwards compatibility
-		[Deprecated(replacement="fillStyle.color.internalDynamicColumn")] public function set dynamicColorColumn(value:Object):void
+		/*[Deprecated(replacement="fillStyle.color.internalDynamicColumn")] public set dynamicColorColumn(value:Object):void
 		{
 			Weave.setState(fillStyle.color.internalDynamicColumn, value);
 		}
-		[Deprecated(replacement="columnToAggregate")] public function set sumColumn(value:Object):void
+		[Deprecated(replacement="columnToAggregate")] public set sumColumn(value:Object):void
 		{
 			Weave.setState(columnToAggregate, value);
 			if (columnToAggregate.getInternalColumn())
 				aggregationMethod.value = AG_SUM;
-		}
+		}*/
 	}
 }

@@ -30,10 +30,10 @@ namespace weavejs.plot
 	import SolidFillStyle = weavejs.geom.SolidFillStyle;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class WeaveWordlePlotter extends AbstractPlotter
+	export class WeaveWordlePlotter extends AbstractPlotter
 	{
 		
-		public function WeaveWordlePlotter()
+		public constructor()
 		{
 			
 			// default fill color
@@ -46,11 +46,11 @@ namespace weavejs.plot
 			this.addSpatialDependencies(this.wordColumn);
 		}	
 		
-		public const wordColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		public const fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+		public wordColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			var words:Array = wordColumn.keys;
 			var i:int;
@@ -82,7 +82,7 @@ namespace weavejs.plot
 		/**
 		 * This gets the data bounds of the histogram bin that a record key falls into.
 		 */
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			if( randPoints[recordKey] != undefined )
 				initBoundsArray(output).setBounds(0, 0, 1, 1);
@@ -96,20 +96,20 @@ namespace weavejs.plot
 		/**
 		 * This draws the words to the screen and sized based on count.
 		 */
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private function drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
-			var normalized:Number;
+			var normalized:number;
 			var j:int;
 			var maxDisplay:uint;
 			screenBoundaries = screenBounds;
 			var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(wordColumn);
-			var lowest:Number = stats.getMin();
-			var highest:Number = stats.getMax();
+			var lowest:number = stats.getMin();
+			var highest:number = stats.getMax();
 			if( highest == lowest )
 				highest = highest + 1;
 			//maxDisplay is used for putting a word limit if necessary, 200 seems to fill the screen.
@@ -158,7 +158,7 @@ namespace weavejs.plot
 		 * This function will look for an possible overlapping and adjust as necessary.
 		 */
 		
-		private function findOpeningLeft():void
+		private findOpeningLeft():void
 		{
 			var i:int;
 			var j:int;
@@ -193,7 +193,7 @@ namespace weavejs.plot
 		/*
 		These are all the functions from a previous recursive attempt at plotting.
 		
-		private function findOpeningDown():void
+		private findOpeningDown():void
 		{
 			var i:int;
 			var j:int;
@@ -232,7 +232,7 @@ namespace weavejs.plot
 				return;
 		}
 		
-		private function findOpeningRight():void
+		private findOpeningRight():void
 		{
 			var i:int;
 			var j:int;
@@ -271,7 +271,7 @@ namespace weavejs.plot
 				return;
 		}
 		
-		private function findOpeningUp():void
+		private findOpeningUp():void
 		{
 			var i:int;
 			var j:int;
@@ -314,7 +314,7 @@ namespace weavejs.plot
 		/**
 		 * This function preforms a brute force approach to checking if the current bounds intersect any previously placed bounds. 
 		 */
-		private function checkBounds():void
+		private checkBounds():void
 		{
 			var i:int;
 			
@@ -351,17 +351,17 @@ namespace weavejs.plot
 			flag = true;						
 		}
 		
-		private var count:Number = 1;
-		private var flag:Boolean = false;
-		private const bitMapper:BitmapText = new BitmapText();
-		private const tempPoint:Point = new Point();
-		private const tempBounds:Bounds2D = new Bounds2D(); // reusable temporary object	
-		private static const randPoints:Object = new Object();
-		private var boundaries:Array = new Array();
-		private var screenBoundaries:Bounds2D = new Bounds2D();
-		private var tooLong:Boolean = false;
-		private var added:int = 0;
-		private var orientation:int = 0;
-		private var increment:int = 4;
+		private count:number = 1;
+		private flag:Boolean = false;
+		private bitMapper:BitmapText = new BitmapText();
+		private tempPoint:Point = new Point();
+		private tempBounds:Bounds2D = new Bounds2D(); // reusable temporary object	
+		private static randPoints:Object = new Object();
+		private boundaries:Array = new Array();
+		private screenBoundaries:Bounds2D = new Bounds2D();
+		private tooLong:Boolean = false;
+		private added:int = 0;
+		private orientation:int = 0;
+		private increment:int = 4;
 	}
 }

@@ -25,20 +25,20 @@ namespace weavejs.plot
 	import PlotTask = weavejs.visualization.layers.PlotTask;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class EquationPlotter extends AbstractPlotter
+	export class EquationPlotter extends AbstractPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, EquationPlotter, "Equation");
 		
-		public const tStep:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
-		public const tBegin:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
-		public const tEnd:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public tStep:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public tBegin:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
+		public tEnd:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(NaN));
 		
-		public const xEquation:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('t', true, false, ['t']));
-		public const yEquation:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('t', true, false, ['t']));
+		public xEquation:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('t', true, false, ['t']));
+		public yEquation:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('t', true, false, ['t']));
 		
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			if ((task as PlotTask).taskType != PlotTask.TASK_TYPE_SUBSET)
 				return 1;
@@ -60,7 +60,7 @@ import EquationPlotter = weavejs.visualization.plotters.EquationPlotter;
 
 internal class AsyncState
 {
-	public function AsyncState(plotter:EquationPlotter, task:IPlotTask)
+	public constructor(plotter:EquationPlotter, task:IPlotTask)
 	{
 		this.plotter = plotter;
 		this.task = task;
@@ -68,17 +68,17 @@ internal class AsyncState
 		this.point = new Point();
 	}
 	
-	public var plotter:EquationPlotter;
-	public var task:IPlotTask;
-	public var shape:Shape;
-	public var point:Point;
-	public var step:Number;
-	public var begin:Number;
-	public var end:Number;
-	public var t:Number;
-	public var handlePoint:Function;
+	public plotter:EquationPlotter;
+	public task:IPlotTask;
+	public shape:Shape;
+	public point:Point;
+	public step:number;
+	public begin:number;
+	public end:number;
+	public t:number;
+	public handlePoint:Function;
 	
-	public function iterate():Number
+	public iterate():number
 	{
 		var graphics:Graphics = shape.graphics;
 		if (task.iteration == 0)
@@ -88,9 +88,9 @@ internal class AsyncState
 			end = plotter.tEnd.value;
 			
 			// calculate default step values in case parameters are unspecified
-			var pixelStep:Number = 1; // default number of pixels to advance each iteration
-			var xStep:Number = pixelStep * task.dataBounds.getXCoverage() / task.screenBounds.getXCoverage();
-			var yStep:Number = pixelStep * task.dataBounds.getYCoverage() / task.screenBounds.getYCoverage();
+			var pixelStep:number = 1; // default number of pixels to advance each iteration
+			var xStep:number = pixelStep * task.dataBounds.getXCoverage() / task.screenBounds.getXCoverage();
+			var yStep:number = pixelStep * task.dataBounds.getYCoverage() / task.screenBounds.getYCoverage();
 			if (!isFinite(step))
 			{
 				if (plotter.xEquation.getSessionState() == 't')
@@ -127,7 +127,7 @@ internal class AsyncState
 			graphics.moveTo(point.x, point.y);
 			plotter.lineStyle.beginLineStyle(null, graphics);
 			
-			var stepEnd:Number = end + step;
+			var stepEnd:number = end + step;
 			for (; t < stepEnd; t += step)
 			{
 				if (getTimer() > task.iterationStopTime)

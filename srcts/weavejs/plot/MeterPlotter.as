@@ -23,24 +23,24 @@ namespace weavejs.plot
 	 * This abstract class contains functionality common to any "meter tool" such as the thermometer and the gauge.
 	 * This functionality includes the ability to select which input drives the single value shown by the tool plotter.
 	 */
-	public class MeterPlotter extends AbstractPlotter
+	export class MeterPlotter extends AbstractPlotter
 	{
 		//These constants are possible values of inputMode.
-		public const PROBE_MODE:Number = 0;
-		public const COLUMN_AVERAGE_MODE:Number = 1;
+		public PROBE_MODE:number = 0;
+		public COLUMN_AVERAGE_MODE:number = 1;
 		
 		//the sessioned number controlling the input mode
-		private const inputMode:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		private inputMode:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
 		//the column whose value drives this meter 
-		public const meterColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		protected const meterColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(meterColumn));
+		public meterColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		protected meterColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(meterColumn));
 		
-//		private var mode:Number = PROBE_MODE;
-		public function MeterPlotter()
+//		private mode:number = PROBE_MODE;
+		public constructor()
 		{
 			//this line causes only the currently probed records to be drawn.			
-			setSingleKeySource(Weave.defaultProbeKeySet);
+			setSingleKeySource(WeaveProperties.defaultProbeKeySet);
 			this.addSpatialDependencies(this.meterColumn);
 		}
 	}

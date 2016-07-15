@@ -35,9 +35,9 @@ namespace weavejs.plot
 	import ColumnUtils = weavejs.data.ColumnUtils;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class RegressionLinePlotter extends AbstractPlotter implements IDisposableObject
+	export class RegressionLinePlotter extends AbstractPlotter implements IDisposableObject
 	{
-		public function RegressionLinePlotter()
+		public constructor()
 		{
 			Weave.properties.rServiceURL.addImmediateCallback(this, resetRService, true);
 			spatialCallbacks.addImmediateCallback(this, resetRegressionLine );
@@ -47,38 +47,38 @@ namespace weavejs.plot
 			// hack to fix old session states
 			_filteredKeySet.addImmediateCallback(this, function():void {
 				if (_filteredKeySet.keyFilter.internalObject == null)
-					_filteredKeySet.keyFilter.targetPath = [Weave.DEFAULT_SUBSET_KEYFILTER];
+					_filteredKeySet.keyFilter.targetPath = [WeaveProperties.DEFAULT_SUBSET_KEYFILTER];
 			});
 		}
 		
-		public const drawLine:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-		public const currentTrendline:LinkableString = Weave.linkableChild(this, new LinkableString(LINEAR));
-		public const polynomialDegree:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
+		public drawLine:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public currentTrendline:LinkableString = Weave.linkableChild(this, new LinkableString(LINEAR));
+		public polynomialDegree:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
 		
-		public const xColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const yColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public xColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public yColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
-		public static const trendlines:Array = [LINEAR, POLYNOMIAL, LOGARITHMIC, EXPONENTIAL, POWER];
-		public static const LINEAR:String = "Linear";
-		public static const POLYNOMIAL:String = "Polynomial";
-		public static const LOGARITHMIC:String = "Logarithmic";
-		public static const EXPONENTIAL:String = "Exponential";
-		public static const POWER:String = "Power";
+		public static trendlines:Array = [LINEAR, POLYNOMIAL, LOGARITHMIC, EXPONENTIAL, POWER];
+		public static LINEAR:string = "Linear";
+		public static POLYNOMIAL:string = "Polynomial";
+		public static LOGARITHMIC:string = "Logarithmic";
+		public static EXPONENTIAL:string = "Exponential";
+		public static POWER:string = "Power";
 
-		private var rService:WeaveRServlet = null;
+		private rService:WeaveRServlet = null;
 		
-		private function resetRService():void
+		private resetRService():void
 		{
 			rService = new WeaveRServlet(Weave.properties.rServiceURL.value);
 		}
 		
-		private function resetRegressionLine():void
+		private resetRegressionLine():void
 		{
 			result = null;
 		}
-		private function calculateRRegression():void
+		private calculateRRegression():void
 		{
 			if (drawLine.value)
 			{
@@ -94,10 +94,10 @@ namespace weavejs.plot
 			}
 		}
 		
-		private var requestID:int = 0; // ID of the latest request, used to ignore old results
-		private var result:LinearRegressionResult;
+		private requestID:int = 0; // ID of the latest request, used to ignore old results
+		private result:LinearRegressionResult;
 		
-		private function handleLinearRegressionResult(event:ResultEvent, token:Object=null):void
+		private handleLinearRegressionResult(event:ResultEvent, token:Object=null):void
 		{
 			if (this.requestID != int(token))
 			{
@@ -109,7 +109,7 @@ namespace weavejs.plot
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
-		private function handleLinearRegressionFault(event:FaultEvent, token:Object = null):void
+		private handleLinearRegressionFault(event:FaultEvent, token:Object = null):void
 		{
 			if (this.requestID != int(token))
 			{
@@ -122,20 +122,20 @@ namespace weavejs.plot
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
-		public function get coefficients():Array
+		public get coefficients():Array
 		{
 			return result ? result.coefficients : null;
 		}
-		public function get rSquared():Number
+		public get rSquared():number
 		{
 			return result ? result.rSquared : NaN;
 		}
 		
-		private var tempRange:Range = new Range();
-		private var tempPoint:Point = new Point();
-		private var tempPoint2:Point = new Point();
+		private tempRange:Range = new Range();
+		private tempPoint:Point = new Point();
+		private tempPoint2:Point = new Point();
 
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			var g:Graphics = tempShape.graphics;
 			g.clear();
@@ -205,10 +205,10 @@ namespace weavejs.plot
 //					}
 					 
 					// Use screenBounds to determine how many points should be drawn ==> Draw lines for every 3 pixels
-					var numberOfPoint:Number = Math.floor(screenBounds.getXCoverage() / 3);
-					var increment:Number = dataBounds.getXCoverage() / numberOfPoint;
+					var numberOfPoint:number = Math.floor(screenBounds.getXCoverage() / 3);
+					var increment:number = dataBounds.getXCoverage() / numberOfPoint;
 					var flag:Boolean = true;
-					for (var x:Number = dataBounds.getXMin(); x <= dataBounds.getXMax(); x = x + increment)
+					for (var x:number = dataBounds.getXMin(); x <= dataBounds.getXMax(); x = x + increment)
 					{
 						tempPoint.x = x;
 						tempPoint.y = evalFunction(currentTrendline.value, coefficients, x);
@@ -237,28 +237,28 @@ namespace weavejs.plot
 			}
 		}
 
-		public function dispose():void
+		public dispose():void
 		{
 			requestID = 0; // forces all results from previous requests to be ignored
 		}
 		
-		private var points:Vector.<Number> = null;
-		private var drawCommand:Vector.<int> = null;
+		private points:Vector.<Number> = null;
+		private drawCommand:Vector.<int> = null;
 		
 		/**
 		 * 	@author Yen-Fu 
 		 *	This function evaluate the regression functions, given the type, the coefficients (a, b, c,..) and the value x. 
 		 * 	ax^n-1+bx^n-2+...
 		 **/
-		private function evalFunction(type:String, coefficients:Array, xValue:Number):Number
+		private evalFunction(type:string, coefficients:Array, xValue:number):number
 		{
 				
-			var b:Number = coefficients[0] || 0;
-			var a:Number = coefficients[1] || 0;
+			var b:number = coefficients[0] || 0;
+			var a:number = coefficients[1] || 0;
 			
 			if (type == POLYNOMIAL) 
 			{
-				var result:Number = 0;
+				var result:number = 0;
 				var degree:int = coefficients.length - 1;
 				for (var i:int = 0; i <= degree; i++)
 				{

@@ -27,33 +27,33 @@ namespace weavejs.plot
 	import LinkableBounds2D = weavejs.primitives.LinkableBounds2D;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class GridLinePlotter extends AbstractPlotter
+	export class GridLinePlotter extends AbstractPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, GridLinePlotter, "Grid lines");
 		
-		public function GridLinePlotter()
+		public constructor()
 		{
 			lineStyle.caps.defaultValue.value = CapsStyle.NONE;
 			this.addSpatialDependencies(this.bounds);
 		}
 		
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
-		public const bounds:LinkableBounds2D = Weave.linkableChild(this, LinkableBounds2D);
-		public const xInterval:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const yInterval:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const xOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const yOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public bounds:LinkableBounds2D = Weave.linkableChild(this, LinkableBounds2D);
+		public xInterval:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public yInterval:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public xOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public yOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
-		private const tempPoint:Point = new Point();
-		private const lineBounds:Bounds2D = new Bounds2D();
+		private tempPoint:Point = new Point();
+		private lineBounds:Bounds2D = new Bounds2D();
 		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			bounds.copyTo(output);
 		}
 		
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 			graphics.clear();
@@ -62,27 +62,27 @@ namespace weavejs.plot
 			bounds.copyTo(lineBounds);
 
 			// find appropriate bounds for lines
-			var xMin:Number = numericMax(lineBounds.getXNumericMin(), dataBounds.getXNumericMin());
-			var yMin:Number = numericMax(lineBounds.getYNumericMin(), dataBounds.getYNumericMin());
-			var xMax:Number = numericMin(lineBounds.getXNumericMax(), dataBounds.getXNumericMax());
-			var yMax:Number = numericMin(lineBounds.getYNumericMax(), dataBounds.getYNumericMax());
+			var xMin:number = numericMax(lineBounds.getXNumericMin(), dataBounds.getXNumericMin());
+			var yMin:number = numericMax(lineBounds.getYNumericMin(), dataBounds.getYNumericMin());
+			var xMax:number = numericMin(lineBounds.getXNumericMax(), dataBounds.getXNumericMax());
+			var yMax:number = numericMin(lineBounds.getYNumericMax(), dataBounds.getYNumericMax());
 			
 			// x
 			if (yMin < yMax)
 			{
-				var x0:Number = xOffset.value || 0;
-				var dx:Number = Math.abs(xInterval.value);
-				var xScale:Number = dataBounds.getXCoverage() / screenBounds.getXCoverage();
+				var x0:number = xOffset.value || 0;
+				var dx:number = Math.abs(xInterval.value);
+				var xScale:number = dataBounds.getXCoverage() / screenBounds.getXCoverage();
 				
 				if (xMin < xMax && ((xMin - x0) % dx == 0 || dx == 0))
 					drawLine(xMin, yMin, xMin, yMax, graphics, dataBounds, screenBounds);
 				
 				if (dx > xScale) // don't draw sub-pixel intervals
 				{
-					var xStart:Number = xMin - (xMin - x0) % dx;
+					var xStart:number = xMin - (xMin - x0) % dx;
 					if (xStart <= xMin)
 						xStart += dx;
-					for (var ix:int = 0, x:Number = xStart; x < xMax; x = xStart + dx * ++ix)
+					for (var ix:int = 0, x:number = xStart; x < xMax; x = xStart + dx * ++ix)
 						drawLine(x, yMin, x, yMax, graphics, dataBounds, screenBounds);
 				}
 				else if (isFinite(xOffset.value) && xMin < x0 && x0 < xMax)
@@ -95,19 +95,19 @@ namespace weavejs.plot
 			// y
 			if (xMin < xMax)
 			{
-				var y0:Number = yOffset.value || 0;
-				var dy:Number = Math.abs(yInterval.value);
-				var yScale:Number = dataBounds.getYCoverage() / screenBounds.getYCoverage();
+				var y0:number = yOffset.value || 0;
+				var dy:number = Math.abs(yInterval.value);
+				var yScale:number = dataBounds.getYCoverage() / screenBounds.getYCoverage();
 				
 				if (yMin < yMax && ((yMin - y0) % dy == 0 || dy == 0))
 					drawLine(xMin, yMin, xMax, yMin, graphics, dataBounds, screenBounds);
 				
 				if (dy > yScale) // don't draw sub-pixel intervals
 				{
-					var yStart:Number = yMin - (yMin - y0) % dy;
+					var yStart:number = yMin - (yMin - y0) % dy;
 					if (yStart <= yMin)
 						yStart += dy;
-					for (var iy:int = 0, y:Number = yStart; y < yMax; y = yStart + dy * ++iy)
+					for (var iy:int = 0, y:number = yStart; y < yMax; y = yStart + dy * ++iy)
 						drawLine(xMin, y, xMax, y, graphics, dataBounds, screenBounds);
 				}
 				else if (isFinite(yOffset.value) && yMin < y0 && y0 < yMax)
@@ -121,17 +121,17 @@ namespace weavejs.plot
 			destination.draw(tempShape);
 		}
 		
-		private function numericMin(userValue:Number, systemValue:Number):Number
+		private numericMin(userValue:number, systemValue:number):number
 		{
 			return userValue < systemValue ? userValue : systemValue; // if userValue is NaN, returns systemValue
 		}
 		
-		private function numericMax(userValue:Number, systemValue:Number):Number
+		private numericMax(userValue:number, systemValue:number):number
 		{
 			return userValue > systemValue ? userValue : systemValue; // if userValue is NaN, returns systemValue
 		}
 		
-		private function drawLine(xMin:Number, yMin:Number, xMax:Number, yMax:Number, graphics:Graphics, dataBounds:Bounds2D, screenBounds:Bounds2D):void
+		private drawLine(xMin:number, yMin:number, xMax:number, yMax:number, graphics:Graphics, dataBounds:Bounds2D, screenBounds:Bounds2D):void
 		{
 			tempPoint.x = xMin;
 			tempPoint.y = yMin;
@@ -147,13 +147,13 @@ namespace weavejs.plot
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		// backwards compatibility
 		
-		[Deprecated] public function set interval(value:Number):void { handleDeprecated('interval', value); }
-		[Deprecated] public function set start(value:Number):void { handleDeprecated('start', value); }
-		[Deprecated] public function set end(value:Number):void { handleDeprecated('end', value); }
-		[Deprecated] public function set horizontal(value:Boolean):void { handleDeprecated('alongXAxis', !value); }
-		[Deprecated] public function set alongXAxis(value:Boolean):void { handleDeprecated('alongXAxis', value); }
-		private var _deprecated:Object;
-		private function handleDeprecated(name:String, value:*):void
+		/*[Deprecated] public set interval(value:number):void { handleDeprecated('interval', value); }
+		[Deprecated] public set start(value:number):void { handleDeprecated('start', value); }
+		[Deprecated] public set end(value:number):void { handleDeprecated('end', value); }
+		[Deprecated] public set horizontal(value:Boolean):void { handleDeprecated('alongXAxis', !value); }
+		[Deprecated] public set alongXAxis(value:Boolean):void { handleDeprecated('alongXAxis', value); }
+		private _deprecated:Object;
+		private handleDeprecated(name:string, value:*):void
 		{
 			if (!_deprecated)
 				_deprecated = {};
@@ -176,6 +176,6 @@ namespace weavejs.plot
 				bounds.setBounds(NaN, _deprecated['start'], NaN, _deprecated['end']);
 			}
 			_deprecated = null;
-		}
+		}*/
 	}
 }

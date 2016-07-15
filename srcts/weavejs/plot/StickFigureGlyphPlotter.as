@@ -29,31 +29,31 @@ namespace weavejs.plot
 	import DrawUtils = weavejs.util.DrawUtils;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class StickFigureGlyphPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
+	export class StickFigureGlyphPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
 	{
-		public function StickFigureGlyphPlotter()
+		public constructor()
 		{
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ["X", "Y", "Theta 1", "Theta 2", "Theta 3", "Theta 4"];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [dataX, dataY, theta1, theta2, theta3, theta4] = weavejs.geom.SolidLineStyle;
 	
-	public class StickFigureGlyphPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
+	export class StickFigureGlyphPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
 	{
-		public function StickFigureGlyphPlotter()
+		public StickFigureGlyphPlotter()
 		{
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ["X", "Y", "Theta 1", "Theta 2", "Theta 3", "Theta 4"];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [dataX, dataY, theta1, theta2, theta3, theta4];
 		}
@@ -61,47 +61,47 @@ namespace weavejs.plot
 		/**
 		 * This is the angle at which each line will be drawn from the vertical axis.
 		 */
-		public const theta1:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const theta2:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const theta3:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const theta4:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public theta1:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public theta2:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public theta3:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public theta4:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		
-		private const theta1stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta1));
-		private const theta2stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta2));
-		private const theta3stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta3));
-		private const theta4stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta4));
+		private theta1stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta1));
+		private theta2stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta2));
+		private theta3stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta3));
+		private theta4stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta4));
 		/**
 		 * This is the limb length.
 		 */
-		public const limbLength:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(10));
+		public limbLength:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(10));
 		/**
 		 * This is the line style used to draw the outline of the rectangle.
 		 */
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
-		public const curvature:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public curvature:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
 
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			// project data coordinates to screen coordinates and draw graphics
-			var theta1:Number = Math.PI*theta1stats.getNorm(recordKey);
-			var theta2:Number = Math.PI*theta2stats.getNorm(recordKey);
-			var theta3:Number = Math.PI*theta3stats.getNorm(recordKey);
-			var theta4:Number = Math.PI*theta4stats.getNorm(recordKey);
-			var limbLength:Number = this.limbLength.getValueFromKey(recordKey, Number);
+			var theta1:number = Math.PI*theta1stats.getNorm(recordKey);
+			var theta2:number = Math.PI*theta2stats.getNorm(recordKey);
+			var theta3:number = Math.PI*theta3stats.getNorm(recordKey);
+			var theta4:number = Math.PI*theta4stats.getNorm(recordKey);
+			var limbLength:number = this.limbLength.getValueFromKey(recordKey, Number);
 			tempPoint.x = dataX.getValueFromKey(recordKey, Number);
 			tempPoint.y = dataY.getValueFromKey(recordKey, Number);
 			dataBounds.projectPointTo(tempPoint, screenBounds);
 
 			// draw graphics
 			var graphics:Graphics = tempShape.graphics;
-			var x:Number = tempPoint.x;
-			var y:Number = tempPoint.y;
-			var topY:Number = y+(limbLength/2);
-			var bottomY:Number = y-(limbLength/2);
+			var x:number = tempPoint.x;
+			var y:number = tempPoint.y;
+			var topY:number = y+(limbLength/2);
+			var bottomY:number = y-(limbLength/2);
 			
 			lineStyle.beginLineStyle(recordKey, graphics);				
 	
@@ -152,6 +152,6 @@ namespace weavejs.plot
 			}
 		}
 		
-		private static const tempPoint:Point = new Point(); // reusable object
+		private static tempPoint:Point = new Point(); // reusable object
 	}
 }

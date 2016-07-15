@@ -36,11 +36,11 @@ namespace weavejs.plot
 	import ObjectPool = weavejs.util.ObjectPool;
 	import PlotTask = weavejs.visualization.layers.PlotTask;
 	
-	public class TextGlyphPlotter extends AbstractGlyphPlotter implements ITextPlotter
+	export class TextGlyphPlotter extends AbstractGlyphPlotter implements ITextPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, TextGlyphPlotter, "Labels");
 		
-		public function TextGlyphPlotter()
+		public constructor()
 		{
 			hideOverlappingText.value = false;
 			xScreenOffset.value = 0;
@@ -48,14 +48,14 @@ namespace weavejs.plot
 			setColumnKeySources([sortColumn, text]);
 		}
 		
-		private const bitmapText:BitmapText = new BitmapText();
-		private const matrix:Matrix = new Matrix();
+		private bitmapText:BitmapText = new BitmapText();
+		private matrix:Matrix = new Matrix();
 
-		public const sortColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public sortColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 
-		public const text:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public text:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		
-		public function setDefaultTextFormat(ltf:LinkableTextFormat):void
+		public setDefaultTextFormat(ltf:LinkableTextFormat):void
 		{
 			font.defaultValue.value = ltf.font.value;
 			size.defaultValue.value = ltf.size.value;
@@ -64,25 +64,25 @@ namespace weavejs.plot
 			italic.defaultValue.value = ltf.italic.value;
 			underline.defaultValue.value = ltf.underline.value;
 		}
-		public const font:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(LinkableTextFormat.DEFAULT_FONT));
-		public const size:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(LinkableTextFormat.DEFAULT_SIZE));
-		public const color:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0x000000));
-		public const bold:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(false));
-		public const italic:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(false));
-		public const underline:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(false));
+		public font:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(LinkableTextFormat.DEFAULT_FONT));
+		public size:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(LinkableTextFormat.DEFAULT_SIZE));
+		public color:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0x000000));
+		public bold:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(false));
+		public italic:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(false));
+		public underline:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(false));
 		
-		public const hAlign:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(BitmapText.HORIZONTAL_ALIGN_CENTER));
-		public const vAlign:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(BitmapText.VERTICAL_ALIGN_MIDDLE));
-		public const angle:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
-		public const hideOverlappingText:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
-		public const xScreenOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const yScreenOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const maxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(100));
+		public hAlign:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(BitmapText.HORIZONTAL_ALIGN_CENTER));
+		public vAlign:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(BitmapText.VERTICAL_ALIGN_MIDDLE));
+		public angle:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public hideOverlappingText:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
+		public xScreenOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public yScreenOffset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public maxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(100));
 
 		/**
 		 * Draws the graphics onto BitmapData.
 		 */
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			if (!(task.asyncState is Function))
 			{
@@ -90,7 +90,7 @@ namespace weavejs.plot
 				const textWasDrawn:Array = [];
 				const reusableBoundsObjects:Array = [];
 				
-				task.asyncState = function():Number
+				task.asyncState = function():number
 				{
 					var bounds:Bounds2D;
 					
@@ -171,16 +171,16 @@ namespace weavejs.plot
 		}
 
 		// reusable temporary objects
-		private static const tempRectangle:Rectangle = new Rectangle();
-		private static const tempBounds:Bounds2D = new Bounds2D();
-		private static const tempMatrix:Matrix = new Matrix();
-		private static const tempPoint:Point = new Point();
+		private static tempRectangle:Rectangle = new Rectangle();
+		private static tempBounds:Bounds2D = new Bounds2D();
+		private static tempMatrix:Matrix = new Matrix();
+		private static tempPoint:Point = new Point();
 		
 		/**
 		 * Draws an invisible background for text that will be illuminated with bitmap filters,
 		 * but only if bitmapText.angle is divisible by 90 and the task is for probing.
 		 */
-		public static function drawInvisibleHalo(bitmapText:BitmapText, task:IPlotTask):void
+		public static drawInvisibleHalo(bitmapText:BitmapText, task:IPlotTask):void
 		{
 			if (!(task is PlotTask) || (task as PlotTask).taskType != PlotTask.TASK_TYPE_PROBE)
 				return;

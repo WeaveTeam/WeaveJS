@@ -19,8 +19,7 @@ namespace weavejs.plot
 	import Graphics = PIXI.Graphics;
 	import Point = weavejs.geom.Point;
 	import TextFormatAlign = flash.text.TextFormatAlign;
-	import getQualifiedClassName = flash.utils.getQualifiedClassName;
-	
+
 	import NumberFormatter = mx.formatters.NumberFormatter;
 	
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -39,9 +38,9 @@ namespace weavejs.plot
 	import BitmapText = weavejs.util.BitmapText;
 	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
 	
-	public class AxisPlotter extends AbstractPlotter
+	export class AxisPlotter extends AbstractPlotter
 	{
-		public function AxisPlotter()
+		public constructor()
 		{
 			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			spatialCallbacks.addImmediateCallback(this, updateLabels);
@@ -65,60 +64,60 @@ namespace weavejs.plot
 		}
 		
 		//TODO: put this huge list of properties into a separate object instead
-		public const axisLabelDistance:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(-10));
-		public const axisLabelRelativeAngle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(-45));
-		public const axisGridLineThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
-		public const axisGridLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0xDDDDDD));
-		public const axisGridLineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public axisLabelDistance:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(-10));
+		public axisLabelRelativeAngle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(-45));
+		public axisGridLineThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public axisGridLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0xDDDDDD));
+		public axisGridLineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
 
 		// the axis line beginning and end data coordinates
-		public const axisLineDataBounds:LinkableBounds2D = Weave.linkableChild(this, LinkableBounds2D);
+		public axisLineDataBounds:LinkableBounds2D = Weave.linkableChild(this, LinkableBounds2D);
 		// the value corresponding to the beginning of the axis line
-		public const axisLineMinValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public axisLineMinValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		// the value corresponding to the end of the axis line
-		public const axisLineMaxValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public axisLineMaxValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		// the value corresponding to the beginning of the axis line.  If not specified, axisLineMinValue will be used.
-		public const tickMinValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public tickMinValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		// the value corresponding to the end of the axis line.  If not specified, axisLineMaxValue will be used.
-		public const tickMaxValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public tickMaxValue:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
 		// show or hide the axis name
-		public const showAxisName:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public showAxisName:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
 		// number of requested tick marks
-		public const tickCountRequested:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10));
+		public tickCountRequested:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10));
 		// This option forces the axis to generate the exact number of requested tick marks between tick min and max values (inclusive)
-		public const forceTickCount:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public forceTickCount:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		public const axisTickLength:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10));
-		public const axisTickThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
+		public axisTickLength:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10));
+		public axisTickThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
 		
-		public const axisLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
-		public const axisLineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
-		public const axisTickColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
-		public const axisTickAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
-		public const axisLineThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
+		public axisLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		public axisLineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public axisTickColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		public axisTickAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public axisLineThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
 		
 		// formatter to use when generating tick mark labels
-		public const labelNumberFormatter:LinkableNumberFormatter = Weave.linkableChild(this, LinkableNumberFormatter);
-		public const labelTextAlignment:LinkableString = Weave.linkableChild(this, LinkableString);
-		public const labelHorizontalAlign:LinkableString = Weave.linkableChild(this, LinkableString);
-		public const labelVerticalAlign:LinkableString = Weave.linkableChild(this, LinkableString);
-		public const labelDistanceIsVertical:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
+		public labelNumberFormatter:LinkableNumberFormatter = Weave.linkableChild(this, LinkableNumberFormatter);
+		public labelTextAlignment:LinkableString = Weave.linkableChild(this, LinkableString);
+		public labelHorizontalAlign:LinkableString = Weave.linkableChild(this, LinkableString);
+		public labelVerticalAlign:LinkableString = Weave.linkableChild(this, LinkableString);
+		public labelDistanceIsVertical:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 
-		private const _keySet:KeySet = Weave.linkableChild(this, KeySet); // stores tick mark keys
-		private const _axisDescription:LooseAxisDescription = new LooseAxisDescription(); // calculates tick marks
-		private const _bitmapText:BitmapText = new BitmapText(); // for drawing text
-		private var _xDataTickDelta:Number; // x distance between ticks
-		private var _yDataTickDelta:Number; // y distance between ticks
-		private const KEY_TYPE:String = getQualifiedClassName(AxisPlotter);
-		private const MIN_LABEL_KEY:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(KEY_TYPE, 'minLabel');
-		private const MAX_LABEL_KEY:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(KEY_TYPE, 'maxLabel');
-		private const _numberFormatter:NumberFormatter = new NumberFormatter();
+		private _keySet:KeySet = Weave.linkableChild(this, KeySet); // stores tick mark keys
+		private _axisDescription:LooseAxisDescription = new LooseAxisDescription(); // calculates tick marks
+		private _bitmapText:BitmapText = new BitmapText(); // for drawing text
+		private _xDataTickDelta:number; // x distance between ticks
+		private _yDataTickDelta:number; // y distance between ticks
+		private KEY_TYPE:string = Weave.className(AxisPlotter);
+		private MIN_LABEL_KEY:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(KEY_TYPE, 'minLabel');
+		private MAX_LABEL_KEY:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(KEY_TYPE, 'maxLabel');
+		private _numberFormatter:NumberFormatter = new NumberFormatter();
 		
-		public var showRealMinAndMax:Boolean = false;
+		public showRealMinAndMax:Boolean = false;
 
 		// validates tick mark variables		
-		public function updateLabels():void
+		public updateLabels():void
 		{
 			var cc:CallbackCollection;
 			var callbackCollections:Array = [Weave.getCallbacks(this), spatialCallbacks];
@@ -127,8 +126,8 @@ namespace weavejs.plot
 			for each (cc in callbackCollections)
 				cc.delayCallbacks();
 			
-			var minValue:Number = tickMinValue.value;
-			var maxValue:Number = tickMaxValue.value;
+			var minValue:number = tickMinValue.value;
+			var maxValue:number = tickMaxValue.value;
 			if (isNaN(minValue))
 				minValue = axisLineMinValue.value;
 			if (isNaN(maxValue))
@@ -143,7 +142,7 @@ namespace weavejs.plot
 			for (var i:int = 0; i < _axisDescription.numberOfTicks; i++)
 			{
 				// only include tick marks that are between min,max values
-				var tickValue:Number = _axisDescription.tickMin + i * _axisDescription.tickDelta;
+				var tickValue:number = _axisDescription.tickMin + i * _axisDescription.tickDelta;
 				if (axisLineMinValue.value <= tickValue && tickValue <= axisLineMaxValue.value)
 					newKeys.push(WeaveAPI.QKeyManager.getQKey(KEY_TYPE, String(i)));
 			}
@@ -162,13 +161,13 @@ namespace weavejs.plot
 		 * @param outputPoint A place to store the data coordinates of the tick mark
 		 * @return The value associated with the tick mark
 		 */
-		private function getTickValueAndDataCoords(recordKey:IQualifiedKey, outputPoint:Point):Number
+		private getTickValueAndDataCoords(recordKey:IQualifiedKey, outputPoint:Point):number
 		{
-			var _axisLineMinValue:Number = axisLineMinValue.value;
-			var _axisLineMaxValue:Number = axisLineMaxValue.value;
+			var _axisLineMinValue:number = axisLineMinValue.value;
+			var _axisLineMaxValue:number = axisLineMaxValue.value;
 			axisLineDataBounds.copyTo(_tempBounds);
 
-			var tickValue:Number;
+			var tickValue:number;
 			// special case for min,max labels
 			if (recordKey == MIN_LABEL_KEY)
 			{
@@ -194,7 +193,7 @@ namespace weavejs.plot
 		}
 		
 		// gets the bounds of a tick mark
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			initBoundsArray(output);
 			getTickValueAndDataCoords(recordKey, tempPoint);
@@ -202,12 +201,12 @@ namespace weavejs.plot
 		}
 		
 		// draws the tick marks
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private function drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 //			if (recordKeys.length == 0)
 //				trace(this,'drawPlot',arguments);
@@ -216,28 +215,28 @@ namespace weavejs.plot
 			// everything below is in screen coordinates
 
 			// get the angle of the axis line (relative to real screen coordinates, positive Y in downward direction)
-			var axisAngle:Number = Math.atan2(_axisLineScreenBounds.getHeight(), _axisLineScreenBounds.getWidth());
+			var axisAngle:number = Math.atan2(_axisLineScreenBounds.getHeight(), _axisLineScreenBounds.getWidth());
 			// ticks are perpendicular to axis line
-			var tickAngle:Number = axisAngle + Math.PI / 2;
+			var tickAngle:number = axisAngle + Math.PI / 2;
 			// label angle is relative to axis angle
-			var labelAngle:Number = axisAngle + axisLabelRelativeAngle.value * Math.PI / 180; // convert from degrees to radians
+			var labelAngle:number = axisAngle + axisLabelRelativeAngle.value * Math.PI / 180; // convert from degrees to radians
 
 			// calculate tick line offset from angle
-			var xTickOffset:Number = Math.cos(tickAngle) * axisTickLength.value / 2;
-			var yTickOffset:Number = Math.sin(tickAngle) * axisTickLength.value / 2;
+			var xTickOffset:number = Math.cos(tickAngle) * axisTickLength.value / 2;
+			var yTickOffset:number = Math.sin(tickAngle) * axisTickLength.value / 2;
 			
 			// calculate label offset from angle
-			var _labelDistance:Number = axisLabelDistance.value;
-			var labelAngleOffset:Number = labelDistanceIsVertical.value ? Math.PI / 2: 0;
-			var xLabelOffset:Number = Math.cos(labelAngle + labelAngleOffset) * axisLabelDistance.value;
-			var yLabelOffset:Number = Math.sin(labelAngle + labelAngleOffset) * axisLabelDistance.value;
+			var _labelDistance:number = axisLabelDistance.value;
+			var labelAngleOffset:number = labelDistanceIsVertical.value ? Math.PI / 2: 0;
+			var xLabelOffset:number = Math.cos(labelAngle + labelAngleOffset) * axisLabelDistance.value;
+			var yLabelOffset:number = Math.sin(labelAngle + labelAngleOffset) * axisLabelDistance.value;
 			
 			setupBitmapText();
 			_bitmapText.maxWidth = 80; // TEMPORARY SOLUTION (for word wrap)
 			
 			// calculate the distance between tick marks to use as _bitmapText.maxHeight
-			var lineLength:Number = Math.sqrt(Math.pow(_axisLineScreenBounds.getWidth(), 2) + Math.pow(_axisLineScreenBounds.getHeight(), 2));
-			var tickScreenDelta:Number = lineLength / (_axisDescription.numberOfTicks - 1);
+			var lineLength:number = Math.sqrt(Math.pow(_axisLineScreenBounds.getWidth(), 2) + Math.pow(_axisLineScreenBounds.getHeight(), 2));
+			var tickScreenDelta:number = lineLength / (_axisDescription.numberOfTicks - 1);
 			tickScreenDelta /= Math.SQRT2; // TEMPORARY SOLUTION -- assumes text is always at 45 degree angle
 			_bitmapText.maxHeight = tickScreenDelta;
 
@@ -252,11 +251,11 @@ namespace weavejs.plot
 				var key:IQualifiedKey = recordKeys[i] as IQualifiedKey;
 
 				// get screen coordinates of tick mark
-				var tickValue:Number = getTickValueAndDataCoords(key, tempPoint);
+				var tickValue:number = getTickValueAndDataCoords(key, tempPoint);
 								
 				_axisLineDataBounds.projectPointTo(tempPoint, _axisLineScreenBounds);
-				var xTick:Number = tempPoint.x;
-				var yTick:Number = tempPoint.y;
+				var xTick:number = tempPoint.x;
+				var yTick:number = tempPoint.y;
 				
 				// draw tick mark line
 				graphics.clear();
@@ -277,7 +276,7 @@ namespace weavejs.plot
 				// draw tick mark label
 				_bitmapText.text = null;
 				// attempt to use label function
-				var labelFunctionResult:String = _labelFunction == null ? null : _labelFunction(tickValue);
+				var labelFunctionResult:string = _labelFunction == null ? null : _labelFunction(tickValue);
 				if (_labelFunction != null && labelFunctionResult != null)
 				{
 					_bitmapText.text = labelFunctionResult;
@@ -303,23 +302,23 @@ namespace weavejs.plot
 			}
 		}
 		
-		private var _titleBounds:Bounds2D = null;
-		public function getTitleLabelBounds():Bounds2D
+		private _titleBounds:Bounds2D = null;
+		public getTitleLabelBounds():Bounds2D
 		{
 			return _titleBounds;
 		}
 		
-		public static const LABEL_POSITION_AT_AXIS_MIN:String  		= "AxisPlotter.LABEL_POSITION_AT_AXIS_MIN";
-		public static const LABEL_POSITION_AT_AXIS_CENTER:String    = "AxisPlotter.LABEL_POSITION_AT_AXIS_CENTER";
-		public static const LABEL_POSITION_AT_AXIS_MAX:String  		= "AxisPlotter.LABEL_POSITION_AT_AXIS_MAX";
+		public static LABEL_POSITION_AT_AXIS_MIN:string  		= "AxisPlotter.LABEL_POSITION_AT_AXIS_MIN";
+		public static LABEL_POSITION_AT_AXIS_CENTER:string    = "AxisPlotter.LABEL_POSITION_AT_AXIS_CENTER";
+		public static LABEL_POSITION_AT_AXIS_MAX:string  		= "AxisPlotter.LABEL_POSITION_AT_AXIS_MAX";
 		
-		public static const LABEL_LEFT_JUSTIFIED:String 	= BitmapText.HORIZONTAL_ALIGN_LEFT;
-		public static const LABEL_CENTERED:String 			= BitmapText.HORIZONTAL_ALIGN_CENTER;
-		public static const LABEL_RIGHT_JUSTIFIED:String 	= BitmapText.HORIZONTAL_ALIGN_RIGHT;
+		public static LABEL_LEFT_JUSTIFIED:string 	= BitmapText.HORIZONTAL_ALIGN_LEFT;
+		public static LABEL_CENTERED:string 			= BitmapText.HORIZONTAL_ALIGN_CENTER;
+		public static LABEL_RIGHT_JUSTIFIED:string 	= BitmapText.HORIZONTAL_ALIGN_RIGHT;
 		
 		// BEGIN TEMPORARY SOLUTION
-		public function setSideAxisName(name:String, angle:Number, xDistance:Number, yDistance:Number, verticalAlign:String, 
-									    labelPosition:String = LABEL_POSITION_AT_AXIS_CENTER, labelAlignment:String = null,
+		public setSideAxisName(name:string, angle:number, xDistance:number, yDistance:number, verticalAlign:string,
+									    labelPosition:string = LABEL_POSITION_AT_AXIS_CENTER, labelAlignment:string = null,
 									    maxLabelWidth:int = -1):void
 		{
 			_axisName = name;
@@ -333,18 +332,18 @@ namespace weavejs.plot
 			
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
-		private var _axisName:String;
-		private var _axisNameAngle:Number;
-		private var _axisNameXDistance:Number;
-		private var _axisNameYDistance:Number;
-		private var _axisNameVerticalAlign:String;
-		private var _labelPosition:String;
-		private var _labelAlignment:String;
-		private var _maxLabelWidth:int;
+		private _axisName:string;
+		private _axisNameAngle:number;
+		private _axisNameXDistance:number;
+		private _axisNameYDistance:number;
+		private _axisNameVerticalAlign:string;
+		private _labelPosition:string;
+		private _labelAlignment:string;
+		private _maxLabelWidth:int;
 		// END TEMPORARY SOLUTION
 		
 		// draws the axis line
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			setupAxisNameBitmapText(dataBounds,screenBounds);
 			
@@ -363,7 +362,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		private const _tempBounds:Bounds2D = new Bounds2D();
+		private _tempBounds:Bounds2D = new Bounds2D();
 		
 		protected function setupBitmapText():void
 		{
@@ -424,7 +423,7 @@ namespace weavejs.plot
 			// END TEMPORARY SOLUTION
 		}
 		
-//		public function getAxisNameScreenBounds(dataBounds:Bounds2D, screenBounds:Bounds2D,outputScreenBounds:Bounds2D):void
+//		public getAxisNameScreenBounds(dataBounds:Bounds2D, screenBounds:Bounds2D,outputScreenBounds:Bounds2D):void
 //		{
 //			setupAxisNameBitmapText(dataBounds,screenBounds);
 //			// this does not work when text is vertical
@@ -432,12 +431,12 @@ namespace weavejs.plot
 //		}
 		
 		// gets the bounds of the axis line
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			axisLineDataBounds.copyTo(output);
 		}
 		
-		private function initPrivateAxisLineBoundsVariables(dataBounds:Bounds2D, screenBounds:Bounds2D):void
+		private initPrivateAxisLineBoundsVariables(dataBounds:Bounds2D, screenBounds:Bounds2D):void
 		{
 			// get axis line data bounds and project to screen coordinates
 			axisLineDataBounds.copyTo(_axisLineDataBounds);
@@ -446,18 +445,18 @@ namespace weavejs.plot
 			dataBounds.projectCoordsTo(_axisLineScreenBounds, screenBounds);
 		}
 
-		private const _axisLineDataBounds:Bounds2D = new Bounds2D();
-		private const _axisLineScreenBounds:Bounds2D = new Bounds2D();
-		private const tempPoint:Point = new Point();
-		private const tempPoint2:Point = new Point();
+		private _axisLineDataBounds:Bounds2D = new Bounds2D();
+		private _axisLineScreenBounds:Bounds2D = new Bounds2D();
+		private tempPoint:Point = new Point();
+		private tempPoint2:Point = new Point();
 
 		// TEMPORARY SOLUTION
-		public function setLabelFunction(func:Function):void
+		public setLabelFunction(func:Function):void
 		{
 			_labelFunction = func;
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
-		private var _labelFunction:Function = null;
+		private _labelFunction:Function = null;
 		// END TEMPORARY SOLUTION
 	}
 }

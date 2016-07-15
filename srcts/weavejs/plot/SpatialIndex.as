@@ -53,58 +53,58 @@ package weave.utils
 	 * This class will not detect changes to the shapes you add to the index.
 	 * If you change the bounds of the shapes, you will need to call SpatialIndex.createIndex().
 	 */
-	public class SpatialIndex implements ILinkableObject
+	export class SpatialIndex implements ILinkableObject
 	{
-		public var debug:Boolean = false;
+		public debug:Boolean = false;
 		
-		public function SpatialIndex()
+		public constructor()
 		{
 			this.callbacks = getCallbackCollection(this);
 		}
 		
-		private var callbacks:ICallbackCollection;
+		private callbacks:ICallbackCollection;
 		
-		private const _kdTree:KDTree = registerDisposableChild(this, new KDTree(5));
-		private const _keysArray:Array = []; // of IQualifiedKey
-		private var _keyToBoundsMap:Dictionary = new Dictionary(); // IQualifiedKey -> Array of IBounds2D
-		private var _keyToGeometriesMap:Dictionary = new Dictionary(); // IQualifiedKey -> Array of GeneralizedGeometry or ISimpleGeometry
+		private _kdTree:KDTree = registerDisposableChild(this, new KDTree(5));
+		private _keysArray:Array = []; // of IQualifiedKey
+		private _keyToBoundsMap:Dictionary = new Dictionary(); // IQualifiedKey -> Array of IBounds2D
+		private _keyToGeometriesMap:Dictionary = new Dictionary(); // IQualifiedKey -> Array of GeneralizedGeometry or ISimpleGeometry
 		
-		private var _restarted:Boolean = false; // used by async code
-		private var _queryMissingBounds:Boolean; // used by async code
-		private var _keysArrayIndex:int; // used by async code
-		private var _keysIndex:int; // used by async code
-		private var _plotter:IPlotter;//used by async code
-		private var _boundsArrayIndex:int; // used by async code
-		private var _boundsArray:Array; // used by async code
+		private _restarted:Boolean = false; // used by async code
+		private _queryMissingBounds:Boolean; // used by async code
+		private _keysArrayIndex:int; // used by async code
+		private _keysIndex:int; // used by async code
+		private _plotter:IPlotter;//used by async code
+		private _boundsArrayIndex:int; // used by async code
+		private _boundsArray:Array; // used by async code
 		
 		/**
 		 * These constants define indices in a KDKey corresponding to xmin,ymin,xmax,ymax,importance values.
 		 */
-		private const XMIN_INDEX:int = 0, YMIN_INDEX:int = 1;
-		private const XMAX_INDEX:int = 2, YMAX_INDEX:int = 3;
-		private const IMPORTANCE_INDEX:int = 4;
+		private XMIN_INDEX:int = 0, YMIN_INDEX:int = 1;
+		private XMAX_INDEX:int = 2, YMAX_INDEX:int = 3;
+		private IMPORTANCE_INDEX:int = 4;
 		
 		/**
 		 * These KDKey arrays are created once and reused to avoid unnecessary creation of objects.
 		 * The only values that change are the ones that are undefined here.
 		 */
-		private const minKDKey:Array = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, NaN, NaN, 0];
-		private const maxKDKey:Array = [NaN, NaN, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
+		private minKDKey:Array = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, NaN, NaN, 0];
+		private maxKDKey:Array = [NaN, NaN, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
 		
 		// reusable temporary objects
-		private const _tempBoundsPolygon:Array = [new Point(), new Point(), new Point(), new Point(), new Point()]; // used by setTempBounds and getKeysGeometryOverlap
+		private _tempBoundsPolygon:Array = [new Point(), new Point(), new Point(), new Point(), new Point()]; // used by setTempBounds and getKeysGeometryOverlap
 
 		/**
 		 * This bounds represents the full extent of the shape index.
 		 */
-		public const collectiveBounds:IBounds2D = new Bounds2D();
+		public collectiveBounds:IBounds2D = new Bounds2D();
 		
 		/**
 		 * This function gets a list of Bounds2D objects associated with a key.
 		 * @param key A record key.
 		 * @result An Array of Bounds2D objects associated with the key, or null if there are none.
 		 */
-		public function getBoundsFromKey(key:IQualifiedKey):Array
+		public getBoundsFromKey(key:IQualifiedKey):Array
 		{
 			return _keyToBoundsMap[key] as Array;
 		}
@@ -112,7 +112,7 @@ package weave.utils
 		/**
 		 * The list of all the IQualifiedKey objects (record identifiers) referenced in this index.
 		 */
-		public function get keys():Array
+		public get keys():Array
 		{
 			return _keysArray;
 		}
@@ -122,7 +122,7 @@ package weave.utils
 		 * 
 		 * @param plotter An IPlotter object to index.
 		 */
-		public function createIndex(plotter:IPlotter, queryMissingBounds:Boolean = false):void
+		public createIndex(plotter:IPlotter, queryMissingBounds:Boolean = false):void
 		{
 			if (debug)
 				debugTrace(plotter,this,'createIndex');
@@ -136,9 +136,9 @@ package weave.utils
 			WeaveAPI.StageUtils.startTask(this, _iterateAll, WeaveAPI.TASK_PRIORITY_NORMAL, callbacks.triggerCallbacks, lang("Creating spatial index for {0}", debugId(plotter)));
 		}
 		
-		private const _iterateAll:Function = StageUtils.generateCompoundIterativeTask(_iterate0, _iterate1, _iterate2);
+		private _iterateAll:Function = StageUtils.generateCompoundIterativeTask(_iterate0, _iterate1, _iterate2);
 
-		private function _iterate0():Number
+		private _iterate0():number
 		{
 			_restarted = false;
 			
@@ -156,18 +156,18 @@ package weave.utils
 			
 			// make a copy of the keys vector
 			if (_plotter)
-				VectorUtils.copy(_plotter.filteredKeySet.keys, _keysArray);			
+				ArrayUtils.copy(_plotter.filteredKeySet.keys, _keysArray);
 			
 			// randomize the order of the shapes to avoid a possibly poorly-performing
 			// KDTree structure due to the given ordering of the records
-			VectorUtils.randomSort(_keysArray);
+			ArrayUtils.randomSort(_keysArray);
 			if (debug)
 				debugTrace(_plotter,this,'keys',_keysArray.length);
 			
 			return 1;
 		}
 		
-		private function _iterate1(stopTime:int):Number
+		private _iterate1(stopTime:int):number
 		{
 			for (; _keysIndex < _keysArray.length; _keysIndex++)
 			{
@@ -195,7 +195,7 @@ package weave.utils
 			return _restarted ? 0 : 1;
 		}
 			
-		private function _iterate2(stopTime:int):Number
+		private _iterate2(stopTime:int):number
 		{
 			for (; _keysArrayIndex < _keysArray.length; _keysArrayIndex++)
 			{
@@ -238,7 +238,7 @@ package weave.utils
 		/**
 		 * This function empties the spatial index.
 		 */
-		public function clear():void
+		public clear():void
 		{
 			callbacks.delayCallbacks();
 			if (debug)
@@ -257,7 +257,7 @@ package weave.utils
 			callbacks.resumeCallbacks();
 		}
 		
-		private static function polygonOverlapsPolyLine(polygon:Array, line:Object):Boolean
+		private static polygonOverlapsPolyLine(polygon:Array, line:Object):Boolean
 		{
 			for (var i:int = 0; i < line.length - 1; ++i)
 			{
@@ -269,7 +269,7 @@ package weave.utils
 			
 			return false;		
 		}
-		private static function polygonOverlapsPolyPoint(polygon:Array, points:Object):Boolean
+		private static polygonOverlapsPolyPoint(polygon:Array, points:Object):Boolean
 		{
 			for (var i:int = 0; i < points.length; ++i)
 			{
@@ -279,22 +279,22 @@ package weave.utils
 			
 			return false;
 		}
-		private static function getMinimumUnscaledDistanceFromPolyLine(line:Object, x:Number, y:Number):Number
+		private static getMinimumUnscaledDistanceFromPolyLine(line:Object, x:number, y:number):number
 		{
-			var min:Number = Number.POSITIVE_INFINITY;
+			var min:number = Number.POSITIVE_INFINITY;
 			for (var i:int = 0; i < line.length - 1; ++i)
 			{
-				var distance:Number = GeometryUtils.getUnscaledDistanceFromLine(line[i].x, line[i].y, line[i + 1].x, line[i + 1].y, x, y, true);
+				var distance:number = GeometryUtils.getUnscaledDistanceFromLine(line[i].x, line[i].y, line[i + 1].x, line[i + 1].y, x, y, true);
 				min = Math.min(distance, min);
 			}			
 			return min;
 		}
-		private static function getMinimumUnscaledDistanceFromPolyPoint(points:Object, x:Number, y:Number):Number
+		private static getMinimumUnscaledDistanceFromPolyPoint(points:Object, x:number, y:number):number
 		{
-			var min:Number = Number.POSITIVE_INFINITY;
+			var min:number = Number.POSITIVE_INFINITY;
 			for (var i:int = 0; i < points.length; ++i)
 			{
-				var distance:Number = GeometryUtils.getDistanceFromPointSq(points[i].x, points[i].y, x, y);
+				var distance:number = GeometryUtils.getDistanceFromPointSq(points[i].x, points[i].y, x, y);
 				min = Math.min(distance, min);
 			}
 			return min;
@@ -306,7 +306,7 @@ package weave.utils
 		 * @param minImportance The minimum importance value imposed on the resulting keys. 
 		 * @return An array of keys.
 		 */
-		public function getKeysBoundingBoxOverlap(bounds:IBounds2D, minImportance:Number = 0):Array
+		public getKeysBoundingBoxOverlap(bounds:IBounds2D, minImportance:number = 0):Array
 		{
 			// This is a filter for bounding boxes and should be used for getting fast results
 			// during panning and zooming.
@@ -326,13 +326,13 @@ package weave.utils
 		/**
 		 * used by getKeysGeometryOverlap.
 		 */
-		private function setTempBounds(bounds:IBounds2D):void
+		private setTempBounds(bounds:IBounds2D):void
 		{
 			var b:Bounds2D = bounds as Bounds2D;
-			var xMin:Number = b.xMin;
-			var yMin:Number = b.yMin;
-			var xMax:Number = b.xMax;
-			var yMax:Number = b.yMax;
+			var xMin:number = b.xMin;
+			var yMin:number = b.yMin;
+			var xMax:number = b.xMax;
+			var yMax:number = b.yMax;
 			_tempBoundsPolygon[0].x = xMin; _tempBoundsPolygon[0].y = yMin;
 			_tempBoundsPolygon[1].x = xMin; _tempBoundsPolygon[1].y = yMax;
 			_tempBoundsPolygon[2].x = xMax; _tempBoundsPolygon[2].y = yMax;
@@ -348,7 +348,7 @@ package weave.utils
 		 * @param filterBoundingBoxesByImportance If true, bounding boxes will be pre-filtered by importance before checking geometry overlap.
 		 * @return An array of keys.
 		 */
-		public function getKeysGeometryOverlap(queryBounds:IBounds2D, minImportance:Number = 0, filterBoundingBoxesByImportance:Boolean = false, dataBounds:IBounds2D = null):Array
+		public getKeysGeometryOverlap(queryBounds:IBounds2D, minImportance:number = 0, filterBoundingBoxesByImportance:Boolean = false, dataBounds:IBounds2D = null):Array
 		{
 			var keys:Array = getKeysBoundingBoxOverlap(queryBounds, filterBoundingBoxesByImportance ? minImportance : 0);
 			
@@ -491,24 +491,24 @@ package weave.utils
 		 * @param yPrecision If specified, Y distance values will be divided by this and truncated before comparing.
 		 * @return An array of IQualifiedKey objects. 
 		 */		
-		public function getClosestOverlappingKeys(queryBounds:IBounds2D, xPrecision:Number, yPrecision:Number, dataBounds:IBounds2D):Array
+		public getClosestOverlappingKeys(queryBounds:IBounds2D, xPrecision:number, yPrecision:number, dataBounds:IBounds2D):Array
 		{
-			var xQueryCenter:Number = queryBounds.getXCenter();
-			var yQueryCenter:Number = queryBounds.getYCenter();
+			var xQueryCenter:number = queryBounds.getXCenter();
+			var yQueryCenter:number = queryBounds.getYCenter();
 			dataBounds.constrainBounds(queryBounds, false);
-			var importance:Number = xPrecision * yPrecision;
+			var importance:number = xPrecision * yPrecision;
 			var keys:Array = getKeysGeometryOverlap(queryBounds, importance, false, dataBounds);
 			
 			// init local vars
-			var closestDistanceSq:Number = Infinity;
-			var xDistance:Number;
-			var yDistance:Number;
-			var distanceSq:Number;
-			var xRecordCenter:Number;
-			var yRecordCenter:Number;
+			var closestDistanceSq:number = Infinity;
+			var xDistance:number;
+			var yDistance:number;
+			var distanceSq:number;
+			var xRecordCenter:number;
+			var yRecordCenter:number;
 			var recordBounds:IBounds2D;
 			var foundQueryCenterOverlap:Boolean = false; // true when we found a key that overlaps the center of the given bounds
-			var tempDistance:Number;
+			var tempDistance:number;
 			// begin with a result of zero shapes
 			var result:Array = [];
 			var resultCount:int = 0;
@@ -531,7 +531,7 @@ package weave.utils
 							xDistance = int(xDistance / xPrecision);
 						if (!isNaN(yPrecision) && yPrecision != 0)
 							yDistance = int(yDistance / yPrecision);
-						var geomDistance:Number = xDistance * xDistance + yDistance * yDistance; 
+						var geomDistance:number = xDistance * xDistance + yDistance * yDistance; 
 						
 						if (geom is GeneralizedGeometry)
 						{
@@ -719,7 +719,7 @@ package weave.utils
 		 **/		
 	
 
-		public function getKeysGeometryOverlapGeometries(geometries:Array, minImportance:Number = 0, filterBoundingBoxesByImportance:Boolean = false):Array
+		public getKeysGeometryOverlapGeometries(geometries:Array, minImportance:number = 0, filterBoundingBoxesByImportance:Boolean = false):Array
 		{
 			var queriedKeys:Array = [];
 			var keys:Dictionary = new Dictionary();
@@ -749,7 +749,7 @@ package weave.utils
 		 * @param filterBoundingBoxesByImportance If true, bounding boxes will be pre-filtered by importance before checking geometry overlap.
 		 * @return An array of IQualifiedKey objects.
 		 */
-		public function getKeysGeometryOverlapGeometry(geometry:ISimpleGeometry, minImportance:Number = 0, filterBoundingBoxesByImportance:Boolean = false):Array
+		public getKeysGeometryOverlapGeometry(geometry:ISimpleGeometry, minImportance:number = 0, filterBoundingBoxesByImportance:Boolean = false):Array
 		{
 			// first filter by bounds
 			var point:Object;

@@ -25,74 +25,40 @@ namespace weavejs.plot
 	import IPlotTask = weavejs.api.ui.IPlotTask;
 	import ISelectableAttributes;
 	
-	public class ThermometerPlotter extends MeterPlotter implements ISelectableAttributes
+	export class ThermometerPlotter extends MeterPlotter implements ISelectableAttributes
 	{
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ["Meter"];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [meterColumn];
 		}
 		
 		// reusable point objects
-		private const bottom:Point = new Point(), top:Point = new Point();
+		private bottom:Point = new Point(), top:Point = new Point();
 		
 		//the radius of the thermometer bulb (circle at bottom) in pixels
-		private const bulbRadius:Number = 30;
+		private bulbRadius:number = 30;
 		
 		//the thickness of the thermometer red center line
-		private const centerLineThickness:Number = 20;
+		private centerLineThickness:number = 20;
 		
 		//the thickness of the thermometer background center line
-		private const backgroundCenterLineThickness:Number = 30;
+		private backgroundCenterLineThickness:number = 30;
 		
 		//the color to use for background elements
-		private const backgroundCenterLineColor:uint = 0x777777;
+		private backgroundCenterLineColor:uint = 0x777777;
 		
 		//the x offset (in pixels) used when drawing all shapes (so axis line is fully visible) 
-		private const xOffset:Number = backgroundCenterLineThickness/2+1;
+		private xOffset:number = backgroundCenterLineThickness/2+1;
 		
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			//compute the meter value by averaging all record values
-			var meterValue:Number = 0 = weavejs.api.data.ISelectableAttributes;
-	
-	public class ThermometerPlotter extends MeterPlotter implements ISelectableAttributes
-	{
-		public function getSelectableAttributeNames():Array
-		{
-			return ["Meter"];
-		}
-		public function getSelectableAttributes():Array
-		{
-			return [meterColumn];
-		}
-		
-		// reusable point objects
-		private const bottom:Point = new Point(), top:Point = new Point();
-		
-		//the radius of the thermometer bulb (circle at bottom) in pixels
-		private const bulbRadius:Number = 30;
-		
-		//the thickness of the thermometer red center line
-		private const centerLineThickness:Number = 20;
-		
-		//the thickness of the thermometer background center line
-		private const backgroundCenterLineThickness:Number = 30;
-		
-		//the color to use for background elements
-		private const backgroundCenterLineColor:uint = 0x777777;
-		
-		//the x offset (in pixels) used when drawing all shapes (so axis line is fully visible) 
-		private const xOffset:Number = backgroundCenterLineThickness/2+1;
-		
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
-		{
-			//compute the meter value by averaging all record values
-			var meterValue:Number = 0;
-			var n:Number = task.recordKeys.length;
+			var meterValue:number = 0;
+			var n:number = task.recordKeys.length;
 			
 			for (var i:int = 0; i < n; i++)//TODO handle missing values
 				meterValue += meterColumn.getValueFromKey(task.recordKeys[i] as IQualifiedKey, Number);
@@ -132,7 +98,7 @@ namespace weavejs.plot
 		 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
 		 * @param destination The sprite to draw the graphics onto.
 		 */
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 			graphics.clear();
@@ -166,12 +132,12 @@ namespace weavejs.plot
 		 * This function returns a Bounds2D object set to the data bounds associated with the background.
 		 * @param output An Bounds2D object to store the result in.
 		 */
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(0, 0, 1, meterColumnStats.getMax());
 		}
 		
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			initBoundsArray(output).setBounds(0, 0, 1, meterColumnStats.getMax());
 		}

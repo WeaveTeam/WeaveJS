@@ -39,44 +39,44 @@ namespace weavejs.plot
 	/**
 	 * ImagePlotter
 	 */
-	public class ImageGlyphPlotter extends AbstractGlyphPlotter
+	export class ImageGlyphPlotter extends AbstractGlyphPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, ImageGlyphPlotter, "Image glyphs");
 		
-		public static var debug:Boolean = false;
+		public static debug:Boolean = false;
 		
-		public function ImageGlyphPlotter()
+		public constructor()
 		{
 			super();
 			
-			color.internalDynamicColumn.target = Weave.defaultColorColumn;
+			color.internalDynamicColumn.target = WeaveProperties.defaultColorColumn;
 			alpha.defaultValue.value = 1;
 			
 			color.internalDynamicColumn.addImmediateCallback(this, handleColor, true);
 			Weave.getCallbacks(colorDataWatcher).addImmediateCallback(this, updateKeySources, true);
 		}
 		
-		public const color:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
-		public const alpha:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+		public color:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+		public alpha:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
 		
-		public const imageURL:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
-		public const imageSize:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+		public imageURL:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+		public imageSize:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
 		
-		public const rotation:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const rotationOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, isFinite));
-		public const dataInDegrees:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
-		public const reverseRotation:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public rotation:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public rotationOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, isFinite));
+		public dataInDegrees:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public reverseRotation:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		private const _urlToImageMap:Object = new Object(); // maps a url to a BitmapData
-		private const tempMatrix:Matrix = new Matrix(); // reusable object
+		private _urlToImageMap:Object = new Object(); // maps a url to a BitmapData
+		private tempMatrix:Matrix = new Matrix(); // reusable object
 
 		[Embed(source="/weave/resources/images/missing.png")]
-		private static var _missingImageClass:Class;
-		private static const _missingImage:BitmapData = Bitmap(new _missingImageClass()).bitmapData;
+		private static _missingImageClass:Class;
+		private static _missingImage:BitmapData = Bitmap(new _missingImageClass()).bitmapData;
 
-		private const colorDataWatcher:LinkableWatcher = Weave.disposableChild(this, LinkableWatcher);
+		private colorDataWatcher:LinkableWatcher = Weave.disposableChild(this, LinkableWatcher);
 		
-		private function handleColor():void
+		private handleColor():void
 		{
 			var cc:ColorColumn = color.getInternalColumn() as ColorColumn;
 			var bc:BinnedColumn = cc ? cc.getInternalColumn() as BinnedColumn : null;
@@ -85,7 +85,7 @@ namespace weavejs.plot
 			colorDataWatcher.target = dc || fc || bc || cc;
 		}
 		
-		private function updateKeySources():void
+		private updateKeySources():void
 		{
 			var columns:Array = [imageSize];
 			var sortDirections:Array = [-1];
@@ -105,13 +105,13 @@ namespace weavejs.plot
 		/**
 		 * Draws the graphics onto BitmapData.
 		 */
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			if (task.iteration < task.recordKeys.length)
 			{
 				var recordKey:IQualifiedKey = task.recordKeys[task.iteration] as IQualifiedKey;
 				
-				var _imageURL:String = imageURL.getValueFromKey(recordKey, String) as String;
+				var _imageURL:string = imageURL.getValueFromKey(recordKey, String) as String;
 				
 				// stop if there is no url
 				if  (!_imageURL)
@@ -132,10 +132,10 @@ namespace weavejs.plot
 				tempMatrix.translate(-image.width / 2, -image.height / 2);
 				
 				// scale the image
-				var _imageSize:Number = imageSize.getValueFromKey(recordKey, Number);
+				var _imageSize:number = imageSize.getValueFromKey(recordKey, Number);
 				if (isFinite(_imageSize))
 				{
-					var _scale:Number = _imageSize / Math.max(image.width, image.height);
+					var _scale:number = _imageSize / Math.max(image.width, image.height);
 					if (isFinite(_scale))
 						tempMatrix.scale(_scale, _scale);
 					else
@@ -144,13 +144,13 @@ namespace weavejs.plot
 				
 				// rotate the image around 0,0
 				// undefined rotation = no rotation
-				var _rotation:Number = rotation.getValueFromKey(recordKey, Number);
+				var _rotation:number = rotation.getValueFromKey(recordKey, Number);
 				if (!isFinite(_rotation))
 					_rotation = 0;
 				_rotation += rotationOffset.value;
 				if (dataInDegrees.value)
 					_rotation = _rotation * Math.PI / 180;
-				var direction:Number = task.screenBounds.getYDirection() < 0 ? -1 : 1;
+				var direction:number = task.screenBounds.getYDirection() < 0 ? -1 : 1;
 				if (reverseRotation.value)
 					direction = -direction;
 				if (_rotation != 0)
@@ -160,12 +160,12 @@ namespace weavejs.plot
 				// if there is no rotation, adjust to pixel coordinates to get a sharper image
 				getCoordsFromRecordKey(recordKey, tempPoint);
 				task.dataBounds.projectPointTo(tempPoint, task.screenBounds);
-				var dx:Number = Math.round(tempPoint.x) + (_rotation == 0 && image.width % 2 ? 0.5 : 0);
-				var dy:Number = Math.round(tempPoint.y) + (_rotation == 0 && image.height % 2 ? 0.5 : 0);
+				var dx:number = Math.round(tempPoint.x) + (_rotation == 0 && image.width % 2 ? 0.5 : 0);
+				var dy:number = Math.round(tempPoint.y) + (_rotation == 0 && image.height % 2 ? 0.5 : 0);
 				tempMatrix.translate(dx, dy);
 				
 				var ct:ColorTransform = tempColorTransform;
-				var color:Number = this.color.getValueFromKey(recordKey, Number);
+				var color:number = this.color.getValueFromKey(recordKey, Number);
 				if (isFinite(color))
 				{
 					const R:int = 0xFF0000;
@@ -194,31 +194,31 @@ namespace weavejs.plot
 			return 1;
 		}
 		
-		private const tempColorTransform:ColorTransform = new ColorTransform();
+		private tempColorTransform:ColorTransform = new ColorTransform();
 		
 		/**
 		 * This function will save a downloaded image into the image cache.
 		 */
-		private function handleImageDownload(event:ResultEvent, url:String):void
+		private handleImageDownload(event:ResultEvent, url:string):void
 		{
 			var bitmap:Bitmap = event.result as Bitmap;
 			_urlToImageMap[url] = bitmap.bitmapData;
 			if (debug)
 				trace(debugId(this), 'received', url, debugId(bitmap.bitmapData));
 		}
-		private function handleImageFault(event:FaultEvent, url:String):void
+		private handleImageFault(event:FaultEvent, url:string):void
 		{
 			event.fault.content = url;
 			JS.error(event);
 		}
 		
-		[Deprecated] public function set xColumn(value:Object):void
+		/*[Deprecated] public set xColumn(value:Object):void
 		{
 			Weave.setState(dataX, value);
 		}
-		[Deprecated] public function set yColumn(value:Object):void
+		[Deprecated] public set yColumn(value:Object):void
 		{
 			Weave.setState(dataY, value);
-		}
+		}*/
 	}
 }

@@ -30,7 +30,7 @@ namespace weavejs.plot
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import Bounds2D = weavejs.geom.Bounds2D;
-	import GeneralizedGeometry = weavejs.primitives.GeneralizedGeometry;
+	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 	import SolidFillStyle = weavejs.geom.SolidFillStyle;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 
@@ -38,14 +38,14 @@ namespace weavejs.plot
 	 * This plotter plots rectangles using xMin,yMin,xMax,yMax values.
 	 * There is a set of data coordinates and a set of screen offset coordinates.
 	 */
-	public class RectanglePlotter extends AbstractPlotter implements ISelectableAttributes
+	export class RectanglePlotter extends AbstractPlotter implements ISelectableAttributes
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, RectanglePlotter, "Rectangles");
 		
-		public function RectanglePlotter()
+		public constructor()
 		{
 			// initialize default line & fill styles
-			fill.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
+			fill.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
 			
 			setColumnKeySources(
 				[xData, yData, widthData, heightData, xMinScreenOffset, yMinScreenOffset, xMaxScreenOffset, yMaxScreenOffset],
@@ -54,12 +54,12 @@ namespace weavejs.plot
 			this.addSpatialDependencies(this.xData, this.yData, this.widthData, this.heightData, this.centerX, this.centerY);
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ['Fill Color', 'X', 'Y', 'Width', 'Height', 'xMin Screen Offset', 'yMin Screen Offset', 'xMax Screen Offset', 'yMax Screen Offset'];
 		}
 		
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [fill.color, xData, yData, widthData, heightData, xMinScreenOffset, yMinScreenOffset, xMaxScreenOffset, yMaxScreenOffset];
 		}
@@ -68,60 +68,60 @@ namespace weavejs.plot
 		/**
 		 * This is the minimum X data value associated with the rectangle.
 		 */
-		public const xData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn());
+		public xData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn());
 		/**
 		 * This is the minimum Y data value associated with the rectangle.
 		 */
-		public const yData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn());
+		public yData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn());
 		/**
 		 * This is the maximum X data value associated with the rectangle.
 		 */
-		public const widthData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public widthData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is the maximum Y data value associated with the rectangle.
 		 */
-		public const heightData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public heightData:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		
 		/**
 		 * If this is true, the rectangle will be centered on xData coordinates.
 		 */
-		public const centerX:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public centerX:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		/**
 		 * If this is true, the rectangle will be centered on yData coordinates.
 		 */
-		public const centerY:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public centerY:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
 		// visual properties
 		/**
 		 * This is an offset in screen coordinates when projecting the data rectangle onto the screen.
 		 */
-		public const xMinScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public xMinScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the data rectangle onto the screen.
 		 */
-		public const yMinScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public yMinScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the data rectangle onto the screen.
 		 */
-		public const xMaxScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public xMaxScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the data rectangle onto the screen.
 		 */
-		public const yMaxScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public yMaxScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is the line style used to draw the outline of the rectangle.
 		 */
-		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		/**
 		 * This is the fill style used to fill the rectangle.
 		 */
-		public const fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+		public fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 		/**
 		 * If this is true, ellipses will be drawn instead of rectangles.
 		 */
-		public const drawEllipse:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public drawEllipse:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		protected function getCoordFromRecordKey(recordKey:IQualifiedKey, trueXfalseY:Boolean):Number
+		protected function getCoordFromRecordKey(recordKey:IQualifiedKey, trueXfalseY:Boolean):number
 		{
 			var dataCol:IAttributeColumn = trueXfalseY ? xData : yData;
 			if (dataCol.getMetadata(ColumnMetadata.DATA_TYPE) == DataType.GEOMETRY)
@@ -141,17 +141,17 @@ namespace weavejs.plot
 		 * @param key The key of a data record.
 		 * @param outputDataBounds An Array of Bounds2D objects to store the result in.
 		 */
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			getBounds(recordKey, initBoundsArray(output));
 		}
 		
-		private function getBounds(recordKey:IQualifiedKey, output:Bounds2D):void
+		private getBounds(recordKey:IQualifiedKey, output:Bounds2D):void
 		{
-			var x:Number = getCoordFromRecordKey(recordKey, true);
-			var y:Number = getCoordFromRecordKey(recordKey, false);
-			var width:Number = widthData.getValueFromKey(recordKey, Number);
-			var height:Number = heightData.getValueFromKey(recordKey, Number);
+			var x:number = getCoordFromRecordKey(recordKey, true);
+			var y:number = getCoordFromRecordKey(recordKey, false);
+			var width:number = widthData.getValueFromKey(recordKey, Number);
+			var height:number = heightData.getValueFromKey(recordKey, Number);
 			
 			if (centerX.value)
 				output.setCenteredXRange(x, width);
@@ -167,7 +167,7 @@ namespace weavejs.plot
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 
@@ -203,10 +203,10 @@ namespace weavejs.plot
 			graphics.endFill();
 		}
 		
-		private static const tempBounds:Bounds2D = new Bounds2D(); // reusable object
-		private static const tempPoint:Point = new Point(); // reusable object
+		private static tempBounds:Bounds2D = new Bounds2D(); // reusable object
+		private static tempPoint:Point = new Point(); // reusable object
 		
-		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void
+		/*[Deprecated(replacement="line")] public set lineStyle(value:Object):void
 		{
 			try
 			{
@@ -217,7 +217,7 @@ namespace weavejs.plot
 				JS.error(e);
 			}
 		}
-		[Deprecated(replacement="fill")] public function set fillStyle(value:Object):void
+		[Deprecated(replacement="fill")] public set fillStyle(value:Object):void
 		{
 			try
 			{
@@ -227,6 +227,6 @@ namespace weavejs.plot
 			{
 				JS.error(e);
 			}
-		}
+		}*/
 	}
 }

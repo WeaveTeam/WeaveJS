@@ -44,8 +44,8 @@ namespace weavejs.plot
 	import ReprojectedGeometryColumn = weavejs.data.column.ReprojectedGeometryColumn;
 	import StreamedGeometryColumn = weavejs.data.column.StreamedGeometryColumn;
 	import Bounds2D = weavejs.geom.Bounds2D;
-	import GeneralizedGeometry = weavejs.primitives.GeneralizedGeometry;
-	import GeometryType = weavejs.primitives.GeometryType;
+	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
+	import GeometryType = weavejs.geom.GeometryType;
 	import CachedBitmap = weavejs.util.CachedBitmap;
 	import ExtendedFillStyle = weavejs.geom.ExtendedFillStyle;
 	import ExtendedLineStyle = weavejs.geom.ExtendedLineStyle;
@@ -53,15 +53,15 @@ namespace weavejs.plot
 	/**
 	 * GeometryPlotter
 	 */
-	public class GeometryPlotter extends AbstractPlotter implements IPlotterWithGeometries, ISelectableAttributes, IObjectWithDescription
+	export class GeometryPlotter extends AbstractPlotter implements IPlotterWithGeometries, ISelectableAttributes, IObjectWithDescription
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, GeometryPlotter, "Geometries");
 		
-		public function GeometryPlotter()
+		public constructor()
 		{
 			// initialize default line & fill styles
 			line.scaleMode.defaultValue.setSessionState(LineScaleMode.NONE);
-			fill.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
+			fill.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
 			line.color.defaultValue.value = 0x000000;
 
 			Weave.linkState(StreamedGeometryColumn.geometryMinimumScreenArea, pixellation);
@@ -76,34 +76,34 @@ namespace weavejs.plot
 			this.addSpatialDependencies(_filteredKeySet.keyFilter); // subset should trigger spatial callbacks
 		}
 		
-		public function getDescription():String
+		public getDescription():string
 		{
 			return geometryColumn.getDescription();
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ['Color', 'Geometry'];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [fill.color, geometryColumn];
 		}
 		
-		public const symbolPlotters:ILinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IPlotter));
+		public symbolPlotters:ILinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IPlotter));
 
 		/**
 		 * This is the reprojected geometry column to draw.
 		 */
-		public const geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
+		public geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
 		
 		/**
 		 * Determines the Z order of geometries
 		 */
-		public const zOrderColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const zOrderAscending:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true), updateKeySources);
+		public zOrderColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public zOrderAscending:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true), updateKeySources);
 		
-		private function updateKeySources():void
+		private updateKeySources():void
 		{
 			setColumnKeySources([geometryColumn, zOrderColumn], [0, zOrderAscending.value ? 1 : -1]);
 		}
@@ -111,29 +111,29 @@ namespace weavejs.plot
 		/**
 		 *  This is the default URL path for images, when using images in place of points.
 		 */
-		public const pointDataImageColumn:ImageColumn = Weave.linkableChild(this, ImageColumn);
-		public const useFixedImageSize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public pointDataImageColumn:ImageColumn = Weave.linkableChild(this, ImageColumn);
+		public useFixedImageSize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
 		[Embed(source="/weave/resources/images/missing.png")]
-		private static var _missingImageClass:Class;
-		private static const _missingImage:BitmapData = Bitmap(new _missingImageClass()).bitmapData;
+		private static _missingImageClass:Class;
+		private static _missingImage:BitmapData = Bitmap(new _missingImageClass()).bitmapData;
 		
 		/**
 		 * This is the line style used to draw the lines of the geometries.
 		 */
-		public const line:ExtendedLineStyle = Weave.linkableChild(this, ExtendedLineStyle);
+		public line:ExtendedLineStyle = Weave.linkableChild(this, ExtendedLineStyle);
 		/**
 		 * This is the fill style used to fill the geometries.
 		 */
-		public const fill:ExtendedFillStyle = Weave.linkableChild(this, ExtendedFillStyle);
+		public fill:ExtendedFillStyle = Weave.linkableChild(this, ExtendedFillStyle);
 
 		/**
 		 * This is the size of the points drawn when the geometry represents point data.
 		 **/
-		public const iconSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10, validateIconSize));
-		private function validateIconSize(value:Number):Boolean { return 0.2 <= value && value <= 1024; };
+		public iconSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10, validateIconSize));
+		private validateIconSize(value:number):Boolean { return 0.2 <= value && value <= 1024; };
 
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			var geoms:Array = null;
 			var column:IAttributeColumn = geometryColumn; 
@@ -163,7 +163,7 @@ namespace weavejs.plot
 			output.length = i;
 		}
 		
-		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, bounds:Bounds2D = null):Array
+		public getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:number = 0, bounds:Bounds2D = null):Array
 		{
 			var value:* = geometryColumn.getValueFromKey(recordKey, Array);
 			var geoms:Array = null;
@@ -192,7 +192,7 @@ namespace weavejs.plot
 			return results;
 		}
 		
-		public function getBackgroundGeometries():Array
+		public getBackgroundGeometries():Array
 		{
 			return [];
 		}
@@ -201,7 +201,7 @@ namespace weavejs.plot
 		 * This function returns a Bounds2D object set to the data bounds associated with the background.
 		 * @param outputDataBounds A Bounds2D object to store the result in.
 		 */
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			// try to find an internal StreamedGeometryColumn
 			var column:IAttributeColumn = geometryColumn;
@@ -216,20 +216,20 @@ namespace weavejs.plot
 				output.reset(); // undefined
 		}
 		
-		public var debugSimplify:Boolean = false;
-		private var _debugSimplifyDataBounds:Bounds2D;
-		private var _debugSimplifyScreenBounds:Bounds2D;
+		public debugSimplify:Boolean = false;
+		private _debugSimplifyDataBounds:Bounds2D;
+		private _debugSimplifyScreenBounds:Bounds2D;
 
 		/**
 		 * This function calculates the importance of a pixel.
 		 */
-		protected function getDataAreaPerPixel(dataBounds:Bounds2D, screenBounds:Bounds2D):Number
+		protected function getDataAreaPerPixel(dataBounds:Bounds2D, screenBounds:Bounds2D):number
 		{
 			// get minimum importance value required to display the shape at this zoom level
-//			var dw:Number = dataBounds.getWidth();
-//			var dh:Number = dataBounds.getHeight();
-//			var sw:Number = screenBounds.getWidth();
-//			var sh:Number = screenBounds.getHeight();
+//			var dw:number = dataBounds.getWidth();
+//			var dh:number = dataBounds.getHeight();
+//			var sw:number = screenBounds.getWidth();
+//			var sh:number = screenBounds.getHeight();
 //			return Math.min((dw*dw)/(sw*sw), (dh*dh)/(sh*sh));
 			return dataBounds.getArea() / screenBounds.getArea();
 		}
@@ -237,12 +237,12 @@ namespace weavejs.plot
 		/**
 		 * A memoized version of _getCircleBitmap().
 		 */
-		private const getCircleBitmap:Function = Compiler.memoize(_getCircleBitmap);
+		private getCircleBitmap:Function = Compiler.memoize(_getCircleBitmap);
 		/**
 		 * Use getCircleBitmap() instead.
 		 * @param radius iconSize.value / 2
 		 */
-		private function _getCircleBitmap(lineParams:Array, fillParamsExt:Array, radius:Number):CachedBitmap
+		private _getCircleBitmap(lineParams:Array, fillParamsExt:Array, radius:number):CachedBitmap
 		{
 			var graphics:Graphics = tempShape.graphics;
 			graphics.clear();
@@ -258,22 +258,22 @@ namespace weavejs.plot
 			return cb;
 		}
 		
-		public var debug:Boolean = false;
-		public var debugGridSkip:Boolean = false;
-		private var keepTrack:Boolean = false;
-		public var totalVertices:int = 0;
+		public debug:Boolean = false;
+		public debugGridSkip:Boolean = false;
+		private keepTrack:Boolean = false;
+		public totalVertices:int = 0;
 		
-		public const pixellation:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public pixellation:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
 		
-		private const _destinationToPlotTaskMap:Dictionary = new Dictionary(true);
+		private _destinationToPlotTaskMap:Dictionary = new Dictionary(true);
 		
-		private const _singleGeom:Array = []; // reusable array for holding one item
+		private _singleGeom:Array = []; // reusable array for holding one item
 		
-		private const RECORD_INDEX:String = 'recordIndex';
-		private const MIN_IMPORTANCE:String = 'minImportance';
-		private const D_PROGRESS:String = 'd_progress';
-		private const D_ASYNCSTATE:String = 'd_asyncState';
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		private RECORD_INDEX:string = 'recordIndex';
+		private MIN_IMPORTANCE:string = 'minImportance';
+		private D_PROGRESS:string = 'd_progress';
+		private D_ASYNCSTATE:string = 'd_asyncState';
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			var simplifyDataBounds:Bounds2D = task.dataBounds;
 			var simplifyScreenBounds:Bounds2D = task.screenBounds;
@@ -308,11 +308,11 @@ namespace weavejs.plot
 				simplifyDataBounds = null;
 
 			var drawImages:Boolean = pointDataImageColumn.getInternalColumn() != null;
-			var recordIndex:Number = task.asyncState[RECORD_INDEX];
-			var minImportance:Number = task.asyncState[MIN_IMPORTANCE];
+			var recordIndex:number = task.asyncState[RECORD_INDEX];
+			var minImportance:number = task.asyncState[MIN_IMPORTANCE];
 			var d_progress:Dictionary = task.asyncState[D_PROGRESS];
 			var d_asyncState:Dictionary = task.asyncState[D_ASYNCSTATE];
-			var progress:Number = 1; // set to 1 in case loop is not entered
+			var progress:number = 1; // set to 1 in case loop is not entered
 			while (recordIndex < task.recordKeys.length)
 			{
 				var recordKey:IQualifiedKey = task.recordKeys[recordIndex] as IQualifiedKey;
@@ -407,16 +407,16 @@ namespace weavejs.plot
 			return progress / (1 + symbolPlottersArray.length);
 		}
 		
-		private static const tempPoint:Point = new Point(); // reusable object
-		private static const tempMatrix:Matrix = new Matrix(); // reusable object
+		private static tempPoint:Point = new Point(); // reusable object
+		private static tempMatrix:Matrix = new Matrix(); // reusable object
 
 		/**
 		 * This function draws a list of GeneralizedGeometry objects
 		 * @param geomParts A 2-dimensional Array or Vector of objects, each having x and y properties.
 		 */
-		private function drawMultiPartShape(key:IQualifiedKey, geom:GeneralizedGeometry, geomParts:Object, dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics, bitmapData:BitmapData):void
+		private drawMultiPartShape(key:IQualifiedKey, geom:GeneralizedGeometry, geomParts:Object, dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics, bitmapData:BitmapData):void
 		{
-			var geomType:String = geom.geomType;
+			var geomType:string = geom.geomType;
 			for (var i:int = 0; i < geomParts.length; i++)
 				drawShape(key, geomParts[i], geomType, dataBounds, screenBounds, graphics, bitmapData);
 		}
@@ -424,7 +424,7 @@ namespace weavejs.plot
 		 * This function draws a single geometry.
 		 * @param points An Array or Vector of objects, each having x and y properties.
 		 */
-		private function drawShape(key:IQualifiedKey, points:Object, geomType:String, dataBounds:Bounds2D, screenBounds:Bounds2D, outputGraphics:Graphics, outputBitmapData:BitmapData):void
+		private drawShape(key:IQualifiedKey, points:Object, geomType:string, dataBounds:Bounds2D, screenBounds:Bounds2D, outputGraphics:Graphics, outputBitmapData:BitmapData):void
 		{
 			if (points.length == 0)
 				return;
@@ -452,15 +452,15 @@ namespace weavejs.plot
 				outputGraphics.endFill();
 
 			var numPoints:int = points.length;
-			var firstX:Number, firstY:Number;
+			var firstX:number, firstY:number;
 			for (var vIndex:int = 0; vIndex < numPoints; vIndex++)
 			{
 				currentNode = points[vIndex];
 				tempPoint.x = currentNode.x;
 				tempPoint.y = currentNode.y;
 				dataBounds.projectPointTo(tempPoint, screenBounds);
-				var x:Number = tempPoint.x,
-					y:Number = tempPoint.y;
+				var x:number = tempPoint.x,
+					y:number = tempPoint.y;
 				
 				if (debug)
 				{
@@ -490,7 +490,7 @@ namespace weavejs.plot
 					outputGraphics.lineTo(firstX, firstY);
 		}
 		
-		private function drawImage(key:IQualifiedKey, dataX:Number, dataY:Number, dataBounds:Bounds2D, screenBounds:Bounds2D, outputGraphics:Graphics, outputBitmapData:BitmapData):void
+		private drawImage(key:IQualifiedKey, dataX:number, dataY:number, dataBounds:Bounds2D, screenBounds:Bounds2D, outputGraphics:Graphics, outputBitmapData:BitmapData):void
 		{
 			tempPoint.x = dataX;
 			tempPoint.y = dataY;
@@ -500,13 +500,13 @@ namespace weavejs.plot
 			tempPoint.y = Math.round(tempPoint.y);
 			
 			var bitmapData:BitmapData = pointDataImageColumn.getValueFromKey(key, BitmapData) || _missingImage;
-			var w:Number = bitmapData.width;
-			var h:Number = bitmapData.height;
+			var w:number = bitmapData.width;
+			var h:number = bitmapData.height;
 			tempMatrix.identity();
 			if (useFixedImageSize.value)
 			{
-				var maxSize:Number = Math.max(w, h);
-				var scale:Number = iconSize.value / maxSize;
+				var maxSize:number = Math.max(w, h);
+				var scale:number = iconSize.value / maxSize;
 				tempMatrix.scale(scale, scale);
 				tempMatrix.translate(Math.round(Math.abs(maxSize - w) / 2), Math.round(Math.abs(maxSize - h) / 2));
 				w = h = iconSize.value;
@@ -516,23 +516,23 @@ namespace weavejs.plot
 		}
 
 		// backwards compatibility 0.9.6
-		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void
+		/*[Deprecated(replacement="line")] public set lineStyle(value:Object):void
 		{
 			try {
 				Weave.setState(line, value[0][DynamicState.SESSION_STATE]);
 			} catch (e:Error) { }
 		}
-		[Deprecated(replacement="fill")] public function set fillStyle(value:Object):void
+		[Deprecated(replacement="fill")] public set fillStyle(value:Object):void
 		{
 			try {
 				Weave.setState(fill, value[0][DynamicState.SESSION_STATE]);
 			} catch (e:Error) { }
 		}
-		[Deprecated(replacement="geometryColumn")] public function set geometry(value:Object):void
+		[Deprecated(replacement="geometryColumn")] public set geometry(value:Object):void
 		{
 			Weave.setState(geometryColumn.internalDynamicColumn, value);
 		}
 		// backwards compatibility May 2012
-		[Deprecated(replacement="iconSize")] public function set pointShapeSize(value:Number):void { iconSize.value = value * 2; }
+		[Deprecated(replacement="iconSize")] public set pointShapeSize(value:number):void { iconSize.value = value * 2; }*/
 	}
 }

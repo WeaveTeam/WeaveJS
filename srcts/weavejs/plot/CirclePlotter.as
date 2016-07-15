@@ -24,79 +24,79 @@ namespace weavejs.plot
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IPlotterWithGeometries = weavejs.api.ui.IPlotterWithGeometries;
 	import LinkableNumber = weavejs.core.LinkableNumber;
-	import GeometryType = weavejs.primitives.GeometryType;
-	import SimpleGeometry = weavejs.primitives.SimpleGeometry;
+	import GeometryType = weavejs.geom.GeometryType;
+	import SimpleGeometry = weavejs.geom.SimpleGeometry;
 
-	public class CirclePlotter extends AbstractPlotter implements IPlotterWithGeometries
+	export class CirclePlotter extends AbstractPlotter implements IPlotterWithGeometries
 	{
-		public function CirclePlotter()
+		public constructor()
 		{
 		}
 		
 		/**
 		 * The x position of the circle. 
 		 */		
-		public const dataX:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
+		public dataX:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
 		
 		/**
 		 * The y position of the circle. 
 		 */		
-		public const dataY:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
+		public dataY:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
 		
 		/**
 		 * The radius of the circle. 
 		 */		
-		public const radius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public radius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
 		
-		[Deprecated(replacement="lineColor")] public function set color(value:Object):void
+		/*[Deprecated(replacement="lineColor")] public set color(value:Object):void
 		{
 			Weave.setState(lineColor, value);
-		}
+		}*/
 		
 		/**
 		 * The color of the circle.
 		 * @default 0 
 		 */		
-		public const lineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyColor));
+		public lineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyColor));
 		/**
 		 * The alpha of the circle.
 		 * @default 1 
 		 */		
-		public const lineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1, verifyAlpha));
+		public lineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1, verifyAlpha));
 		/**
 		 * The color of the fill inside the circle.
 		 * @default 0 
 		 */		
-		public const fillColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyColor));
+		public fillColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyColor));
 		/**
 		 * The alpha of the fill inside the circle.
 		 * @default 0 
 		 */		
-		public const fillAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyAlpha));
+		public fillAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyAlpha));
 
 		/**
 		 * The thickness of the edge of the circle. 
 		 */		
-		public const thickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
+		public thickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
 		
 		/**
 		 * The projection of the map when this circle was created. 
 		 */		
-		//public const projectionSRS:LinkableString = Weave.linkableChild(this, new LinkableString('', WeaveAPI.ProjectionManager.projectionExists));
+		//public projectionSRS:LinkableString = Weave.linkableChild(this, new LinkableString('', WeaveAPI.ProjectionManager.projectionExists));
 		
 		/**
 		 * The number of vertices to use inside the polygon when selecting records. This must be at
 		 * least <code>3</code>. <br>
 		 * @default <code>25</code>
 		 */		
-		public const polygonVertexCount:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25, verifyPolygonVertexCount));
-		private function verifyPolygonVertexCount(value:Number):Boolean
+		public polygonVertexCount:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25, verifyPolygonVertexCount));
+		private verifyPolygonVertexCount(value:number):Boolean
 		{
 			return value >= 3; 
 		}
 
 		
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			_tempDataBounds = dataBounds;
 			_tempScreenBounds = screenBounds;
@@ -116,7 +116,7 @@ namespace weavejs.plot
 			_tempDataBounds.projectPointTo(circumferencePoint, _tempScreenBounds);
 			
 			//calculate projected distance
-			var distance:Number = Point.distance(centerPoint, circumferencePoint);
+			var distance:number = Point.distance(centerPoint, circumferencePoint);
 			
 			//draw circle
 			g.lineStyle(thickness.value, lineColor.value, lineAlpha.value);
@@ -126,27 +126,27 @@ namespace weavejs.plot
 			destination.draw(tempShape);
 		}
 
-		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, bounds:Bounds2D = null):Array
+		public getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:number = 0, bounds:Bounds2D = null):Array
 		{
 			// no keys in this plotter
 			return [];
 		}
 		
-		public function getBackgroundGeometries():Array
+		public getBackgroundGeometries():Array
 		{
 			_tempArray.length = 0;
 			
 			var geometryVector:Array = [];
 			var simpleGeom:ISimpleGeometry = new SimpleGeometry(GeometryType.POLYGON);
 			var numVertices:int = polygonVertexCount.value;
-			var radiusValue:Number = radius.value;
-			var angle:Number = 0;
-			var dAngle:Number = 2 * Math.PI / numVertices;
+			var radiusValue:number = radius.value;
+			var angle:number = 0;
+			var dAngle:number = 2 * Math.PI / numVertices;
 			for (var i:int = 0; i < numVertices; ++i)
 			{
 				// get origin-centered X,Y of the point
-				var x:Number = radiusValue * Math.cos(angle);
-				var y:Number = radiusValue * Math.sin(angle);
+				var x:number = radiusValue * Math.cos(angle);
+				var y:number = radiusValue * Math.sin(angle);
 				var p:Point = new Point(x, y);
 				
 				// offset to the X,Y provided
@@ -164,19 +164,19 @@ namespace weavejs.plot
 		}
 		
 				
-		private function verifyColor(value:Number):Boolean
+		private verifyColor(value:number):Boolean
 		{
 			return value >= 0;
 		}
 		
-		private function verifyAlpha(value:Number):Boolean
+		private verifyAlpha(value:number):Boolean
 		{
 			return value >= 0 && value <= 1;
 		}
 		// reusable objects
 		
-		private var _tempDataBounds:Bounds2D;
-		private var _tempScreenBounds:Bounds2D;
-		private const _tempArray:Array = [];
+		private _tempDataBounds:Bounds2D;
+		private _tempScreenBounds:Bounds2D;
+		private _tempArray:Array = [];
 	}
 }

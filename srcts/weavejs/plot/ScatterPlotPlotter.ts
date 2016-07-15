@@ -25,7 +25,7 @@ namespace weavejs.plot
 
 	export class ScatterPlotPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
 	{
-		public ScatterPlotPlotter()
+		public constructor()
 		{
 			this.fill.color.internalDynamicColumn.globalName = 'defaultColorColumn';
 			this.fill.color.internalDynamicColumn.addImmediateCallback(this, this.handleColor, true);

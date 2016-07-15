@@ -28,15 +28,15 @@ namespace weavejs.plot
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import ReprojectedGeometryColumn = weavejs.data.column.ReprojectedGeometryColumn;
-	import GeneralizedGeometry = weavejs.primitives.GeneralizedGeometry;
+	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 	import BitmapText = weavejs.util.BitmapText;
 	import EquationColumnLib = weavejs.util.EquationColumnLib;
 
-	public class GeometryRelationPlotter extends AbstractPlotter implements IObjectWithDescription
+	export class GeometryRelationPlotter extends AbstractPlotter implements IObjectWithDescription
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, GeometryRelationPlotter, "Geometry relations");
 
-		public function GeometryRelationPlotter()
+		public constructor()
 		{
 			valueStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(valueColumn));
 			
@@ -44,26 +44,26 @@ namespace weavejs.plot
 			this.addSpatialDependencies(this.geometryColumn, this.sourceKeyColumn, this.destinationKeyColumn);
 		}
 		
-		public function getDescription():String
+		public getDescription():string
 		{
 			return geometryColumn.getDescription();
 		}
 		
-		public const geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
-		public const sourceKeyColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const destinationKeyColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const valueColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const lineWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
-		public const posLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0xFF0000));
-		public const negLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x0000FF));
-		public const showValue:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-		public const fontSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(11));
-		public const fontColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
-		private var valueStats:IColumnStatistics;
+		public geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
+		public sourceKeyColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public destinationKeyColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public valueColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public lineWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
+		public posLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0xFF0000));
+		public negLineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x0000FF));
+		public showValue:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public fontSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(11));
+		public fontColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		private valueStats:IColumnStatistics;
 		
-		private const bitmapText:BitmapText = new BitmapText();
-		protected const tempPoint:Point = new Point();
-		protected const tempSourcePoint:Point = new Point();
+		private bitmapText:BitmapText = new BitmapText();
+		protected tempPoint:Point = new Point();
+		protected tempSourcePoint:Point = new Point();
 		
 		/**
 		 * @param geomKey
@@ -88,9 +88,9 @@ namespace weavejs.plot
 			}
 		}
 		
-		public var includeDestPointsInDataBounds:Boolean = false; // for testing
+		public includeDestPointsInDataBounds:Boolean = false; // for testing
 		
-		override public function getDataBoundsFromRecordKey(geomKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(geomKey:IQualifiedKey, output:Array):void
 		{
 			getGeomCoords(geomKey, tempPoint);
 			
@@ -111,7 +111,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			// Make sure all four column are populated
 			if (task.iteration == 0 && (
@@ -138,10 +138,10 @@ namespace weavejs.plot
 				var rowKeys:Array = EquationColumnLib.getAssociatedKeys(sourceKeyColumn, geoKey);
 				var rowKey:IQualifiedKey;
 				var destKey:IQualifiedKey;
-				var value:Number;
+				var value:number;
 				
 				// Draw lines from source to destinations
-				var absMax:Number = Math.max(Math.abs(valueStats.getMin()), Math.abs(valueStats.getMax()));
+				var absMax:number = Math.max(Math.abs(valueStats.getMin()), Math.abs(valueStats.getMax()));
 				
 				// Value normalization
 				for each (rowKey in rowKeys)
@@ -153,11 +153,11 @@ namespace weavejs.plot
 						continue;
 					
 					var color:uint = value < 0 ? negLineColor.value : posLineColor.value;
-					var thickness:Number = Math.abs(value / absMax) * lineWidth.value;
-					var ceil:Number = Math.ceil(thickness);
-					var floor:Number = Math.floor(thickness);
-					var fractional:Number = thickness - floor;
-					var alpha:Number = floor/ceil + (1.0 - floor/ceil) * fractional; // between floor/ceil and 1
+					var thickness:number = Math.abs(value / absMax) * lineWidth.value;
+					var ceil:number = Math.ceil(thickness);
+					var floor:number = Math.floor(thickness);
+					var fractional:number = thickness - floor;
+					var alpha:number = floor/ceil + (1.0 - floor/ceil) * fractional; // between floor/ceil and 1
 					tempShape.graphics.lineStyle(thickness, color, alpha);
 					tempShape.graphics.moveTo(tempSourcePoint.x, tempSourcePoint.y);
 					if (!getGeomCoords(destKey, tempPoint))

@@ -29,32 +29,32 @@ namespace weavejs.plot
 	import SolidFillStyle = weavejs.geom.SolidFillStyle;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class CircleGlyphPlotter extends AbstractGlyphPlotter
+	export class CircleGlyphPlotter extends AbstractGlyphPlotter
 	{
-		public function CircleGlyphPlotter()
+		public constructor()
 		{
-			fill.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
+			fill.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
 		}
 
-		public const minScreenRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(3, isFinite));
-		public const maxScreenRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(12, isFinite));
-		public const defaultScreenRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5, isFinite));
-		public const enabledSizeBy:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public minScreenRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(3, isFinite));
+		public maxScreenRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(12, isFinite));
+		public defaultScreenRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5, isFinite));
+		public enabledSizeBy:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		public const absoluteValueColorEnabled:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-		public const absoluteValueColorMin:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
-		public const absoluteValueColorMax:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
+		public absoluteValueColorEnabled:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public absoluteValueColorMin:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
+		public absoluteValueColorMax:LinkableNumber = Weave.linkableChild(this, new LinkableNumber());
 		
 		/**
 		 * This is the radius of the circle, in screen coordinates.
 		 */
-		public const screenRadius:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public screenRadius:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		// delare dependency on statistics (for norm values)
-		private const _screenRadiusStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(screenRadius));
-		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		private _screenRadiusStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(screenRadius));
+		public line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
 		// backwards compatibility
-		[Deprecated] public function set fillStyle(value:Object):void
+		/*[Deprecated] public set fillStyle(value:Object):void
 		{
 			try
 			{
@@ -64,14 +64,14 @@ namespace weavejs.plot
 			{
 				JS.error(e);
 			}
-		}
+		}*/
 		
-		public const fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+		public fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 //			var hasPrevPoint:Boolean = (isFinite(tempPoint.x) && isFinite(tempPoint.y));
 			var graphics:Graphics = tempShape.graphics;
@@ -84,20 +84,20 @@ namespace weavejs.plot
 			line.beginLineStyle(recordKey, graphics);
 			fill.beginFillStyle(recordKey, graphics);
 			
-			var radius:Number;
+			var radius:number;
 			if (absoluteValueColorEnabled.value)
 			{
-				var sizeData:Number = screenRadius.getValueFromKey(recordKey, Number);
-				var alpha:Number = fill.alpha.getValueFromKey(recordKey, Number);
+				var sizeData:number = screenRadius.getValueFromKey(recordKey, Number);
+				var alpha:number = fill.alpha.getValueFromKey(recordKey, Number);
 				if( sizeData < 0 )
 					graphics.beginFill(absoluteValueColorMin.value, alpha);
 				else if( sizeData > 0 )
 					graphics.beginFill(absoluteValueColorMax.value, alpha);
 				var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(screenRadius);
-				var min:Number = stats.getMin();
-				var max:Number = stats.getMax();
-				var absMax:Number = Math.max(Math.abs(min), Math.abs(max));
-				var normRadius:Number = StandardLib.normalize(Math.abs(sizeData), 0, absMax);
+				var min:number = stats.getMin();
+				var max:number = stats.getMax();
+				var absMax:number = Math.max(Math.abs(min), Math.abs(max));
+				var normRadius:number = StandardLib.normalize(Math.abs(sizeData), 0, absMax);
 				radius = normRadius * maxScreenRadius.value;
 			}
 			else if (enabledSizeBy.value)
@@ -145,7 +145,7 @@ namespace weavejs.plot
 //			graphics.moveTo(tempPoint.x, tempPoint.y);
 		}
 		
-		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void
+		/*[Deprecated(replacement="line")] public set lineStyle(value:Object):void
 		{
 			try
 			{
@@ -155,6 +155,6 @@ namespace weavejs.plot
 			{
 				JS.error(e);
 			}
-		}
+		}*/
 	}
 }

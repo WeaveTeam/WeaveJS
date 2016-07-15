@@ -33,54 +33,54 @@ namespace weavejs.plot
 	import ColumnUtils = weavejs.data.ColumnUtils;
 	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
 	
-	public class AxisLabelPlotter extends AbstractPlotter implements ISelectableAttributes
+	export class AxisLabelPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, AxisLabelPlotter, "Axis labels");
 		
-		public function AxisLabelPlotter()
+		public constructor()
 		{
 			setSingleKeySource(text);
 			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			this.addSpatialDependencies(this.alongXAxis, this.begin, this.end);
 		}
 		
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [text];
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ['Label text'];
 		}
 				
-		private const bitmapText:BitmapText = new BitmapText();
-		private const matrix:Matrix = new Matrix();
+		private bitmapText:BitmapText = new BitmapText();
+		private matrix:Matrix = new Matrix();
 
-		private static const tempPoint:Point = new Point(); // reusable object
+		private static tempPoint:Point = new Point(); // reusable object
 
-		public const alongXAxis:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
-		public const begin:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const end:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public alongXAxis:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public begin:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public end:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
-		public const interval:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const offset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public interval:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public offset:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
-		public const color:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
-		public const text:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const textFormatAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT, verifyTextFormatAlign));
-		public const hAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER));
-		public const vAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
-		public const angle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
-		public const hideOverlappingText:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-		public const xScreenOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
-		public const yScreenOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
-		public const maxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(80));
-		public const alignToDataMax:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public color:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		public text:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public textFormatAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT, verifyTextFormatAlign));
+		public hAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER));
+		public vAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
+		public angle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public hideOverlappingText:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public xScreenOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public yScreenOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
+		public maxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(80));
+		public alignToDataMax:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const labelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number', 'string', 'column']));
+		public labelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number', 'string', 'column']));
 		
-		private function verifyTextFormatAlign(value:String):Boolean
+		private verifyTextFormatAlign(value:string):Boolean
 		{
 			return [
 				TextFormatAlign.CENTER,
@@ -93,7 +93,7 @@ namespace weavejs.plot
 		/**
 		 * Draws the graphics onto BitmapData.
 		 */
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			var textWasDrawn:Array = [];
 			var reusableBoundsObjects:Array = [];
@@ -107,12 +107,12 @@ namespace weavejs.plot
 			bitmapText.maxWidth = maxWidth.value;
 			bitmapText.textFormat.align = textFormatAlign.value;
 			
-			var _begin:Number = numericMax(begin.value, alongXAxis.value ? dataBounds.getXMin() : dataBounds.getYMin());
-			var _end:Number = numericMin(end.value, alongXAxis.value ? dataBounds.getXMax() : dataBounds.getYMax());
-			var _interval:Number = Math.abs(interval.value);
-			var _offset:Number = offset.value || 0;
+			var _begin:number = numericMax(begin.value, alongXAxis.value ? dataBounds.getXMin() : dataBounds.getYMin());
+			var _end:number = numericMin(end.value, alongXAxis.value ? dataBounds.getXMax() : dataBounds.getYMax());
+			var _interval:number = Math.abs(interval.value);
+			var _offset:number = offset.value || 0;
 			
-			var scale:Number = alongXAxis.value
+			var scale:number = alongXAxis.value
 				? dataBounds.getXCoverage() / screenBounds.getXCoverage()
 				: dataBounds.getYCoverage() / screenBounds.getYCoverage();
 			
@@ -121,10 +121,10 @@ namespace weavejs.plot
 			
 			if (_interval > scale)
 			{
-				var first:Number = _begin - (_begin - _offset) % _interval;
+				var first:number = _begin - (_begin - _offset) % _interval;
 				if (first <= _begin)
 					first += _interval;
-				for (var i:int = 0, number:Number = first; number < _end; number = first + _interval * ++i)
+				for (var i:int = 0, number:number = first; number < _end; number = first + _interval * ++i)
 					drawLabel(number, dataBounds, screenBounds, destination);
 			}
 			else if (isFinite(offset.value) && _begin < _offset && _offset < _end)
@@ -134,7 +134,7 @@ namespace weavejs.plot
 				drawLabel(_end, dataBounds, screenBounds, destination);
 		}
 		
-		private function drawLabel(number:Number, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private drawLabel(number:number, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			bitmapText.text = ColumnUtils.deriveStringFromNumber(text, number) || StandardLib.formatNumber(number);
 			try
@@ -164,7 +164,7 @@ namespace weavejs.plot
 			bitmapText.draw(destination);
 		}
 		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.reset();
 			if (alongXAxis.value)
@@ -173,18 +173,18 @@ namespace weavejs.plot
 				output.setYRange(begin.value, end.value);
 		}
 		
-		private function numericMin(userValue:Number, systemValue:Number):Number
+		private numericMin(userValue:number, systemValue:number):number
 		{
 			return userValue < systemValue ? userValue : systemValue; // if userValue is NaN, returns systemValue
 		}
 		
-		private function numericMax(userValue:Number, systemValue:Number):Number
+		private numericMax(userValue:number, systemValue:number):number
 		{
 			return userValue > systemValue ? userValue : systemValue; // if userValue is NaN, returns systemValue
 		}
 		
 		// backwards compatibility
-		[Deprecated] public function set start(value:Number):void { begin.value = offset.value = value; }
-		[Deprecated] public function set horizontal(value:Boolean):void { alongXAxis.value = value; }
+		/*[Deprecated] public set start(value:number):void { begin.value = offset.value = value; }
+		[Deprecated] public set horizontal(value:Boolean):void { alongXAxis.value = value; }*/
 	}
 }

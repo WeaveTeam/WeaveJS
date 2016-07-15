@@ -34,11 +34,11 @@ namespace weavejs.plot
 	import SolidFillStyle = weavejs.geom.SolidFillStyle;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class PieChartPlotter extends AbstractPlotter implements ISelectableAttributes
+	export class PieChartPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
-		public function PieChartPlotter()
+		public constructor()
 		{
-			fill.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
+			fill.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
 			
 			_beginRadians = Weave.linkableChild(this, EquationColumn);
 			_beginRadians.equation.value = "0.5 * PI + getRunningTotal(spanRadians) - getNumber(spanRadians)";
@@ -56,50 +56,50 @@ namespace weavejs.plot
 			this.addSpatialDependencies(this._beginRadians, this.data); 
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ["Wedge Size","Wedge Color","Label"];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [data, fill.color, label];
 		}
 
-		private var _beginRadians:EquationColumn;
-		private var _spanRadians:EquationColumn;
-		private var _filteredData:FilteredColumn;
+		private _beginRadians:EquationColumn;
+		private _spanRadians:EquationColumn;
+		private _filteredData:FilteredColumn;
 		
-		public function get data():DynamicColumn { return _filteredData.internalDynamicColumn; }
-		public const label:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public get data():DynamicColumn { return _filteredData.internalDynamicColumn; }
+		public label:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		
-		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		public const fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+		public line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 		
-		public const labelAngleRatio:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyLabelAngleRatio));
-		public const innerRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyInnerRadius));
+		public labelAngleRatio:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyLabelAngleRatio));
+		public innerRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyInnerRadius));
 		
-		private function verifyLabelAngleRatio(value:Number):Boolean
+		private verifyLabelAngleRatio(value:number):Boolean
 		{
 			return 0 <= value && value <= 1;
 		}
-		private function verifyInnerRadius(value:Number):Boolean
+		private verifyInnerRadius(value:number):Boolean
 		{
 			return 0 <= value && value <= 1;
 		}
 		
-		private var _destination:BitmapData;
+		private _destination:BitmapData;
 		
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			_destination = task.buffer;
 			return super.drawPlotAsyncIteration(task);
 		}
 		
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			// project data coordinates to screen coordinates and draw graphics
-			var beginRadians:Number = _beginRadians.getValueFromKey(recordKey, Number);
-			var spanRadians:Number = _spanRadians.getValueFromKey(recordKey, Number);
+			var beginRadians:number = _beginRadians.getValueFromKey(recordKey, Number);
+			var spanRadians:number = _spanRadians.getValueFromKey(recordKey, Number);
 			
 			var graphics:Graphics = tempShape.graphics;
 			// begin line & fill
@@ -113,15 +113,15 @@ namespace weavejs.plot
 			//----------------------
 			
 			// draw label
-			var midRadians:Number;
+			var midRadians:number;
 			if (!label.containsKey(recordKey as IQualifiedKey))
 				return;
 			beginRadians = _beginRadians.getValueFromKey(recordKey, Number) as Number;
 			spanRadians = _spanRadians.getValueFromKey(recordKey, Number) as Number;
 			midRadians = beginRadians + (spanRadians / 2);
 			
-			var cos:Number = Math.cos(midRadians);
-			var sin:Number = Math.sin(midRadians);
+			var cos:number = Math.cos(midRadians);
+			var sin:number = Math.sin(midRadians);
 			
 			_tempPoint.x = cos;
 			_tempPoint.y = sin;
@@ -153,13 +153,13 @@ namespace weavejs.plot
 			_bitmapText.draw(_destination);
 		}
 		
-		private const _tempPoint:Point = new Point();
-		private const _bitmapText:BitmapText = new BitmapText();
+		private _tempPoint:Point = new Point();
+		private _bitmapText:BitmapText = new BitmapText();
 		
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			var beginRadians:Number = _beginRadians.getValueFromKey(recordKey, Number);
-			var spanRadians:Number = _spanRadians.getValueFromKey(recordKey, Number);
+			var beginRadians:number = _beginRadians.getValueFromKey(recordKey, Number);
+			var spanRadians:number = _spanRadians.getValueFromKey(recordKey, Number);
 			var bounds:Bounds2D = initBoundsArray(output, 1);
 			WedgePlotter.getWedgeBounds(bounds, beginRadians, spanRadians);
 		}
@@ -168,13 +168,13 @@ namespace weavejs.plot
 		 * This function returns a Bounds2D object set to the data bounds associated with the background.
 		 * @param outputDataBounds A Bounds2D object to store the result in.
 		 */
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(-1, -1, 1, 1);
 		}
 		
 		// backwards compatibility
-		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void { try { Weave.setState(line, value[0].sessionState); } catch (e:Error) { } }
-		[Deprecated(replacement="fill")] public function set fillStyle(value:Object):void { try { Weave.setState(fill, value[0].sessionState); } catch (e:Error) { } }
+		//[Deprecated(replacement="line")] public set lineStyle(value:Object):void { try { Weave.setState(line, value[0].sessionState); } catch (e:Error) { } }
+		//[Deprecated(replacement="fill")] public set fillStyle(value:Object):void { try { Weave.setState(fill, value[0].sessionState); } catch (e:Error) { } }
 	}
 }

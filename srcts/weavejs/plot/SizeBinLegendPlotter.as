@@ -31,23 +31,13 @@ namespace weavejs.plot
 	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class SizeBinLegendPlotter extends AbstractPlotter implements ITextPlotter
+	export class SizeBinLegendPlotter extends AbstractPlotter implements ITextPlotter
 	{
-		public function SizeBinLegendPlotter()
-		{
-			init() = weavejs.geom.SolidLineStyle;
-	
-	/**
-	 * 
-	 * @author yluo
-	 */
-	public class SizeBinLegendPlotter extends AbstractPlotter implements ITextPlotter
-	{
-		public function SizeBinLegendPlotter()
+		public constructor()
 		{
 			init();
 		}
-		private function init():void
+		private init():void
 		{
 			minScreenRadius.value = 5;
 			maxScreenRadius.value = 10;
@@ -57,49 +47,49 @@ namespace weavejs.plot
 			this.addSpatialDependencies(this.radiusColumn, this.minScreenRadius, this.maxScreenRadius, this.defaultScreenRadius);
 		}
 		
-		public const radiusColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		private const radiusColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(radiusColumn));
-		public const minScreenRadius:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const maxScreenRadius:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const defaultScreenRadius:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public radiusColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		private radiusColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(radiusColumn));
+		public minScreenRadius:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public maxScreenRadius:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public defaultScreenRadius:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		
-		public const colorBySize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-		public const colorNegative:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x800000));
-		public const colorPositive:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x008000));
+		public colorBySize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public colorNegative:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x800000));
+		public colorPositive:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x008000));
 		
-		public static const simpleRadio:String = "simple";
-		public static const customRadio:String = "custom";
-		public const numberOfCircles:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10, verifyNumberOfCircles));
-		public const customCircleRadiuses:LinkableString = Weave.linkableChild(this, LinkableString);
-		public const typeRadio:LinkableString = Weave.linkableChild(this, new LinkableString(simpleRadio));
+		public static simpleRadio:string = "simple";
+		public static customRadio:string = "custom";
+		public numberOfCircles:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(10, verifyNumberOfCircles));
+		public customCircleRadiuses:LinkableString = Weave.linkableChild(this, LinkableString);
+		public typeRadio:LinkableString = Weave.linkableChild(this, new LinkableString(simpleRadio));
 		
-		private const bitmapText:BitmapText = new BitmapText(); // This is used to draw text on bitmaps
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle); // This is the line style used to draw the outline of the shape.
+		private bitmapText:BitmapText = new BitmapText(); // This is used to draw text on bitmaps
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle); // This is the line style used to draw the outline of the shape.
 		
-		private function verifyNumberOfCircles(value:Number):Boolean {
+		private verifyNumberOfCircles(value:number):Boolean {
 			if (value < 2)
 				return false;
 			else
 				return true;
 		}
 		
-		private var XMIN:Number = 0, YMIN:Number = 0, XMAX:Number = 1, YMAX:Number = 1;		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		private XMIN:number = 0, YMIN:number = 0, XMAX:number = 1, YMAX:number = 1;		
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(XMIN, YMIN, XMAX, YMAX);
 		}
 		
-		private const tempPoint:Point = new Point(); // Reusable temporary object
-		private var valueMax:Number = 0, valueMin:Number = 0; // Variables for min and max values of the radius column
-		private var circleRadiuses:Array;
-		private var normalizedCircleRadiuses:Array;
-		private var yInterval:Number;
-		private var maxCustomRadius:Number;
-		private var xMargin:int = 5;
-		private var xMin:Number;
-		private var yPosition:Number;
-		private var fillColor:Number;
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private tempPoint:Point = new Point(); // Reusable temporary object
+		private valueMax:number = 0, valueMin:number = 0; // Variables for min and max values of the radius column
+		private circleRadiuses:Array;
+		private normalizedCircleRadiuses:Array;
+		private yInterval:number;
+		private maxCustomRadius:number;
+		private xMargin:int = 5;
+		private xMin:number;
+		private yPosition:number;
+		private fillColor:number;
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			var i:int;
 			var j:int;
@@ -120,7 +110,7 @@ namespace weavejs.plot
 				// remove bad values
 				for (i = circleRadiuses.length; i--;)
 				{
-					var number:Number = StandardLib.asNumber(circleRadiuses[i]);
+					var number:number = StandardLib.asNumber(circleRadiuses[i]);
 					if (!isFinite(number))
 						circleRadiuses.splice(i, 1);
 					else
@@ -133,7 +123,7 @@ namespace weavejs.plot
 			normalizedCircleRadiuses = new Array();
 			if (colorBySize.value)
 			{
-				var absMax:Number = Math.max(Math.abs(valueMin), Math.abs(valueMax));
+				var absMax:number = Math.max(Math.abs(valueMin), Math.abs(valueMax));
 				for (i = 0; i < circleRadiuses.length; i++)
 					normalizedCircleRadiuses.push(StandardLib.scale(Math.abs(circleRadiuses[i]), 0, absMax, 0, maxScreenRadius.value));
 			}
@@ -198,7 +188,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		private function drawLegend(destination:BitmapData, index:int):void
+		private drawLegend(destination:BitmapData, index:int):void
 		{
 			// draw circle
 			tempShape.graphics.clear();

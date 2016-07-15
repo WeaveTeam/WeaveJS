@@ -28,28 +28,28 @@ namespace weavejs.plot
 	import SolidFillStyle = weavejs.geom.SolidFillStyle;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class WedgePlotter extends AbstractPlotter
+	export class WedgePlotter extends AbstractPlotter
 	{
-		public function WedgePlotter()
+		public constructor()
 		{
 			setColumnKeySources([beginRadians]);
 			this.addSpatialDependencies(this.beginRadians, this.spanRadians);
 		}
 		
-		public const beginRadians:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const spanRadians:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public beginRadians:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public spanRadians:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		
-		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		public const fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+		public line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public fill:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			// project data coordinates to screen coordinates and draw graphics
-			var _beginRadians:Number = beginRadians.getValueFromKey(recordKey, Number);
-			var _spanRadians:Number = spanRadians.getValueFromKey(recordKey, Number);
+			var _beginRadians:number = beginRadians.getValueFromKey(recordKey, Number);
+			var _spanRadians:number = spanRadians.getValueFromKey(recordKey, Number);
 
 			var graphics:Graphics = tempShape.graphics;
 			// begin line & fill
@@ -60,8 +60,8 @@ namespace weavejs.plot
 			// end fill
 			graphics.endFill();
 		}
-		private static const tempBounds:Bounds2D = new Bounds2D();
-		private static const tempPoint:Point = new Point(); // reusable object, output of projectPoints()
+		private static tempBounds:Bounds2D = new Bounds2D();
+		private static tempPoint:Point = new Point(); // reusable object, output of projectPoints()
 		
 		/**
 		 * The data bounds for a glyph has width and height equal to zero.
@@ -69,15 +69,15 @@ namespace weavejs.plot
 		 * @param key The key of a data record.
 		 * @param output An Array of Bounds2D objects to store the result in.
 		 */
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			var _beginRadians:Number = beginRadians.getValueFromKey(recordKey, Number);
-			var _pieWidthRadians:Number = spanRadians.getValueFromKey(recordKey, Number);
+			var _beginRadians:number = beginRadians.getValueFromKey(recordKey, Number);
+			var _pieWidthRadians:number = spanRadians.getValueFromKey(recordKey, Number);
 			getWedgeBounds(initBoundsArray(output), _beginRadians, _pieWidthRadians);
 		}
 		
 		// gets data bounds for a wedge
-		public static function getWedgeBounds(outputDataBounds:Bounds2D, beginRadians:Number, spanRadians:Number, xDataCenter:Number = 0, yDataCenter:Number = 0, dataRadius:Number = 1):void
+		public static getWedgeBounds(outputDataBounds:Bounds2D, beginRadians:number, spanRadians:number, xDataCenter:number = 0, yDataCenter:number = 0, dataRadius:number = 1):void
 		{
 			///////////////////
 			//TODO: change this to include begin & end arc points, then any arc points at intervals of pi/2 radians between begin & end arc points
@@ -88,28 +88,28 @@ namespace weavejs.plot
 			outputDataBounds.includeCoords(xDataCenter, yDataCenter);
 			
 			// This is the number of points on the arc used to generate the bounding box of a wedge.
-			var numAnchors:Number = 25;
-			var differentialRadians:Number = spanRadians/numAnchors;
-			for(var counter:Number = 0; counter <= numAnchors; ++counter)
+			var numAnchors:number = 25;
+			var differentialRadians:number = spanRadians/numAnchors;
+			for(var counter:number = 0; counter <= numAnchors; ++counter)
 			{
-				var x:Number = xDataCenter + dataRadius * Math.cos(beginRadians + counter * differentialRadians);
-				var y:Number = yDataCenter + dataRadius * Math.sin(beginRadians + counter * differentialRadians);
+				var x:number = xDataCenter + dataRadius * Math.cos(beginRadians + counter * differentialRadians);
+				var y:number = yDataCenter + dataRadius * Math.sin(beginRadians + counter * differentialRadians);
 				
 				outputDataBounds.includeCoords(x, y);
 			}
 		}
 
 		// projects data coordinates to screen coordinates and draws wedge
-		public static function drawProjectedWedge(destination:Graphics, dataBounds:Bounds2D, screenBounds:Bounds2D, beginRadians:Number, spanRadians:Number, xDataCenter:Number = 0, yDataCenter:Number = 0, dataOuterRadius:Number = 1, dataInnerRadius:Number = 0):void
+		public static drawProjectedWedge(destination:Graphics, dataBounds:Bounds2D, screenBounds:Bounds2D, beginRadians:number, spanRadians:number, xDataCenter:number = 0, yDataCenter:number = 0, dataOuterRadius:number = 1, dataInnerRadius:number = 0):void
 		{
 			tempPoint.x = xDataCenter;
 			tempPoint.y = yDataCenter;
 			dataBounds.projectPointTo(tempPoint, screenBounds);
-			var xScreenCenter:Number = tempPoint.x;
-			var yScreenCenter:Number = tempPoint.y;
+			var xScreenCenter:number = tempPoint.x;
+			var yScreenCenter:number = tempPoint.y;
 			// convert x,y distance from data coordinates to screen coordinates to get screen radius
-			var xScreenRadius:Number = dataOuterRadius * screenBounds.getWidth() / dataBounds.getWidth();
-			var yScreenRadius:Number = dataOuterRadius * screenBounds.getHeight() / dataBounds.getHeight();
+			var xScreenRadius:number = dataOuterRadius * screenBounds.getWidth() / dataBounds.getWidth();
+			var yScreenRadius:number = dataOuterRadius * screenBounds.getHeight() / dataBounds.getHeight();
 			
 			// move to beginning of outer arc, draw outer arc and output start coordinates to tempPoint
 			DrawUtils.arcTo(destination, false, xScreenCenter, yScreenCenter, beginRadians, beginRadians + spanRadians, xScreenRadius, yScreenRadius, tempPoint);
@@ -129,7 +129,7 @@ namespace weavejs.plot
 			destination.lineTo(tempPoint.x, tempPoint.y);
 		}
 		
-		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void
+		/*[Deprecated(replacement="line")] public set lineStyle(value:Object):void
 		{
 			try
 			{
@@ -140,7 +140,7 @@ namespace weavejs.plot
 				JS.error(e);
 			}
 		}
-		[Deprecated(replacement="fill")] public function set fillStyle(value:Object):void
+		[Deprecated(replacement="fill")] public set fillStyle(value:Object):void
 		{
 			try
 			{
@@ -150,6 +150,6 @@ namespace weavejs.plot
 			{
 				JS.error(e);
 			}
-		}
+		}*/
 	}
 }

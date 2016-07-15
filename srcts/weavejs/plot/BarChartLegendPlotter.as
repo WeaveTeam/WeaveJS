@@ -33,39 +33,39 @@ namespace weavejs.plot
 	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class BarChartLegendPlotter extends AbstractPlotter
+	export class BarChartLegendPlotter extends AbstractPlotter
 	{
-		public function BarChartLegendPlotter()
+		public constructor()
 		{
 			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			this.addSpatialDependencies(this.columns, this.chartColors, this.colorIndicatesDirection, this.maxColumns, this.reverseOrder, this.itemLabelFunction);
 		}
 		
-		public const columns:ILinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), createColumnHashes);
-		public const chartColors:ColorRamp = Weave.linkableChild(this, ColorRamp);
-		public const colorIndicatesDirection:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), createColumnHashes);
-		public const shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(12));
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		private var numColumns:int = 0;
-		private var _itemOrdering:Array = [];
-		private var _itemToTitle:Dictionary = new Dictionary();
-		private var _maxBoxSize:Number = 8;
+		public columns:ILinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), createColumnHashes);
+		public chartColors:ColorRamp = Weave.linkableChild(this, ColorRamp);
+		public colorIndicatesDirection:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), createColumnHashes);
+		public shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(12));
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		private numColumns:int = 0;
+		private _itemOrdering:Array = [];
+		private _itemToTitle:Dictionary = new Dictionary();
+		private _maxBoxSize:number = 8;
 		
 		/**
 		 * This is the maximum number of items to draw in a single row.
 		 * @default 1
 		 */
-		public const maxColumns:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1), createColumnHashes);
+		public maxColumns:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1), createColumnHashes);
 		
 		/**
 		 * This is an option to reverse the item order.
 		 */
-		public const reverseOrder:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), createColumnHashes);
+		public reverseOrder:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), createColumnHashes);
 		
 		/**
 		 * This is the compiled function to apply to the item labels.
 		 */
-		public const itemLabelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number','string','column']), createColumnHashes);
+		public itemLabelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number','string','column']), createColumnHashes);
 
 		// TODO This should go somewhere else...
 		/**
@@ -73,22 +73,22 @@ namespace weavejs.plot
 		 * 
 		 * @default string  
 		 */		
-		public const legendTitleFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['string']));
+		public legendTitleFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['string']));
 		
-		private static const NEGATIVE_POSITIVE_ITEMS:Array = [lang('Negative'), lang('Positive')];
+		private static NEGATIVE_POSITIVE_ITEMS:Array = [lang('Negative'), lang('Positive')];
 		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(0, 0, 1, 1);
 		}
 		
-		private function createColumnHashes():void
+		private createColumnHashes():void
 		{
 			_itemOrdering = [];
 			_itemToTitle = new Dictionary();
 			var columnObjects:Array = columns.getObjects();
 			var item:Object;
-			var colTitle:String;
+			var colTitle:string;
 			numColumns = colorIndicatesDirection.value ? 2 : columnObjects.length;
 			for (var i:int = 0; i < numColumns; ++i)
 			{
@@ -118,8 +118,8 @@ namespace weavejs.plot
 				_itemOrdering = _itemOrdering.reverse(); 
 		}
 
-		private const _itemBounds:Bounds2D = new Bounds2D();
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private _itemBounds:Bounds2D = new Bounds2D();
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			var g:Graphics = tempShape.graphics;
 			g.clear();
@@ -130,7 +130,7 @@ namespace weavejs.plot
 			for (var iColumn:int = 0; iColumn < numColumns; ++iColumn)
 			{
 				var item:Object = _itemOrdering[iColumn];
-				var title:String = _itemToTitle[item];
+				var title:string = _itemToTitle[item];
 				LegendUtils.getBoundsFromItemID(screenBounds, iColumn, _itemBounds, numColumns, maxCols);
 				LegendUtils.renderLegendItemText(destination, title, _itemBounds, actualShapeSize + margin);
 
@@ -138,14 +138,14 @@ namespace weavejs.plot
 				// if we have reversed the order of the columns, iColumn should match the colors (this has always been backwards?)
 				// otherwise, we reverse the iColorIndex
 				var iColorIndex:int = reverseOrder.value ? (numColumns - 1 - iColumn) : iColumn;
-				var color:Number = chartColors.getColorFromNorm(iColorIndex / (numColumns - 1));
+				var color:number = chartColors.getColorFromNorm(iColorIndex / (numColumns - 1));
 				if (isFinite(color))
 					g.beginFill(color, 1.0);
-				var xMin:Number = _itemBounds.getXNumericMin();
-				var xMax:Number = _itemBounds.getXNumericMax();
-				var yMin:Number = _itemBounds.getYNumericMin();
-				var yMax:Number = _itemBounds.getYNumericMax();
-				var yCoverage:Number = _itemBounds.getYCoverage();
+				var xMin:number = _itemBounds.getXNumericMin();
+				var xMax:number = _itemBounds.getXNumericMax();
+				var yMin:number = _itemBounds.getYNumericMin();
+				var yMax:number = _itemBounds.getYNumericMax();
+				var yCoverage:number = _itemBounds.getYCoverage();
 				// we don't want the rectangles touching
 				yMin += 0.1 * yCoverage;
 				yMax -= 0.1 * yCoverage;
@@ -160,6 +160,6 @@ namespace weavejs.plot
 		}
 		
 		// backwards compatibility
-		[Deprecated(replacement="reverseOrder")] public function set ascendingOrder(value:Boolean):void { reverseOrder.value = value; }
+		//[Deprecated(replacement="reverseOrder")] public set ascendingOrder(value:Boolean):void { reverseOrder.value = value; }
 	}
 }

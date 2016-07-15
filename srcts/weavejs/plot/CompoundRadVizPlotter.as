@@ -48,11 +48,11 @@ namespace weavejs.plot
 	import SolidFillStyle = weavejs.geom.SolidFillStyle;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class CompoundRadVizPlotter extends AbstractPlotter implements ISelectableAttributes
+	export class CompoundRadVizPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
-		public function CompoundRadVizPlotter()
+		public constructor()
 		{
-			fillStyle.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
+			fillStyle.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
 			setNewRandomJitterColumn();		
 			iterations.value = 50;
 			
@@ -67,7 +67,7 @@ namespace weavejs.plot
 			Weave.getCallbacks(this).addImmediateCallback(this, clearCoordCache);
 			this.addSpatialDependencies(this.columns, this.localNormalization, this.anchors, this.jitterLevel, this.enableJitter);
 		}
-		private function handleColumnsListChange():void
+		private handleColumnsListChange():void
 		{
 			// When a new column is created, register the stats to trigger callbacks and affect busy status.
 			// This will be cleaned up automatically when the column is disposed.
@@ -80,57 +80,57 @@ namespace weavejs.plot
 			}
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ["Size", "Color", "Anchor Dimensions"];
 		}
 		
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [radiusColumn, fillStyle.color, columns];
 		}
 		
-		public const columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), handleColumnsChange);
-		public const localNormalization:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), handleColumnsChange);
+		public localNormalization:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
 		
 		/**
 		 * LinkableHashMap of RadViz dimension locations: 
 		 * <br/>contains the location of each column as an AnchorPoint object
 		 */		
-		public const anchors:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(AnchorPoint));
-		private var coordinate:Point = new Point();//reusable object
-		private const tempPoint:Point = new Point();//reusable object
+		public anchors:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(AnchorPoint));
+		private coordinate:Point = new Point();//reusable object
+		private tempPoint:Point = new Point();//reusable object
 				
-		public const jitterLevel:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(-19));
-		public const enableWedgeColoring:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-		public const enableJitter:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-		public const iterations:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
+		public jitterLevel:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(-19));
+		public enableWedgeColoring:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public enableJitter:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public iterations:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
 		
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		public const fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
-		public function get alphaColumn():AlwaysDefinedColumn { return fillStyle.alpha; }
-		public const colorMap:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired")),fillColorMap);
-		public var anchorColorMap:Dictionary;
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+		public get alphaColumn():AlwaysDefinedColumn { return fillStyle.alpha; }
+		public colorMap:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired")),fillColorMap);
+		public anchorColorMap:Dictionary;
 		
 		/**
 		 * This is the radius of the circle, in screen coordinates.
 		 */
-		public const radiusColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		private const radiusColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(radiusColumn));
-		public const radiusConstant:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
+		public radiusColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		private radiusColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(radiusColumn));
+		public radiusConstant:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
 		
-		private static var randomValueArray:Array = new Array();		
-		private static var randomArrayIndexMap:Dictionary;
-		private var keyNumberMap:Dictionary;
-		private var keyNormMap:Dictionary;
-		private var keyGlobalNormMap:Dictionary;
-		private var keyMaxMap:Dictionary;
-		private var keyMinMap:Dictionary;
-		private var columnTitleMap:Dictionary;
+		private static randomValueArray:Array = new Array();
+		private static randomArrayIndexMap:Dictionary;
+		private keyNumberMap:Dictionary;
+		private keyNormMap:Dictionary;
+		private keyGlobalNormMap:Dictionary;
+		private keyMaxMap:Dictionary;
+		private keyMinMap:Dictionary;
+		private columnTitleMap:Dictionary;
 		
-		private const _currentScreenBounds:Bounds2D = new Bounds2D();
+		private _currentScreenBounds:Bounds2D = new Bounds2D();
 		
-		private function handleColumnsChange():void
+		private handleColumnsChange():void
 		{
 			if (Weave.isBusy(columns) || Weave.isBusy(spatialCallbacks))
 				return;
@@ -141,7 +141,7 @@ namespace weavejs.plot
 			var columnNumberMap:Dictionary;
 			var columnNumberArray:Array;
 			_columns = columns.getObjects(IAttributeColumn);
-			var sum:Number = 0;
+			var sum:number = 0;
 			
 			randomArrayIndexMap = 	new Dictionary(true);				
 			keyMaxMap = 			new Dictionary(true);
@@ -161,7 +161,7 @@ namespace weavejs.plot
 				for each( var key:IQualifiedKey in filteredKeySet.keys)
 				{					
 					randomArrayIndexMap[key] = i ;										
-					var magnitude:Number = 0;
+					var magnitude:number = 0;
 					columnNormArray = [];
 					columnNumberArray = [];
 					columnNumberMap = new Dictionary(true);
@@ -175,7 +175,7 @@ namespace weavejs.plot
 						columnNumberMap[column] = column.getValueFromKey(key, Number);
 						columnNumberArray.push(columnNumberMap[column]);
 					}
-					for each(var x:Number in columnNumberMap)
+					for each(var x:number in columnNumberMap)
 					{
 						magnitude += (x*x);
 					}					
@@ -208,10 +208,10 @@ namespace weavejs.plot
 			fillColorMap();
 		}
 		
-		public function setAnchorLocations():void
+		public setAnchorLocations():void
 		{			
 			_columns = columns.getObjects(IAttributeColumn);
-			var theta:Number = (2*Math.PI)/_columns.length;
+			var theta:number = (2*Math.PI)/_columns.length;
 			var anchor:AnchorPoint;
 			anchors.delayCallbacks();
 			anchors.removeAllObjects();
@@ -225,7 +225,7 @@ namespace weavejs.plot
 			anchors.resumeCallbacks();
 		}			
 				
-		private function fillColorMap():void
+		private fillColorMap():void
 		{
 			var i:int = 0;
 			anchorColorMap = new Dictionary(true);
@@ -238,8 +238,8 @@ namespace weavejs.plot
 			}
 		}
 		
-		private var coordCache:Dictionary = new Dictionary(true);
-		private function clearCoordCache():void
+		private coordCache:Dictionary = new Dictionary(true);
+		private clearCoordCache():void
 		{
 			coordCache = new Dictionary(true);
 		}
@@ -247,7 +247,7 @@ namespace weavejs.plot
 		/**
 		 * Applies the RadViz algorithm to a record specified by a recordKey
 		 */
-		private function getXYcoordinates(recordKey:IQualifiedKey):Number
+		private getXYcoordinates(recordKey:IQualifiedKey):number
 		{
 			var cached:Array = coordCache[recordKey] as Array;
 			if (cached)
@@ -258,15 +258,15 @@ namespace weavejs.plot
 			}
 			
 			//implements RadViz algorithm for x and y coordinates of a record
-			var numeratorX:Number = 0;
-			var numeratorY:Number = 0;
-			var denominator:Number = 0;
+			var numeratorX:number = 0;
+			var numeratorY:number = 0;
+			var denominator:number = 0;
 			
 			var anchorArray:Array = anchors.getObjects();			
 			
-			var sum:Number = 0;			
-			var value:Number = 0;			
-			var name:String;
+			var sum:number = 0;			
+			var value:number = 0;			
+			var name:string;
 			var keyMapExists:Boolean = true;
 			var anchor:AnchorPoint;
 			var array:Array = (localNormalization.value) ? keyNormMap[recordKey] : keyGlobalNormMap[recordKey];
@@ -299,19 +299,19 @@ namespace weavejs.plot
 			return sum;
 		}
 		
-		private function jitterRecords(recordKey:IQualifiedKey):void
+		private jitterRecords(recordKey:IQualifiedKey):void
 		{
-			var index:Number = randomArrayIndexMap[recordKey];
-			var jitter:Number = Math.abs(StandardLib.asNumber(jitterLevel.value));
-			var xJitter:Number = (randomValueArray[index])/(jitter);
+			var index:number = randomArrayIndexMap[recordKey];
+			var jitter:number = Math.abs(StandardLib.asNumber(jitterLevel.value));
+			var xJitter:number = (randomValueArray[index])/(jitter);
 			if(randomValueArray[index+1] % 2) xJitter *= -1;
-			var yJitter:Number = (randomValueArray[index+2])/(jitter);
+			var yJitter:number = (randomValueArray[index+2])/(jitter);
 			if(randomValueArray[index+3])yJitter *= -1;
 			if(!isNaN(xJitter))coordinate.x += xJitter ;
 			if(!isNaN(yJitter))coordinate.y += yJitter ;
 		}
 		
-		public function drawWedge(destination:Graphics, beginRadians:Number, spanRadians:Number, projectedPoint:Point, radius:Number = 1):void
+		public drawWedge(destination:Graphics, beginRadians:number, spanRadians:number, projectedPoint:Point, radius:number = 1):void
 		{
 			// move to center point
 			destination.moveTo(projectedPoint.x, projectedPoint.y);
@@ -324,7 +324,7 @@ namespace weavejs.plot
 		/**
 		 * Repopulates the static randomValueArray with new random values to be used for jittering
 		 */
-		public function setNewRandomJitterColumn():void
+		public setNewRandomJitterColumn():void
 		{
 			randomValueArray = [] ;
 			if( randomValueArray.length == 0 )
@@ -336,7 +336,7 @@ namespace weavejs.plot
 			spatialCallbacks.triggerCallbacks();
 		}
 		
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			if (task.iteration == 0)
 			{
@@ -348,13 +348,13 @@ namespace weavejs.plot
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{						
 			var graphics:Graphics = tempShape.graphics;
-			var radius:Number = (radiusColumn.getInternalColumn()) ? radiusColumnStats.getNorm(recordKey) : radiusConstant.value;
+			var radius:number = (radiusColumn.getInternalColumn()) ? radiusColumnStats.getNorm(recordKey) : radiusConstant.value;
 			
 			// Get coordinates of record and add jitter (if specified)
-			var sum:Number= getXYcoordinates(recordKey);
+			var sum:number= getXYcoordinates(recordKey);
 
 			// missing values skipped
 			if(isNaN(coordinate.x) || isNaN(coordinate.y)) return;
@@ -377,12 +377,12 @@ namespace weavejs.plot
 			sum = (1/sum) *2 * Math.PI ;
 			
 			// Plot pie charts of each record
-			var beginRadians:Number = 0;
-			var spanRadians:Number = 0;
-			var value:Number = 0;
+			var beginRadians:number = 0;
+			var spanRadians:number = 0;
+			var value:number = 0;
 			var numberMap:Dictionary = keyNumberMap[recordKey];
 			
-			var defaultAlpha:Number = StandardLib.asNumber(alphaColumn.defaultValue.value);
+			var defaultAlpha:number = StandardLib.asNumber(alphaColumn.defaultValue.value);
 			
 			dataBounds.projectPointTo(coordinate,screenBounds);						
 			
@@ -417,7 +417,7 @@ namespace weavejs.plot
 		 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
 		 * @param destination The sprite to draw the graphics onto.
 		 */
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			var g:Graphics = tempShape.graphics;
 			g.clear();
@@ -425,8 +425,8 @@ namespace weavejs.plot
 			coordinate.x = -1;
 			coordinate.y = -1;
 			dataBounds.projectPointTo(coordinate, screenBounds);
-			var x:Number = coordinate.x;
-			var y:Number = coordinate.y;
+			var x:number = coordinate.x;
+			var y:number = coordinate.y;
 			coordinate.x = 1;
 			coordinate.y = 1;
 			dataBounds.projectPointTo(coordinate, screenBounds);
@@ -450,7 +450,7 @@ namespace weavejs.plot
 		 * @param key The key of a data record.
 		 * @param output An Array of Bounds2D objects to store the result in.
 		 */
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			initBoundsArray(output);
 			_columns = columns.getObjects(IAttributeColumn);
@@ -464,16 +464,16 @@ namespace weavejs.plot
 		 * This function returns a Bounds2D object set to the data bounds associated with the background.
 		 * @return A Bounds2D object specifying the background data bounds.
 		 */
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			return output.setBounds(-1, -1.1, 1, 1.1);
 		}		
 		
-		public var drawProbe:Boolean = false;
-		public var probedKeys:Array = null;
-		private var _destination:BitmapData = null;
+		public drawProbe:Boolean = false;
+		public probedKeys:Array = null;
+		private _destination:BitmapData = null;
 		
-		public function drawProbeLines(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
+		public drawProbeLines(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{						
 			if(!drawProbe) return;
 			if(!probedKeys) return;
@@ -502,9 +502,9 @@ namespace weavejs.plot
 			}
 		}
 						
-		private var _columns:Array = null;		
+		private _columns:Array = null;		
 	
-		private function changeAlgorithm():void
+		private changeAlgorithm():void
 		{
 			if(_currentScreenBounds.isEmpty()) return;
 			
@@ -518,15 +518,15 @@ namespace weavejs.plot
 			RadVizUtils.reorderColumns(columns, array);
 		}
 		
-		private var _algorithm:ILayoutAlgorithm = Weave.linkableChild(this, GreedyLayoutAlgorithm);
+		private _algorithm:ILayoutAlgorithm = Weave.linkableChild(this, GreedyLayoutAlgorithm);
 		
 		// algorithms
-		[Bindable] public var algorithms:Array = [RANDOM_LAYOUT, GREEDY_LAYOUT, NEAREST_NEIGHBOR, INCREMENTAL_LAYOUT, BRUTE_FORCE];
-		public const currentAlgorithm:LinkableString = Weave.linkableChild(this, new LinkableString(GREEDY_LAYOUT), changeAlgorithm);
-		public static const RANDOM_LAYOUT:String = "Random layout";
-		public static const GREEDY_LAYOUT:String = "Greedy layout";
-		public static const NEAREST_NEIGHBOR:String = "Nearest neighbor";
-		public static const INCREMENTAL_LAYOUT:String = "Incremental layout";
-		public static const BRUTE_FORCE:String = "Brute force";
+		[Bindable] public algorithms:Array = [RANDOM_LAYOUT, GREEDY_LAYOUT, NEAREST_NEIGHBOR, INCREMENTAL_LAYOUT, BRUTE_FORCE];
+		public currentAlgorithm:LinkableString = Weave.linkableChild(this, new LinkableString(GREEDY_LAYOUT), changeAlgorithm);
+		public static RANDOM_LAYOUT:string = "Random layout";
+		public static GREEDY_LAYOUT:string = "Greedy layout";
+		public static NEAREST_NEIGHBOR:string = "Nearest neighbor";
+		public static INCREMENTAL_LAYOUT:string = "Incremental layout";
+		public static BRUTE_FORCE:string = "Brute force";
 	}
 }

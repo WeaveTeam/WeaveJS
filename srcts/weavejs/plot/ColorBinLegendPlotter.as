@@ -48,22 +48,22 @@ namespace weavejs.plot
 	 * default this plotter links to the static color column, but it can be linked to another by changing or removing
 	 * the dynamicColorColumn.staticName value.
 	 */
-	public class ColorBinLegendPlotter extends AbstractPlotter implements ITextPlotter, ISelectableAttributes
+	export class ColorBinLegendPlotter extends AbstractPlotter implements ITextPlotter, ISelectableAttributes
 	{
-		public function ColorBinLegendPlotter()
+		public constructor()
 		{
-			dynamicColorColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
+			dynamicColorColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
 			
 			setSingleKeySource(dynamicColorColumn);
 			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			this.addSpatialDependencies(this.dynamicColorColumn, this.maxColumns, this.reverseOrder, this.itemLabelFunction);
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ["Color data"];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [dynamicColorColumn];
 		}
@@ -72,13 +72,13 @@ namespace weavejs.plot
 		 * This plotter is specifically implemented for visualizing a ColorColumn.
 		 * This DynamicColumn only allows internal columns of type ColorColumn.
 		 */
-		public const dynamicColorColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(ColorColumn), createHashMaps);
+		public dynamicColorColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(ColorColumn), createHashMaps);
 		
 		/**
 		 * This accessor function provides convenient access to the internal ColorColumn, which may be null.
 		 * The public session state is defined by dynamicColorColumn.
 		 */
-		public function getInternalColorColumn():ColorColumn
+		public getInternalColorColumn():ColorColumn
 		{
 			return dynamicColorColumn.getInternalColumn() as ColorColumn;
 		}
@@ -86,50 +86,50 @@ namespace weavejs.plot
 		/**
 		 * This is the type of shape to be drawn for each legend item.
 		 */		
-		public const shapeType:LinkableString = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE, verifyShapeType));
-		public static const SHAPE_TYPE_CIRCLE:String = 'circle';
-		public static const SHAPE_TYPE_SQUARE:String = 'square';
-		public static const SHAPE_TYPE_LINE:String = 'line';
-		public static const ENUM_SHAPE_TYPE:Array = [SHAPE_TYPE_CIRCLE, SHAPE_TYPE_SQUARE, SHAPE_TYPE_LINE];
-		private function verifyShapeType(value:String):Boolean { return ENUM_SHAPE_TYPE.indexOf(value) >= 0; }
+		public shapeType:LinkableString = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE, verifyShapeType));
+		public static SHAPE_TYPE_CIRCLE:string = 'circle';
+		public static SHAPE_TYPE_SQUARE:string = 'square';
+		public static SHAPE_TYPE_LINE:string = 'line';
+		public static ENUM_SHAPE_TYPE:Array = [SHAPE_TYPE_CIRCLE, SHAPE_TYPE_SQUARE, SHAPE_TYPE_LINE];
+		private verifyShapeType(value:string):Boolean { return ENUM_SHAPE_TYPE.indexOf(value) >= 0; }
 		
 		/**
 		 * This is the radius of the circle, in screen coordinates.
 		 */
-		public const shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25));
+		public shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25));
 		/**
 		 * This is the line style used to draw the outline of the shape.
 		 */
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
 		/**
 		 * This is the maximum number of items to draw in a single row.
 		 * @default 1 
 		 */		
-		public const maxColumns:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1), createHashMaps);
+		public maxColumns:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1), createHashMaps);
 		
 		/**
 		 * This is an option to reverse the item order.
 		 */
-		public const reverseOrder:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), createHashMaps);
+		public reverseOrder:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), createHashMaps);
 		
 		/**
 		 * This is the compiled function to apply to the item labels.
 		 */		
-		public const itemLabelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number', 'string']), createHashMaps);
+		public itemLabelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number', 'string']), createHashMaps);
 		
 		// TODO This should go somewhere else...
 		/**
 		 * This is the compiled function to apply to the title of the tool.
 		 */		
-		public const legendTitleFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('column.getMetadata("title")', true, false, ['string', 'column']));
+		public legendTitleFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('column.getMetadata("title")', true, false, ['string', 'column']));
 		
-		private const statsWatcher:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher);
+		private statsWatcher:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher);
 		
-		private var _binToBounds:Array = [];
-		private var _binToString:Array = [];
-		public var numBins:int = 0;
-		private function createHashMaps():void
+		private _binToBounds:Array = [];
+		private _binToString:Array = [];
+		public numBins:int = 0;
+		private createHashMaps():void
 		{
 			_binToString = [];
 			_binToBounds = [];
@@ -167,7 +167,7 @@ namespace weavejs.plot
 				LegendUtils.getBoundsFromItemID(tempBounds, adjustedIBin, b, maxNumBins, maxCols, true);
 				
 				_binToBounds[iBin] = b;
-				var binString:String = binnedColumn.deriveStringFromNumber(iBin);
+				var binString:string = binnedColumn.deriveStringFromNumber(iBin);
 				try
 				{
 					_binToString[iBin] = itemLabelFunction.apply(null, [iBin, binString]);
@@ -179,8 +179,8 @@ namespace weavejs.plot
 			}
 		}
 		
-		private var _drawBackground:Boolean = false; // this is used to check if we should draw the bins with no records.
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private _drawBackground:Boolean = false; // this is used to check if we should draw the bins with no records.
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			// draw the bins that have no records in them in the background
 			_drawBackground = true;
@@ -188,12 +188,12 @@ namespace weavejs.plot
 			_drawBackground = false;
 		}
 
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private function drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			var internalColorColumn:ColorColumn = getInternalColorColumn();
 			if (internalColorColumn == null)
@@ -210,7 +210,7 @@ namespace weavejs.plot
 			if (!_drawBackground)
 				return;
 			
-			var _shapeSize:Number = shapeSize.value;
+			var _shapeSize:number = shapeSize.value;
 			var colorColumn:ColorColumn = getInternalColorColumn();
 			var dataColumn:DynamicColumn = colorColumn.internalDynamicColumn;
 			var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(dataColumn);
@@ -225,16 +225,16 @@ namespace weavejs.plot
 			lineStyle.beginLineStyle(null, tempShape.graphics);
 			tempShape.graphics.drawRect(tempBounds.getXNumericMin(), tempBounds.getYNumericMin(), tempBounds.getXCoverage() - 1, tempBounds.getYCoverage() - 1);
 			
-			var minLabel:String = ColumnUtils.deriveStringFromNumber(dataColumn, colorColumn.getDataMin());
+			var minLabel:string = ColumnUtils.deriveStringFromNumber(dataColumn, colorColumn.getDataMin());
 			LegendUtils.renderLegendItemText(destination, minLabel, screenBounds, _shapeSize + labelGap, null, reverseOrder.value ? BitmapText.VERTICAL_ALIGN_BOTTOM : BitmapText.VERTICAL_ALIGN_TOP);
 			
 			if (colorColumn.rampCenterAtZero.value)
 			{
-				var midLabel:String = ColumnUtils.deriveStringFromNumber(dataColumn, 0);
+				var midLabel:string = ColumnUtils.deriveStringFromNumber(dataColumn, 0);
 				LegendUtils.renderLegendItemText(destination, midLabel, screenBounds, _shapeSize + labelGap, null, BitmapText.VERTICAL_ALIGN_MIDDLE);
 			}
 			
-			var maxLabel:String = ColumnUtils.deriveStringFromNumber(dataColumn, colorColumn.getDataMax());
+			var maxLabel:string = ColumnUtils.deriveStringFromNumber(dataColumn, colorColumn.getDataMax());
 			LegendUtils.renderLegendItemText(destination, maxLabel, screenBounds, _shapeSize + labelGap, null, reverseOrder.value ? BitmapText.VERTICAL_ALIGN_TOP : BitmapText.VERTICAL_ALIGN_BOTTOM);
 			
 			destination.draw(tempShape);
@@ -255,10 +255,10 @@ namespace weavejs.plot
 			for (var i:int = 0; i < recordKeys.length; i++)
 				binIndexMap[ binnedColumn.getValueFromKey(recordKeys[i], Number) ] = 1;
 			
-			var _shapeSize:Number = shapeSize.value;
+			var _shapeSize:number = shapeSize.value;
 			if (shapeType.value != SHAPE_TYPE_LINE)
 				_shapeSize = Math.max(1, Math.min(_shapeSize, screenBounds.getYCoverage() / numBins));
-			var xShapeOffset:Number = _shapeSize / 2; 
+			var xShapeOffset:number = _shapeSize / 2; 
 			var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(colorColumn.internalDynamicColumn);
 			statsWatcher.target = stats;
 			var binCount:int = binnedColumn.numberOfBins;
@@ -280,11 +280,11 @@ namespace weavejs.plot
 				
 				// draw circle
 				var iColorIndex:int = reverseOrder.value ? (binCount - 1 - iBin) : iBin;
-				var color:Number = colorColumn.getColorFromDataValue(iBin);
-				var xMin:Number = tempBounds.getXNumericMin(); 
-				var yMin:Number = tempBounds.getYNumericMin();
-				var xMax:Number = tempBounds.getXNumericMax(); 
-				var yMax:Number = tempBounds.getYNumericMax();
+				var color:number = colorColumn.getColorFromDataValue(iBin);
+				var xMin:number = tempBounds.getXNumericMin(); 
+				var yMin:number = tempBounds.getYNumericMin();
+				var xMax:number = tempBounds.getXNumericMax(); 
+				var yMax:number = tempBounds.getYNumericMax();
 				if (isFinite(color))
 					g.beginFill(color, 1.0);
 				switch (shapeType.value)
@@ -314,15 +314,15 @@ namespace weavejs.plot
 			destination.draw(tempShape);
 		}
 		
-		public var labelGap:Number = 5;
-		public var lineShapeThickness:Number = 4;
+		public labelGap:number = 5;
+		public lineShapeThickness:number = 4;
 		
 		// reusable temporary objects
-		private const tempPoint:Point = new Point();
-		private const tempBounds:Bounds2D = new Bounds2D();
-		private const tempRectangle:Rectangle = new Rectangle();
+		private tempPoint:Point = new Point();
+		private tempBounds:Bounds2D = new Bounds2D();
+		private tempRectangle:Rectangle = new Rectangle();
 		
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			initBoundsArray(output);
 			var internalColorColumn:ColorColumn = getInternalColorColumn();
@@ -332,19 +332,19 @@ namespace weavejs.plot
 			var binnedColumn:BinnedColumn = internalColorColumn.getInternalColumn() as BinnedColumn;
 			if (binnedColumn)
 			{
-				var index:Number = binnedColumn.getValueFromKey(recordKey, Number);
+				var index:number = binnedColumn.getValueFromKey(recordKey, Number);
 				var b:Bounds2D = _binToBounds[index];
 				if (b)
 					(output[0] as Bounds2D).copyFrom(b);
 			}
 		}
 		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			return output.setBounds(0, 1, 1, 0);
 		}
 		
 		// backwards compatibility
-		[Deprecated(replacement="reverseOrder")] public function set ascendingOrder(value:Boolean):void { reverseOrder.value = !value; }
+		//[Deprecated(replacement="reverseOrder")] public set ascendingOrder(value:Boolean):void { reverseOrder.value = !value; }
 	}
 }

@@ -38,26 +38,26 @@ namespace weavejs.plot
 	/**
 	 * This plotter displays a 2D histogram with optional colors.
 	 */
-	public class Histogram2DPlotter extends AbstractPlotter implements ISelectableAttributes
+	export class Histogram2DPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, Histogram2DPlotter, "Histogram 2D");
 		
-		public function Histogram2DPlotter()
+		public constructor()
 		{
-			colorColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
+			colorColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
 
 			setColumnKeySources([xColumn, yColumn]);
 			this.addSpatialDependencies(this.xBinnedColumn, this.yBinnedColumn);
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			var array:Array = ["X", "Y"];
 			if (showAverageColorData.value)
 				array.push("Color");
 			return array;
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			var array:Array = [xColumn, yColumn];
 			if (showAverageColorData.value)
@@ -65,30 +65,30 @@ namespace weavejs.plot
 			return array;
 		}
 		
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		public const binColors:ColorRamp = Weave.linkableChild(this, new ColorRamp("0xFFFFFF,0x000000"));
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public binColors:ColorRamp = Weave.linkableChild(this, new ColorRamp("0xFFFFFF,0x000000"));
 		
-		public const xBinnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn);
-		public const yBinnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn);
-		private const xDataStats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(xBinnedColumn.internalDynamicColumn);
-		private const yDataStats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(yBinnedColumn.internalDynamicColumn);
+		public xBinnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn);
+		public yBinnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn);
+		private xDataStats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(xBinnedColumn.internalDynamicColumn);
+		private yDataStats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(yBinnedColumn.internalDynamicColumn);
 
-		public const showAverageColorData:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public showAverageColorData:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const colorColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public colorColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 
-		public function get xColumn():DynamicColumn { return xBinnedColumn.internalDynamicColumn; }
-		public function get yColumn():DynamicColumn { return yBinnedColumn.internalDynamicColumn; }
+		public get xColumn():DynamicColumn { return xBinnedColumn.internalDynamicColumn; }
+		public get yColumn():DynamicColumn { return yBinnedColumn.internalDynamicColumn; }
 		
-		private var keyToCellMap:Dictionary = new Dictionary(true);
-		private var xBinWidth:Number;
-		private var yBinWidth:Number;
-		private var maxBinSize:int;
+		private keyToCellMap:Dictionary = new Dictionary(true);
+		private xBinWidth:number;
+		private yBinWidth:number;
+		private maxBinSize:int;
 		
-		private const tempPoint:Point = new Point();
-		private const tempBounds:Bounds2D = new Bounds2D();
+		private tempPoint:Point = new Point();
+		private tempBounds:Bounds2D = new Bounds2D();
 
-		private function validate():void
+		private validate():void
 		{
 			if (Weave.detectChange(validate, filteredKeySet, xBinnedColumn, yBinnedColumn, xDataStats, yDataStats))
 			{
@@ -100,7 +100,7 @@ namespace weavejs.plot
 				{
 					var xCell:int = xBinnedColumn.getValueFromKey(key, Number);
 					var yCell:int = yBinnedColumn.getValueFromKey(key, Number);
-					var cell:String = xCell + "," + yCell;
+					var cell:string = xCell + "," + yCell;
 					
 					keyToCellMap[key] = cell;
 					
@@ -117,12 +117,12 @@ namespace weavejs.plot
 		/**
 		 * This draws the 2D histogram bins that a list of record keys fall into.
 		 */
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private function drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			validate();
 			if (isNaN(xBinWidth) || isNaN(yBinWidth))
@@ -138,7 +138,7 @@ namespace weavejs.plot
 			
 			// get a list of unique cells so each cell is only drawn once.
 			var cells:Object = {};
-			var cell:String;
+			var cell:string;
 			var keys:Array;
 			for each (var key:IQualifiedKey in recordKeys)
 			{
@@ -170,19 +170,19 @@ namespace weavejs.plot
 				// draw rectangle for bin
 				lineStyle.beginLineStyle(null, graphics);
 				
-				var norm:Number = keys.length / maxBinSize;
+				var norm:number = keys.length / maxBinSize;
 				
 				if (showAverageColorData.value)
 				{
-					var sum:Number = 0;
+					var sum:number = 0;
 					for each (key in keys)
 						sum += dataCol.getValueFromKey(key, Number);
-					var dataValue:Number = sum / keys.length;
+					var dataValue:number = sum / keys.length;
 					//norm = StandardLib.normalize(dataValue, dataMin, dataMax);
 					norm = binCol.getBinIndexFromDataValue(dataValue) / (binCol.numberOfBins - 1);
 				}
 				
-				var color:Number = ramp.getColorFromNorm(norm);
+				var color:number = ramp.getColorFromNorm(norm);
 				if (isFinite(color))
 					graphics.beginFill(color, 1);
 				else
@@ -197,7 +197,7 @@ namespace weavejs.plot
 		/**
 		 * This function returns the collective bounds of all the bins.
 		 */
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			if (xBinnedColumn.getInternalColumn() != null && yBinnedColumn.getInternalColumn() != null)
 				output.setBounds(-0.5, -0.5, xBinnedColumn.numberOfBins - 0.5, yBinnedColumn.numberOfBins -0.5);
@@ -208,7 +208,7 @@ namespace weavejs.plot
 		/**
 		 * This gets the data bounds of the histogram bin that a record key falls into.
 		 */
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			initBoundsArray(output);
 			if (xBinnedColumn.getInternalColumn() == null || yBinnedColumn.getInternalColumn() == null)
@@ -216,7 +216,7 @@ namespace weavejs.plot
 			
 			validate();
 			
-			var shapeKey:String = keyToCellMap[recordKey];
+			var shapeKey:string = keyToCellMap[recordKey];
 			
 			if (shapeKey == null)
 				return;
@@ -226,10 +226,10 @@ namespace weavejs.plot
 			var xKey:int = temp[0];
 			var yKey:int = temp[1];
 			
-			var xMin:Number = xKey - 0.5; 
-			var yMin:Number = yKey - 0.5;
-			var xMax:Number = xKey + 0.5; 
-			var yMax:Number = yKey + 0.5;
+			var xMin:number = xKey - 0.5; 
+			var yMin:number = yKey - 0.5;
+			var xMax:number = xKey + 0.5; 
+			var yMax:number = yKey + 0.5;
 			
 			(output[0] as Bounds2D).setBounds(xMin,yMin,xMax,yMax);
 		}

@@ -19,34 +19,34 @@ namespace weavejs.plot
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import LinkableString = weavejs.core.LinkableString;
 
-	public class AnchorPoint implements ILinkableObject
+	export class AnchorPoint implements ILinkableObject
 	{
-		public const x:LinkableNumber = Weave.linkableChild(this,LinkableNumber,convertCoords);
-		public const y:LinkableNumber = Weave.linkableChild(this,LinkableNumber,convertCoords);
+		public x:LinkableNumber = Weave.linkableChild(this,LinkableNumber,convertCoords);
+		public y:LinkableNumber = Weave.linkableChild(this,LinkableNumber,convertCoords);
 		
-		public const polarRadians:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
-		public const radius:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
-		//public const anchorColor:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const title:LinkableString = Weave.linkableChild(this, LinkableString);
+		public polarRadians:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
+		public radius:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
+		//public anchorColor:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public title:LinkableString = Weave.linkableChild(this, LinkableString);
 		
 		//metric used to calculate the class discrimiation for eg t-stat, p value, mean ratio etc
-		public const classDiscriminationMetric:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
+		export classDiscriminationMetric:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
 		
 		//is the class to which an anchor belongs after the class discimination algorithm is done
-		public const classType:LinkableString = Weave.linkableChild(this, LinkableString);
+		export classType:LinkableString = Weave.linkableChild(this, LinkableString);
 		
-		public function AnchorPoint()
+		public constructor()
 		{
 		}
 		
-		private function convertCoords():void
+		private convertCoords():void
 		{
-			var xval:Number = x.value; 
-			var yval:Number = y.value;
+			var xval:number = x.value; 
+			var yval:number = y.value;
 			
 			radius.value = Math.sqrt(xval * xval + yval * yval);
 
-			var pi:Number = Math.PI;
+			var pi:number = Math.PI;
 			polarRadians.value = Math.atan2(yval,xval);
 			if( polarRadians.value < 0 )
 				polarRadians.value += 2 * pi;				

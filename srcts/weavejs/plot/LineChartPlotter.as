@@ -24,46 +24,46 @@ namespace weavejs.plot
 	import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class LineChartPlotter extends AbstractPlotter implements ISelectableAttributes
+	export class LineChartPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, LineChartPlotter, "Line Chart");
 		
-		public function LineChartPlotter()
+		public constructor()
 		{
 			sortedUnfilteredKeys.setColumnKeySources([group, order, dataX, dataY]);
 			setSingleKeySource(sortedUnfilteredKeys);
 			this.addSpatialDependencies(this.dataX, this.dataY, this.sortedUnfilteredKeys);
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ["X", "Y", "Order", "Group"];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [dataX, dataY, order, group];
 		}
 		
-		private const sortedUnfilteredKeys:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+		private sortedUnfilteredKeys:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 		
-		public const dataX:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const dataY:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const group:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
- 		public const order:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		public const useFilteredDataGaps:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public dataX:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public dataY:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public group:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+ 		public order:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public useFilteredDataGaps:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			if (!(task.asyncState is AsyncState))
 				task.asyncState = new AsyncState(this, task, sortedUnfilteredKeys);
 			return (task.asyncState as AsyncState).iterate();
 		}
 		
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			var x:Number = dataX.getValueFromKey(recordKey, Number);
-			var y:Number = dataY.getValueFromKey(recordKey, Number);
+			var x:number = dataX.getValueFromKey(recordKey, Number);
+			var y:number = dataY.getValueFromKey(recordKey, Number);
 			initBoundsArray(output).setBounds(x, y, x, y);
 		}
 	}
@@ -86,7 +86,7 @@ import LineChartPlotter = weavejs.visualization.plotters.LineChartPlotter;
 
 internal class AsyncState
 {
-	public function AsyncState(plotter:LineChartPlotter, task:IPlotTask, unfilteredKeySet:IKeySet)
+	public AsyncState(plotter:LineChartPlotter, task:IPlotTask, unfilteredKeySet:IKeySet)
 	{
 		this.plotter = plotter;
 		this.task = task;
@@ -97,18 +97,18 @@ internal class AsyncState
 			this.taskKeySet = Weave.disposableChild(plotter, KeySet);
 	}
 	
-	public var renderer:AsyncLineRenderer;
-	public var plotter:LineChartPlotter;
-	public var task:IPlotTask;
-	public var unfilteredKeySet:IKeySet;
-	public var allKeys:Array;
-	public var keyIndex:Number;
-	public var taskKeySet:KeySet;
-	public var group:Number;
+	public renderer:AsyncLineRenderer;
+	public plotter:LineChartPlotter;
+	public task:IPlotTask;
+	public unfilteredKeySet:IKeySet;
+	public allKeys:Array;
+	public keyIndex:number;
+	public taskKeySet:KeySet;
+	public group:number;
 	
-	private static const tempPoint:Point = new Point();
+	private static tempPoint:Point = new Point();
 	
-	public function iterate():Number
+	public iterate():number
 	{
 		if (task.iteration == 0)
 		{
@@ -148,7 +148,7 @@ internal class AsyncState
 				}
 				
 				// if group differs from previous group, use moveTo()
-				var newGroup:Number = plotter.group.getValueFromKey(key, Number);
+				var newGroup:number = plotter.group.getValueFromKey(key, Number);
 				if (ObjectUtil.numericCompare(group, newGroup) != 0)
 					renderer.newLine();
 				group = newGroup;
@@ -168,24 +168,24 @@ internal class AsyncState
 
 internal class AsyncLineRenderer
 {
-	public function AsyncLineRenderer()
+	public AsyncLineRenderer()
 	{
 		shape = new Shape();
 		graphics = shape.graphics;
 	}
 	
-	private var shape:Shape;
-	private var graphics:Graphics;
-	private var handlePoint:Function;
-	private var prevX:Number;
-	private var prevY:Number;
-	private var continueLine:Boolean;
-	private var prevLineStyle:Array;
+	private shape:Shape;
+	private graphics:Graphics;
+	private handlePoint:Function;
+	private prevX:number;
+	private prevY:number;
+	private continueLine:Boolean;
+	private prevLineStyle:Array;
 	
 	/**
 	 * Call this at the beginning of the async task
 	 */
-	public function reset():void
+	public reset():void
 	{
 		graphics.clear();
 		newLine();
@@ -194,7 +194,7 @@ internal class AsyncLineRenderer
 	/**
 	 * Call this before starting a new line
 	 */
-	public function newLine():void
+	public newLine():void
 	{
 		continueLine = false;
 	}
@@ -202,14 +202,14 @@ internal class AsyncLineRenderer
 	/**
 	 * Call this for each coordinate in the line, whether the coordinates are defined or not.
 	 */
-	public function addPoint(x:Number, y:Number, lineStyleParams:Array):void
+	public addPoint(x:number, y:number, lineStyleParams:Array):void
 	{
 		var isDefined:Boolean = isFinite(x) && isFinite(y);
 		
 		if (isDefined && continueLine)
 		{
-			var midX:Number = (prevX + x) / 2;
-			var midY:Number = (prevY + y) / 2;
+			var midX:number = (prevX + x) / 2;
+			var midY:number = (prevY + y) / 2;
 			
 			graphics.lineStyle.apply(graphics, prevLineStyle);
 			graphics.lineTo(midX, midY);
@@ -230,7 +230,7 @@ internal class AsyncLineRenderer
 	/**
 	 * Call this to flush the graphics to a BitmapData buffer.
 	 */
-	public function flush(buffer:BitmapData):void
+	public flush(buffer:BitmapData):void
 	{
 		buffer.draw(shape);
 		graphics.clear();

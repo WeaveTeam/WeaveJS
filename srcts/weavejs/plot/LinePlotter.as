@@ -30,9 +30,9 @@ namespace weavejs.plot
 	 * This plotter plots lines using x1,y1,x2,y2 values.
 	 * There is a set of data coordinates and a set of screen offset coordinates.
 	 */
-	public class LinePlotter extends AbstractPlotter
+	export class LinePlotter extends AbstractPlotter
 	{
-		public function LinePlotter()
+		public constructor()
 		{
 			setColumnKeySources([x1Data, y1Data, x2Data, y2Data]);
 			this.addSpatialDependencies(this.x1Data, this.y1Data, this.x2Data, this.y2Data);
@@ -42,48 +42,48 @@ namespace weavejs.plot
 		/**
 		 * This is the beginning X data value associated with the line.
 		 */
-		public const x1Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public x1Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		/**
 		 * This is the beginning Y data value associated with the line.
 		 */
-		public const y1Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public y1Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		/**
 		 * This is the ending X data value associated with the line.
 		 */
-		public const x2Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public x2Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		/**
 		 * This is the ending Y data value associated with the line.
 		 */
-		public const y2Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public y2Data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 
 		// visual properties
 		/**
 		 * This is an offset in screen coordinates when projecting the line onto the screen.
 		 */
-		public const x1ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public x1ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the line onto the screen.
 		 */
-		public const y1ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public y1ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the line onto the screen.
 		 */
-		public const x2ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public x2ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is an offset in screen coordinates when projecting the line onto the screen.
 		 */
-		public const y2ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
+		public y2ScreenOffset:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(0));
 		/**
 		 * This is the line style used to draw the line.
 		 */
-		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 
 		/**
 		 * This function returns a Bounds2D object set to the data bounds associated with the given record key.
 		 * @param key The key of a data record.
 		 * @param outputDataBounds A Bounds2D object to store the result in.
 		 */
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			initBoundsArray(output, 2);
 			(output[0] as Bounds2D).includeCoords(
@@ -99,7 +99,7 @@ namespace weavejs.plot
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 
@@ -124,9 +124,9 @@ namespace weavejs.plot
 			graphics.lineTo(tempPoint.x, tempPoint.y);
 		}
 		
-		private static const tempPoint:Point = new Point(); // reusable object
+		private static tempPoint:Point = new Point(); // reusable object
 		
-		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void
+		/*[Deprecated(replacement="line")] public set lineStyle(value:Object):void
 		{
 			try
 			{
@@ -136,6 +136,6 @@ namespace weavejs.plot
 			{
 				JS.error(e);
 			}
-		}
+		}*/
 	}
 }

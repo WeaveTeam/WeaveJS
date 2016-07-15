@@ -42,19 +42,19 @@ namespace weavejs.plot
 	import EquationColumn = weavejs.data.column.EquationColumn;
 	import FilteredColumn = weavejs.data.column.FilteredColumn;
 	import KeySet = weavejs.data.key.KeySet;
-	import GeometryType = weavejs.primitives.GeometryType;
-	import SimpleGeometry = weavejs.primitives.SimpleGeometry;
+	import GeometryType = weavejs.geom.GeometryType;
+	import SimpleGeometry = weavejs.geom.SimpleGeometry;
 	import ColumnUtils = weavejs.data.ColumnUtils;
 	import DrawUtils = weavejs.util.DrawUtils;
 	import ObjectPool = weavejs.util.ObjectPool;
-	import VectorUtils = weavejs.util.VectorUtils;
+	import ArrayUtils = weavejs.util.ArrayUtils;
 	import ExtendedLineStyle = weavejs.geom.ExtendedLineStyle;
 	
-	public class OldParallelCoordinatesPlotter extends AbstractPlotter implements IPlotterWithGeometries, ISelectableAttributes
+	export class OldParallelCoordinatesPlotter extends AbstractPlotter implements IPlotterWithGeometries, ISelectableAttributes
 	{
-		public function OldParallelCoordinatesPlotter()
+		public constructor()
 		{
-			lineStyle.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
+			lineStyle.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
 			lineStyle.weight.defaultValue.value = 1;
 			lineStyle.alpha.defaultValue.value = 1.0;
 			
@@ -88,7 +88,7 @@ namespace weavejs.plot
 				this.zoomToSubset
 			);
 		}
-		private function handleColumnsListChange():void
+		private handleColumnsListChange():void
 		{
 			// When a new column is created, register the stats to trigger callbacks and affect busy status.
 			// This will be cleaned up automatically when the column is disposed.
@@ -114,14 +114,14 @@ namespace weavejs.plot
 		}
 		
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			if (enableGroupBy.value)
 				return ["X values", "Y values", "Group by", "Color"];
 			else
 				return ["Color", "Y Columns"];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			if (enableGroupBy.value)
 				return [xData, yData, groupBy, lineStyle.color];
@@ -132,27 +132,27 @@ namespace weavejs.plot
 		/*
 		 * This is the line style used to draw the lines.
 		 */
-		public const lineStyle:ExtendedLineStyle = Weave.linkableChild(this, ExtendedLineStyle);
+		public lineStyle:ExtendedLineStyle = Weave.linkableChild(this, ExtendedLineStyle);
 		
-		public const columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
-		public const xColumns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public xColumns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 		
-		public const enableGroupBy:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), updateFilterEquationColumns);
-		public const groupBy:DynamicColumn = Weave.linkableChild(this, DynamicColumn, updateFilterEquationColumns);
-		public const groupKeyType:LinkableString = Weave.linkableChild(this, LinkableString, updateFilterEquationColumns);
-		public function get xData():DynamicColumn { return _filteredXData.internalDynamicColumn; }
-		public function get yData():DynamicColumn { return _filteredYData.internalDynamicColumn; }
-		public const xValues:LinkableString = Weave.linkableChild(this, LinkableString, updateFilterEquationColumns);
+		public enableGroupBy:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), updateFilterEquationColumns);
+		public groupBy:DynamicColumn = Weave.linkableChild(this, DynamicColumn, updateFilterEquationColumns);
+		public groupKeyType:LinkableString = Weave.linkableChild(this, LinkableString, updateFilterEquationColumns);
+		public get xData():DynamicColumn { return _filteredXData.internalDynamicColumn; }
+		public get yData():DynamicColumn { return _filteredYData.internalDynamicColumn; }
+		public xValues:LinkableString = Weave.linkableChild(this, LinkableString, updateFilterEquationColumns);
 		
-		private const _filteredXData:FilteredColumn = Weave.linkableChild(this, FilteredColumn);
-		private const _filteredYData:FilteredColumn = Weave.linkableChild(this, FilteredColumn);
-		private const _keySet_groupBy:KeySet = Weave.disposableChild(this, KeySet);
+		private _filteredXData:FilteredColumn = Weave.linkableChild(this, FilteredColumn);
+		private _filteredYData:FilteredColumn = Weave.linkableChild(this, FilteredColumn);
+		private _keySet_groupBy:KeySet = Weave.disposableChild(this, KeySet);
 		
-		private var _yColumns:Array = [];
-		private var _xColumns:Array = [];
+		private _yColumns:Array = [];
+		private _xColumns:Array = [];
 		
-		private const colorDataWatcher:LinkableWatcher = Weave.disposableChild(this, LinkableWatcher);
-		private function handleColor():void
+		private colorDataWatcher:LinkableWatcher = Weave.disposableChild(this, LinkableWatcher);
+		private handleColor():void
 		{
 			var cc:ColorColumn = lineStyle.color.getInternalColumn() as ColorColumn;
 			var bc:BinnedColumn = cc ? cc.getInternalColumn() as BinnedColumn : null;
@@ -161,8 +161,8 @@ namespace weavejs.plot
 			colorDataWatcher.target = dc || fc || bc || cc;
 		}
 		
-		private var _xValues:Array;
-		public function getXValues():Array
+		private _xValues:Array;
+		public getXValues():Array
 		{
 			if (!Weave.detectChange(getXValues, xValues, xData))
 				return _xValues;
@@ -180,26 +180,26 @@ namespace weavejs.plot
 				for each (var key:IQualifiedKey in xData.keys)
 					values.push(xData.getValueFromKey(key, String));
 				StandardLib.sort(values);
-				VectorUtils.removeDuplicatesFromSortedArray(values);
+				ArrayUtils.removeDuplicatesFromSortedArray(values);
 			}
-			return _xValues = values.filter(function(value:String, ..._):Boolean { return value ? true : false; });
+			return _xValues = values.filter(function(value:string, ..._):Boolean { return value ? true : false; });
 		}
 		
-		public function getForeignKeyType():String
+		public getForeignKeyType():string
 		{
-			var foreignKeyType:String = groupKeyType.value;
+			var foreignKeyType:string = groupKeyType.value;
 			if (foreignKeyType)
 				return foreignKeyType;
 			foreignKeyType = groupBy.getMetadata(ColumnMetadata.DATA_TYPE);
-			var groupByKeyType:String = groupBy.getMetadata(ColumnMetadata.KEY_TYPE);
-			var lineColorKeyType:String = lineStyle.color.getMetadata(ColumnMetadata.KEY_TYPE);
+			var groupByKeyType:string = groupBy.getMetadata(ColumnMetadata.KEY_TYPE);
+			var lineColorKeyType:string = lineStyle.color.getMetadata(ColumnMetadata.KEY_TYPE);
 			if ((!foreignKeyType || foreignKeyType == DataType.STRING) && groupByKeyType != lineColorKeyType)
 				foreignKeyType = lineColorKeyType;
 			return foreignKeyType;
 		}
 		
-		private var _in_updateFilterEquationColumns:Boolean = false;
-		private function updateFilterEquationColumns():void
+		private _in_updateFilterEquationColumns:Boolean = false;
+		private updateFilterEquationColumns():void
 		{
 			if (_in_updateFilterEquationColumns)
 				return;
@@ -224,10 +224,10 @@ namespace weavejs.plot
 			_keySet_groupBy.delayCallbacks();
 			var reverseKeys:Array = []; // a list of the keys returned as values from keyColumn
 			var lookup:Dictionary = new Dictionary(); // keeps track of what keys were already seen
-			var foreignKeyType:String = getForeignKeyType();
+			var foreignKeyType:string = getForeignKeyType();
 			for each (var key:IQualifiedKey in groupBy.keys)
 			{
-				var localName:String = groupBy.getValueFromKey(key, String) as String;
+				var localName:string = groupBy.getValueFromKey(key, String) as String;
 				var filterKey:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(foreignKeyType, localName);
 				if (filterKey && !lookup[filterKey])
 				{
@@ -251,7 +251,7 @@ namespace weavejs.plot
 			}
 			
 			// check that column keytypes are the same
-			var keyType:String = ColumnUtils.getKeyType(groupBy);
+			var keyType:string = ColumnUtils.getKeyType(groupBy);
 			if (keyType != ColumnUtils.getKeyType(xData) || keyType != ColumnUtils.getKeyType(yData))
 			{
 				_in_updateFilterEquationColumns = false;
@@ -263,14 +263,14 @@ namespace weavejs.plot
 			var values:Array = getXValues();
 			
 			// remove columns with names not appearing in values list
-			for each (var name:String in columns.getNames())
+			for each (var name:string in columns.getNames())
 				if (values.indexOf(name) < 0)
 					columns.removeObject(name);
 			
 			// create an equation column for each filter value
 			for (var i:int = 0; i < values.length; i++)
 			{
-				var value:String = values[i];
+				var value:string = values[i];
 				var col:EquationColumn = columns.requestObject(value, EquationColumn, false);
 				col.delayCallbacks();
 				col.variables.requestObjectCopy("keyCol", groupBy);
@@ -293,21 +293,21 @@ namespace weavejs.plot
 			_in_updateFilterEquationColumns = false;
 		}
 		
-		public const normalize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
-		public const curveType:LinkableString = Weave.linkableChild(this, new LinkableString(CURVE_NONE, curveTypeVerifier));
-		public const zoomToSubset:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
+		public normalize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public curveType:LinkableString = Weave.linkableChild(this, new LinkableString(CURVE_NONE, curveTypeVerifier));
+		public zoomToSubset:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 
-		public const shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
-		public const shapeToDraw:LinkableString = Weave.linkableChild(this, new LinkableString(SOLID_CIRCLE, shapeTypeVerifier));
-		public const shapeBorderThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
-		public const shapeBorderColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
-		public const shapeBorderAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0.5));
+		public shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
+		public shapeToDraw:LinkableString = Weave.linkableChild(this, new LinkableString(SOLID_CIRCLE, shapeTypeVerifier));
+		public shapeBorderThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+		public shapeBorderColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		public shapeBorderAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0.5));
 		
-		public static const CURVE_NONE:String = 'none';
-		public static const CURVE_TOWARDS:String = 'towards';
-		public static const CURVE_AWAY:String = 'away';
-		public static const CURVE_DOUBLE:String = 'double';
-		private function curveTypeVerifier(type:String):Boolean
+		public static CURVE_NONE:string = 'none';
+		public static CURVE_TOWARDS:string = 'towards';
+		public static CURVE_AWAY:string = 'away';
+		public static CURVE_DOUBLE:string = 'double';
+		private curveTypeVerifier(type:string):Boolean
 		{
 			//BACKWARDS COMPATIBILITY 0.9.6
 			// technically, the verifier function is not supposed to do this.
@@ -324,19 +324,19 @@ namespace weavejs.plot
 			return types.indexOf(type) >= 0;
 		}
 
-		public static const shapesAvailable:Array = [NO_SHAPE, SOLID_CIRCLE, SOLID_SQUARE, EMPTY_CIRCLE, EMPTY_SQUARE];
+		public static shapesAvailable:Array = [NO_SHAPE, SOLID_CIRCLE, SOLID_SQUARE, EMPTY_CIRCLE, EMPTY_SQUARE];
 		
-		public static const NO_SHAPE:String 	  = "No Shape";
-		public static const SOLID_CIRCLE:String   = "Solid Circle";
-		public static const EMPTY_CIRCLE:String   = "Empty Circle";
-		public static const SOLID_SQUARE:String   = "Solid Square";
-		public static const EMPTY_SQUARE:String   = "Empty Square";
-		private function shapeTypeVerifier(type:String):Boolean
+		public static NO_SHAPE:string 	  = "No Shape";
+		public static SOLID_CIRCLE:string   = "Solid Circle";
+		public static EMPTY_CIRCLE:string   = "Empty Circle";
+		public static SOLID_SQUARE:string   = "Solid Square";
+		public static EMPTY_SQUARE:string   = "Empty Square";
+		private shapeTypeVerifier(type:string):Boolean
 		{
 			return shapesAvailable.indexOf(type) >= 0;
 		}
 		
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			getBoundsCoords(recordKey, output, false);
 		}
@@ -367,9 +367,9 @@ namespace weavejs.plot
 				ObjectPool.returnObject(output.pop());
 		}
 		
-		private var tempBoundsArray:Array = [];
+		private tempBoundsArray:Array = [];
 		
-		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, dataBounds:Bounds2D = null):Array
+		public getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:number = 0, dataBounds:Bounds2D = null):Array
 		{
 			getBoundsCoords(recordKey, tempBoundsArray, true);
 			
@@ -417,12 +417,12 @@ namespace weavejs.plot
 			return results;
 		}
 		
-		public function getBackgroundGeometries():Array
+		public getBackgroundGeometries():Array
 		{
 			return [];
 		}
 		
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			// this template will draw one record per iteration
 			if (task.iteration < task.recordKeys.length)
@@ -437,7 +437,7 @@ namespace weavejs.plot
 						task.asyncState = new Dictionary();
 						
 					// replace groupBy keys with foreign keys so we only render lines for foreign keys
-					var foreignKeyType:String = getForeignKeyType();
+					var foreignKeyType:string = getForeignKeyType();
 					if (key.keyType != foreignKeyType)
 						key = WeaveAPI.QKeyManager.getQKey(foreignKeyType, groupBy.getValueFromKey(key, String));
 					
@@ -471,15 +471,15 @@ namespace weavejs.plot
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 
 			// project data coordinates to screen coordinates and draw graphics onto tempShape
 			var i:int;
-			var _shapeSize:Number = this.shapeSize.value;
-			var _prevX:Number = 0;
-			var _prevY:Number = 0;
+			var _shapeSize:number = this.shapeSize.value;
+			var _prevX:number = 0;
+			var _prevY:number = 0;
 			var continueLine:Boolean = false;
 			var skipLines:Boolean = enableGroupBy.value && groupBy.containsKey(recordKey);
 			
@@ -496,10 +496,10 @@ namespace weavejs.plot
 				}
 				
 				dataBounds.projectPointTo(tempPoint, screenBounds);				
-				var x:Number = tempPoint.x;
-				var y:Number = tempPoint.y;
+				var x:number = tempPoint.x;
+				var y:number = tempPoint.y;
 				
-				var recordColor:Number = lineStyle.color.getValueFromKey(recordKey, Number);
+				var recordColor:number = lineStyle.color.getValueFromKey(recordKey, Number);
 				
 				// thickness of the line around each shape
 				var shapeLineThickness:int = shapeBorderThickness.value;
@@ -507,9 +507,9 @@ namespace weavejs.plot
 				graphics.lineStyle(shapeLineThickness, shapeBorderColor.value, shapeLineThickness == 0 ? 0 : shapeBorderAlpha.value);
 				if (_shapeSize > 0)
 				{
-					var shapeSize:Number = _shapeSize;
+					var shapeSize:number = _shapeSize;
 					
-					var shapeColor:Number = recordColor;
+					var shapeColor:number = recordColor;
 					if (isNaN(shapeColor) && enableGroupBy.value)
 					{
 						var shapeKey:IQualifiedKey = (_yColumns[i] as IAttributeColumn).getValueFromKey(recordKey, IQualifiedKey);
@@ -593,7 +593,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		public function yAxisLabelFunction(value:Number):String
+		public yAxisLabelFunction(value:number):string
 		{
 			var _yColumns:Array = columns.getObjects();
 			if (_yColumns.length > 0)
@@ -601,7 +601,7 @@ namespace weavejs.plot
 			return null;
 		}
 		
-		public function xAxisLabelFunction(value:Number):String
+		public xAxisLabelFunction(value:number):string
 		{
 			try
 			{
@@ -615,7 +615,7 @@ namespace weavejs.plot
 			return "";
 		}
 		
-		public function get usingXAttributes():Boolean
+		public get usingXAttributes():Boolean
 		{
 			if (_xColumns.length == _yColumns.length)
 				return true;
@@ -623,7 +623,7 @@ namespace weavejs.plot
 				return false;
 		}
 		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			// normalized data coordinates
 			if (zoomToSubset.value)
@@ -669,7 +669,7 @@ namespace weavejs.plot
 		 * @param columnIndex
 		 * @param output
 		 */
-		public function getCoords(recordKey:IQualifiedKey, columnIndex:int, output:Point):void
+		public getCoords(recordKey:IQualifiedKey, columnIndex:int, output:Point):void
 		{
 			output.x = NaN;
 			output.y = NaN;
@@ -696,15 +696,15 @@ namespace weavejs.plot
 				output.y = yCol.getValueFromKey(recordKey, Number);
 		}
 		
-		private static const tempPoint:Point = new Point(); // reusable object
+		private static tempPoint:Point = new Point(); // reusable object
 		
 		
 		// backwards compatibility
-		[Deprecated(replacement="enableGroupBy")] public function set displayFilterColumn(value:Object):void { Weave.setState(enableGroupBy, value); }
-		[Deprecated(replacement="groupBy")] public function set keyColumn(value:Object):void { Weave.setState(groupBy, value); }
-		[Deprecated(replacement="xData")] public function set filterColumn(value:Object):void { Weave.setState(xData, value); }
-		[Deprecated(replacement="xValues")] public function set filterValues(value:Object):void { Weave.setState(xValues, value); }
-		[Deprecated(replacement="xValues")] public function set groupByValues(value:Object):void { Weave.setState(xValues, value); }
-		[Deprecated(replacement="xColumns")] public function set xAttributeColumns(value:Object):void { Weave.setState(xColumns, value, true); }
+		/*[Deprecated(replacement="enableGroupBy")] public set displayFilterColumn(value:Object):void { Weave.setState(enableGroupBy, value); }
+		[Deprecated(replacement="groupBy")] public set keyColumn(value:Object):void { Weave.setState(groupBy, value); }
+		[Deprecated(replacement="xData")] public set filterColumn(value:Object):void { Weave.setState(xData, value); }
+		[Deprecated(replacement="xValues")] public set filterValues(value:Object):void { Weave.setState(xValues, value); }
+		[Deprecated(replacement="xValues")] public set groupByValues(value:Object):void { Weave.setState(xValues, value); }
+		[Deprecated(replacement="xColumns")] public set xAttributeColumns(value:Object):void { Weave.setState(xColumns, value, true); }*/
 	}
 }

@@ -37,9 +37,9 @@ namespace weavejs.plot
 	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class PieChartHistogramPlotter extends AbstractPlotter implements ISelectableAttributes
+	export class PieChartHistogramPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
-		public function PieChartHistogramPlotter()
+		public constructor()
 		{
 			_beginRadians = Weave.linkableChild(this, EquationColumn);
 			_beginRadians.equation.value = "0.5 * PI + getRunningTotal(spanRadians) - getNumber(spanRadians)";
@@ -69,36 +69,36 @@ namespace weavejs.plot
 			this.addSpatialDependencies(this._beginRadians);
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ["Data"];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [unfilteredData];
 		}
 		
-		public var _beginRadians:EquationColumn;
-		public var _spanRadians:EquationColumn;
-		public var _binLookup:StringLookupColumn;
-		public var _binLookupStats:IColumnStatistics;
-		public var _binnedData:BinnedColumn;
-		public var _filteredData:FilteredColumn;
+		public _beginRadians:EquationColumn;
+		public _spanRadians:EquationColumn;
+		public _binLookup:StringLookupColumn;
+		public _binLookupStats:IColumnStatistics;
+		public _binnedData:BinnedColumn;
+		public _filteredData:FilteredColumn;
 		
-		public const chartColors:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired"))); // bars get their color from here
+		public chartColors:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired"))); // bars get their color from here
 		
-		public function get binnedData():BinnedColumn { return _binnedData; }
+		public get binnedData():BinnedColumn { return _binnedData; }
 		
-		public function get unfilteredData():DynamicColumn { return _filteredData.internalDynamicColumn; }
-		public const line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		public const labelAngleRatio:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyLabelAngleRatio));
-		public const innerRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyInnerRadius));
+		public get unfilteredData():DynamicColumn { return _filteredData.internalDynamicColumn; }
+		public line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public labelAngleRatio:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyLabelAngleRatio));
+		public innerRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyInnerRadius));
 		
-		private function verifyLabelAngleRatio(value:Number):Boolean
+		private verifyLabelAngleRatio(value:number):Boolean
 		{
 			return 0 <= value && value <= 1;
 		}
-		private function verifyInnerRadius(value:Number):Boolean
+		private verifyInnerRadius(value:number):Boolean
 		{
 			return 0 <= value && value <= 1;
 		}
@@ -106,7 +106,7 @@ namespace weavejs.plot
 		/**
 		 * This draws the histogram bins that a list of record keys fall into.
 		 */
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			var binKeys:Array;
 			var binKeyMap:Dictionary;
@@ -160,8 +160,8 @@ namespace weavejs.plot
 		protected function drawBin(task:IPlotTask, binKey:IQualifiedKey):void
 		{
 			// project data coordinates to screen coordinates and draw graphics
-			var beginRadians:Number = _beginRadians.getValueFromKey(binKey, Number);
-			var spanRadians:Number = _spanRadians.getValueFromKey(binKey, Number);
+			var beginRadians:number = _beginRadians.getValueFromKey(binKey, Number);
+			var spanRadians:number = _spanRadians.getValueFromKey(binKey, Number);
 			
 			var graphics:Graphics = tempShape.graphics;
 			// begin line & fill
@@ -169,7 +169,7 @@ namespace weavejs.plot
 			//fill.beginFillStyle(recordKey, graphics);
 			
 			// draw graphics
-			var color:Number = chartColors.getColorFromNorm( _binLookupStats.getNorm(binKey) );
+			var color:number = chartColors.getColorFromNorm( _binLookupStats.getNorm(binKey) );
 			graphics.beginFill(color, 1);
 			
 			// move to center point
@@ -178,17 +178,17 @@ namespace weavejs.plot
 			graphics.endFill();
 		}
 		
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			if (_filteredData.keys.length == 0)
 				return;
 			
 			var binKey:IQualifiedKey;
-			var beginRadians:Number;
-			var spanRadians:Number;
-			var midRadians:Number;
-			var xScreenRadius:Number;
-			var yScreenRadius:Number;
+			var beginRadians:number;
+			var spanRadians:number;
+			var midRadians:number;
+			var xScreenRadius:number;
+			var yScreenRadius:number;
 			
 			var binKeyMap:Dictionary = new Dictionary();
 			for (var j:int = 0; j < _filteredData.keys.length; j++)
@@ -205,8 +205,8 @@ namespace weavejs.plot
 				spanRadians = _spanRadians.getValueFromKey(binKey, Number) as Number;
 				midRadians = beginRadians + (spanRadians / 2);
 				
-				var cos:Number = Math.cos(midRadians);
-				var sin:Number = Math.sin(midRadians);
+				var cos:number = Math.cos(midRadians);
+				var sin:number = Math.sin(midRadians);
 				
 				_tempPoint.x = cos;
 				_tempPoint.y = sin;
@@ -239,17 +239,17 @@ namespace weavejs.plot
 			}
 		}
 		
-		private const _tempPoint:Point = new Point();
-		private const _bitmapText:BitmapText = new BitmapText();
+		private _tempPoint:Point = new Point();
+		private _bitmapText:BitmapText = new BitmapText();
 		
 		/**
 		 * This gets the data bounds of the bin that a record key falls into.
 		 */
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			var binKey:IQualifiedKey = _binLookup.getStringLookupKeyFromInternalColumnKey(recordKey);
-			var beginRadians:Number = _beginRadians.getValueFromKey(binKey, Number);
-			var spanRadians:Number = _spanRadians.getValueFromKey(binKey, Number);
+			var beginRadians:number = _beginRadians.getValueFromKey(binKey, Number);
+			var spanRadians:number = _spanRadians.getValueFromKey(binKey, Number);
 			WedgePlotter.getWedgeBounds(initBoundsArray(output), beginRadians, spanRadians);
 		}
 		
@@ -257,12 +257,12 @@ namespace weavejs.plot
 		 * This function returns a Bounds2D object set to the data bounds associated with the background.
 		 * @param outputDataBounds A Bounds2D object to store the result in.
 		 */
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(-1, -1, 1, 1);
 		}
 
 		// backwards compatibility
-		[Deprecated(replacement="line")] public function set lineStyle(value:Object):void { try { Weave.setState(line, value[0].sessionState); } catch (e:Error) { } }
+		//[Deprecated(replacement="line")] public set lineStyle(value:Object):void { try { Weave.setState(line, value[0].sessionState); } catch (e:Error) { } }
 	}
 }

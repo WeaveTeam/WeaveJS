@@ -30,22 +30,22 @@ namespace weavejs.plot
 	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class SimpleParallelCoordinatesAxesPlotter extends AbstractPlotter
+	export class SimpleParallelCoordinatesAxesPlotter extends AbstractPlotter
 	{
-		public function SimpleParallelCoordinatesAxesPlotter()
+		public constructor()
 		{
 		}
 		
-		public const mainPlotter:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(SimpleParallelCoordinatesPlotter));
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		private const textFormat:LinkableTextFormat = Weave.linkableChild(this, Weave.properties.visTextFormat);
+		public mainPlotter:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(SimpleParallelCoordinatesPlotter));
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		private textFormat:LinkableTextFormat = Weave.linkableChild(this, Weave.properties.visTextFormat);
 		
-		private const bitmapText:BitmapText = new BitmapText();
-		private static const minPoint:Point = new Point();
-		private static const maxPoint:Point = new Point();
-		private static const bitmapBounds:Bounds2D = new Bounds2D();
+		private bitmapText:BitmapText = new BitmapText();
+		private static minPoint:Point = new Point();
+		private static maxPoint:Point = new Point();
+		private static bitmapBounds:Bounds2D = new Bounds2D();
 		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			var plotter:SimpleParallelCoordinatesPlotter = mainPlotter.target as SimpleParallelCoordinatesPlotter;
 			if (plotter)
@@ -59,7 +59,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 			var plotter:SimpleParallelCoordinatesPlotter = mainPlotter.target as SimpleParallelCoordinatesPlotter;
@@ -81,22 +81,22 @@ namespace weavejs.plot
 			graphics.clear();
 			lineStyle.beginLineStyle(null, graphics);
 			textFormat.copyTo(bitmapText.textFormat);
-			var maxMarginHeight:Number = Math.abs(bitmapBounds.getYMax() - screenBounds.getYMax());
-			var minMarginHeight:Number = Math.abs(bitmapBounds.getYMin() - screenBounds.getYMin());
+			var maxMarginHeight:number = Math.abs(bitmapBounds.getYMax() - screenBounds.getYMax());
+			var minMarginHeight:number = Math.abs(bitmapBounds.getYMin() - screenBounds.getYMin());
 			bitmapText.maxWidth = bitmapBounds.getXCoverage() / columns.length;
 			bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_CENTER;
 			
 			for (var i:int = 0; i < columns.length; i++)
 			{
 				var column:IAttributeColumn = columns[i] as IAttributeColumn;
-				var dataMin:Number = dataBounds.getYMin();
-				var dataMax:Number = dataBounds.getYMax();
+				var dataMin:number = dataBounds.getYMin();
+				var dataMax:number = dataBounds.getYMax();
 				if (normalize)
 				{
 					// note: watched plotter already registers stats as child, so change will be detected
 					var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(column);
-					var statsMin:Number = stats.getMin();
-					var statsMax:Number = stats.getMax();
+					var statsMin:number = stats.getMin();
+					var statsMax:number = stats.getMax();
 					dataMin = StandardLib.scale(dataMin, 0, 1, statsMin, statsMax);
 					dataMax = StandardLib.scale(dataMax, 0, 1, statsMin, statsMax);
 				}
@@ -141,6 +141,6 @@ namespace weavejs.plot
 			destination.draw(tempShape);
 		}
 		
-		[Deprecated(replacement="mainPlotter")] public function set plotterPath(path:Array):void { mainPlotter.targetPath = path; }
+		//[Deprecated(replacement="mainPlotter")] public set plotterPath(path:Array):void { mainPlotter.targetPath = path; }
 	}
 }

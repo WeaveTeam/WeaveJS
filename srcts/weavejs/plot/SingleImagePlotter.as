@@ -38,11 +38,11 @@ namespace weavejs.plot
 	/**
 	 * A plotter for drawing a single image onto a tool.
 	 */
-	public class SingleImagePlotter extends AbstractPlotter implements ILinkableObjectWithNewProperties
+	export class SingleImagePlotter extends AbstractPlotter implements ILinkableObjectWithNewProperties
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, SingleImagePlotter, "Single image");
 		
-		public function SingleImagePlotter()
+		public constructor()
 		{
 			this.addSpatialDependencies(
 				this.dataX,
@@ -55,70 +55,70 @@ namespace weavejs.plot
 			);
 		}
 		
-		public function set defaultImage(value:BitmapData):void
+		public set defaultImage(value:BitmapData):void
 		{
 			if (_bitmapData == BitmapUtils.MISSING_IMAGE || _bitmapData == _defaultImage)
 				_bitmapData = value;
 			_defaultImage = value;
 		}
 		
-		private var _defaultImage:BitmapData;
+		private _defaultImage:BitmapData;
 		
 		// these vars store info on the image
-		private var _bitmapData:BitmapData = BitmapUtils.MISSING_IMAGE;
-		private var _imgScreenBounds:Bounds2D = new Bounds2D();
-		private var _imgDataBounds:Bounds2D = new Bounds2D();
+		private _bitmapData:BitmapData = BitmapUtils.MISSING_IMAGE;
+		private _imgScreenBounds:Bounds2D = new Bounds2D();
+		private _imgDataBounds:Bounds2D = new Bounds2D();
 		
-		private var _tempMatrix:Matrix = new Matrix();
-		private var _tempPoint:Point = new Point();
+		private _tempMatrix:Matrix = new Matrix();
+		private _tempPoint:Point = new Point();
 		
 		/**
 		 * The URL of the image to download.
 		 */
-		public const imageURL:LinkableString = Weave.linkableChild(this, LinkableString);
+		public imageURL:LinkableString = Weave.linkableChild(this, LinkableString);
 		
-		public const dataX:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const dataY:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const dataWidth:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const dataHeight:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-		public const useImageSize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public dataX:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public dataY:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public dataWidth:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public dataHeight:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+		public useImageSize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		public const horizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER, verifyHAlign));
-		public const verticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE, verifyVAlign));
+		public horizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER, verifyHAlign));
+		public verticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE, verifyVAlign));
 		
-		private function verifyHAlign(value:String):Boolean
+		private verifyHAlign(value:string):Boolean
 		{
 			return value == BitmapText.HORIZONTAL_ALIGN_LEFT
 				|| value == BitmapText.HORIZONTAL_ALIGN_CENTER
 				|| value == BitmapText.HORIZONTAL_ALIGN_RIGHT;
 		}
-		private function verifyVAlign(value:String):Boolean
+		private verifyVAlign(value:string):Boolean
 		{
 			return value == BitmapText.VERTICAL_ALIGN_TOP
 				|| value == BitmapText.VERTICAL_ALIGN_MIDDLE
 				|| value == BitmapText.VERTICAL_ALIGN_BOTTOM;
 		}
 		
-		private function getImageDataWidth():Number
+		private getImageDataWidth():number
 		{
 			if (useImageSize.value)
 				return _bitmapData ? _bitmapData.width : 0;
 			return dataWidth.value || 0
 		}
 		
-		private function getImageDataHeight():Number
+		private getImageDataHeight():number
 		{
 			if (useImageSize.value)
 				return _bitmapData ? _bitmapData.height : 0;
 			return dataHeight.value || 0
 		}
 		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
-			var x:Number = dataX.value;
-			var y:Number = dataY.value;
-			var w:Number = getImageDataWidth();
-			var h:Number = getImageDataHeight();
+			var x:number = dataX.value;
+			var y:number = dataY.value;
+			var w:number = getImageDataWidth();
+			var h:number = getImageDataHeight();
 			
 			if (horizontalAlign.value == BitmapText.HORIZONTAL_ALIGN_LEFT)
 				output.setXRange(x, x + w);
@@ -135,7 +135,7 @@ namespace weavejs.plot
 				output.setYRange(y, y + h);
 		}
 		
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			if (Weave.detectChange(drawBackground, imageURL))
 			{
@@ -158,8 +158,8 @@ namespace weavejs.plot
 			
 			_tempMatrix.identity();
 			
-			var xOffset:Number = 0;
-			var yOffset:Number = 0;
+			var xOffset:number = 0;
+			var yOffset:number = 0;
 			
 			switch (horizontalAlign.value)
 			{
@@ -189,10 +189,10 @@ namespace weavejs.plot
 			}
 			_tempMatrix.translate(xOffset, yOffset);
 			
-			var w:Number = getImageDataWidth();
-			var h:Number = getImageDataHeight();
-			var scaleWidth:Number = w * screenBounds.getXCoverage() / dataBounds.getXCoverage() / _bitmapData.width;
-			var scaleHeight:Number = h * screenBounds.getYCoverage() / dataBounds.getYCoverage() / _bitmapData.height;
+			var w:number = getImageDataWidth();
+			var h:number = getImageDataHeight();
+			var scaleWidth:number = w * screenBounds.getXCoverage() / dataBounds.getXCoverage() / _bitmapData.width;
+			var scaleHeight:number = h * screenBounds.getYCoverage() / dataBounds.getYCoverage() / _bitmapData.height;
 			
 			if (!isFinite(w))
 			{
@@ -212,7 +212,7 @@ namespace weavejs.plot
 			destination.draw(_bitmapData, _tempMatrix);
 		}
 		
-		private function handleImage(event:ResultEvent, url:String):void
+		private handleImage(event:ResultEvent, url:string):void
 		{
 			if (objectWasDisposed(this) || url != imageURL.value)
 				return;
@@ -228,7 +228,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		private function handleImageFault(event:FaultEvent, url:String):void
+		private handleImageFault(event:FaultEvent, url:string):void
 		{
 			if (objectWasDisposed(this) || url != imageURL.value)
 				return;
@@ -237,7 +237,7 @@ namespace weavejs.plot
 			JS.error(event);
 		}
 		
-		public function handleMissingSessionStateProperty(newState:Object, missingProperty:String):void
+		public handleMissingSessionStateProperty(newState:Object, missingProperty:string):void
 		{
 			if (missingProperty == 'useImageSize')
 			{
@@ -251,11 +251,11 @@ namespace weavejs.plot
 		
 		
 		[Embed(source='/weave/resources/images/red-circle.png')]
-		private static var _redCircle:Class;
-		private static var _redCircleUrl:String;
-		public static function get RED_CIRCLE_IMAGE_URL():String
+		private static _redCircle:Class;
+		private static _redCircleUrl:string;
+		public static get RED_CIRCLE_IMAGE_URL():string
 		{
-			var name:String = 'red-circle.png';
+			var name:string = 'red-circle.png';
 			if (!WeaveAPI.URLRequestUtils.getLocalFile(name))
 				_redCircleUrl = WeaveAPI.URLRequestUtils.saveLocalFile(name, new _redCircle())
 			return _redCircleUrl;

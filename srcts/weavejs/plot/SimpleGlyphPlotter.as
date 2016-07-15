@@ -31,55 +31,55 @@ namespace weavejs.plot
 	/**
 	 * Plots squares or circles.
 	 */
-	public class SimpleGlyphPlotter extends AbstractGlyphPlotter
+	export class SimpleGlyphPlotter extends AbstractGlyphPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, SimpleGlyphPlotter, "Simple glyphs");
 		
-		public function SimpleGlyphPlotter()
+		public constructor()
 		{
-			fillStyle.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
+			fillStyle.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
 			setColumnKeySources([screenSize, dataX, dataY], [-1, 1, -1]);
 		}
 		
-		private static const LEFT:String = 'left', CENTER:String = 'center', RIGHT:String = 'right';
-		private static const TOP:String = 'top', MIDDLE:String = 'middle', BOTTOM:String = 'bottom';
-		private static const HORIZONTAL_MODES:Array = [LEFT,CENTER,RIGHT];
-		private static const VERTICAL_MODES:Array = [TOP,MIDDLE,BOTTOM];
-		private static function verifyHorizontal(value:String):Boolean { return HORIZONTAL_MODES.indexOf(value) >= 0; }
-		private static function verifyVertical(value:String):Boolean { return VERTICAL_MODES.indexOf(value) >= 0; }
+		private static LEFT:string = 'left', CENTER:string = 'center', RIGHT:string = 'right';
+		private static TOP:string = 'top', MIDDLE:string = 'middle', BOTTOM:string = 'bottom';
+		private static HORIZONTAL_MODES:Array = [LEFT,CENTER,RIGHT];
+		private static VERTICAL_MODES:Array = [TOP,MIDDLE,BOTTOM];
+		private static verifyHorizontal(value:string):Boolean { return HORIZONTAL_MODES.indexOf(value) >= 0; }
+		private static verifyVertical(value:string):Boolean { return VERTICAL_MODES.indexOf(value) >= 0; }
 		
 		/**
 		 * This is the line style used to draw the outline of the rectangle.
 		 */
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, new SolidLineStyle());
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, new SolidLineStyle());
 		/**
 		 * This is the fill style used to fill the rectangle.
 		 */
-		public const fillStyle:SolidFillStyle = Weave.linkableChild(this, new SolidFillStyle());
+		public fillStyle:SolidFillStyle = Weave.linkableChild(this, new SolidFillStyle());
 		/**
 		 * This determines the screen size of the glyphs.
 		 */
-		public const screenSize:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn());
+		public screenSize:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn());
 		/**
 		 * If this is true, ellipses will be drawn instead of rectangles.
 		 */
-		public const drawEllipse:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public drawEllipse:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		/**
 		 * This determines how the glyphs are aligned horizontally to the data coordinates.
 		 */		
-		public const horizontalPosition:LinkableString = Weave.linkableChild(this, new LinkableString(CENTER, verifyHorizontal));
+		public horizontalPosition:LinkableString = Weave.linkableChild(this, new LinkableString(CENTER, verifyHorizontal));
 		/**
 		 * This determines how the glyphs are aligned vertically to the data coordinates.
 		 */		
-		public const verticalPosition:LinkableString = Weave.linkableChild(this, new LinkableString(MIDDLE, verifyVertical));
+		public verticalPosition:LinkableString = Weave.linkableChild(this, new LinkableString(MIDDLE, verifyVertical));
 		
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			getCoordsFromRecordKey(recordKey, tempPoint);
-			var size:Number = screenSize.getValueFromKey(recordKey, Number);
+			var size:number = screenSize.getValueFromKey(recordKey, Number);
 			
 			if (isNaN(tempPoint.x) || isNaN(tempPoint.y) || isNaN(size))
 				return;
@@ -104,6 +104,6 @@ namespace weavejs.plot
 			graphics.endFill();
 		}
 		
-		private static const tempPoint:Point = new Point(); // reusable object
+		private static tempPoint:Point = new Point(); // reusable object
 	}
 }

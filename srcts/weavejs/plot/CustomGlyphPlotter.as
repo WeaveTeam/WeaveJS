@@ -27,17 +27,17 @@ namespace weavejs.plot
 	import LinkableFunction = weavejs.core.LinkableFunction;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 
-	public class CustomGlyphPlotter extends AbstractGlyphPlotter implements ITextPlotter
+	export class CustomGlyphPlotter extends AbstractGlyphPlotter implements ITextPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, CustomGlyphPlotter, "ActionScript glyphs");
 		
-		public function CustomGlyphPlotter()
+		public constructor()
 		{
 			setColumnKeySources([dataX, dataY]);
 			vars.childListCallbacks.addImmediateCallback(this, handleVarList);
 			this.addSpatialDependencies(this.vars, this.function_getDataBoundsFromRecordKey, this.function_getBackgroundDataBounds);
 		}
-		private function handleVarList():void
+		private handleVarList():void
 		{
 			// When a new column is created, register the stats to trigger callbacks and affect busy status.
 			// This will be cleaned up automatically when the column is disposed.
@@ -49,11 +49,11 @@ namespace weavejs.plot
 		/**
 		 * This can hold any objects that should be stored in the session state.
 		 */
-		public const vars:ILinkableHashMap = Weave.linkableChild(this, LinkableHashMap);
-		public const locals:Object = {};
+		publics:ILinkableHashMap = Weave.linkableChild(this, LinkableHashMap);
+		public locals:Object = {};
 		
-		public const function_drawPlot:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_drawPlot, false, true, ['keys','dataBounds','screenBounds','destination']));
-		public static const script_drawPlot:String = <![CDATA[
+		public_drawPlot:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_drawPlot, false, true, ['keys','dataBounds','screenBounds','destination']));
+		public static script_drawPlot:string = <![CDATA[
 			// Parameter types: Array, Bounds2D, Bounds2D, BitmapData
 			function(keys, dataBounds, screenBounds, destination)
 			{
@@ -101,7 +101,7 @@ namespace weavejs.plot
 				buffer.flush();
 			}
 		]]>;
-		override public function drawPlotAsyncIteration(task:IPlotTask):Number
+		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			try
 			{
@@ -118,8 +118,8 @@ namespace weavejs.plot
 			return 1;
 		}
 		
-		public const function_drawBackground:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_drawBackground, false, true, ['dataBounds', 'screenBounds', 'destination']));
-		public static const script_drawBackground:String = <![CDATA[
+		public_drawBackground:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_drawBackground, false, true, ['dataBounds', 'screenBounds', 'destination']));
+		public static script_drawBackground:string = <![CDATA[
 			// Parameter types: Bounds2D, Bounds2D, BitmapData
 			function(dataBounds, screenBounds, destination)
 			{
@@ -134,7 +134,7 @@ namespace weavejs.plot
 				*/
 			}
 		]]>;
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			try
 			{
@@ -146,8 +146,8 @@ namespace weavejs.plot
 			}
 		}
 		
-		public const function_getDataBoundsFromRecordKey:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_getDataBoundsFromRecordKey, false, true, ['key', 'output']));
-		public static const script_getDataBoundsFromRecordKey:String = <![CDATA[
+		public_getDataBoundsFromRecordKey:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_getDataBoundsFromRecordKey, false, true, ['key', 'output']));
+		public static script_getDataBoundsFromRecordKey:string = <![CDATA[
 			// Parameter types: IQualifiedKey, Array
 			function(key, output)
 			{
@@ -161,7 +161,7 @@ namespace weavejs.plot
 					bounds.setYRange(-Infinity, Infinity);
 			}
 		]]>;
-		override public function getDataBoundsFromRecordKey(key:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(key:IQualifiedKey, output:Bounds2D[]):void
 		{
 			try
 			{
@@ -173,8 +173,8 @@ namespace weavejs.plot
 			}
 		}
 		
-		public const function_getBackgroundDataBounds:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_getBackgroundDataBounds, false, true, ['output']));
-		public static const script_getBackgroundDataBounds:String = <![CDATA[
+		public_getBackgroundDataBounds:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_getBackgroundDataBounds, false, true, ['output']));
+		public static script_getBackgroundDataBounds:string = <![CDATA[
 			// Parameter type: Bounds2D
 			function (output)
 			{
@@ -197,7 +197,7 @@ namespace weavejs.plot
 				}
 			}
 		]]>;
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			try
 			{

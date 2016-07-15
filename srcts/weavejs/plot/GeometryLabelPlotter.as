@@ -22,16 +22,16 @@ namespace weavejs.plot
 	import SessionManager = weavejs.core.SessionManager;
 	import ReprojectedGeometryColumn = weavejs.data.column.ReprojectedGeometryColumn;
 	import SortedKeySet = weavejs.data.key.SortedKeySet;
-	import GeneralizedGeometry = weavejs.primitives.GeneralizedGeometry;
+	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 
 	/**
 	 * This plotter is for drawing text labels on the map, corresponding to a geometry column.
 	 */
-	public class GeometryLabelPlotter extends TextGlyphPlotter implements IObjectWithDescription
+	export class GeometryLabelPlotter extends TextGlyphPlotter implements IObjectWithDescription
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, GeometryLabelPlotter, "Geometry labels");
 
-		public function GeometryLabelPlotter()
+		public constructor()
 		{
 			// hide dataX,dataY because they don't need to be shown in the session state.
 			(WeaveAPI.SessionManager as SessionManager).excludeLinkableChildFromSessionState(this, dataX);
@@ -47,16 +47,16 @@ namespace weavejs.plot
 			this.addSpatialDependencies(this.geometryColumn);
 		}
 		
-		override public function getDescription():String
+		/*override*/ public getDescription():string
 		{
 			return geometryColumn.getDescription();
 		}
 		
-		public const geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
+		public geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
 		
-		private var _sortCopyKeys:Function;
+		private _sortCopyKeys:Function;
 		
-		private function getGeometryArea(key:IQualifiedKey):Number
+		private getGeometryArea(key:IQualifiedKey):number
 		{
 			try
 			{
@@ -71,9 +71,9 @@ namespace weavejs.plot
 		}
 		
 		// backwards compatibility 0.9.6
-		[Deprecated(replacement="geometryColumn")] public function set geometry(value:Object):void
+		/*[Deprecated(replacement="geometryColumn")] public set geometry(value:Object):void
 		{
 			Weave.setState(geometryColumn.internalDynamicColumn, value);
-		}
+		}*/
 	}
 }

@@ -29,33 +29,33 @@ namespace weavejs.plot
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
-	import GeometryType = weavejs.primitives.GeometryType;
-	import SimpleGeometry = weavejs.primitives.SimpleGeometry;
+	import GeometryType = weavejs.geom.GeometryType;
+	import SimpleGeometry = weavejs.geom.SimpleGeometry;
 	import DrawUtils = weavejs.util.DrawUtils;
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	
-	public class SimpleParallelCoordinatesPlotter extends AbstractPlotter implements IPlotterWithGeometries, ISelectableAttributes
+	export class SimpleParallelCoordinatesPlotter extends AbstractPlotter implements IPlotterWithGeometries, ISelectableAttributes
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, SimpleParallelCoordinatesPlotter, "Parallel Coordinates");
 		
-		private static const tempBoundsArray:Array = []; // Array of reusable Bounds2D objects
-		private static const tempPoint:Point = new Point(); // reusable Point object
+		private static tempBoundsArray:Array = []; // Array of reusable Bounds2D objects
+		private static tempPoint:Point = new Point(); // reusable Point object
 		
-		public const columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
-		public const normalize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
-		public const selectableLines:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public normalize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+		public selectableLines:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public const lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-		public const curvedLines:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+		public curvedLines:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		private var _columns:Array = [];
-		private var _stats:Dictionary = new Dictionary(true);
-		private var extendPointBounds:Number = 0.25; // extends point bounds when selectableLines is false
-		private var drawStubs:Boolean = true; // draws stubbed line segments eminating from points with missing neighboring values
+		private _columns:Array = [];
+		private _stats:Dictionary = new Dictionary(true);
+		private extendPointBounds:number = 0.25; // extends point bounds when selectableLines is false
+		private drawStubs:Boolean = true; // draws stubbed line segments eminating from points with missing neighboring values
 		
-		public function SimpleParallelCoordinatesPlotter()
+		public constructor()
 		{
-			lineStyle.color.internalDynamicColumn.globalName = Weave.DEFAULT_COLOR_COLUMN;
+			lineStyle.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
 			lineStyle.weight.defaultValue.value = 1;
 			lineStyle.alpha.defaultValue.value = 1.0;
 			
@@ -66,7 +66,7 @@ namespace weavejs.plot
 			this.addSpatialDependencies(Weave.properties.enableGeometryProbing);
 			this.addSpatialDependencies(this.columns, this.normalize, this.selectableLines);
 		}
-		private function handleColumnsListChange():void
+		private handleColumnsListChange():void
 		{
 			// When a new column is created, register the stats to trigger callbacks and affect busy status.
 			// This will be cleaned up automatically when the column is disposed.
@@ -82,11 +82,11 @@ namespace weavejs.plot
 			setColumnKeySources([lineStyle.color].concat(_columns));
 		}
 		
-		public function getSelectableAttributeNames():Array
+		public getSelectableAttributeNames():Array
 		{
 			return ["Color", "Columns"];
 		}
-		public function getSelectableAttributes():Array
+		public getSelectableAttributes():Array
 		{
 			return [lineStyle.color, columns];
 		}
@@ -96,7 +96,7 @@ namespace weavejs.plot
 		 * @param recordKey A key.
 		 * @return An Array Numbers.
 		 */
-		private function getValues(recordKey:IQualifiedKey):Array
+		private getValues(recordKey:IQualifiedKey):Array
 		{
 			var output:Array = new Array(_columns.length);
 			for (var i:int = 0; i < _columns.length; i++)
@@ -110,7 +110,7 @@ namespace weavejs.plot
 			return output;
 		}
 		
-		override public function getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Array):void
+		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
 			var enableGeomProbing:Boolean = Weave.properties.enableGeometryProbing.value;
 			
@@ -119,11 +119,11 @@ namespace weavejs.plot
 			// when geom probing is enabled, report a single data bounds
 			initBoundsArray(output, enableGeomProbing ? 1 : values.length);
 			
-			var stubSize:Number = selectableLines.value ? 0.5 : extendPointBounds;
+			var stubSize:number = selectableLines.value ? 0.5 : extendPointBounds;
 			var outputIndex:int = 0;
 			for (var x:int = 0; x < values.length; x++)
 			{
-				var y:Number = values[x];
+				var y:number = values[x];
 				if (isFinite(y))
 				{
 					var bounds:Bounds2D = output[outputIndex] as Bounds2D;
@@ -139,10 +139,10 @@ namespace weavejs.plot
 			}
 		}
 		
-		public function getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:Number = 0, dataBounds:Bounds2D = null):Array
+		public getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:number = 0, dataBounds:Bounds2D = null):Array
 		{
 			var x:int;
-			var y:Number;
+			var y:number;
 			var results:Array = [];
 			var values:Array = getValues(recordKey);
 			if (selectableLines.value)
@@ -227,7 +227,7 @@ namespace weavejs.plot
 			return results;
 		}
 		
-		public function getBackgroundGeometries():Array
+		public getBackgroundGeometries():Array
 		{
 			return [];
 		}
@@ -235,11 +235,11 @@ namespace weavejs.plot
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		override protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
 		{
 			var graphics:Graphics = tempShape.graphics;
-			var prevScreenX:Number = NaN;
-			var prevScreenY:Number = NaN;
+			var prevScreenX:number = NaN;
+			var prevScreenY:number = NaN;
 			var continueLine:Boolean = false;
 			
 			lineStyle.beginLineStyle(recordKey, graphics);
@@ -247,7 +247,7 @@ namespace weavejs.plot
 			var values:Array = getValues(recordKey);
 			for (var x:int = 0; x < values.length; x++)
 			{
-				var y:Number = values[x];
+				var y:number = values[x];
 				if (!isFinite(y))
 				{
 					// missing value
@@ -297,7 +297,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setXRange(0, _columns.length - 1);
 			if (normalize.value)

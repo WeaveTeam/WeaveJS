@@ -24,16 +24,16 @@ namespace weavejs.plot
 	import BitmapText = weavejs.util.BitmapText;
 	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
 	
-	public class BackgroundTextPlotter extends AbstractPlotter
+	export class BackgroundTextPlotter extends AbstractPlotter
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, BackgroundTextPlotter, "Background text");
 		
-		public const textFormat:LinkableTextFormat = Weave.linkableChild(this, LinkableTextFormat);
-		public const textFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('target && target.getSessionState()', true, false, ['target']));
-		public const dependency:LinkableDynamicObject = Weave.linkableChild(this, LinkableDynamicObject);
-		private const bitmapText:BitmapText = new BitmapText();
+		public textFormat:LinkableTextFormat = Weave.linkableChild(this, LinkableTextFormat);
+		public textFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('target && target.getSessionState()', true, false, ['target']));
+		public dependency:LinkableDynamicObject = Weave.linkableChild(this, LinkableDynamicObject);
+		private bitmapText:BitmapText = new BitmapText();
 		
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			bitmapText.x = screenBounds.getXCenter();
 			bitmapText.y = screenBounds.getYCenter();

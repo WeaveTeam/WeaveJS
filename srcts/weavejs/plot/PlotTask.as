@@ -62,7 +62,7 @@ namespace weavejs.plot
 		 * @param zoomBounds
 		 * @param layerSettings
 		 */
-		public PlotTask(taskType:number, plotter:IPlotter, spatialIndex:SpatialIndex, zoomBounds:ZoomBounds, layerSettings:LayerSettings)
+		public constructor(taskType:number, plotter:IPlotter, spatialIndex:SpatialIndex, zoomBounds:ZoomBounds, layerSettings:LayerSettings)
 		{
 			this._taskType = taskType;
 			this._plotter = plotter;

@@ -24,16 +24,16 @@ namespace weavejs.plot
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import Bounds2D = weavejs.geom.Bounds2D;
 	
-	public class RamachandranBackgroundPlotter extends AbstractPlotter
+	export class RamachandranBackgroundPlotter extends AbstractPlotter
 	{
-		public function RamachandranBackgroundPlotter()
+		public constructor()
 		{
 		}
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.setBounds(-180,-180,180,180);
 		}
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			var g:Graphics = tempShape.graphics;
 			g.clear();
@@ -59,12 +59,12 @@ namespace weavejs.plot
 			destination.draw(tempShape);
 		}
 		
-		private const tempBounds:Bounds2D = new Bounds2D();
-		private const tempPoint:Point = new Point();
+		private tempBounds:Bounds2D = new Bounds2D();
+		private tempPoint:Point = new Point();
 
 		// background image
 		[Embed(source="/weave/resources/images/RamaPlot.png")]
-		private static var _missingImageClass:Class;
-		private static const _missingImage:BitmapData = Bitmap(new _missingImageClass()).bitmapData;
+		private static _missingImageClass:Class;
+		private static _missingImage:BitmapData = Bitmap(new _missingImageClass()).bitmapData;
 	}
 }

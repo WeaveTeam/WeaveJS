@@ -21,43 +21,26 @@ namespace weavejs.plot
 	
 	import Bounds2D;
 	
-	public class ProbeLinePlotter extends AbstractPlotter
+	export class ProbeLinePlotter extends AbstractPlotter
 	{
-		public function ProbeLinePlotter()
+		public constructor()
 		{
 		}
 		
-		private var drawLine:Boolean = false;
-		private const yAxis:Point = new Point();//reusable object
-		private const plot:Point = new Point(); // reusable object
-		private const xAxis:Point = new Point(); // reusable object
-		private var yToPlot:Boolean ;
-		private var xToPlot:Boolean ;
+		private drawLine:Boolean = false;
+		private yAxis:Point = new Point();//reusable object
+		private plot:Point = new Point(); // reusable object
+		private xAxis:Point = new Point(); // reusable object
+		private yToPlot:Boolean ;
+		private xToPlot:Boolean ;
 		
-		public function clearCoordinates():void
-		{
-			drawLine = false = weavejs.geom.Bounds2D;
-	
-	public class ProbeLinePlotter extends AbstractPlotter
-	{
-		public function ProbeLinePlotter()
-		{
-		}
-		
-		private var drawLine:Boolean = false;
-		private const yAxis:Point = new Point();//reusable object
-		private const plot:Point = new Point(); // reusable object
-		private const xAxis:Point = new Point(); // reusable object
-		private var yToPlot:Boolean ;
-		private var xToPlot:Boolean ;
-		
-		public function clearCoordinates():void
+		public clearCoordinates():void
 		{
 			drawLine = false;
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
-		public function setCoordinates(x_yAxis:Number, y_yAxis:Number, xPlot:Number, yPlot:Number, x_xAxis:Number, y_xAxis:Number, yToPlotBool:Boolean, xToPlotBool:Boolean):void
+		public setCoordinates(x_yAxis:number, y_yAxis:number, xPlot:number, yPlot:number, x_xAxis:number, y_xAxis:number, yToPlotBool:Boolean, xToPlotBool:Boolean):void
 		{
 			yAxis.x = x_yAxis;
 			yAxis.y = y_yAxis;
@@ -72,7 +55,7 @@ namespace weavejs.plot
 		}
 		
 		
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			if(drawLine)
 			{

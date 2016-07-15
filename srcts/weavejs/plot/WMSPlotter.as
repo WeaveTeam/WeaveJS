@@ -51,43 +51,43 @@ namespace weavejs.plot
 	import DrawUtils = weavejs.util.DrawUtils;
 	import ZoomUtils = weavejs.util.ZoomUtils;
 
-	public class WMSPlotter extends AbstractPlotter implements ILinkableObjectWithBusyStatus, IDisposableObject, IObjectWithDescription
+	export class WMSPlotter extends AbstractPlotter implements ILinkableObjectWithBusyStatus, IDisposableObject, IObjectWithDescription
 	{
 		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, WMSPlotter, "WMS images");
 		
 		// TODO: move the image reprojection code elsewhere
 		
-		public var debug:Boolean = false;
+		public debug:Boolean = false;
 		
-		public function WMSPlotter()
+		public constructor()
 		{
 			//setting default WMS Map to Blue Marble
 			setProvider(WMSProviders.OPEN_STREET_MAP);
 			this.addSpatialDependencies(this.service, this.srs, this.gridSpacing);
 		}
 		
-		public function getDescription():String
+		public getDescription():string
 		{
-			var src:String = sourceSRS;
-			var dest:String = getDestinationSRS();
+			var src:string = sourceSRS;
+			var dest:string = getDestinationSRS();
 			if (dest && src != dest)
 				return lang('{0} ({1} -> {2})', providerName, src || '?', dest);
 			return lang('{0} ({1})', providerName, src);
 		}
 		
-		public function get sourceSRS():String
+		public get sourceSRS():string
 		{
 			var srv:IWMSService = _service;
 			return srv ? srv.getProjectionSRS() : null;
 		}
 
 		// the service and its parameters
-		private function get _service():IWMSService
+		private get _service():IWMSService
 		{
 			return service.internalObject as IWMSService;
 		}
 		
-		public function get providerName():String
+		public get providerName():string
 		{
 			if (_service is ModestMapsWMS)
 				return (_service as ModestMapsWMS).providerName.value;
@@ -101,38 +101,38 @@ namespace weavejs.plot
 			return null;
 		}
 		
-		public const service:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(IWMSService));
+		public service:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(IWMSService));
 		
-		public const preferLowerQuality:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-		public const srs:LinkableString = Weave.linkableChild(this, LinkableString); // needed for linking MapTool settings
-		public const styles:LinkableString = Weave.linkableChild(this, LinkableString, setStyle); // needed for changing seasons
-		public const displayMissingImage:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
+		public preferLowerQuality:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+		public srs:LinkableString = Weave.linkableChild(this, LinkableString); // needed for linking MapTool settings
+		public styles:LinkableString = Weave.linkableChild(this, LinkableString, setStyle); // needed for changing seasons
+		public displayMissingImage:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 		
 		// reusable objects
-		private const _tempMatrix:Matrix = new Matrix(); 
-		private const _tempDataBounds:Bounds2D = new Bounds2D();
-		private const _tempScreenBounds:Bounds2D = new Bounds2D();
-		private const _tempBackgroundDataBounds:Bounds2D = new Bounds2D();
-		private const _clipRectangle:Rectangle = new Rectangle();
+		private _tempMatrix:Matrix = new Matrix();
+		private _tempDataBounds:Bounds2D = new Bounds2D();
+		private _tempScreenBounds:Bounds2D = new Bounds2D();
+		private _tempBackgroundDataBounds:Bounds2D = new Bounds2D();
+		private _clipRectangle:Rectangle = new Rectangle();
 		
 		// used to show a missing image
 		[Embed(source="/weave/resources/images/missing.png")]
-		private static var _missingImageClass:Class;
-		private static const _missingImage:Bitmap = Bitmap(new _missingImageClass());
-		private static const _missingImageColorTransform:ColorTransform = new ColorTransform(1, 1, 1, 0.25);
+		private static _missingImageClass:Class;
+		private static _missingImage:Bitmap = Bitmap(new _missingImageClass());
+		private static _missingImageColorTransform:ColorTransform = new ColorTransform(1, 1, 1, 0.25);
 		
 		// reprojecting bitmaps 
-		public const gridSpacing:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(12)); // number of pixels between grid points
-		private const _tempBounds:Bounds2D = new Bounds2D();
-		private const _tempImageBounds:Bounds2D = new Bounds2D(); // bounds of the image
-		private const _latLonBounds:Bounds2D = new Bounds2D(-180 + ProjConstants.EPSLN, -90 + ProjConstants.EPSLN, 180 - ProjConstants.EPSLN, 90 - ProjConstants.EPSLN);
-		private const _allowedTileReprojBounds:Bounds2D = new Bounds2D(); // allowed bounds for point to point reprojections
-		private const _normalizedGridBounds:Bounds2D = new Bounds2D();
-		private const _tempReprojPoint:Point = new Point(); // reusable object for reprojections
-		private const projManager:IProjectionManager = WeaveAPI.ProjectionManager; // reprojecting tiles
-		private const _tileSRSToShapeCache:Dictionary2D = new Dictionary2D(true, true); // use WeakReferences to be GC friendly
+		public gridSpacing:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(12)); // number of pixels between grid points
+		private _tempBounds:Bounds2D = new Bounds2D();
+		private _tempImageBounds:Bounds2D = new Bounds2D(); // bounds of the image
+		private _latLonBounds:Bounds2D = new Bounds2D(-180 + ProjConstants.EPSLN, -90 + ProjConstants.EPSLN, 180 - ProjConstants.EPSLN, 90 - ProjConstants.EPSLN);
+		private _allowedTileReprojBounds:Bounds2D = new Bounds2D(); // allowed bounds for point to point reprojections
+		private _normalizedGridBounds:Bounds2D = new Bounds2D();
+		private _tempReprojPoint:Point = new Point(); // reusable object for reprojections
+		private projManager:IProjectionManager = WeaveAPI.ProjectionManager; // reprojecting tiles
+		private _tileSRSToShapeCache:Dictionary2D = new Dictionary2D(true, true); // use WeakReferences to be GC friendly
 		
-		private function getDestinationSRS():String
+		private getDestinationSRS():string
 		{
 			if (projManager.projectionExists(srs.value))
 				return srs.value;
@@ -140,10 +140,10 @@ namespace weavejs.plot
 		}
 		
 		// reusable objects in getShape()
-		private const vertices:Vector.<Number> = new Vector.<Number>();
-		private const indices:Vector.<int> = new Vector.<int>();
-		private const uvtData:Vector.<Number> = new Vector.<Number>();
-		private function getShape(tile:WMSTile):ProjectedShape
+		private vertices:Vector.<Number> = new Vector.<Number>();
+		private indices:Vector.<int> = new Vector.<int>();
+		private uvtData:Vector.<Number> = new Vector.<Number>();
+		private getShape(tile:WMSTile):ProjectedShape
 		{
 			// check if this tile has a cached shape
 			var cachedValue:ProjectedShape = _tileSRSToShapeCache.get(tile, getDestinationSRS());
@@ -157,13 +157,13 @@ namespace weavejs.plot
 			uvtData.length = 0;
 						
 			// get projector for optimized reprojection
-			var serviceSRS:String = _service.getProjectionSRS();
+			var serviceSRS:string = _service.getProjectionSRS();
 			var projector:IProjector = projManager.getProjector(serviceSRS, srs.value);
 			
 			// Make lower-left corner of image 0,0 normalized coordinates by making this height negative.
 			// To eliminate the seams between images, adjust grid bounds so edge
 			// coordinates 0 and 1 will get projected to slightly outside tile.bounds.
-			var overlap:Number = 0; // in pixels
+			var overlap:number = 0; // in pixels
 			_normalizedGridBounds.setCenteredRectangle(
 				.5,
 				.5,
@@ -177,8 +177,8 @@ namespace weavejs.plot
 			{
 				for (var ix:int = 0; ix < fencePosts; ++ix)
 				{
-					var xNorm:Number = ix / fences;
-					var yNorm:Number = iy / fences;
+					var xNorm:number = ix / fences;
+					var yNorm:number = iy / fences;
 
 					// percent bounds of where we are in the image space
 					_tempReprojPoint.x = xNorm;
@@ -198,7 +198,7 @@ namespace weavejs.plot
 					// meaning half a pixel will be lost on all edges.  This code adjusts the normalized values so
 					// the edge pixels are not cut in half by converting our definition of normalized coordinates
 					// into flash player's definition.
-					var offset:Number = 0.5 + overlap;
+					var offset:number = 0.5 + overlap;
 					uvtData.push(
 						(xNorm * tile.imageWidth - offset) / (tile.imageWidth - offset * 2),
 						(yNorm * tile.imageHeight - offset) / (tile.imageHeight - offset * 2)
@@ -251,13 +251,13 @@ namespace weavejs.plot
 			return projShape;
 		}
 		
-		override public function drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
 		{
 			// if there is no service to use, we can't draw anything
 			if (!_service)
 				return;
 
-			var serviceSRS:String = _service.getProjectionSRS();			
+			var serviceSRS:string = _service.getProjectionSRS();			
 			var mapProjExists:Boolean = projManager.projectionExists(srs.value);
 			var areProjectionsDifferent:Boolean = serviceSRS != srs.value;
 			if (!areProjectionsDifferent || !mapProjExists)
@@ -321,7 +321,7 @@ namespace weavejs.plot
 		/**
 		 * This function will draw tiles which do not need to be reprojected.
 		 */
-		private function drawUnProjectedTiles(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private drawUnProjectedTiles(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
 		{
 			if (!_service)
 				return;
@@ -381,11 +381,11 @@ namespace weavejs.plot
 			drawCreditText(destination);
 		}
 		
-		private const bt:BitmapText = new BitmapText();
-		private const ct:ColorTransform = new ColorTransform();
-		private const rect:Rectangle = new Rectangle();
-		private const tempBounds:Bounds2D = new Bounds2D();
-		private function debugTileBounds(tileBounds:Bounds2D, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData, url:String, drawRect:Boolean):void
+		private bt:BitmapText = new BitmapText();
+		private ct:ColorTransform = new ColorTransform();
+		private rect:Rectangle = new Rectangle();
+		private tempBounds:Bounds2D = new Bounds2D();
+		private debugTileBounds(tileBounds:Bounds2D, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData, url:string, drawRect:Boolean):void
 		{
 			_tempScreenBounds.copyFrom(tileBounds);
 			dataBounds.projectCoordsTo(_tempScreenBounds, screenBounds);
@@ -405,16 +405,16 @@ namespace weavejs.plot
 			bt.draw(destination);
 		}
 		
-		public const creditInfoTextColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
-		public const creditInfoBackgroundColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0xFFFFFF));
-		public const creditInfoAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0.5, isFinite));
+		public creditInfoTextColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
+		public creditInfoBackgroundColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0xFFFFFF));
+		public creditInfoAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0.5, isFinite));
 		
-		private function drawCreditText(destination:BitmapData):void
+		private drawCreditText(destination:BitmapData):void
 		{
-			var _providerCredit:String = _service.getCreditInfo();
+			var _providerCredit:string = _service.getCreditInfo();
 			if (_providerCredit)
 			{
-				var textColor:Number = creditInfoTextColor.value;
+				var textColor:number = creditInfoTextColor.value;
 				if (!isFinite(textColor))
 					return;
 				
@@ -426,7 +426,7 @@ namespace weavejs.plot
 				bt.y = destination.height;
 				bt.text = _providerCredit;
 				
-				var backgroundColor:Number = creditInfoBackgroundColor.value;
+				var backgroundColor:number = creditInfoBackgroundColor.value;
 				if (isFinite(backgroundColor))
 				{
 					bt.getUnrotatedBounds(tempBounds);
@@ -447,7 +447,7 @@ namespace weavejs.plot
 		/**
 		 * Set the provider for the plotter.
 		 */
-		public function setProvider(provider:String):void
+		public setProvider(provider:string):void
 		{
 			if (!verifyServiceName(provider))
 				return;
@@ -472,7 +472,7 @@ namespace weavejs.plot
 			spatialCallbacks.triggerCallbacks();
 		}
 		
-		override public function getBackgroundDataBounds(output:Bounds2D):void
+		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.reset();
 			if (_service)
@@ -480,7 +480,7 @@ namespace weavejs.plot
 				// determine bounds of plotter
 				_service.getAllowedBounds(output);
 				
-				var serviceSRS:String = _service.getProjectionSRS();
+				var serviceSRS:string = _service.getProjectionSRS();
 				if (serviceSRS != srs.value
 					&& projManager.projectionExists(srs.value)
 					&& projManager.projectionExists(serviceSRS))
@@ -490,7 +490,7 @@ namespace weavejs.plot
 			}
 		}
 		
-		public function dispose():void
+		public dispose():void
 		{
 			if (_service)
 				_service.cancelPendingRequests(); // cancel everything to prevent any callbacks from running
@@ -500,10 +500,10 @@ namespace weavejs.plot
 		/**
 		 * This function will set the style of the image requests for NASA WMS.
 		 */
-		public function setStyle():void
+		public setStyle():void
 		{
 			var nasaService:OnEarthProvider = _service as OnEarthProvider;
-			var style:String = styles.value;
+			var style:string = styles.value;
 			
 			if (!nasaService)
 				return;
@@ -511,7 +511,7 @@ namespace weavejs.plot
 			nasaService.changeStyleToMonth(style);
 		}
 		
-		private function verifyServiceName(s:String):Boolean
+		private verifyServiceName(s:string):Boolean
 		{
 			if (!s)
 				return false;
@@ -519,12 +519,12 @@ namespace weavejs.plot
 			return WMSProviders.providers.indexOf(s) >= 0;
 		}
 		
-		public function isBusy():Boolean
+		public isBusy():Boolean
 		{
 			return false;
 		}
 		
-		public function adjustZoomBounds(zoomBounds:ZoomBounds):void
+		public adjustZoomBounds(zoomBounds:ZoomBounds):void
 		{
 			if (!_service)
 				return;
@@ -534,17 +534,17 @@ namespace weavejs.plot
 			zoomBounds.getScreenBounds(_tempScreenBounds);
 			getBackgroundDataBounds(_tempBackgroundDataBounds);
 			
-			var inputZoomLevel:Number = ZoomUtils.getZoomLevel(_tempDataBounds, _tempScreenBounds, _tempBackgroundDataBounds, minScreenSize);
-			var inputScale:Number = ZoomUtils.getScaleFromZoomLevel(_tempBackgroundDataBounds, minScreenSize, inputZoomLevel);
+			var inputZoomLevel:number = ZoomUtils.getZoomLevel(_tempDataBounds, _tempScreenBounds, _tempBackgroundDataBounds, minScreenSize);
+			var inputScale:number = ZoomUtils.getScaleFromZoomLevel(_tempBackgroundDataBounds, minScreenSize, inputZoomLevel);
 			
-			var outputZoomLevel:Number = Math.round(inputZoomLevel);
-			var outputScale:Number = ZoomUtils.getScaleFromZoomLevel(_tempBackgroundDataBounds, minScreenSize, outputZoomLevel);
+			var outputZoomLevel:number = Math.round(inputZoomLevel);
+			var outputScale:number = ZoomUtils.getScaleFromZoomLevel(_tempBackgroundDataBounds, minScreenSize, outputZoomLevel);
 			
 			ZoomUtils.zoomDataBoundsByRelativeScreenScale(_tempDataBounds, _tempScreenBounds, _tempScreenBounds.getXCenter(), _tempScreenBounds.getYCenter(), outputScale / inputScale, false);
 			zoomBounds.setDataBounds(_tempDataBounds);
 		}
 		
-		[Deprecated(replacement="service")] public function set serviceName(value:String):void { setProvider(value); }
+		//[Deprecated(replacement="service")] public set serviceName(value:string):void { setProvider(value); }
 	}
 }
 
@@ -555,8 +555,8 @@ import Bounds2D;
 // an internal object used for reprojecting shapes
 internal class ProjectedShape
 {
-	public var shape:Shape;
-	public var bounds:Bounds2D;
-	public var imageWidth:int;
-	public var imageHeight:int;	
+	public shape:Shape;
+	public bounds:Bounds2D;
+	public imageWidth:int;
+	public imageHeight:int;
 }
