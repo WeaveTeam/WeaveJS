@@ -15,13 +15,9 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
 	import Graphics = PIXI.Graphics;
-	import Shape = flash.display.Shape;
 	import Point = weavejs.geom.Point;
-
 	import StandardLib = weavejs.util.StandardLib;
-
 	import IKeySet = weavejs.api.data.IKeySet;
 	import IPlotTask = weavejs.api.ui.IPlotTask;
 	import KeySet = weavejs.data.key.KeySet;
@@ -37,8 +33,6 @@ namespace weavejs.plot
 	
 	export class LineChartPlotter extends AbstractPlotter
 	{
-		//WeaveAPI.ClassRegistry.registerImplementation(IPlotter, LineChartPlotter, "Line Chart");
-		
 		public constructor()
 		{
 			super();
@@ -87,10 +81,10 @@ namespace weavejs.plot
 			this.plotter = plotter;
 			this.task = task;
 			this.unfilteredKeySet = unfilteredKeySet;
-			this.renderer = new AsyncLineRenderer();
+			this.renderer = new AsyncLineRenderer(task.buffer);
 			
 			if ((task as PlotTask).taskType != PlotTask.TASK_TYPE_SUBSET)
-				this.taskKeySet = Weave.disposableChild(plotter, KeySet);
+				this.taskKeySet = new Set<IQualifiedKey>();
 		}
 		
 		public renderer:AsyncLineRenderer;
@@ -99,7 +93,7 @@ namespace weavejs.plot
 		public unfilteredKeySet:IKeySet;
 		public allKeys:IQualifiedKey[];
 		public keyIndex:number;
-		public taskKeySet:KeySet;
+		public taskKeySet:Set<IQualifiedKey>;
 		public group:number;
 		
 		private static tempPoint:Point = new Point();
@@ -111,8 +105,9 @@ namespace weavejs.plot
 				this.renderer.reset();
 				if (this.taskKeySet)
 				{
-					this.taskKeySet.clearKeys();
-					this.taskKeySet.replaceKeys(this.task.recordKeys);
+					this.taskKeySet.clear();
+					for (let key of this.task.recordKeys)
+						this.taskKeySet.add(key);
 				}
 				this.allKeys = this.plotter.useFilteredDataGaps.value ? this.unfilteredKeySet.keys : this.plotter.filteredKeySet.keys;
 				this.keyIndex = 0;
@@ -124,13 +119,12 @@ namespace weavejs.plot
 				{
 					if (Date.now() > this.task.iterationStopTime)
 					{
-						this.renderer.flush(this.task.buffer);
 						return this.keyIndex / this.allKeys.length;
 					}
 					
 					var key:IQualifiedKey = this.allKeys[this.keyIndex] as IQualifiedKey;
 					
-					if (this.taskKeySet ? this.taskKeySet.containsKey(key) : this.plotter.filteredKeySet.containsKey(key))
+					if (this.taskKeySet ? this.taskKeySet.has(key) : this.plotter.filteredKeySet.containsKey(key))
 					{
 						AsyncState.tempPoint.x = this.plotter.dataX.getValueFromKey(key, Number);
 						AsyncState.tempPoint.y = this.plotter.dataY.getValueFromKey(key, Number);
@@ -148,8 +142,9 @@ namespace weavejs.plot
 					if (StandardLib.numericCompare(this.group, newGroup) != 0)
 						this.renderer.newLine();
 					this.group = newGroup;
-					
-					this.renderer.addPoint(AsyncState.tempPoint.x, AsyncState.tempPoint.y, this.plotter.lineStyle.getLineStyleParams(key));
+
+					var style = this.plotter.lineStyle.getStyle(key);
+					this.renderer.addPoint(AsyncState.tempPoint.x, AsyncState.tempPoint.y, [style.weight, style.color, style.alpha]);
 				}
 			}
 			catch (e)
@@ -157,32 +152,27 @@ namespace weavejs.plot
 				console.error(e);
 			}
 			
-			this.renderer.flush(this.task.buffer);
 			return 1;
 		}
 	}
 	class AsyncLineRenderer
 	{
-		public AsyncLineRenderer()
+		public constructor(graphics:Graphics)
 		{
-			this.shape = new Shape();
-			this.graphics = this.shape.graphics;
+			this.graphics = graphics;
 		}
 		
-		private shape:Shape;
 		private graphics:Graphics;
-		private handlePoint:Function;
 		private prevX:number;
 		private prevY:number;
-		private continueLine:Boolean;
-		private prevLineStyle:Array;
+		private continueLine:boolean;
+		private prevLineStyle:[number, number, number];
 		
 		/**
 		 * Call this at the beginning of the async task
 		 */
 		public reset():void
 		{
-			this.graphics.clear();
 			this.newLine();
 		}
 		
@@ -197,9 +187,9 @@ namespace weavejs.plot
 		/**
 		 * Call this for each coordinate in the line, whether the coordinates are defined or not.
 		 */
-		public addPoint(x:number, y:number, lineStyleParams:Array):void
+		public addPoint(x:number, y:number, lineStyleParams:[number, number, number]):void
 		{
-			var isDefined:Boolean = isFinite(x) && isFinite(y);
+			var isDefined:boolean = isFinite(x) && isFinite(y);
 			
 			if (isDefined && this.continueLine)
 			{
@@ -221,18 +211,9 @@ namespace weavejs.plot
 			this.continueLine = isDefined;
 			this.prevLineStyle = lineStyleParams;
 		}
-		
-		/**
-		 * Call this to flush the graphics to a BitmapData buffer.
-		 */
-		public flush(buffer:BitmapData):void
-		{
-			buffer.draw(this.shape);
-			this.graphics.clear();
-			if (this.continueLine)
-				this.graphics.moveTo(this.prevX, this.prevY);
-		}
 	}
+
+	Weave.registerClass(LineChartPlotter, "Line Chart", [IPlotter]);
 }
 
 
