@@ -151,6 +151,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 					style={{width: "100%"}}
 					ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
 					options={columnIds}
+					placeholder={Weave.lang("Auto-generated keys")}
 					className={keysAreUnique ? "":"error"}
 				/>
 			],
