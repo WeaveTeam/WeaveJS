@@ -55,6 +55,9 @@
     },
     "pixi.js/pixi.js.d.ts": {
       "commit": "eff17bc708c00906a108e6edbb4b07b599ba9a48"
+    },
+    "react-notification-system/react-notification-system.d.ts": {
+      "commit": "6dff9058d3968f2f7eea6b336fd930a1c39da575"
     }
   }
 }

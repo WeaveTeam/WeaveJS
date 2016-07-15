@@ -10,6 +10,7 @@ import WeaveArchive from "../core/WeaveArchive";
 import FileDialog from "../dialog/FileDialog";
 import WeaveMenus from "./WeaveMenus";
 import {getWeaveProperties} from "../app/WeaveProperties";
+import WeaveApp from "../app/WeaveApp";
 
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -236,7 +237,19 @@ export default class FileMenu implements MenuBarItemProps
 					// this check attempts to invalidate old requests
 					if (this.fileName == this.fileName)
 						this.loadArchive(result);
-				});
+					/*WeaveApp.notificationSystem.addNotification({
+						message: Weave.lang("File Opened Successfully"),
+						position: 'tr',
+						level: 'success'
+					})*/
+				},
+					(result)=> {
+						WeaveApp.notificationSystem.addNotification({
+							message: Weave.lang("Failed to open file"),
+							position: 'tr',
+							level: 'error'
+						})
+					});
 		}
 		else
 		{
@@ -401,11 +414,21 @@ export default class FileMenu implements MenuBarItemProps
 			(result: Uint8Array)=>
 			{
 				weavejs.net.Admin.service.saveWeaveFileByteArray(result, newFileName, overwrite);
+				WeaveApp.notificationSystem.addNotification({
+					message: Weave.lang("Session saved to server"),
+					position: 'tr',
+					level: 'success'
+				})
 			},
 			(error:any)=>
 			{
 				/* Call login window from here if auth error and retry, otherwise, display error. */
 				console.error(error);
+				WeaveApp.notificationSystem.addNotification({
+					message: Weave.lang("Failed to save session to server"),
+					position: 'tr',
+					level: 'error'
+				})
 			}
 		);
 	};

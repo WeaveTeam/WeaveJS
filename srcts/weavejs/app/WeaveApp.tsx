@@ -21,6 +21,7 @@ import WindowLayout from "../layout/WindowLayout";
 import FlexibleLayout from "../layout/FlexibleLayout";
 import WeaveMenus from "../menu/WeaveMenus";
 import SessionStateEditor from "../editor/SessionStateEditor";
+import NotificationSystem from "../../modules/NotificationSystem";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -58,6 +59,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 {
 	enableMenuBarWatcher:LinkableWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
 	menus:WeaveMenus;
+	static notificationSystem:NotificationSystem.System;
 	_popout_windows = new Set<Window>();
 
 	get popout_windows()
@@ -654,6 +656,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{progressBarUI}
 				{weaveTabbedComponent}
 				{interactiveTourComponent}
+				<NotificationSystem ref={(c:NotificationSystem.System) => {WeaveApp.notificationSystem = c;}}/>
 			</VBox>
 		);
 	}
