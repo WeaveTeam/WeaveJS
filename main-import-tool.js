@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 var parseArgs = require('minimist');
 var fs = require('fs');
@@ -118,7 +118,7 @@ function initDeps(file)
 
 	// check for extends class in same package
 	// Example: export class Foo extends Bar<Baz>
-	var extendsPattern = /^\s*(?:export\s+)?class\s+(?:[^\s]+)\s+(?:implements\s+(?:[^\s]+)\s+)?extends\s+([^\s<]+)/gm;
+	var extendsPattern = /^\s*(?:export\s+)?(?:abstract\s+)?class\s+(?:[^\s]+)\s+(?:implements\s+(?:[^\s]+)\s+)?extends\s+([^\s<]+)/gm;
 	while (match = extendsPattern.exec(fileContent))
 	{
 		let fileNoExt = path.join(path.dirname(file), match[1]);
