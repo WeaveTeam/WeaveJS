@@ -1297,3 +1297,15 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 .weave-caption-border {
 	border-top: 1px solid lightgrey;
 }
+
+.weave-input-div {
+	line-height: 1.2142em;
+	padding: .67861429em 1em;
+	border: 1px solid white;
+}
+
+.weave-input-div.disabled {
+	cursor: default;
+	pointer-events: none;
+	opacity: .45;
+}

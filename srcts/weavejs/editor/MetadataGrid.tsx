@@ -81,7 +81,7 @@ export default class MetadataGrid extends React.Component<MetadataGridProps, Met
 		
 		switch (key) {
 			case ColumnMetadata.KEY_TYPE:
-				return singleValue;
+				return <div className="weave-input-div disabled">{singleValue}</div>;
 			case ColumnMetadata.AGGREGATION:
 			case ColumnMetadata.DATA_TYPE:
 			case ColumnMetadata.DATE_DISPLAY_FORMAT:

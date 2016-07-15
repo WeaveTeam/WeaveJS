@@ -67,12 +67,22 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 		//check if the click target is not within the element and the editable mode is on
 		if (!this.element.contains(event.target as HTMLElement) && this.state.editMode)
 		{
-			this.setState({
-				editMode :false
-			});
-			this.props.onChange && this.props.onChange(this.state.textContent);//onChange called once element is no longer in focus
+			this.setDisabledState();
 		}
 
+	};
+
+	setDisabledState=():void => {
+		this.setState({
+			editMode :false
+		});
+		this.props.onChange && this.props.onChange(this.state.textContent);//onChange called once element is no longer in focus
+	};
+
+	handleKeyPress = (event:any) => {
+		if(event.key == 'Enter'){
+			this.setDisabledState();
+		}
 	};
 
 	componentDidMount()
@@ -86,16 +96,17 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 		document.removeEventListener('mousedown', this.disableEditMode);
 	}
 
+
 	//TODO fix styles
 	render():JSX.Element
 	{
 		return(
 			<VBox style={this.props.style} onDoubleClick={ this.enableEditMode }>
 				{ (this.state.editMode) ?
-				<Input value={ this.state.textContent } onChange={ this.handleEditableContent }/>
+				<Input value={ this.state.textContent } onChange={ this.handleEditableContent } onKeyPress={this.handleKeyPress}/>
 
 				:
-				<div>
+				<div className="weave-input-div">
 					{ this.state.textContent ? this.state.textContent : this.props.emptyText}
 				</div>
 				}
