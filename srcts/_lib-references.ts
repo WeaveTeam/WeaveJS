@@ -1,8 +1,8 @@
-/// <reference path="./../typings/FileSaver/FileSaver.d.ts"/>
 /// <reference path="./../typings/c3/c3.d.ts"/>
 /// <reference path="./../typings/classnames/classnames.d.ts"/>
 /// <reference path="./../typings/clipboard/clipboard.d.ts"/>
 /// <reference path="./../typings/d3/d3.d.ts"/>
+/// <reference path="./../typings/FileSaver/FileSaver.d.ts"/>
 /// <reference path="./../typings/fixed-data-table/fixed-data-table.d.ts"/>
 /// <reference path="./../typings/fuse/fuse.d.ts"/>
 /// <reference path="./../typings/jquery/jquery.d.ts"/>
@@ -28,6 +28,7 @@
 /// <reference path="./../typings/react-color/react-color.d.ts"/>
 /// <reference path="./../typings/react-date-picker.d.ts"/>
 /// <reference path="./../typings/react-dropzone/react-dropzone.d.ts"/>
+/// <reference path="./../typings/react-notification-system/react-notification-system.d.ts"/>
 /// <reference path="./../typings/react-sparklines/react-sparklines.d.ts"/>
 /// <reference path="./../typings/react-swf/react-swf.d.ts"/>
 /// <reference path="./../typings/swfobject/swfobject.d.ts"/>
