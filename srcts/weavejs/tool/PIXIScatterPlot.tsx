@@ -25,12 +25,11 @@ namespace weavejs.tool
 		renderer:PIXI.WebGLRenderer | PIXI.CanvasRenderer;
 		graphics:PIXI.Graphics = new PIXI.Graphics();
 		stage:PIXI.Container = new PIXI.Container();
-		plotter:ScatterPlotPlotter = Weave.linkableChild(this, ScatterPlotPlotter, this.forceUpdate);
+		plotter:ScatterPlotPlotter = Weave.linkableChild(this, ScatterPlotPlotter, this.forceUpdate, true);
 
 		constructor(props:PIXIScatterPlotProps)
 		{
 			super(props);
-			console.log('IPlotter', IPlotter);
 			this.plotter.spatialCallbacks.addGroupedCallback(this, this.forceUpdate);
 			this.plotter.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		}
@@ -80,7 +79,7 @@ namespace weavejs.tool
 
 	Weave.registerClass(
 		PIXIScatterPlot,
-		["weavejs.tool.PIXIScatterPlot", "weave.visualization.tools::ScatterPlotTool"],
+		["weavejs.tool.PIXIScatterPlot"/*, "weave.visualization.tools::ScatterPlotTool"*/],
 		[
 			weavejs.api.ui.IVisTool,
 			weavejs.api.core.ILinkableObjectWithNewProperties,
