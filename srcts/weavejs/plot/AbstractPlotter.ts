@@ -12,16 +12,45 @@ namespace weavejs.plot
 	import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 	import IFilteredKeySet = weavejs.api.data.IFilteredKeySet;
 	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 
 	/**
 	 * This is a base implementation for an IPlotter.
 	 */
-	export class AbstractPlotter implements IPlotter
+	export abstract class AbstractPlotter implements IPlotter, ISelectableAttributes
 	{
 		constructor()
 		{
 			this.addSpatialDependencies(this.filteredKeySet);
 		}
+
+		get selectableAttributes():Map<string, IColumnWrapper|ILinkableHashMap>
+		{
+			let map = new Map<string, IColumnWrapper|ILinkableHashMap>();
+			let selectableAttributeNames = this.getSelectableAttributeNames();
+			let selectableAttributes = this.getSelectableAttributes();
+			for (let idx = 0; idx < selectableAttributes.length; idx++)
+			{
+				let attribute = selectableAttributes[idx];
+				let attributeName = selectableAttributeNames[idx];
+				map.set(attributeName, attribute);
+			}
+			return map;
+		}
+
+		getSelectableAttributeNames():string[]
+		{
+			return [];
+		}
+
+		getSelectableAttributes():(IColumnWrapper|ILinkableHashMap)[]
+		{
+			return [];
+		}
+
+
 
 		/**
 		 * Registers dependencies that affect data bounds and should trigger spatial callbacks.
