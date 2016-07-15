@@ -1,6 +1,7 @@
 const babel = require("babel-core");
 const browserifyInc = require("browserify-incremental");
-const argv = require("yargs").argv;
+const minimist = require('minimist');
+const argv = minimist(process.argv.slice(2));
 const fs = require("fs");
 
 const libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'openlayers', 'jszip'];
