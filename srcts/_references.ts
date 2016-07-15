@@ -1,4 +1,3 @@
-/// <reference path="./weavejs/ui/FilterList.tsx"/>
 /// <reference path="./weavejs/ui/flexbox/BoxProps.tsx"/>
 /// <reference path="./weavejs/ui/LinkableDynamicComponent.tsx"/>
 /// <reference path="./weavejs/ui/ProgressBar.tsx"/>
