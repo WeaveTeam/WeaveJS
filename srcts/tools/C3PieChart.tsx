@@ -187,7 +187,7 @@ export default class C3PieChart extends AbstractC3Tool
 
             var colors:{[key:string]: string} = {};
             this.records.forEach((record:Record) => {
-                colors[record.id as any] = record.fill.color || "#808080";
+                colors[record.id as any] = (record.fill.color && record.fill.color !== "NaN") ? record.fill.color:"#808080";
             });
 
             this.c3Config.data.columns = columns;
