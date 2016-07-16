@@ -42,18 +42,20 @@ const layoutModes:ComboBoxOption[] = [
 export default class DataInfoTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool,IInitSelectableAttributes
 {
 	columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
-	layout = Weave.linkableChild(this, new LinkableString("horizontal"));
-	showRecordBar = Weave.linkableChild(this, new LinkableBoolean(true));
-	showRecordValue = Weave.linkableChild(this, new LinkableBoolean(true));
 	columnMetaDataProperties = Weave.linkableChild(this,  LinkableHashMap );
-	colorRamp = Weave.linkableChild(this, new ColorRamp(["0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"]));
-	columnNames:string[] = null;
-	
+
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
 
+	layout = Weave.linkableChild(this, new LinkableString("horizontal"));
+	showRecordBar = Weave.linkableChild(this, new LinkableBoolean(true));
+	showRecordValue = Weave.linkableChild(this, new LinkableBoolean(true));
+	colorRamp = Weave.linkableChild(this, new ColorRamp(["0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"]));
 	panelTitle = Weave.linkableChild(this, LinkableString);
+
+	columnNames:string[] = null;
+	keys:IQualifiedKey[] = null;
 
 	constructor(props:IVisToolProps)
 	{
@@ -90,12 +92,23 @@ export default class DataInfoTool extends React.Component<IVisToolProps, IVisToo
 		if (!Weave.wasDisposed(this) && !Weave.isBusy(this))
 		{
 			var columnChanged = Weave.detectChange(this, this.columns,this.columnMetaDataProperties);
-			var dataChanged = columnChanged || Weave.detectChange(this, this.probeFilter, this.selectionFilter,  this.filteredKeySet) ;
-
-			if(dataChanged)
+			if(columnChanged)
 				this.columnNames = this.columns.getNames();
 
-			this.forceUpdate();
+			var dataChanged = columnChanged || Weave.detectChange(this, this.probeFilter, this.selectionFilter,  this.filteredKeySet) ;
+			if(dataChanged)
+			{
+				let probekeys:IQualifiedKey[] = this.probeKeySet && this.probeKeySet.keys;
+				let selectionkeys:IQualifiedKey[] = this.selectionKeySet && this.selectionKeySet.keys;
+				let filterkeys:IQualifiedKey[] = this.filteredKeySet.keys;
+				let keys = probekeys && probekeys.length > 0 ? probekeys : selectionkeys;
+				this.keys = keys  && keys.length > 0 ? keys : filterkeys;
+			}
+
+			var controllersChanged = Weave.detectChange(this, this.showRecordBar, this.showRecordValue,  this.layout, this.colorRamp , this.panelTitle) ;
+
+			if(dataChanged || controllersChanged)
+				this.forceUpdate();
 		}
 	}
 
@@ -134,8 +147,7 @@ export default class DataInfoTool extends React.Component<IVisToolProps, IVisToo
 	render()
 	{
 		let columnObjects = this.columns && this.columns.getObjects();
-		let key = this.probeKeySet && this.probeKeySet.keys[0];
-		key = key ? key : this.filteredKeySet.keys[0];
+
 
 		let columnUI:JSX.Element[] = columnObjects && columnObjects.map( (col:IAttributeColumn,index:number) =>
 			{
@@ -148,11 +160,33 @@ export default class DataInfoTool extends React.Component<IVisToolProps, IVisToo
 					metaDataProps = metaDataPropNames.state as string[]
 				}
 
+
+				let colStatsStyle:React.CSSProperties = {};
+				if(this.layout.value == "horizontal")
+				{
+					if(columnObjects.length -1 != index){
+						colStatsStyle["borderRight"] = "1px solid lightgrey";
+					}
+
+					colStatsStyle["marginTop"] = "2px";
+					colStatsStyle["marginBottom"] = "2px";
+				}
+				else
+				{
+					if(columnObjects.length -1 != index){
+						colStatsStyle["borderBottom"] = "1px solid lightgrey";
+					}
+					colStatsStyle["marginLeft"] = "2px";
+					colStatsStyle["marginRight"] = "2px";
+
+				}
+
 				return <ColumnStats key={index}
 				                    colorRamp={this.colorRamp}
 				                    layout={this.layout.value}
 				                    column={col}
-				                    recordKey={key}
+				                    recordKeys={this.keys}
+				                    style={colStatsStyle}
 				                    showRecordBar={this.showRecordBar.value}
 				                    showRecordValue={this.showRecordValue.value}
 				                    columnMetaDataProperties={metaDataProps}/>
@@ -180,7 +214,7 @@ interface ColumnStatsProps extends React.HTMLProps<ColumnStats>
 	showRecordValue:boolean;
 	columnMetaDataProperties:any;
 	column:IAttributeColumn;
-	recordKey:IQualifiedKey;
+	recordKeys:IQualifiedKey[];
 	colorRamp:ColorRamp;
 }
 
@@ -194,36 +228,14 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 	constructor(props:ColumnStatsProps)
 	{
 		super(props)
-		
-		
 	}
-
 
 	render(){
 
 
 		let colName = weavejs.data.ColumnUtils.getTitle(this.props.column);
-		let recordValue = this.props.recordKey ? this.props.column.getValueFromKey(this.props.recordKey) : null;
-		let color = recordValue ? this.props.colorRamp.getHexColor(recordValue as any, 0, 100) : null;
-
-		let valueBoxStyle:React.CSSProperties = {
-			display:"flex",
-			alignItems:"center",
-			justifyContent:"center",
-			background:color,
-			width:"40px",
-			height:"40px",
-			color:"white",
-			margin:"2px",
-			textShadow:"0px 0px 2px black",
-			borderRadius:"4px"
-		};
-
-
 
 		let columnTitleUI:JSX.Element = null;
-		let recordValueUI:JSX.Element = null;
-		let columnInfoUI:JSX.Element = null;
 
 		if(colName)
 		{
@@ -232,20 +244,70 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 				colName = Weave.lang(colName);
 			}
 
-			columnTitleUI = <div style={ {whiteSpace: "nowrap",overflow: "hidden",textOverflow: "ellipsis",padding:"2px",flex:"1 0"} }>
+			columnTitleUI = <div style={ {whiteSpace: "nowrap",overflow: "hidden",textOverflow: "ellipsis",padding:"2px"} }>
 								{colName}
 							</div>
 		}
 
-
-
+		let recordValueUI:JSX.Element = null;
+		let maxValue:number = NaN;
+		let color:string;
 		if(this.props.showRecordValue)
 		{
-			recordValueUI = <div style={ valueBoxStyle }>
-								{Weave.lang(recordValue)}
+			if(this.props.recordKeys)
+			{
+				 this.props.recordKeys.map((recordKey:IQualifiedKey)=>
+				 {
+					 let recordValue =  this.props.column.getValueFromKey(recordKey,Number);
+					 if(isNaN(maxValue) || maxValue < recordValue){
+						 maxValue = recordValue;
+					 }
+				});
+
+				color = maxValue ? this.props.colorRamp.getHexColor(maxValue as any, 0, 100) : null;
+				let valueBoxStyle:React.CSSProperties = {
+					display:"flex",
+					alignItems:"center",
+					justifyContent:"center",
+					background:color,
+					width:"40px",
+					height:"40px",
+					color:"white",
+					margin:"2px",
+					textShadow:"0px 0px 2px black",
+					borderRadius:"4px",
+					border:"1px solid lightgrey"
+				};
+				let statNameUI:JSX.Element = null;
+				if(this.props.recordKeys.length > 1)
+				{
+					let textShadowValue:string = "1px 1px 1px " + color;
+					statNameUI = <div style={ {textAlign:"center",color:"grey",textShadow:textShadowValue} }>Max</div>
+				}
+				recordValueUI =  <div>
+									{statNameUI}
+									<div style={ valueBoxStyle }>
+										{ Weave.lang(String(maxValue)) }
+									</div>
+								</div>;
+			}
+		}
+
+		let recordBarUI:JSX.Element = null;
+		if(this.props.showRecordBar)
+		{
+			recordBarUI = <div style={ {position:"relative",width:"100%", height:"40px"} }>
+								<HBox style={ {position:"absolute",left:0,top:0,width:"100%", height:"100%"} }>
+									<div style={ {background:"grey",flex:"1 0 33.3%"} }></div>
+									<div style={ {background:"darkgrey",flex:"1 0 33.3%"} }></div>
+									<div style={ {background:"lightgrey",flex:"1 0 33.4%"} }></div>
+								</HBox>
+								<div style={ {position:"absolute",left:0,top:16,bottom:16,width:String(maxValue) + "%",background:color} }>
+								</div>
 							</div>;
 		}
 
+		let columnInfoUI:JSX.Element = null;
 		if(this.props.columnMetaDataProperties )
 		{
 			let colMetaDataPropertyNames:string[] = this.props.columnMetaDataProperties as string[];
@@ -263,7 +325,6 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 					paddingBottom:"2px",marginTop:"2px",
 					fontSize:"12px"
 				};
-
 				
 				infoUIs = colMetaDataPropertyNames.map((metaDataPropertyName:string , index:number)=>{
 					let metadata = this.props.column.getMetadata(metaDataPropertyName);
@@ -282,17 +343,16 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 					}
 					else
 						return null;
-
 				});
-
-				
-				
-
 			}
-			
 
 			columnInfoUI = <VBox style={ {flex:"1 0"} } >{infoUIs}</VBox>
 		}
+
+		let containerStyle:React.CSSProperties = _.merge({},this.props.style,{
+			flex:"1",
+			padding:"4px"
+		});
 
 		let layoutUI:JSX.Element = null;
 		if(this.props.layout == "vertical")
@@ -301,7 +361,7 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 							{columnTitleUI}
 							{columnInfoUI}
 							{recordValueUI}
-						</HBox>
+						</HBox>;
 		}
 		else
 		{
@@ -309,23 +369,13 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 							{columnInfoUI}
 							{recordValueUI}
 						</HBox>
+
+
 		}
 
-		let recordBarUI:JSX.Element = null;
-		if(this.props.showRecordBar)
-		{
-			recordBarUI = <div style={ {position:"relative",width:"100%", height:"40px"} }>
-				<HBox style={ {position:"absolute",left:0,top:0,width:"100%", height:"100%"} }>
-					<div style={ {background:"grey",flex:"1 0 33.3%"} }></div>
-					<div style={ {background:"darkgrey",flex:"1 0 33.3%"} }></div>
-					<div style={ {background:"lightgrey",flex:"1 0 33.4%"} }></div>
-				</HBox>
-				<div style={ {position:"absolute",left:0,top:16,bottom:16,width:String(recordValue) + "%",background:color} }>
-				</div>
-			</div>;
-		}
 
-		return  <VBox  style={ {flex:"1",border:"1px solid lightgrey",borderRadius:"4px",padding:"4px" } }>
+
+		return  <VBox  style={ containerStyle }>
 					{this.props.layout == "horizontal" ? columnTitleUI : null}
 					{layoutUI}
 					{recordBarUI}
