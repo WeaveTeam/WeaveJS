@@ -124,6 +124,8 @@ export interface IFixedDataTableProps<RowDatum> extends React.Props<FixedDataTab
 	sortDirection?: SortDirection;
 	colorRamp?:ColorRamp;
 	enableHeatMap?:boolean
+	tableMin?:number
+	tableMax?:number
 
 	/**
 	 *	a callback function that will be called if you want to sort the data
@@ -522,9 +524,11 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		// numbers may come as string value
 		if(this.props.enableHeatMap && Number(value) != NaN)
 		{
+			let min = ! isNaN(this.props.tableMin) ? this.props.tableMin : 0
+			let max = ! isNaN(this.props.tableMax) ? this.props.tableMax : 100
 			// todo : automate min max value form all columns
 			// give editor config for user to set that manually too (as 0 to 1 or 1 to 100 are usually expected for heatmap)
-			cellStyle["background"] =  this.props.colorRamp.getHexColor(value as any, 0, 100)
+			cellStyle["background"] =  this.props.colorRamp.getHexColor(value as any,min, max)
 		}
 
 		let cellValue:number | string = typeof value == 'number' ? value as number : value as string;

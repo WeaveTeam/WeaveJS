@@ -12,6 +12,8 @@ import PrintUtils from "../utils/PrintUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import Checkbox from "../semantic-ui/Checkbox";
+import Accordion from "../semantic-ui/Accordion";
+import {HBox, VBox} from "../react-ui/FlexBox";
 import ColorRampEditor from "../editors/ColorRampEditor";
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
@@ -32,6 +34,8 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
 import EventCallbackCollection = weavejs.core.EventCallbackCollection;
 import ColorRamp = weavejs.util.ColorRamp;
+import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+import ColumnStatistics = weavejs.data.ColumnStatistics;
 
 export interface IDataTableState extends IVisToolState
 {
@@ -56,13 +60,19 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	attributeColumnTable: AttributeColumnTable;
 
 	columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+	statsColumns = {};
+
 	heatMapColors = Weave.linkableChild(this, new ColorRamp(["0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"]));
 	enableHeatMap = Weave.linkableChild(this, new LinkableBoolean(false));
+	overrideMinMax = Weave.linkableChild(this, new LinkableBoolean(false));
+	tableMinValue = Weave.linkableChild(this,  LinkableNumber);
+	tableMaxValue = Weave.linkableChild(this,  LinkableNumber);
 
 	sortFieldIndex = Weave.linkableChild(this, new LinkableNumber(0));
 	columnWidth = Weave.linkableChild(this, new LinkableNumber(85));
 	rowHeight = Weave.linkableChild(this, new LinkableNumber(30));
 	headerHeight = Weave.linkableChild(this, new LinkableNumber(30));
+
 	sortInDescendingOrder = Weave.linkableChild(this, new LinkableBoolean(false));
 
 	panelTitle = Weave.linkableChild(this, new LinkableString);
@@ -87,7 +97,9 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
+		this.overrideMinMax.addImmediateCallback(this, this.updateColumnChildListCallbacks, true);
 		this.columns.addGroupedCallback(this, this.dataChanged, true);
+
 		this.sortFieldIndex.addGroupedCallback(this, this.dataChanged, true);
 		this.sortInDescendingOrder.addGroupedCallback(this, this.dataChanged, true);
 		this.filteredKeySet.addGroupedCallback(this, this.dataChanged, true);
@@ -98,6 +110,60 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			height:0
 		};
 	}
+
+	updateColumnChildListCallbacks=()=>
+	{
+		if(this.overrideMinMax.state)
+		{
+			this.columns.childListCallbacks.removeCallback(this, this.getRespectiveStatsColumn);
+		}
+		else
+		{
+			this.tableMinValue.value = NaN;
+			this.tableMaxValue.value = NaN;
+			this.columns.childListCallbacks.addImmediateCallback(this, this.getRespectiveStatsColumn,true);
+		}
+	};
+
+	getMinMax=()=>
+	{
+		var keys = Object.keys(this.statsColumns);
+		keys.map( (statsColName:string) => {
+			let statsCol = (this.statsColumns as any)[statsColName] as IColumnStatistics;
+			if(isNaN(this.tableMinValue.value) || this.tableMinValue.value > statsCol.getMin())
+			{
+				this.tableMinValue.value = statsCol.getMin();
+			}
+			if( isNaN(this.tableMaxValue.value) || this.tableMaxValue.value < statsCol.getMax())
+			{
+				this.tableMaxValue.value = statsCol.getMax();
+			}
+
+		});
+
+	};
+
+	getRespectiveStatsColumn=()=>
+	{
+		let addedColName:string = this.columns.childListCallbacks.lastNameAdded;
+		let removedColName:string = this.columns.childListCallbacks.lastNameRemoved;
+
+		if(addedColName){
+			let colStats:IColumnStatistics = Weave.privateLinkableChild(this,weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.columns.childListCallbacks.lastObjectAdded as IAttributeColumn)) as any;
+			(this.statsColumns as any)[addedColName] = colStats;
+			Weave.getCallbacks(colStats).addGroupedCallback(this, this.getMinMax);
+		}
+		else if(removedColName)
+		{
+			let colStats:IColumnStatistics =(this.statsColumns as any)[removedColName] as IColumnStatistics
+			Weave.getCallbacks(colStats).removeCallback(this, this.getMinMax);
+			delete (this.statsColumns as any)[removedColName];
+		}
+		else // happens when called from changing overrideMinMax value
+		{
+			this.getMinMax();
+		}
+	};
 
 	get deprecatedStateMapping()
 	{
@@ -223,37 +289,42 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			.forEach((item, i) => ColumnUtils.initSelectableAttribute(this.columns, item, i == 0));
 	}
 
-	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
+	getSelectableAttributesEditor(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void = null):React.ReactChild[][]
+	{
+		return renderSelectableAttributes(this.selectableAttributes, pushCrumb);
+	}
+
+	getDisplayEditor(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void):React.ReactChild[][]
+	{
+		return [
+					[Weave.lang("Show Key Column"),<Checkbox label={" "} onChange={this.handleShowKeyColumn} value={this.keyColumnShown}/>],
+					[Weave.lang("Show Heat Map"),<Checkbox label={" "} ref={linkReactStateRef(this, { value: this.enableHeatMap })}/>],
+					[Weave.lang("Override Min - Max"),<Checkbox label={" "} ref={linkReactStateRef(this, { value: this.overrideMinMax })}/>],
+					[Weave.lang("Table Min - Max"),
+						<HBox padded={true}>
+							<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={linkReactStateRef(this, {value: this.tableMinValue })}/>
+							<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={linkReactStateRef(this, {value: this.tableMaxValue})}/>
+						</HBox>
+					],
+					[Weave.lang("Color theme"),
+						<ColorRampEditor
+							compact={true}
+							colorRamp={this.heatMapColors}
+							pushCrumb={ pushCrumb }
+						/>
+					]
+				];
+	}
+
+
 	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void):JSX.Element =>
 	{
-		return ReactUtils.generateTable({
-			body: renderSelectableAttributes(this.selectableAttributes, pushCrumb)
-				  .concat(this.getTitlesEditor())
-				  .concat([
-					  [
-    					  Weave.lang("Show Key Column"),
-						  <Checkbox label={" "} onChange={this.handleShowKeyColumn} value={this.keyColumnShown}/>
-    				  ],
-					  [
-						  Weave.lang("Show Heat Map"),
-						  <Checkbox label={" "} ref={linkReactStateRef(this, { value: this.enableHeatMap })}/>
-					  ],
-					  [
-						  Weave.lang("Color theme"),
-						  <ColorRampEditor
-							  compact={true}
-							  colorRamp={this.heatMapColors}
-							  pushCrumb={ pushCrumb }
-						  />
-					  ]
-				  ]),
-			classes: {
-				td: [
-					"weave-left-cell",
-					"weave-right-cell"
-				]
-			}
-		});
+		return Accordion.render(
+			[Weave.lang("Data"), this.getSelectableAttributesEditor(pushCrumb)],
+			[Weave.lang("Display"),this.getDisplayEditor(pushCrumb)],
+			[Weave.lang("Titles"), this.getTitlesEditor()]
+		);
+
 	};
 	
 	getTitlesEditor():React.ReactChild[][]
@@ -287,7 +358,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		let column: IAttributeColumn = this.columns.getObject(columnKey) as IAttributeColumn;
 
 		this.events.dispatch({ key, column });
-	}
+	};
 
 	getCellValue = (row:IQualifiedKey, columnKey:string):React.ReactChild =>
 	{
@@ -300,7 +371,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			let column = this.columns.getObject(columnKey) as IAttributeColumn;
 			return column.getValueFromKey(row, String);
 		}
-	}
+	};
 
 	getColumnTitle = (columnKey:string):React.ReactChild =>
 	{
@@ -313,7 +384,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			let column = this.columns.getObject(columnKey) as IAttributeColumn;
 			return column && column.getMetadata(weavejs.api.data.ColumnMetadata.TITLE);
 		}
-	}
+	};
 
 	render()
 	{
@@ -343,6 +414,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				onSortCallback={this.onSort}
 				colorRamp={this.heatMapColors}
 				enableHeatMap={this.enableHeatMap.value}
+				tableMin={this.tableMinValue.value}
+				tableMax={this.tableMaxValue.value}
 				ref={(c: AttributeColumnTable) => { this.attributeColumnTable = c } }
 			/>
 		);
