@@ -15,19 +15,21 @@ namespace weavejs.api.ui
 	{
 	}
 
-	export class IVisTool extends ISelectableAttributes
+	export interface IVisTool extends ISelectableAttributes
 	{
 		title:string;
 		renderEditor:(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void)=>JSX.Element;
 	}
-
-	export function renderSelectableAttributes(selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>, pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void):React.ReactChild[][]
+	export class IVisTool
 	{
-		return weavejs.util.JS.mapEntries(selectableAttributes).map(([key, value]) => {
-				return [
-					Weave.lang(key),
-					<SelectableAttributeComponent attributeName={key} attributes={ selectableAttributes } pushCrumb={ pushCrumb }/>
-				]
-		})
+		static 	renderSelectableAttributes(selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>, pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void):React.ReactChild[][]
+		{
+			return weavejs.util.JS.mapEntries(selectableAttributes).map(([key, value]) => {
+					return [
+						Weave.lang(key),
+						<SelectableAttributeComponent attributeName={key} attributes={ selectableAttributes } pushCrumb={ pushCrumb }/>
+					]
+			})
+		}
 	}
 }

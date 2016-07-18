@@ -30,7 +30,6 @@ namespace weavejs.tool
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisTool = weavejs.api.ui.IVisTool;
-	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
 
 	export class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 	{
@@ -351,7 +350,7 @@ namespace weavejs.tool
 			}
 
 			return ReactUtils.generateTable({
-				body: renderSelectableAttributes(this.props.selectableAttributes, this.props.pushCrumb).concat(editorConfigs),
+				body: IVisTool.renderSelectableAttributes(this.props.selectableAttributes, this.props.pushCrumb).concat(editorConfigs),
 				classes: {
 					td: [
 						"weave-left-cell",

@@ -31,7 +31,6 @@ namespace weavejs.tool
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisTool = weavejs.api.ui.IVisTool;
-	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
 	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 	import DataTable = weavejs.ui.DataTable;
@@ -225,7 +224,7 @@ namespace weavejs.tool
 		renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void):JSX.Element =>
 		{
 			return ReactUtils.generateTable({
-				body: renderSelectableAttributes(this.selectableAttributes, pushCrumb)
+				body: IVisTool.renderSelectableAttributes(this.selectableAttributes, pushCrumb)
 					  .concat(this.getTitlesEditor())
 					  .concat([
 						  [

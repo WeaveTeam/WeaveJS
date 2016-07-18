@@ -32,7 +32,6 @@ namespace weavejs.tool
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisTool = weavejs.api.ui.IVisTool;
-	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
 
 	export class Margin
 	{
@@ -227,7 +226,7 @@ namespace weavejs.tool
 		
 		getSelectableAttributesEditor(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void = null):React.ReactChild[][]
 		{
-			return renderSelectableAttributes(this.selectableAttributes, pushCrumb);
+			return IVisTool.renderSelectableAttributes(this.selectableAttributes, pushCrumb);
 		}
 		
 		renderNumberEditor(linkableNumber:LinkableNumber, flex:number):JSX.Element

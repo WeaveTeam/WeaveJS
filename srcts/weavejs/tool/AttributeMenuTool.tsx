@@ -28,7 +28,6 @@ namespace weavejs.tool
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisTool = weavejs.api.ui.IVisTool;
-	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
 
 	const LAYOUT_LIST:string = "List";
 	const LAYOUT_COMBO:string = "ComboBox";
@@ -310,7 +309,7 @@ namespace weavejs.tool
 						ReactUtils.generateTable({
 								body: [].concat(
 									this.toolConfigs,
-									renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.pushCrumb),
+									IVisTool.renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.pushCrumb),
 									this.renderTitleEditor()
 								),
 								classes: {

@@ -44,7 +44,6 @@ namespace weavejs.tool
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisTool = weavejs.api.ui.IVisTool;
-	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
 
 	export declare type Record = {
 		id: IQualifiedKey,
@@ -265,7 +264,7 @@ namespace weavejs.tool
 			let columns = this.columns.getObjects(IAttributeColumn);
 
 			return Accordion.render(
-				[Weave.lang("Data"), renderSelectableAttributes(this.selectableAttributes, pushCrumb)],
+				[Weave.lang("Data"), IVisTool.renderSelectableAttributes(this.selectableAttributes, pushCrumb)],
 				[
 					Weave.lang("Display"),
 					[

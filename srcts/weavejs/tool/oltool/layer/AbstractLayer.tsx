@@ -21,14 +21,14 @@ namespace weavejs.tool.oltool.layer
 	import IFilteredKeySet = weavejs.api.data.IFilteredKeySet;
 	import WeaveAPI = weavejs.WeaveAPI;
 	import Projections = weavejs.tool.oltool.Projections;
+	import IVisTool = weavejs.api.ui.IVisTool;
 
 	export type EditableField = [
 		LinkableBoolean|LinkableString|LinkableNumber,
 		(string | {label: string, value: any })[]
 	] | LinkableVariable | IFilteredKeySet;
 
-	import Bounds2D = weavejs.geom.Bounds2D;
-	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
+	import Bounds2D = weavejs.geom.Bounds2D;	
 	import IOpenLayersMapTool = weavejs.tool.oltool.IOpenLayersMapTool;
 
 	export class AbstractLayer implements ILinkableObject
@@ -139,7 +139,7 @@ namespace weavejs.tool.oltool.layer
 
 			return ReactUtils.generateTable({
 				body: [].concat(
-					renderSelectableAttributes(this.selectableAttributes, pushCrumb),
+					IVisTool.renderSelectableAttributes(this.selectableAttributes, pushCrumb),
 					this.renderEditableFields()
 				),
 				classes: {

@@ -144,7 +144,9 @@ namespace weavejs.tool.oltool
 								menu={layerTypes.map((layerClass) => ({
 									label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
 									click: () => {
+										let oldNames = this.props.layers.getNames();
 										let newLayer = this.props.layers.requestObject('', layerClass);
+										this.props.layers.setNameOrder(oldNames);
 										this.setState({selectedLayer: newLayer});
 										this.onEditLayerClick(newLayer);
 									}
