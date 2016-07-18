@@ -6,7 +6,7 @@ addons:
         packages:
             - sshpass
 node_js:
-  - 0.12
+  - "6"
 branches:
   only:
     - travisdevelop
