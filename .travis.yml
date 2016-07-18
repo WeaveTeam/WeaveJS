@@ -11,8 +11,12 @@ branches:
   only:
     - travisdevelop
 before_install:
+  - wget $TRAVIS_FLEX
+  - mkdir flexJS
+  - tar -xvf flexjstrav.tgz -C flexJS/
+  - mkdir lib
   - yes | npm install
-install: npm run compile-libs && npm run compile
+install: FLEXJS_HOME="flexJS/" npm run compile-libs && npm run compile
 after_success:
   - cd dist/ && tar -zcvf ../$TRAVIS_BRANCH.tgz * && cd ..
   - chmod a+x printDir.sh
