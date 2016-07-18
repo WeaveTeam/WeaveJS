@@ -1,0 +1,25 @@
+notifications:
+  email: false
+language: node_js
+addons:
+    apt:
+        packages:
+            - sshpass
+node_js:
+  - "6"
+before_install:
+  - wget $TRAVIS_FLEX
+  - mkdir flexJS
+  - sudo tar -xvf flexjstrav.tgz -C flexJS/
+  - mkdir lib
+  - mkdir dist
+  - yes | npm install
+  - pushd node_modules/flexjs/js/bin/
+  - chmod a+x *
+  - popd
+install: FLEXJS_HOME="flexJS/" npm run compile-libs && npm run compile
+after_success:
+  - cd dist/ && tar -zcvf ../$TRAVIS_BRANCH.tgz * && cd ..
+  - export SSHPASS=$DEPLOY_PASS
+  - sshpass -e scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $TRAVIS_BRANCH.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
+  - sshpass -e ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "sudo $DEPLOY_PATH/deploy.sh $TRAVIS_BRANCH"

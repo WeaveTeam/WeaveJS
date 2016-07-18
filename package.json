@@ -4,7 +4,7 @@
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
   "main": "lib/weavejs.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\"",
     "clean": "npm run clean:outts; npm run clean:lib; npm run clean:dist",
     "clean:outts": "rimraf outts/",
     "clean:lib": "rimraf lib/*.js",
