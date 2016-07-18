@@ -7,9 +7,6 @@ addons:
             - sshpass
 node_js:
   - "6"
-branches:
-  only:
-    - travisdevelop
 before_install:
   - wget $TRAVIS_FLEX
   - mkdir flexJS
