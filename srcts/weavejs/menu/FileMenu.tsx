@@ -240,12 +240,13 @@ namespace weavejs.menu
 					.then(
 						(result) => {
 							// this check attempts to invalidate old requests
-							if (this.fileName == this.fileName)
+							if (fileName == this.fileName)
 								this.loadArchive(result);
 							//WeaveProperties.notify(this.owner.weave, 'success', Weave.lang("File Opened Successfully"));
 						},
 						(result) => {
-							WeaveProperties.notify(this.owner.weave, 'error', Weave.lang("Failed to open file"));
+							if (fileName == this.fileName)
+								WeaveProperties.notify(this.owner.weave, 'error', Weave.lang('Failed to open file "{0}"', fileName));
 						}
 					);
 			}
