@@ -952,9 +952,7 @@ namespace weavejs.tool.oltool
 					[
 						[
 							Weave.lang("Control location"),
-							<HBox>
-								<ComboBox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.tool.controlLocation }) } options={controlLocationOpts}/>
-							</HBox>
+							<ComboBox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.tool.controlLocation }) } options={controlLocationOpts}/>
 						],
 						[
 							Weave.lang("Show zoom to extent button"),
