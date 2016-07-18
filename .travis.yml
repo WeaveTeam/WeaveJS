@@ -18,6 +18,7 @@ before_install:
   - mkdir dist
   - yes | npm install
   - pushd node_modules/flexjs/js/bin/
+  - chmod a+x *
   - ls -l
   - popd
 install: FLEXJS_HOME="flexJS/" npm run compile-libs && npm run compile
