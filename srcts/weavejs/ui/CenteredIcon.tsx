@@ -26,6 +26,7 @@ namespace weavejs.ui
 					{
 						this.props.children || (
 							<i
+								aria-hidden={true}
 								{...this.props.iconProps}
 							/>
 						)
