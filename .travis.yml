@@ -16,7 +16,6 @@ before_install:
   - sudo tar -xvf flexjstrav.tgz -C flexJS/
   - mkdir lib
   - mkdir dist
-  - cd flexJS/
   - yes | npm install
   - pushd node_modules/flexjs/js/bin/
   - ls -l
