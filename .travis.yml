@@ -15,6 +15,7 @@ before_install:
   - mkdir flexJS
   - tar -xvf flexjstrav.tgz -C flexJS/
   - mkdir lib
+  - mkdir dist
   - yes | npm install
 install: FLEXJS_HOME="flexJS/" npm run compile-libs && npm run compile
 after_success:
