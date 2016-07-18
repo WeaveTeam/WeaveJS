@@ -146,12 +146,12 @@ namespace weavejs.editor
 			return (
 				<HBox style={{flex: 1, alignItems: "center", alignSelf: "stretch"}}>
 
-					<CenteredIcon title={Weave.lang('Undo')}
+					<CenteredIcon aria-label={Weave.lang('Undo')}
 								  onClick={() => this._stateLog.undo()}
 								  className={classNames("weave-icon", 'weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}
 								  iconProps={{className: "fa fa-arrow-left"}}/>
 
-					<CenteredIcon title={Weave.lang('Redo')}
+					<CenteredIcon aria-label={Weave.lang('Redo')}
 								  onClick={() => this._stateLog.redo()}
 								  className={classNames("weave-icon", 'weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}
 								  iconProps={{className:"fa fa-arrow-right"}}/>
