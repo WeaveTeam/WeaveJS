@@ -146,7 +146,13 @@ namespace weavejs.tool.oltool
 									click: () => {
 										let oldNames = this.props.layers.getNames();
 										let newLayer = this.props.layers.requestObject('', layerClass);
-										this.props.layers.setNameOrder(oldNames);
+
+										/* Place tile layers at the bottom by default. */
+										if (layerClass === TileLayer)
+										{
+											this.props.layers.setNameOrder(oldNames);
+										}
+
 										this.setState({selectedLayer: newLayer});
 										this.onEditLayerClick(newLayer);
 									}
