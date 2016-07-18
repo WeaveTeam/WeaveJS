@@ -382,6 +382,9 @@ namespace weavejs.layout
 			var srcId = PanelDragEvent.getPanelId(event);
 			var destId = this.dragOverId;
 
+			/* If this drop is indeed from a paneldrag, prevent default behavior. */
+			if (srcId && sourceLayout) event.preventDefault();
+
 			this.handlePanelDrop(sourceLayout, srcId, destId, this.dropZone);
 			
 			// cleanup

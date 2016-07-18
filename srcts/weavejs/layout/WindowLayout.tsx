@@ -191,6 +191,9 @@ namespace weavejs.layout
 			var panelDragged = PanelDragEvent.getPanelId(event);
 			var sourceLayout= PanelDragEvent.getLayout(event, Weave.getWeave(this));
 
+			/* If this drop is indeed from a paneldrag, prevent default behavior. */
+			if (panelDragged && sourceLayout) event.preventDefault();
+
 			// remove the panel from the other layout;
 			// add it to this layout;
 			if (sourceLayout && sourceLayout != this)
