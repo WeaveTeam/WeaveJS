@@ -1,6 +1,7 @@
 notifications:
   email: false
 language: node_js
+sudo: required
 addons:
     apt:
         packages:
@@ -13,7 +14,7 @@ branches:
 before_install:
   - wget $TRAVIS_FLEX
   - mkdir flexJS
-  - tar -xvf flexjstrav.tgz -C flexJS/
+  - sudo tar -xvf flexjstrav.tgz -C flexJS/
   - mkdir lib
   - mkdir dist
   - yes | npm install
