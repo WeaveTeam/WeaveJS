@@ -26,5 +26,4 @@ after_success:
   - cd dist/ && tar -zcvf ../$TRAVIS_BRANCH.tgz * && cd ..
   - export SSHPASS=$DEPLOY_PASS
   - sshpass -e scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $TRAVIS_BRANCH.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
-  - sleep 30
   - sshpass -e ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "sudo $DEPLOY_PATH/deploy.sh $TRAVIS_BRANCH"
