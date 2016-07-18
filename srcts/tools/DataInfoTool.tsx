@@ -282,7 +282,12 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 				if(this.props.recordKeys.length > 1)
 				{
 					let textShadowValue:string = "1px 1px 1px " + color;
-					statNameUI = <div style={ {textAlign:"center",color:"grey",textShadow:textShadowValue} }>Max</div>
+					let statsName:string = "Max";
+					if(weavejs.WeaveAPI.Locale.reverseLayout)
+					{
+						statsName = Weave.lang(statsName);
+					}
+					statNameUI = <div style={ {textAlign:"center",color:"grey",textShadow:textShadowValue} }>{statsName}</div>
 				}
 				recordValueUI =  <div>
 									{statNameUI}
