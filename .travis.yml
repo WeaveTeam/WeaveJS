@@ -24,11 +24,6 @@ before_install:
 install: FLEXJS_HOME="flexJS/" npm run compile-libs && npm run compile
 after_success:
   - cd dist/ && tar -zcvf ../$TRAVIS_BRANCH.tgz * && cd ..
-  - chmod a+x printDir.sh
-  - ./printDir.sh
-  - cd dist/
-  - .././printDir.sh
-  - cd ..
   - export SSHPASS=$DEPLOY_PASS
   - sshpass -e scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $TRAVIS_BRANCH.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
   - sshpass -e ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "sudo $DEPLOY_PATH/deploy.sh $TRAVIS_BRANCH"
