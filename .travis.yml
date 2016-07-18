@@ -1,7 +1,6 @@
 notifications:
   email: false
 language: node_js
-sudo: required
 addons:
     apt:
         packages:
@@ -17,6 +16,8 @@ before_install:
   - sudo tar -xvf flexjstrav.tgz -C flexJS/
   - mkdir lib
   - mkdir dist
+  - cd flexJS/
+  - ls -l
   - yes | npm install
 install: FLEXJS_HOME="flexJS/" npm run compile-libs && npm run compile
 after_success:
