@@ -3,7 +3,7 @@ notifications:
   slack:
     rooms:
       secure: XZXu/nKH0fgld3Nnf2KIXHMzXUUDZpo+lsmyf0KI7cIkxBuy21yQuZvYa2bBW/34K2Z7lxck+l1wl8+jiAXkxhkM16M+ZJMgmBG5+3v7vCRAVhA9KF8m51Mm2loEvtfnNU4Uyr/sy3dOlIZcdu/0jNF9rD0AlGuA5SxjumOVLhB3fDiIrZfwe/9baG03H2YyIZWlh+tNlHWo2sjYRcblGcIjwl7nILAqh/0oWGmK7ao9TTJhQxVJmkNYWyocnUFp4hdKlNnYahK2zKwT4OAZ157gRMRia+lPdBndAYW0o57DPqPcp5+CDJfl+3zlbII9RVkyIqZC/pszT+f6LcaQzXIkjVmZ52Cv3lZVlRx3QVzyhH5qv0TIMsC7p+s89idLdoSX6nOmF0rie99bWCtRzzX0q7Acv/3joqFpyfMNzdpUWEPRB43vBo0yz2NM011vwZRdAlcErKBUy4oMqPsbgRu+hU80NHE4sX7Y2+iBk6CICT5vdV+xgklFeLeEiLCk1ixlQ51rFGomocNFIJJBNUsqLM4BY52SMxuJtrFQEo/lvHD23OKrJ2nx+bLYHbT3JjMyqPgfcD0wj60Y3iDK/xCS1UivYGF63lVM2pLempKZWNln/9kP77srXeRQUTGsXfE6c1Fc+EczT9m2H4nUgoPwtOJyLGW2TKIPA2S0ex4=
-    on_success: never
+    on_success: always
     on_failure: always
 language: node_js
 addons:
