@@ -5,7 +5,7 @@
   "main": "lib/weavejs.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "clean": "npm run clean:outts; npm run clean:lib; npm run clean:dist",
+    "clean": "npm run clean:outts && npm run clean:lib && npm run clean:dist",
     "clean:outts": "rimraf outts/",
     "clean:lib": "rimraf lib/*.js",
     "clean:dist": "rimraf dist/*.js dist/*.css dist/*.html",
