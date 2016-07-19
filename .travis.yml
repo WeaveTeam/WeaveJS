@@ -2,7 +2,7 @@ notifications:
   email: false
   slack: iweave:kosIpZZFQyRKqyCYoXT3gYit
     on_success: never
-	on_failure: always
+    on_failure: always
 language: node_js
 addons:
     apt:
