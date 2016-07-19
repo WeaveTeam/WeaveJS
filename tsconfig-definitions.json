@@ -5,7 +5,8 @@
     "module": "system",
     "target": "es6",
     "outFile": "lib-typings/weavejs.jsx",
-    "declaration": true
+    "declaration": true,
+	"newLine": "lf"
   },
   "exclude":[
     "node_modules", "outts", "lib-typings", "WeaveASJS"

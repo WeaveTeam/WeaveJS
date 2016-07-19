@@ -12,7 +12,8 @@
 	"forceConsistentCasingInFileNames": true,
 	"listFiles": false,
 	"noImplicitReturns": false,
-	"pretty": false
+	"pretty": false,
+	"newLine": "lf"
   },
   "files": [
   	"srcts/_lib-references.ts",
