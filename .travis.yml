@@ -1,6 +1,6 @@
 notifications:
   email: false
-  slack: $SLACK_CHANNEL:$SLACK_KEY
+  slack: iweave:kosIpZZFQyRKqyCYoXT3gYit
 language: node_js
 addons:
     apt:
