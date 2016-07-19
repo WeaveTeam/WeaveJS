@@ -12,6 +12,7 @@ before_install:
   - wget $TRAVIS_FLEX
   - mkdir flexJS
   - sudo tar -xvf flexjstrav.tgz -C flexJS/
+  - mkdir lib
   - mkdir dist
   - yes | npm install
   - pushd node_modules/flexjs/js/bin/
