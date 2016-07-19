@@ -3,7 +3,7 @@ notifications:
   slack:
     rooms:
       - iweave:kosIpZZFQyRKqyCYoXT3gYit
-    on_success: never
+    on_success: always
     on_failure: always
 language: node_js
 addons:
