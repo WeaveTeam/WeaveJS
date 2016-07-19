@@ -2,5 +2,7 @@
     "sourceMaps": "inline",
     "presets": ["es2015", "react"],
     "plugins": ["transform-object-rest-spread"],
-    "compact": true
+    "compact": true,
+    "comments": false,
+    "minified": true
 }
