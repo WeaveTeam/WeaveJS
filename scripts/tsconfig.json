@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"outDir": "./outts",
+		"noImplicitAny": true,
+		"removeComments": false,
+		"target": "es6",
+		"module": "amd",
+		"forceConsistentCasingInFileNames": true,
+		"noImplicitReturns": false,
+		"pretty": false
+	},
+	"compileOnSave": true
+}

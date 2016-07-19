@@ -35,7 +35,8 @@ function copy_target(target)
 		{
 			let dest;
 			dest = path.join(target.dest, target.flatten ? path.basename(match) : match);
-			if (argv.v) console.log(path.join(target.cwd, match), dest);
+			if (argv.v)
+				console.log(path.join(target.cwd, match), dest);
 			fse.copySync(path.join(target.cwd, match), dest);
 		})
 	});

@@ -6,7 +6,7 @@ process.stdin.pipe(split()).on('data', processErrorLine).on('end', processReplac
 
 var d_filename_lines_replacements = new Map();
 
-function processErrorLine(line)
+function processErrorLine(line/*:string*/)
 {
 	// srcts/weavejs/plot/LineChartPlotter.ts(118,75): error TS2663: Cannot find name 'plotter'. Did you mean the instance member 'this.plotter'?
 
@@ -16,8 +16,8 @@ function processErrorLine(line)
 	{
 		let [/* skip */, fileName, line, column, original, replacement] = match;
 		
-		line = parseInt(line);
-		column = parseInt(column);
+		let lineNum = parseInt(line);
+		let columnNum = parseInt(column);
 
 		if (!d_filename_lines_replacements.has(fileName))
 		{
@@ -25,16 +25,16 @@ function processErrorLine(line)
 		}
 		let d_line_replacements = d_filename_lines_replacements.get(fileName);
 
-		if (!d_line_replacements.has(line))
+		if (!d_line_replacements.has(lineNum))
 		{
-			d_line_replacements.set(line, [])
+			d_line_replacements.set(lineNum, [])
 		}
-		let replacements = d_line_replacements.get(line);
-		replacements.push({column, original, replacement});
+		let replacements = d_line_replacements.get(lineNum);
+		replacements.push({columnNum, original, replacement});
 	}
 }
 
-function multiReplace(inputString, replacementObjects)
+function multiReplace(inputString/*:string*/, replacementObjects/*:{column:number, original:string, replacement:string}[]*/)
 {
 	lodash.sortBy(replacementObjects, 'column');
 	let offset = 0;
@@ -56,7 +56,7 @@ function processReplacements()
 		let tmpOutStream = new stream.Readable();
 		tmpOutStream._read = lodash.noop;
 
-		fs.createReadStream(fileName).pipe(split()).on('data', (line) => {
+		fs.createReadStream(fileName).pipe(split()).on('data', (line/*:string*/) => {
 			lineNumber++;
 			if (lines.has(lineNumber))
 			{

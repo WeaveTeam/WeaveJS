@@ -1,4 +1,0 @@
-To update/regenerate reference files, from the root dir:
-
-node main-import-tool.js -d typings/ -f srcts/_lib-references.ts -a
-node main-import-tool.js -d srcts/weavejs -f srcts/_references.ts -a

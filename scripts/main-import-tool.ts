@@ -1,47 +1,36 @@
-var debug = false;
+let debug = false;
 
-var parseArgs = require('minimist');
-var fs = require('fs');
-var path = require('path').posix;
-var lodash = require('lodash');
-var tsort = require('tsort');
+let fs = require('fs');
+let minimist = require('minimist');
+let path = require('path').posix;
+let lodash = require('lodash');
+let tsort = require('tsort');
 
 /**
-* main-import-tool
-* -f: Filename for main import file.
-* -d: Base source directory.
-* -x: A comma-separated list of paths to exclude from the output.
-* --ext: A comma-separated list of extensions to include in the output. Default: .tsx,.ts
-* (Default behavior): Print error and return non-zero if not all files are referenced.
-*/
+ * main-import-tool
+ * -f: Filename for main import file.
+ * -d: Base source directory.
+ * -x: A comma-separated list of paths to exclude from the output.
+ * --ext: A comma-separated list of extensions to include in the output. Default: .tsx,.ts
+ */
 
 /* Cribbed from https://gist.github.com/kethinov/6658166 */
-function walkSync(dir, excluded, extensions, filelist)
+function walkSync(dir:string, excluded:string[], extensions:string[], filelist:string[])
 {
-	var files = fs.readdirSync(dir);
-	files.forEach(function(file) {
+	var files = fs.readdirSync(dir) as string[];
+	files.forEach(file => {
 		var fullPath = path.join(dir, file);
 		if (lodash.includes(excluded, fullPath))
-		{
 			return;
-		}
 		if (fs.statSync(fullPath).isDirectory())
-		{
 			walkSync(fullPath, excluded, extensions, filelist);
-		}
-		else
-		{
-			var extension = path.extname(file);
-			if (lodash.includes(extensions, extension))
-			{
-				filelist.push(fullPath);	
-			}
-		}
+		else if (lodash.includes(extensions, path.extname(file)))
+			filelist.push(fullPath);
 	});
 	return filelist;
 }
 
-var args = parseArgs(process.argv, {string: ["d", "f", "x", "ext"]});
+var args = minimist(process.argv, {string: ["d", "f", "x", "ext"]});
 var sourceDir = args.d;
 var importFileName = args.f;
 var excludedFiles = args.x ? args.x.split(",") : [];
@@ -57,16 +46,15 @@ if (!sourceDir || !fs.statSync(sourceDir).isDirectory())
 
 if (!importFileName)
 {
-	console.error("A main import file must be specified.");
+	console.error("A main import file must be specified with -f.");
 	process.exit(-1);
 }
 
 var rootPath = path.dirname(importFileName);
 var filePaths = walkSync(sourceDir, excludedFiles, extensions, []);
 var graph = tsort();
-var match;
 
-function fileExists(filePath)
+function fileExists(filePath:string)
 {
 	try
 	{
@@ -79,7 +67,7 @@ function fileExists(filePath)
 	}
 }
 
-function findFileWithExtension(fileNoExt, extensions)
+function findFileWithExtension(fileNoExt:string, extensions:string[])
 {
 	for (var ext of extensions)
 	{
@@ -89,14 +77,19 @@ function findFileWithExtension(fileNoExt, extensions)
 	}
 }
 
-var getOrInit = (map, key, type) => map.has(key) ? map.get(key) : map.set(key, new type()).get(key);
+function getOrInit<K,V>(map:Map<K,V>, key:K, type:new(..._:any[])=>V):V
+{
+	return map.has(key) ? map.get(key) : map.set(key, new type()).get(key);
+}
+
 var map2d_file_dep_chain = new Map();
 
-function initDeps(file)
+function initDeps(file:string)
 {
 	var map_dep_chain = getOrInit(map2d_file_dep_chain, file, Map);
 	var fileContent = fs.readFileSync(file, "utf8");
-	
+	let match:string[];
+
 	// check for import statements
 	// Example: import Baz = foo.bar.Baz;
 	var importPattern = /^\s*import\s+(?:[^\s]+)\s*=\s*([^\s]+);/gm;
@@ -125,19 +118,19 @@ function initDeps(file)
 		{
 			if (debug)
 				console.log(file, 'extends', path.basename(dep));
-			
+
 			map_dep_chain.set(dep, [file, dep]);
 			graph.add(file, dep);
 		}
 	}
 }
 
-function formatDepChain(chain)
+function formatDepChain(chain:string[])
 {
 	return chain.map(filePath => path.basename(filePath)).join(' -> ');
 }
 
-function checkDependency(file, dep, chain)
+function checkDependency(file:string, dep:string, chain:string[] = null):string[]
 {
 	var map_dep_chain = map2d_file_dep_chain.get(file);
 	var hasChain = map_dep_chain.get(dep);
@@ -152,7 +145,7 @@ function checkDependency(file, dep, chain)
 		return null;
 
 	chain.push(file);
-	hasChain = false;
+	hasChain = null;
 	for (let [ref, hasRef] of map_dep_chain)
 	{
 		if (ref == dep || !hasRef)
@@ -172,10 +165,10 @@ function checkDependency(file, dep, chain)
 }
 
 // get direct dependencies
-filePaths.forEach(initDeps);
+filePaths.sort().forEach(initDeps);
 
 // topological sort
-var ordered = graph.sort().reverse();
+var ordered = graph.sort().reverse() as string[];
 filePaths = Array.from(new Set(ordered.concat(filePaths)));
 filePaths = filePaths.slice(ordered.length).concat(ordered);
 
