@@ -1,27 +1,31 @@
 notifications:
   email: false
-  slack: $SLACK_CHANNEL:$SLACK_KEY
-    on_success: always
+  slack:
+    rooms:
+      secure: XZXu/nKH0fgld3Nnf2KIXHMzXUUDZpo+lsmyf0KI7cIkxBuy21yQuZvYa2bBW/34K2Z7lxck+l1wl8+jiAXkxhkM16M+ZJMgmBG5+3v7vCRAVhA9KF8m51Mm2loEvtfnNU4Uyr/sy3dOlIZcdu/0jNF9rD0AlGuA5SxjumOVLhB3fDiIrZfwe/9baG03H2YyIZWlh+tNlHWo2sjYRcblGcIjwl7nILAqh/0oWGmK7ao9TTJhQxVJmkNYWyocnUFp4hdKlNnYahK2zKwT4OAZ157gRMRia+lPdBndAYW0o57DPqPcp5+CDJfl+3zlbII9RVkyIqZC/pszT+f6LcaQzXIkjVmZ52Cv3lZVlRx3QVzyhH5qv0TIMsC7p+s89idLdoSX6nOmF0rie99bWCtRzzX0q7Acv/3joqFpyfMNzdpUWEPRB43vBo0yz2NM011vwZRdAlcErKBUy4oMqPsbgRu+hU80NHE4sX7Y2+iBk6CICT5vdV+xgklFeLeEiLCk1ixlQ51rFGomocNFIJJBNUsqLM4BY52SMxuJtrFQEo/lvHD23OKrJ2nx+bLYHbT3JjMyqPgfcD0wj60Y3iDK/xCS1UivYGF63lVM2pLempKZWNln/9kP77srXeRQUTGsXfE6c1Fc+EczT9m2H4nUgoPwtOJyLGW2TKIPA2S0ex4=
+    on_success: never
     on_failure: always
 language: node_js
 addons:
-    apt:
-        packages:
-            - sshpass
+  apt:
+    packages:
+    - sshpass
 node_js:
-  - "6"
+- '6'
 before_install:
-  - wget $TRAVIS_FLEX
-  - mkdir flexJS
-  - sudo tar -xvf flexjstrav.tgz -C flexJS/
-  - mkdir dist
-  - yes | npm install
-  - pushd node_modules/flexjs/js/bin/
-  - chmod a+x *
-  - popd
+- wget $TRAVIS_FLEX
+- mkdir flexJS
+- sudo tar -xvf flexjstrav.tgz -C flexJS/
+- mkdir dist
+- yes | npm install
+- pushd node_modules/flexjs/js/bin/
+- chmod a+x *
+- popd
 install: FLEXJS_HOME="flexJS/" npm run compile-libs && npm run compile
 after_success:
-  - cd dist/ && tar -zcvf ../$TRAVIS_BRANCH.tgz * && cd ..
-  - export SSHPASS=$DEPLOY_PASS
-  - sshpass -e scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $TRAVIS_BRANCH.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
-  - sshpass -e ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "sudo $DEPLOY_PATH/deploy.sh $TRAVIS_BRANCH"
+- cd dist/ && tar -zcvf ../$TRAVIS_BRANCH.tgz * && cd ..
+- export SSHPASS=$DEPLOY_PASS
+- sshpass -e scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $TRAVIS_BRANCH.tgz
+  $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
+- sshpass -e ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST
+  "sudo $DEPLOY_PATH/deploy.sh $TRAVIS_BRANCH"
