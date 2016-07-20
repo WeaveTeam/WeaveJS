@@ -12,7 +12,7 @@
     "copy": "node scripts/copy",
     "dts": "tsc -p tsconfig-definitions.json",
     "compile": "npm run compile-as && npm run compile-dts && npm run compile-ts && npm run compile-app && npm run copy",
-    "compile-refs": "node scripts/run-ts.js main-import-tool.ts -d srcts/weavejs -f srcts/_references.ts",
+    "compile-refs": "node scripts/run-ts.js main-import-tool.ts -d srcts/weavejs -f srcts/_references.ts && npm run compile-librefs",
     "compile-librefs": "node scripts/run-ts.js main-import-tool.ts -d typings/ -f srcts/_lib-references.ts",
     "compile-libs": "npm run compile-librefs && tsc -p tsconfig-libs.json && babel outts/libs.js --out-file lib/libs.js && browserifyinc --cachefile  browserifycache.json lib/libs.js > dist/libs.js",
     "compile-module": "tsc -p tsconfig-module.json && babel outts/module.js --out-file lib/module.js",
