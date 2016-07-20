@@ -13,15 +13,12 @@ addons:
 node_js:
 - '6'
 before_install:
-- wget $TRAVIS_FLEX
-- mkdir flexJS
-- sudo tar -xvf flexjstrav.tgz -C flexJS/
 - mkdir dist
 - yes | npm install
 - pushd node_modules/flexjs/js/bin/
 - chmod a+x *
 - popd
-install: FLEXJS_HOME="flexJS/" npm run compile-libs && npm run compile
+install: npm run compile-libs && npm run compile
 after_success:
 - cd dist/ && tar -zcvf ../$TRAVIS_BRANCH.tgz * && cd ..
 - export SSHPASS=$DEPLOY_PASS
