@@ -10,8 +10,7 @@ targets = {
 	semantic: {cwd: 'src/semantic', src: '**', dest: 'dist/semantic/'},
 	weavesessions: {flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"},
 	projdb: {flatten: true, cwd: 'src/', src: 'ProjDatabase.zip', dest: "dist/"},
-	core: {cwd: "WeaveASJS/bin/js-release/", src: "*.*", dest: "dist/core"},
-	weave_dts: {cwd: "WeaveASJS/typings/", src: "weavejs-core.d.ts", dest: "typings/weave/"}
+	core: {cwd: "WeaveASJS/bin/js-release/", src: "*.*", dest: "dist/core"}
 };
 
 fse = require("fs-extra");
