@@ -46,7 +46,7 @@ package weavejs.geom
 		 * @param geoJsonGeom A GeoJSON geometry object.
 		 * @return An array of GeneralizedGeometry objects
 		 */
-		public static function fromGeoJson(geoJsonGeom:Object):Array
+		public static function fromGeoJson(geoJsonGeom:Object):Array/*/<GeneralizedGeometry>/*/
 		{
 			var type:String = geoJsonGeom[GeoJSON.P_TYPE];
 			var coords:Array = geoJsonGeom[GeoJSON.G_P_COORDINATES];
@@ -96,8 +96,8 @@ package weavejs.geom
 		{
 			var type:String = GeometryType.toGeoJsonType(geomType, true); // Multi- geoms can represent non-Multi geoms
 			var coords:Array = [];
-			var parts:Array/*Vector.<Vector.<BLGNode>>*/ = getSimplifiedGeometry(minImportance, visibleBounds);
-			var part:Array;//Vector.<BLGNode>
+			var parts:/*/BLGNode[][]/*/Array = getSimplifiedGeometry(minImportance, visibleBounds);
+			var part:/*/BLGNode[]/*/Array;
 			var node:BLGNode;
 
 			if (type == GeoJSON.T_MULTI_POINT)
@@ -157,7 +157,7 @@ package weavejs.geom
 		 * For example, partMarkers[0] is the vertexID that marks the end of part 0 and the start of part 1.
 		 * If there are no part markers, it is assumed that there is only one part.
 		 */
-		private var partMarkers:Array = [];//Vector.<int>
+		private var partMarkers:Array/*/<number>/*/ = [];//Vector.<int>
 		/**
 		 * This maps BLGTree from the parts Array to a Boolean.
 		 * If there are multiple parts in this geometry, only parts that map to values of true will be included in getSimplifiedGeometry() results.
@@ -203,7 +203,7 @@ package weavejs.geom
 		 * @return An Array of ISimpleGeometry objects
 		 * @see weave.api.data.ISimpleGeometry
 		 */
-		public function getSimpleGeometries(minImportance:Number = 0, visibleBounds:Bounds2D = null, output:Array = null):Array
+		public function getSimpleGeometries(minImportance:Number = 0, visibleBounds:Bounds2D = null, output:Array = null):Array/*/<ISimpleGeometry>/*/
 		{
 			var result:Array = output || [];
 			var parts:Array/*Vector.<Vector.<BLGNode>>*/ = getSimplifiedGeometry(minImportance, visibleBounds);
@@ -222,7 +222,7 @@ package weavejs.geom
 		 * @param visibleBounds If not null, this bounds will be used to remove unnecessary offscreen points.
 		 * @return A vector of results from BLGTree.getPointVector(minImportance, visibleBounds) from each part.
 		 */
-		public function getSimplifiedGeometry(minImportance:Number = 0, visibleBounds:Bounds2D = null):Array/*Vector.<Vector.<BLGNode>>*/
+		public function getSimplifiedGeometry(minImportance:Number = 0, visibleBounds:Bounds2D = null):/*/BLGNode[][]/*/Array
 		{
 			// if bounds is completely contained in visibleBounds, don't pass visibleBounds to getPointVector() (faster this way)
 			if (visibleBounds && visibleBounds.containsBounds(bounds))
@@ -252,7 +252,7 @@ package weavejs.geom
 			return _simplifiedParts;
 		}
 		// _simplifiedParts: A place to store results from getSimplifiedGeometry()
-		private var _simplifiedParts:Array/*Vector.<Vector.<BLGNode>>*/ = [];
+		private var _simplifiedParts:/*/BLGNode[][]/*/Array = [];
 
 		/**
 		 * Inserts a new point into the appropriate part of the geometry.
@@ -315,7 +315,7 @@ package weavejs.geom
 		 * @param xyCoordinates An array of Numbers, even index values being x coordinates and odd index values being y coordinates.
 		 *                      To indicate part markers, use a sequence of two NaN values.
 		 */
-		public function setCoordinates(xyCoordinates:Array, method:String = "BLGTreeUtils.METHOD_SAMPLE"):void
+		public function setCoordinates(xyCoordinates:Array/*/<number>/*/, method:String = "BLGTreeUtils.METHOD_SAMPLE"):void
 		{
 			// reset bounds and parts before processing coordinates
 			bounds.reset();
