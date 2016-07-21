@@ -27,9 +27,11 @@ namespace weavejs.app
 			return {};
 		}
 
-		static getProperties(weave:Weave):WeaveProperties
+		static getProperties(context:Weave | ILinkableObject):WeaveProperties
 		{
-			return weave.root.requestObject("WeaveProperties", WeaveProperties, true);
+			if (!(context instanceof Weave))
+				context = Weave.getWeave(context);
+			return (context as Weave).root.requestObject("WeaveProperties", WeaveProperties, true);
 		}
 
 		static notify(weave:Weave, level:"error"|"warning"|"info"|"success", message:string)
