@@ -41,7 +41,7 @@ import * as d3 from "d3";
 (window as any).c3 = c3;
 (window as any).proj4 = (proj4 as any).default;
 (window as any).Slider = (Slider as any).default;
-(window as any).ReactColorPicker = ReactColorPicker;
+(window as any).ReactColorPicker = (ReactColorPicker as any).default; /* Workaround for incorrect typings. */
 (window as any).classNames = (classNames as any).default;
 (window as any).Clipboard = (Clipboard as any).default;
 (window as any).JSZip = (JSZip as any).default;
