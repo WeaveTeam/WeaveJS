@@ -369,6 +369,8 @@ namespace weavejs.app
 			this.tabLayout.activeTabIndex = -1;
 		}
 
+		// this function gets called during menu click event
+		// to create new Session Object like Charts
 		createObject=(type:new(..._:any[])=>any):void=>
 		{
 			var weave = this.props.weave;
