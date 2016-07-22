@@ -45,7 +45,6 @@ namespace weavejs.layout
 		private rootLayout:Layout;
 		private layoutRect:ClientRect;
 		private overlay:PanelOverlay;
-		private maximizedId:WeavePathArray; // requires to make sure, wehen we add new panel if we have un-maximize a panel if any
 		private draggedId:WeavePathArray; // required because we can't read drag data in dragover event
 		private dragOverId:WeavePathArray;
 		private dropZone:DropZone = DropZone.NONE;
@@ -110,19 +109,6 @@ namespace weavejs.layout
 					direction: state.direction == 'horizontal' ? 'horizontal' : 'vertical'
 				};
 			}
-			// if there is a maximized panel,
-			// set the layoutState maximize to false.
-			// id of maximized panel to null
-			if(this.maximizedId)
-			{
-				let maximizedNode:LayoutState = FlexibleLayout.findStateNode(state, this.maximizedId);
-				if (maximizedNode)
-				{
-					maximizedNode.maximized = false;
-					this.maximizedId = null;
-				}
-			}
-
 			this.setSessionState(state);
 		}
 
@@ -151,25 +137,11 @@ namespace weavejs.layout
 
 		maximizePanel(id:WeavePathArray, maximized:boolean):void
 		{
-			// if the ui-event is un-maximize of the maximized panel
-			// set the maximizedId to null
-			if(_.isEqual(this.maximizedId,id))
-			{
-				if(!maximized)
-					this.maximizedId = null;
-
-			}
 			var state = this.getSessionState();
-			let node:LayoutState = FlexibleLayout.findStateNode(state, id);
+			var node = FlexibleLayout.findStateNode(state, id);
 			if (node)
 			{
 				node.maximized = maximized;
-				// if the ui-event is to maximize a panel
-				// store the id of the panel
-				if(maximized)
-				{
-					this.maximizedId = id;
-				}
 				this.setSessionState(state);
 			}
 		}
