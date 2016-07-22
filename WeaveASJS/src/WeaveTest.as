@@ -76,6 +76,7 @@ package
 	import weavejs.data.source.GeoJSONDataSource;
 	import weavejs.data.source.GroupedDataTransform;
 	import weavejs.data.source.WeaveDataSource;
+	import weavejs.data.source.WebSocketDataSource;
 	import weavejs.geom.SolidFillStyle;
 	import weavejs.geom.SolidLineStyle;
 	import weavejs.geom.ZoomBounds;
@@ -145,6 +146,7 @@ package
 			CensusDataSource,
 			DBFDataSource,
 			GroupedDataTransform,
+			WebSocketDataSource,
 			CKANDataSource,
 			KeyColumn,
 			ExternalTool,
