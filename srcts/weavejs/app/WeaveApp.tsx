@@ -404,6 +404,8 @@ namespace weavejs.app
 				}
 
 				LinkablePlaceholder.whenReady(this, weave.getObject(tabLayout.activePanelId), (layout:AnyAbstractLayout) => {
+					for (let id of layout.getPanelIds())
+						layout.maximizePanel(id, false);
 					layout.addPanel(path);
 				});
 
