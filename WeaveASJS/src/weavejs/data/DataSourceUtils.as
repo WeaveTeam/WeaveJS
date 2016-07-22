@@ -88,6 +88,27 @@ package weavejs.data
 		 */
 		public static function initColumn(proxyColumn:ProxyColumn, keys:Array, data:Array):void
 		{
+			var asyncCallback:Function = function ():void
+			{
+				var newColumn:IAttributeColumn;
+				if (dataType == DataType.NUMBER)
+				{
+					newColumn = new NumberColumn(metadata);
+					(newColumn as NumberColumn).setRecords(qkeys, data);
+				}
+				else if (dataType == DataType.DATE)
+				{
+					newColumn = new DateColumn(metadata);
+					(newColumn as DateColumn).setRecords(qkeys, data);
+				}
+				else
+				{
+					newColumn = new StringColumn(metadata);
+					(newColumn as StringColumn).setRecords(qkeys, data);
+				}
+				proxyColumn.setInternalColumn(newColumn);
+			}
+
 			var metadata:Object = proxyColumn.getProxyMetadata();
 			var dataType:String = metadata[ColumnMetadata.DATA_TYPE];
 			if (!dataType && StandardLib.getArrayType(data) === Number)
@@ -111,26 +132,6 @@ package weavejs.data
 				(WeaveAPI.QKeyManager as QKeyManager).getQKeysAsync(proxyColumn, metadata[ColumnMetadata.KEY_TYPE], keys, asyncCallback, qkeys);
 			}
 			
-			function asyncCallback():void
-			{
-				var newColumn:IAttributeColumn;
-				if (dataType == DataType.NUMBER)
-				{
-					newColumn = new NumberColumn(metadata);
-					(newColumn as NumberColumn).setRecords(qkeys, data);
-				}
-				else if (dataType == DataType.DATE)
-				{
-					newColumn = new DateColumn(metadata);
-					(newColumn as DateColumn).setRecords(qkeys, data);
-				}
-				else
-				{
-					newColumn = new StringColumn(metadata);
-					(newColumn as StringColumn).setRecords(qkeys, data);
-				}
-				proxyColumn.setInternalColumn(newColumn);
-			}
 		}
 	}
 }
