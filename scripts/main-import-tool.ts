@@ -50,6 +50,9 @@ module.exports = function()
 
 	function initDeps(file:string)
 	{
+		if (debug)
+			console.log(file);
+
 		var map_dep_chain = getOrInit(map2d_file_dep_chain, file, Map);
 		var fileContent = fs.readFileSync(file, "utf8");
 		let match:string[];
@@ -60,7 +63,14 @@ module.exports = function()
 		while (match = importPattern.exec(fileContent))
 		{
 			let fileNoExt = path.join(rootPath, match[1].replace(/\./g, '/'));
-			let dep = FileUtils.findFileWithExtension(fileNoExt, ['.tsx', '.ts']);
+			let dep:string = null;
+			while (fileNoExt)
+			{
+				dep = FileUtils.findFileWithExtension(fileNoExt, extensions);
+				if (dep)
+					break;
+				fileNoExt = fileNoExt.substr(0, fileNoExt.lastIndexOf('/'));
+			}
 			if (dep)
 			{
 				if (debug)

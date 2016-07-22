@@ -20,8 +20,11 @@ function runTypeScript(tsFilePath, args)
 	var out_mtime = get_mtime(outfile);
 
 	// if outfile missing or infile modified after outfile, recompile
-	if (!out_mtime || in_mtime > out_mtime)
-		run('tsc', ['--project', scriptsFolder]);
+	if (!isFile(outfile) || in_mtime > out_mtime)
+	{
+		var tsc = process.cwd().indexOf('/') < 0 ? 'tsc.cmd' : 'tsc';
+		run(tsc, ['--project', scriptsFolder]).error;
+	}
 
 	// method 1: spawn a new task
 	// run('node', [outfile].concat(process.argv.slice(3)));
@@ -39,9 +42,22 @@ function runTypeScript(tsFilePath, args)
 function findFile(fileNoExt, extensions)
 {
 	for (var ext of extensions)
-		if (isFinite(get_mtime(fileNoExt + ext)))
+		if (isFile(fileNoExt + ext))
 			return fileNoExt + ext;
 	return null;
+}
+
+function isFile(file)
+{
+	try
+	{
+		fs.statSync(file).isFile();
+		return true;
+	}
+	catch (e)
+	{
+		return false;
+	}
 }
 
 function get_mtime(file)
@@ -69,9 +85,6 @@ function run(cmd, args)
 		}
 	);
 	if (result.error)
-	{
-		console.error(result);
 		throw result.error;
-	}
 	return result;
 }

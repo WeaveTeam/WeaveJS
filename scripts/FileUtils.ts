@@ -1,5 +1,6 @@
 {
 	let fs = require('fs');
+	let realpath = require('path');
 	let path = require('path').posix;
 	let lodash = require('lodash');
 
@@ -17,12 +18,12 @@
 			}
 		}
 
-		static fileExists(filePath:string):boolean
+		static isFile(filePath:string):boolean
 		{
 			try
 			{
-				fs.accessSync(filePath);
-				return true;
+				return path.basename(filePath) == realpath.basename(fs.realpathSync(filePath))
+					&& fs.statSync(filePath).isFile();
 			}
 			catch (e)
 			{
@@ -35,7 +36,7 @@
 			for (var ext of extensions)
 			{
 				var refext = fileNoExt + ext;
-				if (FileUtils.fileExists(refext))
+				if (FileUtils.isFile(refext))
 					return refext;
 			}
 		}
