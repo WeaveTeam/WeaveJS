@@ -1,6 +1,8 @@
 namespace weavejs.layout.flexiblelayout
 {
 	import prefixer = weavejs.css.prefixer;
+	import HORIZONTAL = weavejs.layout.flexiblelayout.DirectionTypes.HORIZONTAL;
+	import Direction = weavejs.layout.flexiblelayout.DirectionTypes.Direction;
 
 	const STYLE_BASE = {
 		background: "#e6e6e6",

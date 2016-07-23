@@ -3,10 +3,8 @@ namespace weavejs.layout.flexiblelayout
 	import prefixer = weavejs.css.prefixer;
 	import ReactUtils = weavejs.util.ReactUtils;
 	import MouseUtils = weavejs.util.MouseUtils;
-
-	export const VERTICAL:"vertical" = "vertical";
-	export const HORIZONTAL:"horizontal" = "horizontal";
-	export type Direction = typeof HORIZONTAL | typeof VERTICAL;
+	import Direction = weavejs.layout.flexiblelayout.DirectionTypes.Direction;
+	import HORIZONTAL = weavejs.layout.flexiblelayout.DirectionTypes.HORIZONTAL;
 
 	export interface LayoutState
 	{
@@ -127,7 +125,8 @@ namespace weavejs.layout.flexiblelayout
 		{
 			var element1Index = resizerIndex;
 			var element2Index = resizerIndex + 1;
-			if (this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout){
+			if (this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout)
+			{
 				element1Index = resizerIndex + 1;
 				element2Index = resizerIndex
 			}
@@ -154,7 +153,8 @@ namespace weavejs.layout.flexiblelayout
 
 					var element1Index = index;
 					var element2Index = index + 1;
-					if (this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout){
+					if (this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout)
+					{
 						element1Index = index + 1;
 						element2Index = index
 					}

@@ -3,6 +3,8 @@ namespace weavejs.layout.flexiblelayout
 	import prefixer = weavejs.css.prefixer;
 	import MouseUtils = weavejs.util.MouseUtils;
 	import ReactUtils = weavejs.util.ReactUtils;
+	import Direction = weavejs.layout.flexiblelayout.DirectionTypes.Direction;
+	import HORIZONTAL = weavejs.layout.flexiblelayout.DirectionTypes.HORIZONTAL;
 
 	const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 

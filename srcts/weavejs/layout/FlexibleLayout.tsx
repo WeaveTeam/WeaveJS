@@ -13,8 +13,9 @@ namespace weavejs.layout
 	import WeavePathArray = weavejs.util.WeavePathArray;
 	import Layout = weavejs.layout.flexiblelayout.Layout;
 	import LayoutState = weavejs.layout.flexiblelayout.LayoutState;
-	import VERTICAL = weavejs.layout.flexiblelayout.VERTICAL;
-	import HORIZONTAL = weavejs.layout.flexiblelayout.HORIZONTAL;
+	import HORIZONTAL = weavejs.layout.flexiblelayout.DirectionTypes.HORIZONTAL;
+	import VERTICAL = weavejs.layout.flexiblelayout.DirectionTypes.VERTICAL;
+
 	export enum DropZone {
 		NONE,
 		LEFT,
@@ -106,7 +107,7 @@ namespace weavejs.layout
 				let newFlex = (state.children && state.children.length) ? 1/state.children.length:null;
 				state = {
 					children: [state, {id, flex: newFlex}],
-					direction: state.direction == 'horizontal' ? 'horizontal' : 'vertical'
+					direction: state.direction == HORIZONTAL ? HORIZONTAL : VERTICAL
 				};
 			}
 			this.setSessionState(state);
