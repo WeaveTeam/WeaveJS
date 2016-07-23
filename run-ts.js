@@ -51,8 +51,7 @@ function isFile(file)
 {
 	try
 	{
-		fs.statSync(file).isFile();
-		return true;
+		return fs.statSync(file).isFile();
 	}
 	catch (e)
 	{
