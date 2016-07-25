@@ -18,6 +18,7 @@ package weavejs.data.source
 	import weavejs.WeaveAPI;
 	import weavejs.api.core.ILinkableHashMap;
 	import weavejs.api.core.ILinkableVariable;
+	import weavejs.api.data.IKeySet;
 	import weavejs.api.data.Aggregation;
 	import weavejs.api.data.ColumnMetadata;
 	import weavejs.api.data.DataType;
@@ -37,6 +38,7 @@ package weavejs.data.source
 	import weavejs.data.hierarchy.ColumnTreeNode;
 	import weavejs.data.ColumnUtils;
 	import weavejs.data.DataSourceUtils;
+	import weavejs.data.key.DynamicKeyFilter;
 	import weavejs.util.JS;
 	import weavejs.util.StandardLib;
 
@@ -49,27 +51,44 @@ package weavejs.data.source
 
 		public function WebSocketDataSource()
 		{
+			this.selectionFilter.targetPath = ["defaultSelectionKeySet"];
 		}
 
 		public const keyType:LinkableString = Weave.linkableChild(this, LinkableString);
 		public const keyProperty:LinkableString = Weave.linkableChild(this, LinkableString);
 		public const keepLast:LinkableNumber = Weave.linkableChild(this, LinkableNumber, onKeepLastChange);
+		public const selectionFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter, onSelectionFilterChange);
 		//public const selectionFeedback:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 		public const url:LinkableString = Weave.linkableChild(this, LinkableString, onUrlChange);
 
 
+		private function onSelectionFilterChange():void
+		{
+			if (_socket && _socket.readyState == 1)
+			{
+				var ks:IKeySet = selectionFilter.getInternalKeyFilter() as IKeySet;
+				_socket.send(JSON.stringify(ks.keys.map(function (key:IQualifiedKey, idx:int, a:Array):String {
+					return key.localName;
+				})));
+			}
+		}
+
 		private var _socket:Object = null;
 		private function onUrlChange():void
+		{
+			reconnect();
+
+			records = [];
+			propertyNames.clear();
+		}
+
+		public function reconnect():void /* To be called from UI reconnect button. */
 		{
 			if (_socket && _socket.readyState < 2)
 			{
 				_socket.close(1000, "No longer needed.");
 				_socket = null;
 			}
-
-			records = [];
-			propertyNames.clear();
-
 
 			_socket = new JS.global.WebSocket(url.value);
 
@@ -86,6 +105,7 @@ package weavejs.data.source
 		private function onError(event:Object):void
 		{
 			JS.error(event);
+			/* Should we automatically retry here? */
 			_socket = null;
 		}
 
