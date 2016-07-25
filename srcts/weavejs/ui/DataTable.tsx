@@ -143,7 +143,7 @@ namespace weavejs.ui
 		sortDirection?:SortDirection;
 		width?:number;
 		height?:number;
-		sortIndices?:number[];
+		orderOfRows?:number[]; // this holds the current order of props.rows and based on the each cell is rendered , altered by UI event move selected to top
 		probedIds?:string[];
 		selectedIds?:string[];
 	}
@@ -198,7 +198,7 @@ namespace weavejs.ui
 		constructor(props:IDataTableProps<RowDatum>)
 		{
 			super(props);
-			var sortIndices:number[] = this.props.rows.map((row, index) => index);
+			var orderOfRows:number[] = this.props.rows.map((row, index) => index);
 			var headerIndices:number[] = [];
 
 			if (props.selectedIds && props.probedIds)
@@ -206,7 +206,7 @@ namespace weavejs.ui
 
 			this.state = {
 				columnWidths: {},
-				sortIndices,
+				orderOfRows,
 				selectedIds: props.selectedIds || [],
 				probedIds: props.probedIds || [],
 				sortId: props.sortId,
@@ -216,6 +216,34 @@ namespace weavejs.ui
 			};
 
 			this.setIdPropertyGetter(props);
+		}
+
+		componentWillReceiveProps(nextProps:IDataTableProps<RowDatum>)
+		{
+			var newState:IDataTableState = {};
+
+			this.setIdPropertyGetter(nextProps);
+
+			// update sort indices if there is change in row size or sort direction
+			if (nextProps.rows.length !== this.state.orderOfRows.length || this.props.sortDirection !== nextProps.sortDirection)
+				newState.orderOfRows = nextProps.rows.map((row, index) => index);
+
+			if (nextProps.probedIds)
+				newState.probedIds = nextProps.probedIds.concat([]);
+
+			if (nextProps.selectedIds)
+				newState.selectedIds = nextProps.selectedIds.concat([]);
+
+			if (nextProps.sortId)
+			{
+				newState.sortId = nextProps.sortId;
+			}
+
+			if (this.props.sortDirection !== nextProps.sortDirection )
+			{
+				newState.sortDirection = nextProps.sortDirection;
+			}
+			this.setState(newState);
 		}
 
 		setIdPropertyGetter(props:IDataTableProps<RowDatum>)
@@ -236,21 +264,34 @@ namespace weavejs.ui
 
 		moveSelectedToTop():void
 		{
-			//get sort index of selected records
-			var sortIndices:number[] = this.state.sortIndices;
-			var selectedIndices:number[] = this.state.selectedIds.map( (id:string,index:number) => {
-				let foundIndex:number = _.indexOf(this.props.rows.map(this.idPropertyGetter), id);
-				return sortIndices.indexOf(foundIndex);
-			});
-			//splice found indices to front of sort list
-			selectedIndices.forEach( (value) => {
-				var element = sortIndices[value];
-				sortIndices.splice(value, 1);
-				sortIndices.splice(0, 0, element);
+			//get ids of each row
+			var rowIds = this.props.rows.map(this.idPropertyGetter);
+			//get current order of rows
+			var orderOfRows:number[] = this.state.orderOfRows;
+
+			let selectedRowIdsIndices:number[] = []; // collection of row index for respective selectedIds
+			this.state.selectedIds.map( (id:string,index:number) =>
+			{
+				let idIndex:number = _.indexOf(rowIds, id); // get id's index of a row from props.rows
+				selectedRowIdsIndices.push(idIndex); // store them as they have to come in the top
+				// alter the row order now
+				let rowIndex:number = orderOfRows.indexOf(idIndex);
+				orderOfRows.splice(rowIndex, 1,NaN); // replace with NaN, till we extract all the row index inside this loop
 			});
 
+			// now remove all the NaN from row order
+			orderOfRows = orderOfRows.filter((id:number)=>
+			{
+				if(isNaN(id))
+				{
+					return false;
+				}
+				return true;
+			});
+
+			// concat the selected row index with filtered row order
 			this.setState({
-				sortIndices
+				orderOfRows :selectedRowIdsIndices.concat(orderOfRows)
 			});
 
 			if (this.props.onSelection)
@@ -265,13 +306,13 @@ namespace weavejs.ui
 			{
 				return this.getId(index);
 			}
-			var row = this.props.rows[this.state.sortIndices[index]];
+			var row = this.props.rows[this.state.orderOfRows[index]];
 			return row && this.props.getCellValue(row, columnKey);
 		}
 
 		getId(index:number):string
 		{
-			var row = this.props.rows[this.state.sortIndices[index]];
+			var row = this.props.rows[this.state.orderOfRows[index]];
 			return row && this.idPropertyGetter(row);
 		}
 
@@ -379,10 +420,7 @@ namespace weavejs.ui
 			else if (event.shiftKey && this.props.multiple)
 			{
 				selectedIds = [];
-				if (this.lastClicked == null)
-				{
-				}
-				else
+				if (this.lastClicked != null)
 				{
 					var start:number = this.lastClicked;
 
@@ -397,7 +435,7 @@ namespace weavejs.ui
 
 					for (var i:number = start; i <= end; i++)
 					{
-						id = this.getId(this.state.sortIndices[i]);
+						id = this.getId(i);
 						if (id)
 							selectedIds.push(id);
 					}
@@ -433,16 +471,16 @@ namespace weavejs.ui
 
 		updateSortDirection=(columnKey:string, sortDirection:SortDirection) =>
 		{
-			var sortIndices:number[] = this.state.sortIndices;
-			this.sortColumnIndices(columnKey,sortDirection,sortIndices);
+			var orderOfRows:number[] = this.state.orderOfRows;
+			this.sortColumnIndices(columnKey,sortDirection,orderOfRows);
 			this.setState({
 				sortId: columnKey,
 				sortDirection,
-				sortIndices
+				orderOfRows
 			})
 		};
 
-		sortColumnIndices=(columnKey:string, sortDirection:SortDirection, sortIndices:number[]) =>
+		sortColumnIndices=(columnKey:string, sortDirection:SortDirection, orderOfRows:number[]) =>
 		{
 			if (this.props.onSortCallback)
 			{
@@ -450,7 +488,7 @@ namespace weavejs.ui
 			}
 			else
 			{
-				sortIndices.sort((indexA:number, indexB:number) => {
+				orderOfRows.sort((indexA:number, indexB:number) => {
 					//use sortFunction.call() because the default sortFunction is not bound but requires 'this' to be a this DataTable
 					var sortVal = this.props.sortFunction.call(this, indexA, indexB, columnKey);
 					if (sortVal !== 0 && sortDirection === SortTypes.ASC)
@@ -460,32 +498,7 @@ namespace weavejs.ui
 			}
 		};
 
-		componentWillReceiveProps(nextProps:IDataTableProps<RowDatum>)
-		{
-			var newState:IDataTableState = {};
-
-			this.setIdPropertyGetter(nextProps);
-
-			if (nextProps.rows.length !== this.state.sortIndices.length)
-				newState.sortIndices = nextProps.rows.map((row, index) => index);
-
-			if (nextProps.probedIds)
-				newState.probedIds = nextProps.probedIds.concat([]);
-			
-			if (nextProps.selectedIds)
-				newState.selectedIds = nextProps.selectedIds.concat([]);
-			
-			if (nextProps.sortId)
-			{
-				newState.sortId = nextProps.sortId;
-			}
-			
-			if (nextProps.sortDirection)
-			{
-				newState.sortDirection = nextProps.sortDirection;
-			}
-			this.setState(newState);
-		}
+		
 		
 		handleResize=(newSize:ResizingDivState) =>
 		{
