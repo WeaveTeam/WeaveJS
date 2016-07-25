@@ -171,8 +171,8 @@ namespace weavejs.ui
 		handleChange=(color:any) => {
 			if (this.popup)
 			{
-				this.setState({ hexColor: '#' + color.hex });
-				this.props.onChange && this.props.onChange('#' + color.hex);
+				this.setState({ hexColor:  color.hex });
+				this.props.onChange && this.props.onChange(color.hex);
 			}
 		};
 
