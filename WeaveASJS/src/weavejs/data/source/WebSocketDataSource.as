@@ -84,6 +84,7 @@ package weavejs.data.source
 
 		public function reconnect():void /* To be called from UI reconnect button. */
 		{
+			JS.global.clearTimeout(timeoutId);
 			if (_socket && _socket.readyState < 2)
 			{
 				_socket.close(1000, "No longer needed.");
@@ -97,9 +98,14 @@ package weavejs.data.source
 			_socket.onerror = onError;
 		}
 
+		private var timeoutId:int = 0;
 		private function onClose(event:Object):void
 		{
 			_socket = null;
+			if (url.value && event.code == 1006 /* CLOSE_ABNORMAL */) 
+			{
+				timeoutId = JS.global.setTimeout(reconnect, 1500)
+			}
 		}
 
 		private function onError(event:Object):void
