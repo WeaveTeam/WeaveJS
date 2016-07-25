@@ -29,4 +29,4 @@ after_success:
 - sshpass -e scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $TRAVIS_BRANCH.tgz
   $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
 - sshpass -e ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST
-  "sudo $DEPLOY_PATH/deploy.sh $TRAVIS_BRANCH"
+  "sudo $DEPLOY_PATH/deploy.sh $TRAVIS_BRANCH $TRAVIS_EVENT_TYPE"
