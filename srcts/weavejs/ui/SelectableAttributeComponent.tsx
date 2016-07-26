@@ -107,7 +107,12 @@ namespace weavejs.ui
 							{
 								hexColor = "000000";
 							}
-							return <ColorPicker hexColor={hexColor} onChange={(value)=>{adc.defaultValue.state = value;}}/>
+							return <HBox>
+								<ColorPicker style={{width: "45px", height: "initial", borderBottomRightRadius: 0, borderTopRightRadius: 0}} hexColor={hexColor} onChange={(value)=>{adc.defaultValue.state = value;}}/>
+								<Button style={{borderBottomLeftRadius:0, borderTopLeftRadius: 0, borderLeft: "none"}} onClick={ () => {adc.defaultValue.state = null;}} title={Weave.lang("Clear color")}>
+									<i className="fa fa-remove" aria-hidden="true"/>
+								</Button>
+							</HBox>
 						}
 					}/>
 				}
