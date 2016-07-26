@@ -107,7 +107,7 @@ namespace weavejs.ui
 							{
 								hexColor = "000000";
 							}
-							return <ColorPicker hexColor={hexColor} onChange={(value)=>{value.substr(1); adc.defaultValue.state = value.substr(1);}}/>
+							return <ColorPicker hexColor={hexColor} onChange={(value)=>{adc.defaultValue.state = value;}}/>
 						}
 					}/>
 				}
