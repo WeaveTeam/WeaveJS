@@ -1,6 +1,7 @@
 namespace weavejs.ui
 {
 	import ReactUtils = weavejs.util.ReactUtils;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils;
 	import HBox = weavejs.ui.flexbox.HBox;
 	import VBox = weavejs.ui.flexbox.VBox;
 	import ColumnUtils = weavejs.data.ColumnUtils;
@@ -17,15 +18,20 @@ namespace weavejs.ui
 	import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import ColorColumn = weavejs.data.column.ColorColumn;
 	import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
 	import ControlPanel = weavejs.editor.ControlPanel;
 	import AttributeSelector = weavejs.ui.AttributeSelector;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
 	import ComboBox = weavejs.ui.ComboBox;
 	import Button = weavejs.ui.Button;
+	import ColorPicker = weavejs.ui.ColorPicker;
+	import StandardLib = weavejs.util.StandardLib;
 	import DynamicComponent = weavejs.ui.DynamicComponent;
 
 	export interface ISelectableAttributeComponentProps extends IColumnSelectorProps
 	{
+
 	}
 
 	export interface ISelectableAttributeComponentState
@@ -60,21 +66,61 @@ namespace weavejs.ui
 		
 		render():JSX.Element
 		{
+			let mainSelector = <HBox overflow style={_.merge({flex: 1}, this.props.style)}>
+						<ColumnSelector {...this.props}/>
+						<Button
+							onClick={ () => this.launchAttributeSelector(this.props.attributeName) }
+							style={{
+								borderBottomLeftRadius: 0,
+								borderTopLeftRadius: 0,
+								borderLeft: "none"
+							}}
+							title={Weave.lang("Click to explore other DataSources for " + this.props.attributeName) }
+						>
+							<i className="fa fa-angle-right" aria-hidden="true" style={ { fontWeight: "bold" } }/>
+						</Button>
+					</HBox>;
+
+			let column = this.props.attributes.get(this.props.attributeName);
+			let adc = Weave.AS(column, AlwaysDefinedColumn);
+			let defaultSelector:JSX.Element = null;
+
+			if (adc)
+			{
+				let isColorColumn = adc && Weave.IS(adc.internalDynamicColumn.target, ColorColumn);
+				if (isColorColumn)
+				{
+					defaultSelector = <DynamicComponent dependencies={[adc.defaultValue]} render={
+						()=>
+						{
+							let value = adc.defaultValue.state;
+							let hexColor:string;
+							if (typeof value == typeof 0)
+							{
+								hexColor = StandardLib.getHexColor(value as number);
+							}
+							else if (typeof value == typeof "")
+							{
+								hexColor = (value as string);
+							}
+							else
+							{
+								hexColor = "000000";
+							}
+							return <ColorPicker hexColor={hexColor} onChange={(value)=>{value.substr(1); adc.defaultValue.state = value.substr(1);}}/>
+						}
+					}/>
+				}
+				else
+				{
+					defaultSelector = <StatefulTextField style={{flex: 1}} ref={WeaveReactUtils.linkReactStateRef(this, { value: adc.defaultValue })}/>;
+				}
+			}
 			return (
-				<HBox overflow style={_.merge({flex: 1}, this.props.style)}>
-					<ColumnSelector {...this.props}/>
-					<Button
-						onClick={ () => this.launchAttributeSelector(this.props.attributeName) }
-						style={{
-							borderBottomLeftRadius: 0,
-							borderTopLeftRadius: 0,
-							borderLeft: "none"
-						}}
-						title={Weave.lang("Click to explore other DataSources for " + this.props.attributeName) }
-					>
-						<i className="fa fa-angle-right" aria-hidden="true" style={ { fontWeight: "bold" } }/>
-					</Button>
-				</HBox>
+				<VBox overflow padded>
+					{mainSelector}
+					{defaultSelector ? <HBox padded><div style={{alignSelf: "center"}}>{Weave.lang("Default value")}</div>{defaultSelector}</HBox> : null}
+				</VBox>
 			);
 		}
 	}
