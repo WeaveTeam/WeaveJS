@@ -244,7 +244,7 @@ package
 		 * @return A value of true if the callbacks for the linkableObject have triggered since the last time this function was called
 		 *         with the same observer and linkableObject parameters.
 		 */
-		public static function _internalDetectChange(observer:Object, linkableObject:ILinkableObject, clearChangedNow:Boolean = true):Boolean
+		private static function _internalDetectChange(observer:Object, linkableObject:ILinkableObject, clearChangedNow:Boolean = true):Boolean
 		{
 			var previousCount:* = d2d_linkableObject_observer_triggerCounter.get(linkableObject, observer); // untyped to handle undefined value
 			var newCount:uint = WeaveAPI.SessionManager.getCallbackCollection(linkableObject).triggerCounter;
@@ -684,7 +684,7 @@ package
 		/**
 		 * For testing purposes.
 		 */
-		public function triggerColumns():void
+		private function triggerColumns():void
 		{
 			triggerAll('ReferencedColumn');
 		}
@@ -692,7 +692,7 @@ package
 		/**
 		 * For testing purposes.
 		 */
-		public function triggerAll(filter:*):void
+		private function triggerAll(filter:*):void
 		{
 			if (filter is String)
 				filter = getDefinition(filter);
@@ -703,7 +703,7 @@ package
 		/**
 		 * For testing purposes.
 		 */
-		public function populateColumns():void
+		private function populateColumns():void
 		{
 			var RefCol:Class = Weave.getDefinition('ReferencedColumn');
 			var ExtDynCol:Class = Weave.getDefinition('ExtendedDynamicColumn');
@@ -727,7 +727,7 @@ package
 		/**
 		 * For testing purposes.
 		 */
-		public function stringifyState(...pathOrType):String
+		private function stringifyState(...pathOrType):String
 		{
 			var object:ILinkableObject;
 			if (JS.isClass(pathOrType[0]))
@@ -749,14 +749,14 @@ package
 			return DebugUtils.debugId(arg);
 		}
 
-		public static const watch:/*/typeof DebugUtils.watch/*/Function = DebugUtils.watch;
-		public static const unwatch:/*/typeof DebugUtils.unwatch/*/Function = DebugUtils.unwatch;
-		public static const watchState:/*/typeof DebugUtils.watchState/*/Function = DebugUtils.watchState;
+		private static const watch:/*/typeof DebugUtils.watch/*/Function = DebugUtils.watch;
+		private static const unwatch:/*/typeof DebugUtils.unwatch/*/Function = DebugUtils.unwatch;
+		private static const watchState:/*/typeof DebugUtils.watchState/*/Function = DebugUtils.watchState;
 
 		/**
 		 * Temporary solution
 		 */
-		public function createScript(name:String, targets:/*/{[name:string]:string[]}/*/Object, script:String, groupedCallback:Boolean = false):/*/weavejs.core.LinkableCallbackScript/*/Object
+		private function createScript(name:String, targets:/*/{[name:string]:string[]}/*/Object, script:String, groupedCallback:Boolean = false):/*/weavejs.core.LinkableCallbackScript/*/Object
 		{
 			var lcs:Object = root.requestObject(name, Weave.getDefinition('LinkableCallbackScript'));
 			var array:Array = [];
