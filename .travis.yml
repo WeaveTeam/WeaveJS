@@ -6,10 +6,6 @@ notifications:
     on_success: never
     on_failure: always
 language: node_js
-addons:
-  apt:
-    packages:
-    - sshpass
 node_js:
 - '6'
 env:
@@ -20,6 +16,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+      - sshpass
 before_install:
 - mkdir dist
 - yes | npm install
