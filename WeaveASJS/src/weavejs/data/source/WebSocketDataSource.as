@@ -72,6 +72,7 @@ package weavejs.data.source
 			if (_socket && _socket.readyState == 1)
 			{
 				var ks:IKeySet = selectionFilter.getInternalKeyFilter() as IKeySet;
+				if (!ks || !ks.keys) return;
 				_socket.send(JSON.stringify(ks.keys.map(function (key:IQualifiedKey, idx:int, a:Array):String {
 					return key.localName;
 				})));
