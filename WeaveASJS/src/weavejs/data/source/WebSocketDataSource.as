@@ -61,6 +61,11 @@ package weavejs.data.source
 		//public const selectionFeedback:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 		public const url:LinkableString = Weave.linkableChild(this, LinkableString, onUrlChange);
 
+		override protected function initialize(forceRefresh:Boolean = false):void
+		{
+			// recalculate all columns previously requested because CSV data may have changed.
+			super.initialize(true);
+		}
 
 		private function onSelectionFilterChange():void
 		{
@@ -115,11 +120,8 @@ package weavejs.data.source
 			_socket = null;
 		}
 
-		private function onMessage(event:/*/MessageEvent/*/Object):void
+		private function addRecord(record:Object):void
 		{
-			var str:String = event.data;
-			var record:Object = JSON.parse(str);
-
 			if ((records.length == keepLast.value) && (keepLast.value > 0))
 			{
 				records.shift();
@@ -132,8 +134,23 @@ package weavejs.data.source
 			{
 				propertyNames.add(key);
 			}
+		}
 
-			refreshAllProxyColumns();
+		private function onMessage(event:/*/MessageEvent/*/Object):void
+		{
+			var str:String = event.data;
+			var message:Object = JSON.parse(str);
+
+			if (message is Array)
+			{
+				message.forEach(addRecord);
+			}
+			else
+			{
+				addRecord(message);
+			}
+
+			Weave.getCallbacks(this).triggerCallbacks();
 		}
 
 		public function getPropertyNames():Array/*/<string>/*/
