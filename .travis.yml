@@ -15,6 +15,7 @@ node_js:
 before_install:
 - mkdir dist
 - yes | npm install
+- npm install
 - pushd node_modules/flexjs/js/bin/
 - chmod a+x *
 - popd
