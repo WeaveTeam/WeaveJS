@@ -175,7 +175,7 @@ package weavejs.data
 		 * @param ignoreKeyType If true, ignores the dataType of the column (the column's foreign keyType) and the keyType of the keyValue
 		 * @return An array of record keys with the given value under the given column
 		 */
-		public static function getAssociatedKeys(column:IAttributeColumn, keyValue:IQualifiedKey, ignoreKeyType:Boolean = false):Array
+		public static function getAssociatedKeys(column:IAttributeColumn, keyValue:IQualifiedKey, ignoreKeyType:Boolean = false):Array/*/<IQualifiedKey>/*/
 		{
 			var map_lookup:Object = map_reverseKeyLookupCache.get(column);
 			if (map_lookup == null || column.triggerCounter != map_reverseKeyLookupTriggerCounter.get(column)) // if cache is invalid, validate it now
@@ -443,7 +443,7 @@ package weavejs.data
 		 * @param value A value to cast.
 		 * @param newType Either a qualifiedClassName or a Class object referring to the type to cast the value as.
 		 */
-		public static function cast/*/<T>/*/(value:*, newType:/*/T|string/*/*):/*/T/*/*
+		public static function cast/*/<T>/*/(value:*, newType:/*/(new(..._:any[])=>T)|string/*/*):/*/T/*/*
 		{
 			if (newType == null)
 				return value;

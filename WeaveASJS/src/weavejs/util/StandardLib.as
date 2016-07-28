@@ -557,7 +557,7 @@ package weavejs.util
 		 * Code from Graphics Gems Volume 1
 		 * Note: This may return less than the requested number of values
 		 */
-		public static function getNiceNumbersInRange(min:Number, max:Number, numberOfValuesInRange:int):Array
+		public static function getNiceNumbersInRange(min:Number, max:Number, numberOfValuesInRange:int):/*/number[]/*/Array
 		{
 			// special case
 			if (min == max)

@@ -302,7 +302,7 @@ package weavejs.core
 			}
 			else
 			{
-				// when switcing from a local object to a global one that doesn't exist yet, copy the local object
+				// when switching from a local object to a global one that doesn't exist yet, copy the local object
 				var root:ILinkableHashMap = Weave.getRoot(this);
 				if (target && !targetPath && !root.getObject(newGlobalName))
 					root.requestObjectCopy(newGlobalName, internalObject);

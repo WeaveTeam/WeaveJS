@@ -77,7 +77,7 @@ package weavejs.geom
 						xyCoords.push(NaN, NaN);
 					// push x,y coords
 					for each (var point:Array in part)
-					xyCoords.push(point[0], point[1]);
+						xyCoords.push(point[0], point[1]);
 				}
 				geom.setCoordinates(xyCoords, BLGTreeUtils.METHOD_SAMPLE);
 				result.push(geom);
@@ -157,7 +157,7 @@ package weavejs.geom
 		 * For example, partMarkers[0] is the vertexID that marks the end of part 0 and the start of part 1.
 		 * If there are no part markers, it is assumed that there is only one part.
 		 */
-		private var partMarkers:Array/*/<number>/*/ = [];//Vector.<int>
+		private var partMarkers:/*/int[]/*/Array = [];
 		/**
 		 * This maps BLGTree from the parts Array to a Boolean.
 		 * If there are multiple parts in this geometry, only parts that map to values of true will be included in getSimplifiedGeometry() results.
@@ -168,7 +168,7 @@ package weavejs.geom
 		 * Each element in this vector is a separate part of the geometry.
 		 * Each could be either a new polygon or a hole in a previous polygon.
 		 */
-		private var parts:Array = [];//Vector.<BLGTree>
+		private var parts:/*/BLGTree[]/*/Array = [];
 		/**
 		 * This is a bounding box for the geometry.
 		 * It is useful for spatial indexing when not all the points are available yet.
@@ -206,10 +206,10 @@ package weavejs.geom
 		public function getSimpleGeometries(minImportance:Number = 0, visibleBounds:Bounds2D = null, output:Array = null):Array/*/<ISimpleGeometry>/*/
 		{
 			var result:Array = output || [];
-			var parts:Array/*Vector.<Vector.<BLGNode>>*/ = getSimplifiedGeometry(minImportance, visibleBounds);
+			var parts:/*/BLGNode[][]/*/Array = getSimplifiedGeometry(minImportance, visibleBounds);
 			for (var i:int = 0; i < parts.length; i++)
 			{
-				var part:Array/*Vector.<BLGNode>*/ = parts[i];
+				var part:/*/BLGNode[]/*/Array = parts[i];
 				var geom:ISimpleGeometry = result[i] as ISimpleGeometry || new SimpleGeometry(geomType); // re-use existing or create new
 				geom.setVertices(ArrayUtils.copy(part, []));
 				result[i] = geom;
@@ -237,7 +237,7 @@ package weavejs.geom
 				if (parts.length > 1 && !map_blgTree_receivedPartMarker.get(part))
 					continue;
 
-				var simplifiedPart:Array/*Vector.<BLGNode>*/ = part.getPointVector(minImportance, visibleBounds);
+				var simplifiedPart:/*/BLGNode[]/*/Array = part.getPointVector(minImportance, visibleBounds);
 
 				// skip parts without enough vertices
 				if (simplifiedPart.length == 0)

@@ -2,6 +2,7 @@ namespace weavejs.api.ui
 {
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import Graphics = PIXI.Graphics;
 
 	/**
 	 * An IPlotTask provides information for an IPlotter for rendering a plot asynchronously.
@@ -11,7 +12,7 @@ namespace weavejs.api.ui
 		/**
 		 * This is the off-screen buffer, which may change
 		 */
-		buffer:PIXI.Graphics;
+		buffer:Graphics;
 		
 		/**
 		 * This specifies the range of data to be rendered

@@ -9,7 +9,7 @@ namespace weavejs.menu
 	import ControllersMenu = weavejs.menu.ControllersMenu;
 	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
 
-	export type CreateObjectFunction = (type:new(..._:any[])=>any)=>void;
+	export type CreateObjectFunction = (type:Class)=>void;
 
 	export class WeaveMenus implements IWeaveMenus
 	{

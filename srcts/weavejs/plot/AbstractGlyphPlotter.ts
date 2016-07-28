@@ -116,7 +116,7 @@ namespace weavejs.plot
 					var geoms:GeneralizedGeometry[] = dataCol.getValueFromKey(recordKey, Array);
 					var geom:GeneralizedGeometry;
 					if (geoms && geoms.length)
-						geom = geoms[0] as GeneralizedGeometry;
+						geom = geoms[0];
 					if (geom)
 					{
 						if (i == 0)

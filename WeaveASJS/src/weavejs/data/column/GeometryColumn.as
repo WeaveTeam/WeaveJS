@@ -40,7 +40,7 @@ package weavejs.data.column
 		/**
 		 * This vector maps an index value to a GeneralizedGeometry object.
 		 */
-		private var _geometryVector:Array = [];//Vector.<GeneralizedGeometry>
+		private var _geometryVector:/*/GeneralizedGeometry[]/*/Array = [];
 		
 		/**
 		 * This maps a GeneralizedGeometry object to its index in _geometryVector.
@@ -66,7 +66,7 @@ package weavejs.data.column
 			return map_key_geomArray.has(key);
 		}
 
-		public function setRecords(keys:Array, geometries:Array/*Vector.<GeneralizedGeometry>*/):void
+		public function setRecords(keys:Array, geometries:/*/GeneralizedGeometry[]/*/Array):void
 		{
 			if (_geometryVector.length > 0)
 			{

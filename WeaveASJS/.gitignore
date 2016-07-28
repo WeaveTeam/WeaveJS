@@ -1,5 +1,5 @@
-/bin
-/bin-debug
-/bin-release
-/definitions
-/.settings
+bin
+bin-debug
+bin-release
+definitions
+.settings

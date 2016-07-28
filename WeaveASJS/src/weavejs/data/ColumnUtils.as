@@ -342,11 +342,11 @@ package weavejs.data
 			for (var iGenGeom:int; iGenGeom < genGeoms.length; ++iGenGeom)
 			{
 				var genGeom:GeneralizedGeometry = genGeoms[iGenGeom];
-				var simplifiedGeom:Array/*Vector.<Vector.<BLGNode>>*/ = genGeom.getSimplifiedGeometry();
+				var simplifiedGeom:/*/BLGNode[][]/*/Array = genGeom.getSimplifiedGeometry();
 				var newSimplifiedGeom:Array = [];			
 				for (var iSimplifiedGeom:int; iSimplifiedGeom < simplifiedGeom.length; ++iSimplifiedGeom)
 				{
-					var nodeVector:Array/*Vector.<BLGNode>*/ = simplifiedGeom[iSimplifiedGeom];
+					var nodeVector:/*/BLGNode[]/*/Array = simplifiedGeom[iSimplifiedGeom];
 					var newNodeVector:Array = [];
 					for (var iNode:int = 0; iNode < nodeVector.length; ++iNode)
 					{

@@ -58,6 +58,5 @@ package weavejs.api.data
 		 * @param An array of objects with x and y properties. 
 		 */		
 		function setVertices(o:Array/*/<{x:number, y:number}>/*/):void;
-		
 	}
 }

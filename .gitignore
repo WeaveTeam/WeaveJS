@@ -54,7 +54,6 @@ browserifycache.json
 *.iml
 
 lib-typings/
-typings/weave/*.d.ts
 
 # reference files
 srcts/_lib-references.ts

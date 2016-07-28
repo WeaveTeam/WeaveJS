@@ -242,7 +242,7 @@ package weavejs.geom
 		 * @param visibleBounds If not null, this bounds will be used to remove unnecessary offscreen points.
 		 * @return A list of BLGNodes, ordered by point index.
 		 */
-		public function getPointVector(minImportance:Number = 0, visibleBounds:Bounds2D = null):Array/*Vector.<BLGNode>*/
+		public function getPointVector(minImportance:Number = 0, visibleBounds:Bounds2D = null):/*/BLGNode[]/*/Array
 		{
 			if (minImportance == previousTraversalMinImportance && previousTraversalVisibleBounds.equals(visibleBounds))
 				return traversalVector; // avoid redundant computation
@@ -361,7 +361,7 @@ package weavejs.geom
 		 * are currently being traversed. The first entry in the vector is the root node,
 		 * and each other entry corresponds to a child node of the previous entry.
 		 */
-		private var traversalVector:Array/*Vector.<BLGNode>*/ = [];
+		private var traversalVector:/*/BLGNode[]/*/Array = [];
 		/**
 		 * This is the minImportance value from the last traversal.
 		 * It can be used to avoid redundant traversal computations.

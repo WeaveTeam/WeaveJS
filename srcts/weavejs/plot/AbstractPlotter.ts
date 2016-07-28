@@ -15,6 +15,7 @@ namespace weavejs.plot
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import Graphics = PIXI.Graphics;
 
 	/**
 	 * This is a base implementation for an IPlotter.
@@ -150,7 +151,7 @@ namespace weavejs.plot
 			{
 				//------------------------
 				// draw one record
-				var key:IQualifiedKey = task.recordKeys[task.iteration] as IQualifiedKey;
+				var key:IQualifiedKey = task.recordKeys[task.iteration];
 				this.addRecordGraphics(key, task.dataBounds, task.screenBounds, task.buffer);
 				//------------------------
 				
@@ -162,7 +163,7 @@ namespace weavejs.plot
 			return 1; // avoids division by zero in case task.recordKeys.length == 0
 		}
 
-		protected /* abstract */ addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, buffer:PIXI.Graphics):void
+		protected /* abstract */ addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, buffer:Graphics):void
 		{
 		}
 		
@@ -173,7 +174,7 @@ namespace weavejs.plot
 		 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
 		 * @param destination The sprite to draw the graphics onto.
 		 */
-		public /* abstract */ drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		public /* abstract */ drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
 		}
 

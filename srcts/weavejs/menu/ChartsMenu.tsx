@@ -72,7 +72,7 @@ namespace weavejs.menu
 			}).filter(item => !!item);
 		}
 		
-		static isBeta(impl:new(..._:any[])=>any):boolean
+		static isBeta(impl:Class):boolean
 		{
 			return impl == C3Gauge;
 		}
