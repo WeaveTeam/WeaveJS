@@ -677,7 +677,7 @@ namespace weavejs.app
 			path?:WeavePathArray,
 			weaveInstance?:Weave}):Weave
 		{
-			let {element, weave} = WeaveApp.getElementAndInstance(options);
+			let {element, weave} = WeaveComponentRenderer.getElementAndInstance(options);
 
 			if (typeof Symbol === 'undefined')
 			{
@@ -696,48 +696,6 @@ namespace weavejs.app
 			}
 
 			return weave;
-		}
-
-		static getElementAndInstance(options:{
-			element:string|Element,
-			weaveInstance?:Weave
-		}):{element: Element, weave:Weave}
-		{
-			let element:Element;
-
-			if (typeof options.element == typeof "")
-			{
-				element = document.getElementById(options.element as string);
-			}
-			else
-			{
-				element = options.element as Element;
-			}
-
-			(element as HTMLElement).style.display = "flex";
-
-			/* Check if WeaveJS's class registries have been initialized. */
-			if (!((weavejs.WeaveAPI.ClassRegistry as any)['defaultPackages'] as any).length)
-			{
-				new WeaveJS().start();
-			}
-
-			let weave = options.weaveInstance;
-			if (!weave)
-			{
-				/* Check if window.weave exists and is a weave instance, if so, use that. */
-				if ((window as any).weave instanceof Weave)
-				{
-					weave = (window as any).weave;
-				}
-				else
-				{
-					weave = new Weave();
-					(window as any).weave = weave;
-				}
-			}
-
-			return {element, weave};
 		}
 	}
 }

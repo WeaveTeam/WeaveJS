@@ -1,6 +1,7 @@
 namespace weavejs.dialog
 {
 	import WeaveApp = weavejs.app.WeaveApp;
+	import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
 	import MiscUtils = weavejs.util.MiscUtils;
 
 	const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -86,7 +87,7 @@ namespace weavejs.dialog
 			weaveInstance?:Weave
 			showSplash?:boolean}):Weave
 		{
-			let {element, weave} = WeaveApp.getElementAndInstance(options);
+			let {element, weave} = WeaveComponentRenderer.getElementAndInstance(options);
 
 			if (typeof Symbol === 'undefined')
 			{
