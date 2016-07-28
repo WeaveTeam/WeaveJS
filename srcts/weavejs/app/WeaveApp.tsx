@@ -714,6 +714,8 @@ namespace weavejs.app
 				element = options.element as Element;
 			}
 
+			(element as HTMLElement).style.display = "flex";
+
 			/* Check if WeaveJS's class registries have been initialized. */
 			if (!((weavejs.WeaveAPI.ClassRegistry as any)['defaultPackages'] as any).length)
 			{
