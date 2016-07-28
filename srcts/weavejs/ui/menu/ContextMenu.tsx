@@ -8,10 +8,10 @@ namespace weavejs.ui.menu
 	{
 		static open(event:React.MouseEvent)
 		{
-			event.preventDefault();
 			var contextMenuItems = Menu.getMenuItems(event.target as HTMLElement);
 			if (!contextMenuItems.length)
 				return;
+			event.preventDefault();
 			var contextMenu:ContextMenu = null;
 			var popup = Popup.open(
 				event.target as Element,
