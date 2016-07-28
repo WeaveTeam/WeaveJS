@@ -80,5 +80,30 @@ namespace weavejs.dialog
 				/>
 			)
 		}
+
+		static initialize(options:{
+			element:string|Element,
+			weaveInstance?:Weave
+			showSplash?:boolean}):Weave
+		{
+			let {element, weave} = WeaveApp.getElementAndInstance(options);
+
+			if (typeof Symbol === 'undefined')
+			{
+				ReactDOM.render(<span>Browser not supported</span>, element);
+				return;
+			}
+
+			ReactDOM.render(
+				<LandingPage
+					weave={weave}
+					initialView={options.showSplash ? "splash" : "file"}
+					weaveAppRef={(weaveApp:weavejs.app.WeaveApp) => (window as any).weaveApp = weaveApp}
+				/>,
+				element
+			);
+
+			return weave;
+		}
 	}
 }

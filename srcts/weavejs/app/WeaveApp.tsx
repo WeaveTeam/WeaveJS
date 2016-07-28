@@ -670,5 +670,67 @@ namespace weavejs.app
 				</VBox>
 			);
 		}
+
+		static initialize(options:{
+			element:string|Element, 
+			sessionUrl?: string,
+			path?:WeavePathArray,
+			weaveInstance?:Weave}):Weave
+		{
+			let {element, weave} = WeaveApp.getElementAndInstance(options);
+
+			if (typeof Symbol === 'undefined')
+			{
+				ReactDOM.render(<span>Browser not supported</span>, element);
+				return;
+			}
+
+			ReactDOM.render(
+				<WeaveApp weave={weave} renderPath={options.path}/>,
+				element
+			);
+
+			return weave;
+		}
+
+		static getElementAndInstance(options:{
+			element:string|Element,
+			weaveInstance?:Weave
+		}):{element: Element, weave:Weave}
+		{
+			let element:Element;
+
+			if (typeof options.element == typeof "")
+			{
+				element = document.getElementById(options.element as string);
+			}
+			else
+			{
+				element = options.element as Element;
+			}
+
+			/* Check if WeaveJS's class registries have been initialized. */
+			if (!((weavejs.WeaveAPI.ClassRegistry as any)['defaultPackages'] as any).length)
+			{
+				new WeaveJS().start();
+			}
+
+			let weave = options.weaveInstance;
+			if (!weave)
+			{
+				/* Check if window.weave exists and is a weave instance, if so, use that. */
+				if ((window as any).weave instanceof Weave)
+				{
+					weave = (window as any).weave;
+				}
+				else
+				{
+					weave = new Weave();
+					(window as any).weave = weave;
+				}
+			}
+
+			return {element, weave};
+		}
 	}
 }
