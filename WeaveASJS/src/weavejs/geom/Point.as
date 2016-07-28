@@ -24,5 +24,12 @@ package weavejs.geom
 		}
 		public var x:Number;
 		public var y:Number;
+
+		public static function distance(p1:Point, p2:Point):Number
+		{
+			var dx:Number = p2.x - p1.x;
+			var dy:Number = p2.y - p1.y;
+			return Math.sqrt(dx * dx + dy * dy);
+		}
 	}
 }
