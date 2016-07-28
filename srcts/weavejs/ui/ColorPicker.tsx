@@ -16,6 +16,7 @@ namespace weavejs.ui
 		buttonMode?:boolean;
 		buttonLabel?:string|React.ReactChild;
 		direction?:string;
+		noDefaultSize?: boolean;
 		style?:React.CSSProperties, // has to mention as they are not part of React.props in typescript
 		className?:string // has to mention as they are not part of React.props in typescript
 	}
@@ -232,8 +233,11 @@ namespace weavejs.ui
 				// if width and height aren't specified the width and height values are passed from prev parent
 				// and parent with more than one child wont split those values equally as overflow property of parent has to be considered
 				// and eventually each child will take parents complete size.
-				styleObject.width = styleObject.width ? styleObject.width : "30px";
-				styleObject.height = styleObject.height ? styleObject.height : "20px";
+				if (!this.props.noDefaultSize)
+				{
+					styleObject.width = styleObject.width ? styleObject.width : "30px";
+					styleObject.height = styleObject.height ? styleObject.height : "20px";	
+				}
 
 				ui = <div style={ styleObject }>
 						<div ref={(elt:Element) => this.element = elt as HTMLElement}
