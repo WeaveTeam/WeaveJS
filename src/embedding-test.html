@@ -18,9 +18,9 @@
 		<script type="text/javascript">
 			new WeaveJS().start();
 			$(function () {
-				weavejs.ui.WeaveComponentRenderer.initialize({element: "vis1", sessionUrl: "test-nba.weave" , path: ["MapTool"]});
-				weavejs.ui.WeaveComponentRenderer.initialize({element: "vis2", path: ["Histogram"]});
-				weavejs.ui.WeaveComponentRenderer.initialize({element: "vis3", path: ["Table"]});
+				weavejs.util.EmbedUtils.embed({element: "vis1", sessionUrl: "test-nba.weave" , path: ["MapTool"]});
+				weavejs.util.EmbedUtils.embed({element: "vis2", mode: "splash"});
+				weavejs.util.EmbedUtils.embed({element: "vis3", mode: "app"});
 			});
 		</script>
 		<script type="text/javascript" src="weavejs.js"></script>

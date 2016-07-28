@@ -670,32 +670,5 @@ namespace weavejs.app
 				</VBox>
 			);
 		}
-
-		static initialize(options:{
-			element:string|Element, 
-			sessionUrl?: string,
-			path?:WeavePathArray,
-			weaveInstance?:Weave}):Weave
-		{
-			let {element, weave} = WeaveComponentRenderer.getElementAndInstance(options);
-
-			if (typeof Symbol === 'undefined')
-			{
-				ReactDOM.render(<span>Browser not supported</span>, element);
-				return;
-			}
-
-			ReactDOM.render(
-				<WeaveApp weave={weave} renderPath={options.path}/>,
-				element
-			);
-
-			if (options.sessionUrl)
-			{
-				weavejs.core.WeaveArchive.setSessionFromUrl(weave, options.sessionUrl);
-			}
-
-			return weave;
-		}
 	}
 }
