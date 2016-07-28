@@ -71,7 +71,7 @@ module.exports = function()
 					break;
 				fileNoExt = fileNoExt.substr(0, fileNoExt.lastIndexOf('/'));
 			}
-			if (dep)
+			if (dep && dep != file)
 			{
 				if (debug)
 					console.log(file, '>', path.basename(dep));
