@@ -569,7 +569,7 @@ namespace weavejs.tool.oltool
 
 		updateResolutionDependentStyles(event:ol.MapEvent):void
 		{
-			if (event.frameState.animate)
+			if (event.frameState && event.frameState.animate)
 				return;
 
 			this.map.un("postrender", this.updateResolutionDependentStyles, this);
