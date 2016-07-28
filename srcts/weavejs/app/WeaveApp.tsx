@@ -690,6 +690,11 @@ namespace weavejs.app
 				element
 			);
 
+			if (options.sessionUrl)
+			{
+				weavejs.core.WeaveArchive.setSessionFromUrl(weave, options.sessionUrl);
+			}
+
 			return weave;
 		}
 
