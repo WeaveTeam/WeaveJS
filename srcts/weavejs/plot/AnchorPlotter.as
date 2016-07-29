@@ -15,20 +15,12 @@
 
 namespace weavejs.plot
 {	
-	import BitmapData = flash.display.BitmapData;
 	import Graphics = PIXI.Graphics;
-	import Shape = flash.display.Shape;
-	import Matrix = flash.geom.Matrix;
 	import Point = weavejs.geom.Point;
 	import Rectangle = weavejs.geom.Rectangle;
-	import Dictionary = flash.utils.Dictionary;
-	
-	import VEdge = net.ivank.voronoi.VEdge;
-	import Voronoi = net.ivank.voronoi.Voronoi;
-	
+	import VEdge = weavejs.geom.net_ivank_voronoi.VEdge;
+	import Voronoi = weavejs.geom.net_ivank_voronoi.Voronoi;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-	import Bounds2D = weavejs.geom.Bounds2D;
-	import ILineStyle = weavejs.api.ui.ILineStyle;
 	import IPlotTask = weavejs.api.ui.IPlotTask;
 	import IPlotter = weavejs.api.ui.IPlotter;
 	import ITextPlotter = weavejs.api.ui.ITextPlotter;
@@ -41,47 +33,42 @@ namespace weavejs.plot
 	import KeySet = weavejs.data.key.KeySet;
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import ColorRamp = weavejs.util.ColorRamp;
-	import BitmapText = weavejs.util.BitmapText;
-	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import LinkableTextFormat = weavejs.plot.LinkableTextFormat;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
+	import WeaveProperties = weavejs.app.WeaveProperties;
+	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 
 	export class AnchorPlotter extends AbstractPlotter implements ITextPlotter
 	{
 		public constructor()
 		{
+			super();
 			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // this causes a redraw when text format changes
-			Weave.linkableChild(this, WeaveProperties.defaultColorColumn);
-			setSingleKeySource(_keySet);
+			this.setSingleKeySource(this._keySet);
 		}
 		
-		public setRadViz(radviz:IPlotter):void
+		public setRadViz(radviz:RadVizPlotter | CompoundRadVizPlotter):void
 		{
-			if (this._radviz)
-				throw new Error("radviz plotter may only be set once.");
-			_radviz = radviz;
-			if (radviz is RadVizPlotter)
-				anchors = (radviz as RadVizPlotter).anchors;
-			if (radviz is CompoundRadVizPlotter)
-				anchors = (radviz as CompoundRadVizPlotter).anchors;
-			if (!anchors)
-				throw new Error("not a radviz plotter");
-			this.addSpatialDependencies(this.anchors = anchors);
-			this.anchors.childListCallbacks.addGroupedCallback(this, handleAnchorsChange, true);
-			spatialCallbacks.triggerCallbacks();
+			if (this.radviz)
+				throw new Error("RadViz plotter may only be set once.");
+			this.radviz = radviz;
+			Weave.linkableChild(this, this.radviz.fillStyle.color);
+			this.addSpatialDependencies(this.radviz.anchors);
+			this.radviz.anchors.childListCallbacks.addGroupedCallback(this, this.handleAnchorsChange, true);
+			this.spatialCallbacks.triggerCallbacks();
 		}
-		private _radviz:IPlotter;
-		private anchors:LinkableHashMap = null;
-		
-		public labelAngleRatio:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyLabelAngleRatio));
+		private radviz:RadVizPlotter | CompoundRadVizPlotter;
+
+		public labelAngleRatio:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, this.verifyLabelAngleRatio));
 		
 		private _keySet:KeySet = Weave.disposableChild(this, KeySet);
 		private tempPoint:Point = new Point();
 		private _bitmapText:BitmapText = new BitmapText();
 		private coordinate:Point = new Point();//reusable object
-		public enableWedgeColoring:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), fillColorMap);
-		public colorMap:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired")),fillColorMap);
-		public anchorColorMap:Dictionary;
+		public enableWedgeColoring:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.fillColorMap);
+		public colorMap:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")), this.fillColorMap);
+		public anchorColorMap:Map<string, number>;
 		public wordWrap:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(200));
 		
 		
@@ -89,7 +76,7 @@ namespace weavejs.plot
 
 
 		// anchorClasses key is String, value is array of AnchorPoint names
-		public anchorClasses:Dictionary = null;//this tells us the classes to which dimensional anchors belong to
+		public anchorClasses:Map<string, string[]> = null;//this tells us the classes to which dimensional anchors belong to
 
 		public anchorThreshold:number;
 		public doCDLayout:boolean = false;// this displays the tstat value with every dimensional anchor name (displayed only when CD layout is done)
@@ -97,9 +84,9 @@ namespace weavejs.plot
 		
 		private getClassFromAnchor(anchorName:string):string
 		{
-			for (var key:string in anchorClasses)
+			for (var key of this.anchorClasses.keys())
 			{
-				var anchors:Array = anchorClasses[key];
+				var anchors = this.anchorClasses.get(key);
 				if (anchors.indexOf(anchorName) >= 0)
 					return key;
 			}
@@ -107,7 +94,7 @@ namespace weavejs.plot
 		}
 		
 		//Fill this hash map with bounds of every record key for efficient look up in getDataBoundsFromRecordKey
-		private keyBoundsMap:Dictionary = new Dictionary();
+		private map_key_bounds:Map<IQualifiedKey, Bounds2D> = new Map();
 		private _currentScreenBounds:Bounds2D = new Bounds2D();
 		private _currentDataBounds:Bounds2D = new Bounds2D();
 		
@@ -128,11 +115,11 @@ namespace weavejs.plot
 		
 		public handleAnchorsChange():void
 		{
-			var keys:Array = anchors.getNames(AnchorPoint);
-			var keyArray:Array = WeaveAPI.QKeyManager.getQKeys(ANCHOR_KEYTYPE,keys);
+			var keys = this.radviz.anchors.getNames(AnchorPoint);
+			var keyArray = WeaveAPI.QKeyManager.getQKeys(AnchorPlotter.ANCHOR_KEYTYPE, keys);
 
-			_keySet.replaceKeys(keyArray);
-			fillColorMap();
+			this._keySet.replaceKeys(keyArray);
+			this.fillColorMap();
 		}
 		
 		private static ANCHOR_KEYTYPE:string = 'dimensionAnchors';
@@ -141,42 +128,38 @@ namespace weavejs.plot
 		
 		private fillColorMap():void
 		{
-			anchorColorMap = new Dictionary(true);
-			var _names:Array = anchors.getNames(AnchorPoint);
+			this.anchorColorMap = new Map();
+			var _names = this.radviz.anchors.getNames(AnchorPoint);
 			for (var i:int = 0; i < _names.length; i++)
-				anchorColorMap[_names[i]] = colorMap.getColorFromNorm(i / (_names.length - 1)); 
+				this.anchorColorMap.set(_names[i], this.colorMap.getColorFromNorm(i / (_names.length - 1))); 
 		}
 		
 		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
-			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
+			this.drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private drawAll(recordKeys:IQualifiedKey[], dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
 			var x:number; 
 			var y:number;
 			
 			var anchor:AnchorPoint;
 			var radians:number;
-			keyBoundsMap = new Dictionary();
+			this.map_key_bounds = new Map();
 
-			var graphics:Graphics = tempShape.graphics;
-			graphics.clear();
-									
-			
-			for each(var key:IQualifiedKey in recordKeys)
+			for (var key of recordKeys)
 			{
-				anchor = anchors.getObject(key.localName) as AnchorPoint;
-				if (key.keyType != ANCHOR_KEYTYPE || !anchor)
+				anchor = Weave.AS(this.radviz.anchors.getObject(key.localName), AnchorPoint);
+				if (key.keyType != AnchorPlotter.ANCHOR_KEYTYPE || !anchor)
 					continue;
 				
-				anchorLineStyle.beginLineStyle(null, graphics);
-				anchorFillStyle.beginFillStyle(null, graphics);
+				this.anchorLineStyle.beginLineStyle(null, graphics);
+				this.anchorFillStyle.beginFillStyle(null, graphics);
 
-				if(anchorThreshold)
+				if (this.anchorThreshold)
 				{
-					if(anchor.classDiscriminationMetric.value < anchorThreshold)
+					if (anchor.classDiscriminationMetric.value < this.anchorThreshold)
 						continue;
 					
 				}
@@ -189,84 +172,84 @@ namespace weavejs.plot
 				var cos:number = Math.cos(radians);
 				var sin:number = Math.sin(radians);
 				
-				tempPoint.x = radius * cos;
-				tempPoint.y = radius * sin;
-				dataBounds.projectPointTo(tempPoint, screenBounds);
+				this.tempPoint.x = radius * cos;
+				this.tempPoint.y = radius * sin;
+				dataBounds.projectPointTo(this.tempPoint, screenBounds);
 				
 				// draw circle
-				if(enableWedgeColoring.value)
-					graphics.beginFill(anchorColorMap[key.localName]);
-				else if (doCDLayout)
+				if (this.enableWedgeColoring.value)
+				{
+					graphics.beginFill(this.anchorColorMap.get(key.localName));
+				}
+				else if (this.doCDLayout)
 				{
 					//color the dimensional anchors according to the class they belong to
-					var classStr:string = getClassFromAnchor(key.localName);
-					var cc:ColorColumn = WeaveProperties.defaultColorColumn;
-					var binColumn:BinnedColumn = cc.getInternalColumn() as BinnedColumn;
-					binColumn.binningDefinition.requestLocalObject(CategoryBinningDefinition, false)
+					var classStr:string = this.getClassFromAnchor(key.localName);
+					var cc:ColorColumn = Weave.AS(this.radviz.fillStyle.color.getInternalColumn(), ColorColumn);
+					var binColumn:BinnedColumn = Weave.AS(cc.getInternalColumn(), BinnedColumn);
+					binColumn.binningDefinition.requestLocalObject(CategoryBinningDefinition, false);
 					var binIndex:int = binColumn.getBinIndexFromDataValue(classStr);
 					var color:number = cc.ramp.getColorFromNorm(binIndex / (binColumn.numberOfBins - 1));
 					if (isFinite(color))
 						graphics.beginFill(color);
 				}
-				graphics.drawCircle(tempPoint.x, tempPoint.y, anchorRadius.value);				
+				graphics.drawCircle(this.tempPoint.x, this.tempPoint.y, this.anchorRadius.value);				
 				graphics.endFill();
 				
 				
 				
-				_bitmapText.trim = false;
-				_bitmapText.text = " " + anchor.title.value + " ";
+				this._bitmapText.trim = false;
+				this._bitmapText.text = " " + anchor.title.value + " ";
 				
-				if(doCDLayout && doCDLayoutMetric)//displays the class discrimination metric used, either tstat or pvalue
-					_bitmapText.text = _bitmapText.text + "\n"+ "  Metric : " + 
+				if (this.doCDLayout && this.doCDLayoutMetric)//displays the class discrimination metric used, either tstat or pvalue
+					this._bitmapText.text = this._bitmapText.text + "\n"+ "  Metric : " + 
 						Math.round(anchor.classDiscriminationMetric.value *100)/100 +"\n" + "  Class :" + anchor.classType.value;
-				_bitmapText.verticalAlign = BitmapText.VERTICAL_ALIGN_MIDDLE;
+				this._bitmapText.verticalAlign = BitmapText.VERTICAL_ALIGN_MIDDLE;
 				
-				_bitmapText.angle = screenBounds.getYDirection() * (radians * 180 / Math.PI);
-				_bitmapText.angle = (_bitmapText.angle % 360 + 360) % 360;
+				this._bitmapText.angle = screenBounds.getYDirection() * (radians * 180 / Math.PI);
+				this._bitmapText.angle = (this._bitmapText.angle % 360 + 360) % 360;
 				if (cos > -0.000001) // the label exactly at the bottom will have left align
 				{
-					_bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_LEFT;
+					this._bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_LEFT;
 					// first get values between -90 and 90, then multiply by the ratio
-					_bitmapText.angle = ((_bitmapText.angle + 90) % 360 - 90) * labelAngleRatio.value;
+					this._bitmapText.angle = ((this._bitmapText.angle + 90) % 360 - 90) * this.labelAngleRatio.value;
 				}
 				else
 				{
-					_bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_RIGHT;
+					this._bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_RIGHT;
 					// first get values between -90 and 90, then multiply by the ratio
-					_bitmapText.angle = (_bitmapText.angle - 180) * labelAngleRatio.value;
+					this._bitmapText.angle = (this._bitmapText.angle - 180) * this.labelAngleRatio.value;
 				}
 				
-				LinkableTextFormat.defaultTextFormat.copyTo(_bitmapText.textFormat);				
-				_bitmapText.x = tempPoint.x;
-				_bitmapText.y = tempPoint.y;
-				_bitmapText.maxWidth = wordWrap.value;
+				LinkableTextFormat.defaultTextFormat.copyTo(this._bitmapText.textFormat);				
+				this._bitmapText.x = this.tempPoint.x;
+				this._bitmapText.y = this.tempPoint.y;
+				this._bitmapText.maxWidth = this.wordWrap.value;
 				
 				// draw almost-invisible rectangle behind text
 				/*_bitmapText.getUnrotatedBounds(_tempBounds);
 				_tempBounds.getRectangle(_tempRectangle);				
-				destination.fillRect(_tempRectangle, 0x02808080);*/
+				graphics.fillRect(_tempRectangle, 0x02808080);*/
 				
 				// draw bitmap text
-				_bitmapText.draw(destination);								
+				this._bitmapText.draw(graphics);
 			}
 			
-			destination.draw(tempShape);
-			
-			if (showBarycenter.value)
+			if (this.showBarycenter.value)
 			{
-				drawBarycenter(recordKeys, dataBounds, screenBounds, destination);
+				this.drawBarycenter(recordKeys, dataBounds, screenBounds, graphics);
 			}
-			if (showVoronoi.value)
+			if (this.showVoronoi.value)
 			{
-				drawVoronoi(recordKeys, dataBounds, screenBounds, destination);
+				this.drawVoronoi(recordKeys, dataBounds, screenBounds, graphics);
 			}
-			if (showConvexHull.value)
+			if (this.showConvexHull.value)
 			{
-				drawConvexHull(recordKeys, dataBounds, screenBounds, destination);
+				this.drawConvexHull(recordKeys, dataBounds, screenBounds, graphics);
 			}
 			
-			_currentScreenBounds.copyFrom(screenBounds);
-			_currentDataBounds.copyFrom(dataBounds);
+			this._currentScreenBounds.copyFrom(screenBounds);
+			this._currentDataBounds.copyFrom(dataBounds);
 		}
 		
 		
@@ -277,48 +260,43 @@ namespace weavejs.plot
 		 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
 		 * @param destination The sprite to draw the graphics onto.
 		 */
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
-			super.drawBackground(dataBounds,screenBounds,destination);
-			var g:Graphics = tempShape.graphics;
-			g.clear();
-			
-			coordinate.x = -1;
-			coordinate.y = -1;
+			super.drawBackground(dataBounds, screenBounds, graphics);
+
+			this.coordinate.x = -1;
+			this.coordinate.y = -1;
 			
 			
-			dataBounds.projectPointTo(coordinate, screenBounds);
-			var x:number = coordinate.x;
-			var y:number = coordinate.y;
-			coordinate.x = 1;
-			coordinate.y = 1;
-			dataBounds.projectPointTo(coordinate, screenBounds);
+			dataBounds.projectPointTo(this.coordinate, screenBounds);
+			var x:number = this.coordinate.x;
+			var y:number = this.coordinate.y;
+			this.coordinate.x = 1;
+			this.coordinate.y = 1;
+			dataBounds.projectPointTo(this.coordinate, screenBounds);
 			
 			// draw RadViz circle
-			if(unrestrictAnchors.value)
+			if (this.unrestrictAnchors.value)
 					return;
 
 			try {
-				circleLineStyle.beginLineStyle(null,g);
-				g.drawEllipse(x, y, coordinate.x - x, coordinate.y - y);
-			} catch (e:Error) { }
-			destination.draw(tempShape);
-			
-			if(drawingClassLines)
+				this.circleLineStyle.beginLineStyle(null, graphics);
+				graphics.drawEllipse(x, y, this.coordinate.x - x, this.coordinate.y - y);
+			} catch (e) { }
+
+			if (this.drawingClassLines)
 			{
-				drawClassLines(dataBounds, screenBounds, destination );
+				this.drawClassLines(dataBounds, screenBounds, graphics);
 			}
 			
-			_currentScreenBounds.copyFrom(screenBounds);
-			_currentDataBounds.copyFrom(dataBounds);
+			this._currentScreenBounds.copyFrom(screenBounds);
+			this._currentDataBounds.copyFrom(dataBounds);
 		}
 		
-		public drawClassLines(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		public drawClassLines(dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
-			var graphics:Graphics = static_tempShape.graphics;
-			graphics.clear();
 			var numOfClasses:int = 0;
-			for ( var type:Object in anchorClasses)
+			for ( var type in this.anchorClasses)
 			{
 				numOfClasses++;
 			}
@@ -329,9 +307,9 @@ namespace weavejs.plot
 			centre.x = 0; centre.y = 0;
 			dataBounds.projectPointTo(centre, screenBounds);//projecting the centre of the Radviz circle
 			
-			for(var cdClass:Object in anchorClasses)
+			for (var cdClass in this.anchorClasses)
 			{
-				_bitmapText.text = "";
+				this._bitmapText.text = "";
 				var previousClassAnchor:Point = new Point();
 				var classLabelPoint:Point = new Point();
 				var currentClassPos:number = classTheta * classIncrementor;
@@ -364,14 +342,10 @@ namespace weavejs.plot
 				
 				_bitmapText.draw(destination);*/
 			}
-			destination.draw(static_tempShape);
 		}
 		
-		public drawBarycenter(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		public drawBarycenter(recordKeys:IQualifiedKey[], dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
-			var graphics:Graphics = static_tempShape.graphics;
-			graphics.clear();
-			
 			var barycenter:Point = new Point();
 			var counter:int = 0;
 			var anchor:AnchorPoint;
@@ -380,10 +354,10 @@ namespace weavejs.plot
 			if (!recordKeys || !recordKeys.length)
 				return;
 			
-			for each(var key:IQualifiedKey in recordKeys)
+			for (var key of recordKeys)
 			{
-				anchor = anchors.getObject(key.localName) as AnchorPoint;
-				if (key.keyType != ANCHOR_KEYTYPE || !anchor)
+				anchor = Weave.AS(this.radviz.anchors.getObject(key.localName), AnchorPoint);
+				if (key.keyType != AnchorPlotter.ANCHOR_KEYTYPE || !anchor)
 					continue;
 				
 				barycenter.x += anchor.x.value;
@@ -394,44 +368,39 @@ namespace weavejs.plot
 			barycenter.x = barycenter.x / counter;
 			barycenter.y = barycenter.y / counter;
 			
-			barycenterLineStyle.beginLineStyle(null, graphics);
-			barycenterFillStyle.beginFillStyle(null, graphics);
+			this.barycenterLineStyle.beginLineStyle(null, graphics);
+			this.barycenterFillStyle.beginFillStyle(null, graphics);
 			
 			dataBounds.projectPointTo(barycenter, screenBounds);
 			
-			graphics.drawCircle(barycenter.x, barycenter.y, barycenterRadius.value);
+			graphics.drawCircle(barycenter.x, barycenter.y, this.barycenterRadius.value);
 			
 			graphics.endFill();
-			destination.draw(static_tempShape);
 		}
 		
-		public drawConvexHull(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		public drawConvexHull(recordKeys:IQualifiedKey[], dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
-			static_drawConvexHull(anchors, circleLineStyle, recordKeys, dataBounds, screenBounds, destination);
+			AnchorPlotter.static_drawConvexHull(this.radviz.anchors, this.circleLineStyle, recordKeys, dataBounds, screenBounds, graphics);
 		}
 		
-		private static static_tempShape:Shape = new Shape();
-		public static static_drawConvexHull(anchors:LinkableHashMap, lineStyle:ILineStyle, recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		public static static_drawConvexHull(anchors:LinkableHashMap, lineStyle:SolidLineStyle, recordKeys:IQualifiedKey[], dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
-			var graphics:Graphics = static_tempShape.graphics;
 			var anchor1:AnchorPoint;
 			var anchor2:AnchorPoint;
 			var anchor:AnchorPoint;
-			var _anchors:Array = [];
+			var _anchors:AnchorPoint[] = [];
 			var index:int;
 			var p1:Point = new Point();
 			var p2:Point = new Point();
 			
-			graphics.clear();
 			if (recordKeys)
 			{
-				
 				// convert the array of record keys into array of anchors
-				for(index = 0; index < recordKeys.length; index++)
+				for (index = 0; index < recordKeys.length; index++)
 				{
-					anchor = anchors.getObject(recordKeys[index].localName) as AnchorPoint;
+					anchor = Weave.AS(anchors.getObject(recordKeys[index].localName), AnchorPoint);
 					
-					if (recordKeys[index].keyType != ANCHOR_KEYTYPE || !anchor)
+					if (recordKeys[index].keyType != AnchorPlotter.ANCHOR_KEYTYPE || !anchor)
 						continue;
 					
 					_anchors.push(anchor);
@@ -445,10 +414,10 @@ namespace weavejs.plot
 				return;
 			
 			// sort by polar angle
-			_anchors.sort(anchorCompareFunctionByPolarAngle);
+			_anchors.sort(AnchorPlotter.anchorCompareFunctionByPolarAngle);
 			
 			// draw convex hull
-			for(index = 0; index < _anchors.length - 1; index++)
+			for (index = 0; index < _anchors.length - 1; index++)
 			{
 				anchor1 = _anchors[index];
 				anchor2 = _anchors[index + 1];
@@ -471,35 +440,26 @@ namespace weavejs.plot
 			graphics.lineTo(p2.x, p2.y);
 			
 			graphics.endFill();
-			destination.draw(static_tempShape);
-			
-			function anchorCompareFunctionByPolarAngle(a1:AnchorPoint, a2:AnchorPoint):number
-			{
-				if(a1.polarRadians.value < a2.polarRadians.value)
-				{
-					return -1;
-				} else if (a1.polarRadians.value > a2.polarRadians.value)
-				{
-					return 1;
-				} else {
-					return 0;
-				}
-			}
-			
+
 		}
-		
-		
-		
-		public drawVoronoi(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+
+		private static anchorCompareFunctionByPolarAngle(a1:AnchorPoint, a2:AnchorPoint):number
+		{
+			if (a1.polarRadians.value < a2.polarRadians.value)
+				return -1;
+			else if (a1.polarRadians.value > a2.polarRadians.value)
+				return 1;
+			else
+				return 0;
+		}
+
+		public drawVoronoi(recordKeys:IQualifiedKey[], dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
 			// http://blog.ivank.net/voronoi-diagram-in-as3.html
-			var graphics:Graphics = static_tempShape.graphics;
-			graphics.clear();
-			
 			var i:int;
-			var edges:Vector.<VEdge>; // vector  for edges
+			var edges:VEdge[];
 			var v:Voronoi = new Voronoi();
-			var vertices:Vector.<Point> = new Vector.<Point>();
+			var vertices:Point[] = [];
 			
 			var counter:int = 0;
 			
@@ -511,10 +471,10 @@ namespace weavejs.plot
 			if (!recordKeys || !recordKeys.length)
 				return;
 			
-			for each(var key:IQualifiedKey in recordKeys)
+			for (var key of recordKeys)
 			{
-				anchor = anchors.getObject(key.localName) as AnchorPoint;
-				if (key.keyType != ANCHOR_KEYTYPE || !anchor)
+				anchor = Weave.AS(this.radviz.anchors.getObject(key.localName), AnchorPoint);
+				if (key.keyType != AnchorPlotter.ANCHOR_KEYTYPE || !anchor)
 					continue;
 				
 				barycenter.x += anchor.x.value;
@@ -536,25 +496,24 @@ namespace weavejs.plot
 			edges = v.GetEdges(vertices, screenBounds.getWidth(), screenBounds.getHeight());
 			
 			graphics.lineStyle(1, 0x888888);
-			for(i = 0; i< edges.length; i++)
+			for (i = 0; i < edges.length; i++)
 			{
 			   graphics.moveTo(edges[i].start.x, edges[i].start.y);
 			   graphics.lineTo(edges[i].end  .x, edges[i].end  .y);
 			}
-			destination.draw(static_tempShape);
 		}
 		
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			if (anchors)
+			if (this.radviz.anchors)
 			{
-				var bounds:Bounds2D = initBoundsArray(output);
-				var anchor:AnchorPoint = anchors.getObject(recordKey.localName) as AnchorPoint;
+				var bounds:Bounds2D = this.initBoundsArray(output);
+				var anchor:AnchorPoint = Weave.AS(this.radviz.anchors.getObject(recordKey.localName), AnchorPoint);
 				if (anchor)
 					bounds.includeCoords(anchor.x.value, anchor.y.value);
 			}
 			else
-				initBoundsArray(output, 0);
+				this.initBoundsArray(output, 0);
 		}
 		
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
@@ -567,44 +526,9 @@ namespace weavejs.plot
 			return 0 <= value && value <= 1;
 		}
 		
-		private _matrix:Matrix = new Matrix();
 		private _tempBounds:Bounds2D = new Bounds2D();
 		private _tempRectangle:Rectangle = new Rectangle();
 		
-		private drawRectangle(graphics:Graphics,destination:BitmapData):void
-		{
-			_bitmapText.getUnrotatedBounds(_tempBounds);			
-			_tempBounds.getRectangle(_tempRectangle);
-			
-			//graphics.drawRect(_tempRectangle.x, _tempRectangle.y, _tempRectangle.width, _tempRectangle.height);
-			
-			destination.fillRect(_tempRectangle,  0x02808080);
-			return;
-			var height:number = _tempBounds.getWidth();
-			var width:number = _tempBounds.getHeight();
-			
-			/*_tempBounds.getRectangle(_tempRectangle);
-			var p1:Point = new Point();
-			_tempBounds.getMinPoint(p1);
-			var p2:Point = new Point(_tempBounds.xMin, _tempBounds.yMax);
-			var p3:Point = new Point();
-			_tempBounds.getMaxPoint(p3);
-			var p4:Point = new Point(_tempBounds.xMax, _tempBounds.yMin);
-			var angle:number = _bitmapText.angle;
-			angle = angle * Math.PI/180;
-			var p:Point = new Point();
-			_tempBounds.getMinPoint(p);
-						
-			graphics.moveTo(p1.x,p1.y);
-			graphics.lineTo(p2.x,p2.y);
-			graphics.moveTo(p2.x,p2.y);
-			graphics.lineTo(p3.x,p3.y);
-			graphics.moveTo(p3.x,p3.y);
-			graphics.lineTo(p4.x,p4.y);
-			graphics.moveTo(p4.x,p4.y);
-			graphics.lineTo(p1.x,p1.y);*/
-			//graphics.drawRect(rect.x, rect.y, rect.width, rect.height);
-		}		
 		public rotatePoint(p:Point, o:Point, d:number):Point{
 			
 			var np:Point = new Point();
@@ -613,7 +537,7 @@ namespace weavejs.plot
 			np.x = (p.x * Math.cos(d)) - (p.y * Math.sin(d));
 			np.y = Math.sin(d) * p.x + Math.cos(d) * p.y;
 			np.x += (0 + o.x);
-			np.y += (0 + o.y)
+			np.y += (0 + o.y);
 			
 			return np;
 			

@@ -16,7 +16,6 @@
 namespace weavejs.plot
 {
 	import Graphics = PIXI.Graphics;
-	import Shape = flash.display.Shape;
 	import Point = weavejs.geom.Point;
 	
 	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
@@ -27,21 +26,7 @@ namespace weavejs.plot
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import DrawUtils = weavejs.util.DrawUtils;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
-	
-	export class StickFigureGlyphPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
-	{
-		public constructor()
-		{
-		}
-		
-		public getSelectableAttributeNames():Array
-		{
-			return ["X", "Y", "Theta 1", "Theta 2", "Theta 3", "Theta 4"];
-		}
-		public getSelectableAttributes():Array
-		{
-			return [dataX, dataY, theta1, theta2, theta3, theta4] = weavejs.geom.SolidLineStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	
 	export class StickFigureGlyphPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
 	{
@@ -49,13 +34,13 @@ namespace weavejs.plot
 		{
 		}
 		
-		public getSelectableAttributeNames():Array
+		public getSelectableAttributeNames()
 		{
 			return ["X", "Y", "Theta 1", "Theta 2", "Theta 3", "Theta 4"];
 		}
-		public getSelectableAttributes():Array
+		public getSelectableAttributes()
 		{
-			return [dataX, dataY, theta1, theta2, theta3, theta4];
+			return [this.dataX, this.dataY, this.theta1, this.theta2, this.theta3, this.theta4];
 		}
 
 		/**
@@ -66,10 +51,10 @@ namespace weavejs.plot
 		public theta3:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		public theta4:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 		
-		private theta1stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta1));
-		private theta2stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta2));
-		private theta3stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta3));
-		private theta4stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(theta4));
+		private theta1stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.theta1));
+		private theta2stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.theta2));
+		private theta3stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.theta3));
+		private theta4stats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.theta4));
 		/**
 		 * This is the limb length.
 		 */
@@ -84,27 +69,26 @@ namespace weavejs.plot
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, buffer:Graphics):void
 		{
 			// project data coordinates to screen coordinates and draw graphics
-			var theta1:number = Math.PI*theta1stats.getNorm(recordKey);
-			var theta2:number = Math.PI*theta2stats.getNorm(recordKey);
-			var theta3:number = Math.PI*theta3stats.getNorm(recordKey);
-			var theta4:number = Math.PI*theta4stats.getNorm(recordKey);
+			var theta1:number = Math.PI*this.theta1stats.getNorm(recordKey);
+			var theta2:number = Math.PI*this.theta2stats.getNorm(recordKey);
+			var theta3:number = Math.PI*this.theta3stats.getNorm(recordKey);
+			var theta4:number = Math.PI*this.theta4stats.getNorm(recordKey);
 			var limbLength:number = this.limbLength.getValueFromKey(recordKey, Number);
-			tempPoint.x = dataX.getValueFromKey(recordKey, Number);
-			tempPoint.y = dataY.getValueFromKey(recordKey, Number);
-			dataBounds.projectPointTo(tempPoint, screenBounds);
+			StickFigureGlyphPlotter.tempPoint.x = this.dataX.getValueFromKey(recordKey, Number);
+			StickFigureGlyphPlotter.tempPoint.y = this.dataY.getValueFromKey(recordKey, Number);
+			dataBounds.projectPointTo(StickFigureGlyphPlotter.tempPoint, screenBounds);
 
 			// draw graphics
 			var graphics:Graphics = tempShape.graphics;
-			var x:number = tempPoint.x;
-			var y:number = tempPoint.y;
+			var x:number = StickFigureGlyphPlotter.tempPoint.x;
+			var y:number = StickFigureGlyphPlotter.tempPoint.y;
 			var topY:number = y+(limbLength/2);
 			var bottomY:number = y-(limbLength/2);
 			
-			lineStyle.beginLineStyle(recordKey, graphics);				
-	
+			this.lineStyle.beginLineStyle(recordKey, graphics);				
 
 			//trace("graphics.drawCircle(",tempPoint.x, tempPoint.y, radius,");");
 			graphics.moveTo(x, y);
@@ -136,22 +120,23 @@ namespace weavejs.plot
 			
 			//move back to top and draw first limb with top of vertical line as "orgin point"
 			if (!isNaN(theta1)){
-				DrawUtils.drawCurvedLine(graphics, x, topY, x+(Math.sin(theta1)*limbLength), topY-(Math.cos(theta1)*limbLength), curvature.value);
+				DrawUtils.drawCurvedLine(graphics, x, topY, x+(Math.sin(theta1)*limbLength), topY-(Math.cos(theta1)*limbLength), this.curvature.value);
 			}
 			//move back to top and draw second limb with top of vertical line as "orgin point"
 			if (!isNaN(theta2)){
-				DrawUtils.drawCurvedLine(graphics, x, topY, x-(Math.sin(theta2)*limbLength), topY-(Math.cos(theta2)*limbLength), curvature.value);
+				DrawUtils.drawCurvedLine(graphics, x, topY, x-(Math.sin(theta2)*limbLength), topY-(Math.cos(theta2)*limbLength), this.curvature.value);
 			}
 			//move back to top and draw second limb with bottom of vertical line as "orgin point"
 			if (!isNaN(theta3)){
-				DrawUtils.drawCurvedLine(graphics, x, bottomY, x-(Math.sin(theta3)*limbLength), bottomY+(Math.cos(theta3)*limbLength), curvature.value);
+				DrawUtils.drawCurvedLine(graphics, x, bottomY, x-(Math.sin(theta3)*limbLength), bottomY+(Math.cos(theta3)*limbLength), this.curvature.value);
 			}
 			//move back to top and draw second limb with bottom of vertical line as "orgin point"
 			if (!isNaN(theta4)){
-				DrawUtils.drawCurvedLine(graphics, x, bottomY, x+(Math.sin(theta4)*limbLength), bottomY+(Math.cos(theta4)*limbLength), curvature.value);
+				DrawUtils.drawCurvedLine(graphics, x, bottomY, x+(Math.sin(theta4)*limbLength), bottomY+(Math.cos(theta4)*limbLength), this.curvature.value);
 			}
 		}
 		
 		private static tempPoint:Point = new Point(); // reusable object
 	}
 }
+

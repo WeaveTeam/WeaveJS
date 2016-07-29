@@ -15,15 +15,10 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
 	import Graphics = PIXI.Graphics;
 	import Point = weavejs.geom.Point;
-	import TextFormatAlign = flash.text.TextFormatAlign;
 
-	import NumberFormatter = mx.formatters.NumberFormatter;
-	
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-	import Bounds2D = weavejs.geom.Bounds2D;
 	import IPlotTask = weavejs.api.ui.IPlotTask;
 	import StandardLib = weavejs.util.StandardLib;
 	import CallbackCollection = weavejs.core.CallbackCollection;
@@ -32,25 +27,25 @@ namespace weavejs.plot
 	import LinkableString = weavejs.core.LinkableString;
 	import KeySet = weavejs.data.key.KeySet;
 	import Bounds2D = weavejs.geom.Bounds2D;
-	import LinkableBounds2D = weavejs.primitives.LinkableBounds2D;
-	import LinkableNumberFormatter = weavejs.primitives.LinkableNumberFormatter;
-	import LooseAxisDescription = weavejs.primitives.LooseAxisDescription;
-	import BitmapText = weavejs.util.BitmapText;
-	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
-	
+	import LinkableBounds2D = weavejs.geom.LinkableBounds2D;
+	import LooseAxisDescription = weavejs.plot.LooseAxisDescription;
+	import LinkableTextFormat = weavejs.plot.LinkableTextFormat;
+	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
+
 	export class AxisPlotter extends AbstractPlotter
 	{
 		public constructor()
 		{
+			super();
 			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
-			spatialCallbacks.addImmediateCallback(this, updateLabels);
+			this.spatialCallbacks.addImmediateCallback(this, this.updateLabels);
 
 			// set defaults so something will show if these values are not set
-			axisLineDataBounds.setBounds(-1, -1, 1, 1);
-			axisLineMinValue.value = -1;
-			axisLineMaxValue.value = 1;
+			this.axisLineDataBounds.setBounds(-1, -1, 1, 1);
+			this.axisLineMinValue.value = -1;
+			this.axisLineMaxValue.value = 1;
 			
-			setSingleKeySource(_keySet);
+			this.setSingleKeySource(this._keySet);
 			this.addSpatialDependencies(
 				this.axisLineDataBounds,
 				this.axisLineMinValue,
@@ -110,8 +105,8 @@ namespace weavejs.plot
 		private _xDataTickDelta:number; // x distance between ticks
 		private _yDataTickDelta:number; // y distance between ticks
 		private KEY_TYPE:string = Weave.className(AxisPlotter);
-		private MIN_LABEL_KEY:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(KEY_TYPE, 'minLabel');
-		private MAX_LABEL_KEY:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(KEY_TYPE, 'maxLabel');
+		private MIN_LABEL_KEY:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(this.KEY_TYPE, 'minLabel');
+		private MAX_LABEL_KEY:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(this.KEY_TYPE, 'maxLabel');
 		private _numberFormatter:NumberFormatter = new NumberFormatter();
 		
 		public showRealMinAndMax:boolean = false;
@@ -119,40 +114,39 @@ namespace weavejs.plot
 		// validates tick mark variables		
 		public updateLabels():void
 		{
-			var cc:CallbackCollection;
-			var callbackCollections:Array = [Weave.getCallbacks(this), spatialCallbacks];
+			var callbackCollections:ICallbackCollection[] = [Weave.getCallbacks(this), this.spatialCallbacks];
 
 			// make sure callbacks only run once
-			for each (cc in callbackCollections)
+			for (let cc of callbackCollections)
 				cc.delayCallbacks();
 			
-			var minValue:number = tickMinValue.value;
-			var maxValue:number = tickMaxValue.value;
+			var minValue:number = this.tickMinValue.value;
+			var maxValue:number = this.tickMaxValue.value;
 			if (isNaN(minValue))
-				minValue = axisLineMinValue.value;
+				minValue = this.axisLineMinValue.value;
 			if (isNaN(maxValue))
-				maxValue = axisLineMaxValue.value;
+				maxValue = this.axisLineMaxValue.value;
 				
-			_axisDescription.setup(minValue, maxValue, tickCountRequested.value, forceTickCount.value);
+			this._axisDescription.setup(minValue, maxValue, this.tickCountRequested.value, this.forceTickCount.value);
 			
 			
-			labelNumberFormatter.precision.value = _axisDescription.numberOfDigits;
+			this.labelNumberFormatter.precision.value = this._axisDescription.numberOfDigits;
 			
-			var newKeys:Array = showRealMinAndMax ? [MIN_LABEL_KEY] : [];
-			for (var i:int = 0; i < _axisDescription.numberOfTicks; i++)
+			var newKeys:IQualifiedKey[] = this.showRealMinAndMax ? [this.MIN_LABEL_KEY] : [];
+			for (var i:int = 0; i < this._axisDescription.numberOfTicks; i++)
 			{
 				// only include tick marks that are between min,max values
-				var tickValue:number = _axisDescription.tickMin + i * _axisDescription.tickDelta;
-				if (axisLineMinValue.value <= tickValue && tickValue <= axisLineMaxValue.value)
-					newKeys.push(WeaveAPI.QKeyManager.getQKey(KEY_TYPE, String(i)));
+				var tickValue:number = this._axisDescription.tickMin + i * this._axisDescription.tickDelta;
+				if (this.axisLineMinValue.value <= tickValue && tickValue <= this.axisLineMaxValue.value)
+					newKeys.push(WeaveAPI.QKeyManager.getQKey(this.KEY_TYPE, String(i)));
 			}
-			if(showRealMinAndMax)
-				newKeys.push(MAX_LABEL_KEY);
+			if (this.showRealMinAndMax)
+				newKeys.push(this.MAX_LABEL_KEY);
 			
-			var keysChanged:boolean = _keySet.replaceKeys(newKeys);
+			var keysChanged:boolean = this._keySet.replaceKeys(newKeys);
 			
 			// allow callbacks to run now
-			for each (cc in callbackCollections)
+			for (let cc of callbackCollections)
 				cc.resumeCallbacks();
 		}
 		
@@ -163,30 +157,30 @@ namespace weavejs.plot
 		 */
 		private getTickValueAndDataCoords(recordKey:IQualifiedKey, outputPoint:Point):number
 		{
-			var _axisLineMinValue:number = axisLineMinValue.value;
-			var _axisLineMaxValue:number = axisLineMaxValue.value;
-			axisLineDataBounds.copyTo(_tempBounds);
+			var _axisLineMinValue:number = this.axisLineMinValue.value;
+			var _axisLineMaxValue:number = this.axisLineMaxValue.value;
+			this.axisLineDataBounds.copyTo(this._tempBounds);
 
 			var tickValue:number;
 			// special case for min,max labels
-			if (recordKey == MIN_LABEL_KEY)
+			if (recordKey == this.MIN_LABEL_KEY)
 			{
 				tickValue = _axisLineMinValue;
-				outputPoint.x = _tempBounds.xMin;
-				outputPoint.y = _tempBounds.yMin;
+				outputPoint.x = this._tempBounds.xMin;
+				outputPoint.y = this._tempBounds.yMin;
 			}
-			else if (recordKey == MAX_LABEL_KEY)
+			else if (recordKey == this.MAX_LABEL_KEY)
 			{
 				tickValue = _axisLineMaxValue;
-				outputPoint.x = _tempBounds.xMax;
-				outputPoint.y = _tempBounds.yMax;
+				outputPoint.x = this._tempBounds.xMax;
+				outputPoint.y = this._tempBounds.yMax;
 			}
 			else
 			{
 				var tickIndex:int = parseInt(recordKey.localName);
-				tickValue = _axisDescription.tickMin + tickIndex * _axisDescription.tickDelta;
-				outputPoint.x = StandardLib.scale(tickValue, _axisLineMinValue, _axisLineMaxValue, _tempBounds.xMin, _tempBounds.xMax);
-				outputPoint.y = StandardLib.scale(tickValue, _axisLineMinValue, _axisLineMaxValue, _tempBounds.yMin, _tempBounds.yMax);
+				tickValue = this._axisDescription.tickMin + tickIndex * this._axisDescription.tickDelta;
+				outputPoint.x = StandardLib.scale(tickValue, _axisLineMinValue, _axisLineMaxValue, this._tempBounds.xMin, this._tempBounds.xMax);
+				outputPoint.y = StandardLib.scale(tickValue, _axisLineMinValue, _axisLineMaxValue, this._tempBounds.yMin, this._tempBounds.yMax);
 			}
 			
 			return tickValue;
@@ -195,73 +189,71 @@ namespace weavejs.plot
 		// gets the bounds of a tick mark
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			initBoundsArray(output);
-			getTickValueAndDataCoords(recordKey, tempPoint);
-			(output[0] as Bounds2D).includePoint(tempPoint);
+			this.initBoundsArray(output);
+			this.getTickValueAndDataCoords(recordKey, this.tempPoint);
+			output[0].includePoint(this.tempPoint);
 		}
 		
 		// draws the tick marks
 		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
-			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
+			this.drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private drawAll(recordKeys:IQualifiedKey[], dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
 //			if (recordKeys.length == 0)
 //				trace(this,'drawPlot',arguments);
 			
-			initPrivateAxisLineBoundsVariables(dataBounds, screenBounds);
+			this.initPrivateAxisLineBoundsVariables(dataBounds, screenBounds);
 			// everything below is in screen coordinates
 
 			// get the angle of the axis line (relative to real screen coordinates, positive Y in downward direction)
-			var axisAngle:number = Math.atan2(_axisLineScreenBounds.getHeight(), _axisLineScreenBounds.getWidth());
+			var axisAngle:number = Math.atan2(this._axisLineScreenBounds.getHeight(), this._axisLineScreenBounds.getWidth());
 			// ticks are perpendicular to axis line
 			var tickAngle:number = axisAngle + Math.PI / 2;
 			// label angle is relative to axis angle
-			var labelAngle:number = axisAngle + axisLabelRelativeAngle.value * Math.PI / 180; // convert from degrees to radians
+			var labelAngle:number = axisAngle + this.axisLabelRelativeAngle.value * Math.PI / 180; // convert from degrees to radians
 
 			// calculate tick line offset from angle
-			var xTickOffset:number = Math.cos(tickAngle) * axisTickLength.value / 2;
-			var yTickOffset:number = Math.sin(tickAngle) * axisTickLength.value / 2;
+			var xTickOffset:number = Math.cos(tickAngle) * this.axisTickLength.value / 2;
+			var yTickOffset:number = Math.sin(tickAngle) * this.axisTickLength.value / 2;
 			
 			// calculate label offset from angle
-			var _labelDistance:number = axisLabelDistance.value;
-			var labelAngleOffset:number = labelDistanceIsVertical.value ? Math.PI / 2: 0;
-			var xLabelOffset:number = Math.cos(labelAngle + labelAngleOffset) * axisLabelDistance.value;
-			var yLabelOffset:number = Math.sin(labelAngle + labelAngleOffset) * axisLabelDistance.value;
+			var _labelDistance:number = this.axisLabelDistance.value;
+			var labelAngleOffset:number = this.labelDistanceIsVertical.value ? Math.PI / 2: 0;
+			var xLabelOffset:number = Math.cos(labelAngle + labelAngleOffset) * this.axisLabelDistance.value;
+			var yLabelOffset:number = Math.sin(labelAngle + labelAngleOffset) * this.axisLabelDistance.value;
 			
-			setupBitmapText();
-			_bitmapText.maxWidth = 80; // TEMPORARY SOLUTION (for word wrap)
+			this.setupBitmapText();
+			this._bitmapText.maxWidth = 80; // TEMPORARY SOLUTION (for word wrap)
 			
 			// calculate the distance between tick marks to use as _bitmapText.maxHeight
-			var lineLength:number = Math.sqrt(Math.pow(_axisLineScreenBounds.getWidth(), 2) + Math.pow(_axisLineScreenBounds.getHeight(), 2));
-			var tickScreenDelta:number = lineLength / (_axisDescription.numberOfTicks - 1);
+			var lineLength:number = Math.sqrt(Math.pow(this._axisLineScreenBounds.getWidth(), 2) + Math.pow(this._axisLineScreenBounds.getHeight(), 2));
+			var tickScreenDelta:number = lineLength / (this._axisDescription.numberOfTicks - 1);
 			tickScreenDelta /= Math.SQRT2; // TEMPORARY SOLUTION -- assumes text is always at 45 degree angle
-			_bitmapText.maxHeight = tickScreenDelta;
+			this._bitmapText.maxHeight = tickScreenDelta;
 
-			_bitmapText.angle = labelAngle * 180 / Math.PI; // convert from radians to degrees
+			this._bitmapText.angle = labelAngle * 180 / Math.PI; // convert from radians to degrees
 			
 			// init number formatter for beginning & end tick marks
-			labelNumberFormatter.copyTo(_numberFormatter);
+			this.labelNumberFormatter.copyTo(this._numberFormatter);
 			
-			var graphics:Graphics = tempShape.graphics;
 			for (var i:int = 0; i < recordKeys.length; i++)
 			{
-				var key:IQualifiedKey = recordKeys[i] as IQualifiedKey;
+				var key:IQualifiedKey = recordKeys[i];
 
 				// get screen coordinates of tick mark
-				var tickValue:number = getTickValueAndDataCoords(key, tempPoint);
+				var tickValue:number = this.getTickValueAndDataCoords(key, this.tempPoint);
 								
-				_axisLineDataBounds.projectPointTo(tempPoint, _axisLineScreenBounds);
-				var xTick:number = tempPoint.x;
-				var yTick:number = tempPoint.y;
+				this._axisLineDataBounds.projectPointTo(this.tempPoint, this._axisLineScreenBounds);
+				var xTick:number = this.tempPoint.x;
+				var yTick:number = this.tempPoint.y;
 				
 				// draw tick mark line
-				graphics.clear();
-				graphics.lineStyle(axisTickThickness.value, axisTickColor.value, axisTickAlpha.value);
+				graphics.lineStyle(this.axisTickThickness.value, this.axisTickColor.value, this.axisTickAlpha.value);
 				
-				if ( key == MIN_LABEL_KEY || key == MAX_LABEL_KEY )
+				if ( key == this.MIN_LABEL_KEY || key == this.MAX_LABEL_KEY )
 				{
 					graphics.moveTo(xTick - xTickOffset*2, yTick - yTickOffset*2);
 					graphics.lineTo(xTick + xTickOffset*2, yTick + yTickOffset*2);
@@ -271,41 +263,40 @@ namespace weavejs.plot
 					graphics.moveTo(xTick - xTickOffset, yTick - yTickOffset);
 					graphics.lineTo(xTick + xTickOffset, yTick + yTickOffset);
 				}
-				destination.draw(tempShape);
-				
+
 				// draw tick mark label
-				_bitmapText.text = null;
+				this._bitmapText.text = null;
 				// attempt to use label function
-				var labelFunctionResult:string = _labelFunction == null ? null : _labelFunction(tickValue);
-				if (_labelFunction != null && labelFunctionResult != null)
+				var labelFunctionResult:string = this._labelFunction == null ? null : this._labelFunction(tickValue);
+				if (this._labelFunction != null && labelFunctionResult != null)
 				{
-					_bitmapText.text = labelFunctionResult;
+					this._bitmapText.text = labelFunctionResult;
 				}
-				else if (key == MIN_LABEL_KEY || key == MAX_LABEL_KEY )
+				else if (key == this.MIN_LABEL_KEY || key == this.MAX_LABEL_KEY )
 				{
-					if (tickValue == int(tickValue))
-						_numberFormatter.precision = -1;
+					if (tickValue == (tickValue | 0))
+						this._numberFormatter.precision = -1;
 					else
-						_numberFormatter.precision = 2;
+						this._numberFormatter.precision = 2;
 					
-					_bitmapText.text = _numberFormatter.format(tickValue);
+					this._bitmapText.text = this._numberFormatter.format(tickValue);
 				}
 				else
 				{
-					_bitmapText.text = labelNumberFormatter.format(tickValue);
+					this._bitmapText.text = this.labelNumberFormatter.format(tickValue);
 				}
 				
 
-				_bitmapText.x = xTick + xLabelOffset;
-				_bitmapText.y = yTick + yLabelOffset;
-				_bitmapText.draw(destination);
+				this._bitmapText.x = xTick + xLabelOffset;
+				this._bitmapText.y = yTick + yLabelOffset;
+				this._bitmapText.draw(graphics);
 			}
 		}
 		
 		private _titleBounds:Bounds2D = null;
 		public getTitleLabelBounds():Bounds2D
 		{
-			return _titleBounds;
+			return this._titleBounds;
 		}
 		
 		public static LABEL_POSITION_AT_AXIS_MIN:string  		= "AxisPlotter.LABEL_POSITION_AT_AXIS_MIN";
@@ -318,17 +309,17 @@ namespace weavejs.plot
 		
 		// BEGIN TEMPORARY SOLUTION
 		public setSideAxisName(name:string, angle:number, xDistance:number, yDistance:number, verticalAlign:string,
-									    labelPosition:string = LABEL_POSITION_AT_AXIS_CENTER, labelAlignment:string = null,
+									    labelPosition:string = AxisPlotter.LABEL_POSITION_AT_AXIS_CENTER, labelAlignment:string = null,
 									    maxLabelWidth:int = -1):void
 		{
-			_axisName = name;
-			_axisNameAngle = angle;
-			_axisNameXDistance = xDistance;
-			_axisNameYDistance = yDistance;
-			_axisNameVerticalAlign = verticalAlign;
-			_labelPosition = labelPosition;
-			_labelAlignment = labelAlignment;
-			_maxLabelWidth = maxLabelWidth;
+			this._axisName = name;
+			this._axisNameAngle = angle;
+			this._axisNameXDistance = xDistance;
+			this._axisNameYDistance = yDistance;
+			this._axisNameVerticalAlign = verticalAlign;
+			this._labelPosition = labelPosition;
+			this._labelAlignment = labelAlignment;
+			this._maxLabelWidth = maxLabelWidth;
 			
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
@@ -343,79 +334,76 @@ namespace weavejs.plot
 		// END TEMPORARY SOLUTION
 		
 		// draws the axis line
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
-			setupAxisNameBitmapText(dataBounds,screenBounds);
+			this.setupAxisNameBitmapText(dataBounds,screenBounds);
 			
 			// draw the axis line
-			var graphics:Graphics = tempShape.graphics;
-			graphics.clear();
-			graphics.lineStyle(axisLineThickness.value, axisLineColor.value, axisLineAlpha.value);
-			graphics.moveTo(_axisLineScreenBounds.xMin, _axisLineScreenBounds.yMin);
-			graphics.lineTo(_axisLineScreenBounds.xMax, _axisLineScreenBounds.yMax);
-			destination.draw(tempShape);
-			if (showAxisName.value && _axisName != null)
+			graphics.lineStyle(this.axisLineThickness.value, this.axisLineColor.value, this.axisLineAlpha.value);
+			graphics.moveTo(this._axisLineScreenBounds.xMin, this._axisLineScreenBounds.yMin);
+			graphics.lineTo(this._axisLineScreenBounds.xMax, this._axisLineScreenBounds.yMax);
+			if (this.showAxisName.value && this._axisName != null)
 			{
 //				getAxisNameScreenBounds(dataBounds,screenBounds,_tempBounds);
 //				destination.fillRect(new Rectangle(_tempBounds.xMin,_tempBounds.yMin,_tempBounds.width,_tempBounds.height),0x80FF0000);
-				_bitmapText.draw(destination);
+				this._bitmapText.draw(graphics);
 			}
 		}
 		
 		private _tempBounds:Bounds2D = new Bounds2D();
 		
-		protected function setupBitmapText():void
+		protected setupBitmapText():void
 		{
-			LinkableTextFormat.defaultTextFormat.copyTo(_bitmapText.textFormat);
+			LinkableTextFormat.defaultTextFormat.copyTo(this._bitmapText.textFormat);
 			try {
-				_bitmapText.textFormat.align = labelTextAlignment.value;
-			} catch (e:Error) { }
+				this._bitmapText.textFormat.align = this.labelTextAlignment.value;
+			} catch (e) { }
 			
-			_bitmapText.horizontalAlign = labelHorizontalAlign.value;
-			_bitmapText.verticalAlign = labelVerticalAlign.value;
+			this._bitmapText.horizontalAlign = this.labelHorizontalAlign.value;
+			this._bitmapText.verticalAlign = this.labelVerticalAlign.value;
 		}
 		
-		protected function setupAxisNameBitmapText(dataBounds:Bounds2D, screenBounds:Bounds2D):void
+		protected setupAxisNameBitmapText(dataBounds:Bounds2D, screenBounds:Bounds2D):void
 		{
-			initPrivateAxisLineBoundsVariables(dataBounds, screenBounds);
+			this.initPrivateAxisLineBoundsVariables(dataBounds, screenBounds);
 
 			//trace(dataBounds, screenBounds);
 
 			// BEGIN TEMPORARY SOLUTION -- setup BitmapText for axis name
-			if (_axisName != null)
+			if (this._axisName != null)
 			{
-				setupBitmapText();
-				_bitmapText.text = _axisName;
-				_bitmapText.angle = _axisNameAngle;
-				_bitmapText.textFormat.align = TextFormatAlign.LEFT;
-				_bitmapText.verticalAlign = _axisNameAngle == 0 ? BitmapText.VERTICAL_ALIGN_BOTTOM : BitmapText.VERTICAL_ALIGN_TOP;
-				_bitmapText.maxWidth = _axisNameAngle == 0 ? screenBounds.getXCoverage() : screenBounds.getYCoverage();
-				_bitmapText.maxHeight = 40; // temporary solution
+				this.setupBitmapText();
+				this._bitmapText.text = this._axisName;
+				this._bitmapText.angle = this._axisNameAngle;
+				this._bitmapText.textFormat.align = TextFormatAlign.LEFT;
+				this._bitmapText.verticalAlign = this._axisNameAngle == 0 ? BitmapText.VERTICAL_ALIGN_BOTTOM : BitmapText.VERTICAL_ALIGN_TOP;
+				this._bitmapText.maxWidth = this._axisNameAngle == 0 ? screenBounds.getXCoverage() : screenBounds.getYCoverage();
+				this._bitmapText.maxHeight = 40; // temporary solution
 				
-				if(_maxLabelWidth != -1)
-					_bitmapText.maxWidth = _maxLabelWidth;
+				if (this._maxLabelWidth != -1)
+					this._bitmapText.maxWidth = this._maxLabelWidth;
 				
-				if(_labelPosition == LABEL_POSITION_AT_AXIS_MIN)
+				if (this._labelPosition == AxisPlotter.LABEL_POSITION_AT_AXIS_MIN)
 				{
-					_bitmapText.x = _axisLineScreenBounds.xMin + _axisNameXDistance;
-					_bitmapText.y = _axisLineScreenBounds.yMin + _axisNameYDistance;
-					_bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_LEFT;
+					this._bitmapText.x = this._axisLineScreenBounds.xMin + this._axisNameXDistance;
+					this._bitmapText.y = this._axisLineScreenBounds.yMin + this._axisNameYDistance;
+					this._bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_LEFT;
 				}
-				if(_labelPosition == LABEL_POSITION_AT_AXIS_MAX)
+				if (this._labelPosition == AxisPlotter.LABEL_POSITION_AT_AXIS_MAX)
 				{
-					_bitmapText.x = _axisLineScreenBounds.xMax + _axisNameXDistance;
-					_bitmapText.y = _axisLineScreenBounds.yMax + _axisNameYDistance;
-					_bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_RIGHT;
+					this._bitmapText.x = this._axisLineScreenBounds.xMax + this._axisNameXDistance;
+					this._bitmapText.y = this._axisLineScreenBounds.yMax + this._axisNameYDistance;
+					this._bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_RIGHT;
 				}
-				if(_labelPosition == LABEL_POSITION_AT_AXIS_CENTER)
+				if (this._labelPosition == AxisPlotter.LABEL_POSITION_AT_AXIS_CENTER)
 				{
-					_bitmapText.x = _axisLineScreenBounds.getXCenter() + _axisNameXDistance;
-					_bitmapText.y = _axisLineScreenBounds.getYCenter() + _axisNameYDistance;
-					_bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_CENTER;
+					this._bitmapText.x = this._axisLineScreenBounds.getXCenter() + this._axisNameXDistance;
+					this._bitmapText.y = this._axisLineScreenBounds.getYCenter() + this._axisNameYDistance;
+					this._bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_CENTER;
 				}
 				
-				if(_labelAlignment)
-					_bitmapText.horizontalAlign = _labelAlignment;
+				if (this._labelAlignment)
+					this._bitmapText.horizontalAlign = this._labelAlignment;
 
 				//_titleBounds = new Bounds2D(_bitmapText.x, _bitmapText.y, _bitmapText.width + _bitmapText.x, _bitmapText.height + _bitmapText.y)
 
@@ -433,16 +421,16 @@ namespace weavejs.plot
 		// gets the bounds of the axis line
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
-			axisLineDataBounds.copyTo(output);
+			this.axisLineDataBounds.copyTo(output);
 		}
 		
 		private initPrivateAxisLineBoundsVariables(dataBounds:Bounds2D, screenBounds:Bounds2D):void
 		{
 			// get axis line data bounds and project to screen coordinates
-			axisLineDataBounds.copyTo(_axisLineDataBounds);
+			this.axisLineDataBounds.copyTo(this._axisLineDataBounds);
 			// project to screen coords
-			_axisLineScreenBounds.copyFrom(_axisLineDataBounds);
-			dataBounds.projectCoordsTo(_axisLineScreenBounds, screenBounds);
+			this._axisLineScreenBounds.copyFrom(this._axisLineDataBounds);
+			dataBounds.projectCoordsTo(this._axisLineScreenBounds, screenBounds);
 		}
 
 		private _axisLineDataBounds:Bounds2D = new Bounds2D();
@@ -453,10 +441,11 @@ namespace weavejs.plot
 		// TEMPORARY SOLUTION
 		public setLabelFunction(func:Function):void
 		{
-			_labelFunction = func;
+			this._labelFunction = func;
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		private _labelFunction:Function = null;
 		// END TEMPORARY SOLUTION
 	}
 }
+

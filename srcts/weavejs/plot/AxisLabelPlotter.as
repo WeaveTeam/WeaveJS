@@ -15,11 +15,8 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
-	import Matrix = flash.geom.Matrix;
 	import Point = weavejs.geom.Point;
-	import TextFormatAlign = flash.text.TextFormatAlign;
-	
+
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IPlotter = weavejs.api.ui.IPlotter;
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
@@ -29,33 +26,31 @@ namespace weavejs.plot
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import LinkableString = weavejs.core.LinkableString;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
-	import BitmapText = weavejs.util.BitmapText;
 	import ColumnUtils = weavejs.data.ColumnUtils;
-	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
-	
+	import LinkableTextFormat = weavejs.plot.LinkableTextFormat;
+	import Graphics = PIXI.Graphics;
+
 	export class AxisLabelPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
-		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, AxisLabelPlotter, "Axis labels");
-		
 		public constructor()
 		{
-			setSingleKeySource(text);
+			super();
+			this.setSingleKeySource(this.text);
 			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			this.addSpatialDependencies(this.alongXAxis, this.begin, this.end);
 		}
 		
-		public getSelectableAttributes():Array
+		public getSelectableAttributes()
 		{
-			return [text];
+			return [this.text];
 		}
 		
-		public getSelectableAttributeNames():Array
+		public getSelectableAttributeNames()
 		{
 			return ['Label text'];
 		}
 				
 		private bitmapText:BitmapText = new BitmapText();
-		private matrix:Matrix = new Matrix();
 
 		private static tempPoint:Point = new Point(); // reusable object
 
@@ -68,17 +63,16 @@ namespace weavejs.plot
 		
 		public color:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
 		public text:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public textFormatAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT, verifyTextFormatAlign));
+		public textFormatAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_LEFT, this.verifyTextFormatAlign));
 		public hAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER));
 		public vAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE));
 		public angle:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
-		public hideOverlappingText:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		public xScreenOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
 		public yScreenOffset:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0));
 		public maxWidth:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(80));
 		public alignToDataMax:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 		
-		public labelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, false, ['number', 'string', 'column']));
+		public labelFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('string', true, ['number', 'string', 'column']));
 		
 		private verifyTextFormatAlign(value:string):boolean
 		{
@@ -93,31 +87,27 @@ namespace weavejs.plot
 		/**
 		 * Draws the graphics onto BitmapData.
 		 */
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
-			var textWasDrawn:Array = [];
-			var reusableBoundsObjects:Array = [];
-			var bounds:Bounds2D;
+			LinkableTextFormat.defaultTextFormat.copyTo(this.bitmapText.textFormat);
+			this.bitmapText.textFormat.color = this.color.value;
+			this.bitmapText.angle = this.angle.value;
+			this.bitmapText.verticalAlign = this.vAlign.value;
+			this.bitmapText.horizontalAlign = this.hAlign.value;
+			this.bitmapText.maxWidth = this.maxWidth.value;
+			this.bitmapText.textFormat.align = this.textFormatAlign.value;
 			
-			LinkableTextFormat.defaultTextFormat.copyTo(bitmapText.textFormat);
-			bitmapText.textFormat.color = color.value;
-			bitmapText.angle = angle.value;
-			bitmapText.verticalAlign = vAlign.value;
-			bitmapText.horizontalAlign = hAlign.value;
-			bitmapText.maxWidth = maxWidth.value;
-			bitmapText.textFormat.align = textFormatAlign.value;
+			var _begin:number = Math.max(this.begin.value || -Infinity, this.alongXAxis.value ? dataBounds.getXMin() : dataBounds.getYMin());
+			var _end:number = Math.min(this.end.value || Infinity, this.alongXAxis.value ? dataBounds.getXMax() : dataBounds.getYMax());
+			var _interval:number = Math.abs(this.interval.value);
+			var _offset:number = this.offset.value || 0;
 			
-			var _begin:number = numericMax(begin.value, alongXAxis.value ? dataBounds.getXMin() : dataBounds.getYMin());
-			var _end:number = numericMin(end.value, alongXAxis.value ? dataBounds.getXMax() : dataBounds.getYMax());
-			var _interval:number = Math.abs(interval.value);
-			var _offset:number = offset.value || 0;
-			
-			var scale:number = alongXAxis.value
+			var scale:number = this.alongXAxis.value
 				? dataBounds.getXCoverage() / screenBounds.getXCoverage()
 				: dataBounds.getYCoverage() / screenBounds.getYCoverage();
 			
 			if (_begin < _end && ((_begin - _offset) % _interval == 0 || _interval == 0))
-				drawLabel(_begin, dataBounds, screenBounds, destination);
+				this.drawLabel(_begin, dataBounds, screenBounds, destination);
 			
 			if (_interval > scale)
 			{
@@ -125,66 +115,59 @@ namespace weavejs.plot
 				if (first <= _begin)
 					first += _interval;
 				for (var i:int = 0, number:number = first; number < _end; number = first + _interval * ++i)
-					drawLabel(number, dataBounds, screenBounds, destination);
+					this.drawLabel(number, dataBounds, screenBounds, destination);
 			}
-			else if (isFinite(offset.value) && _begin < _offset && _offset < _end)
-				drawLabel(_offset, dataBounds, screenBounds, destination);
+			else if (isFinite(this.offset.value) && _begin < _offset && _offset < _end)
+				this.drawLabel(_offset, dataBounds, screenBounds, destination);
 
 			if (_begin <= _end && ((_end - _offset) % _interval == 0 || _interval == 0))
-				drawLabel(_end, dataBounds, screenBounds, destination);
+				this.drawLabel(_end, dataBounds, screenBounds, destination);
 		}
 		
-		private drawLabel(number:number, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private drawLabel(number:number, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
-			bitmapText.text = ColumnUtils.deriveStringFromNumber(text, number) || StandardLib.formatNumber(number);
+			this.bitmapText.text = ColumnUtils.deriveStringFromNumber(this.text, number) || StandardLib.formatNumber(number);
 			try
 			{
-				if (labelFunction.value)
-					bitmapText.text = labelFunction.apply(null, [number, bitmapText.text, text]);
+				if (this.labelFunction.value)
+					this.bitmapText.text = this.labelFunction.apply(null, [number, this.bitmapText.text, this.text]);
 			}
-			catch (e:Error)
+			catch (e)
 			{
 				return;
 			}
 			
-			if (alongXAxis.value)
+			if (this.alongXAxis.value)
 			{
-				tempPoint.x = number;
-				tempPoint.y = alignToDataMax.value ? dataBounds.getYMax() : dataBounds.getYMin();
+				AxisLabelPlotter.tempPoint.x = number;
+				AxisLabelPlotter.tempPoint.y = this.alignToDataMax.value ? dataBounds.getYMax() : dataBounds.getYMin();
 			}
 			else
 			{
-				tempPoint.x = alignToDataMax.value ? dataBounds.getXMax() : dataBounds.getXMin();
-				tempPoint.y = number;
+				AxisLabelPlotter.tempPoint.x = this.alignToDataMax.value ? dataBounds.getXMax() : dataBounds.getXMin();
+				AxisLabelPlotter.tempPoint.y = number;
 			}
-			dataBounds.projectPointTo(tempPoint, screenBounds);
-			bitmapText.x = tempPoint.x + xScreenOffset.value;
-			bitmapText.y = tempPoint.y + yScreenOffset.value;
+			dataBounds.projectPointTo(AxisLabelPlotter.tempPoint, screenBounds);
+			this.bitmapText.x = AxisLabelPlotter.tempPoint.x + this.xScreenOffset.value;
+			this.bitmapText.y = AxisLabelPlotter.tempPoint.y + this.yScreenOffset.value;
 								
-			bitmapText.draw(destination);
+			this.bitmapText.draw(destination);
 		}
 		
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			output.reset();
-			if (alongXAxis.value)
-				output.setXRange(begin.value, end.value);
+			if (this.alongXAxis.value)
+				output.setXRange(this.begin.value, this.end.value);
 			else
-				output.setYRange(begin.value, end.value);
-		}
-		
-		private numericMin(userValue:number, systemValue:number):number
-		{
-			return userValue < systemValue ? userValue : systemValue; // if userValue is NaN, returns systemValue
-		}
-		
-		private numericMax(userValue:number, systemValue:number):number
-		{
-			return userValue > systemValue ? userValue : systemValue; // if userValue is NaN, returns systemValue
+				output.setYRange(this.begin.value, this.end.value);
 		}
 		
 		// backwards compatibility
 		/*[Deprecated] public set start(value:number):void { begin.value = offset.value = value; }
 		[Deprecated] public set horizontal(value:boolean):void { alongXAxis.value = value; }*/
 	}
+
+	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, AxisLabelPlotter, "Axis labels");
 }
+

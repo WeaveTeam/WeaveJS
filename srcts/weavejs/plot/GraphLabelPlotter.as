@@ -29,10 +29,10 @@ namespace weavejs.plot
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import BitmapText = weavejs.util.BitmapText;
-	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import LinkableTextFormat = weavejs.plot.LinkableTextFormat;
 	import ObjectPool = weavejs.util.ObjectPool;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 
 	/**
 	 * A plotter for placing and rendering labels on the graph plotter.
@@ -43,7 +43,7 @@ namespace weavejs.plot
 		public constructor()
 		{
 			super();
-			setSingleKeySource(nodesColumn);
+			this.setSingleKeySource(this.nodesColumn);
 			//nodesColumn.addImmediateCallback(this, setKeySource, [nodesColumn], true);
 			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			this.addSpatialDependencies(this.labelColumn, this.nodesColumn, this.edgeSourceColumn, this.edgeTargetColumn, this.radius);
@@ -52,7 +52,7 @@ namespace weavejs.plot
 
 		public runCallbacks():void
 		{
-			spatialCallbacks.triggerCallbacks();
+			this.spatialCallbacks.triggerCallbacks();
 		}
 		
 		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
@@ -61,12 +61,12 @@ namespace weavejs.plot
 			// don't let labels overlap nodes (might need a separate KDTree to handle this)
 			// dynamically place labels
 			
-			if (!(task.asyncState is Function))
+			if (typeof task.asyncState != 'function')
 			{
 				// these variables are used to save state between function calls
 				var i:int;
 				var textWasDrawn:Array = [];
-				var reusableBoundsObjects:Array = [];
+				var reusableBoundsObjects:Bounds2D[] = [];
 				var bounds:Bounds2D;
 				var nodes:Array = [];
 				
@@ -75,7 +75,7 @@ namespace weavejs.plot
 					if (task.iteration < task.recordKeys.length)
 					{
 						var recordKey:IQualifiedKey = task.recordKeys[task.iteration];
-						var node:IGraphNode = (layoutAlgorithm as IGraphAlgorithm).getNodeFromKey(recordKey);
+						var node:IGraphNode = layoutAlgorithm.getNodeFromKey(recordKey);
 						
 						// project data coordinates to screen coordinates and draw graphics onto tempShape
 						tempDataPoint.x = node.position.x;
@@ -85,7 +85,7 @@ namespace weavejs.plot
 						// round to nearest pixel to get clearer text
 						bitmapText.x = Math.round(tempDataPoint.x);
 						bitmapText.y = Math.round(tempDataPoint.y);
-						bitmapText.text = labelColumn.getValueFromKey(recordKey, String) as String;
+						bitmapText.text = labelColumn.getValueFromKey(recordKey, String) as string;
 		
 						LinkableTextFormat.defaultTextFormat.copyTo(bitmapText.textFormat);
 						bitmapText.verticalAlign = BitmapText.VERTICAL_ALIGN_MIDDLE;
@@ -102,7 +102,7 @@ namespace weavejs.plot
 						var j:int;
 						for (j = 0; j < i; j++)
 						{
-							if (textWasDrawn[j] && bounds.overlaps(reusableBoundsObjects[j] as Bounds2D))
+							if (textWasDrawn[j] && bounds.overlaps(reusableBoundsObjects[j]))
 							{
 								overlaps = true;
 								break;
@@ -149,21 +149,21 @@ namespace weavejs.plot
 		
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			initBoundsArray(output);
+			this.initBoundsArray(output);
 			var bounds:Bounds2D = output[0];
 			
-			if (!layoutAlgorithm)
+			if (!this.layoutAlgorithm)
 				return;
 			
-			var node:IGraphNode = (layoutAlgorithm as IGraphAlgorithm).getNodeFromKey(recordKey);
+			var node:IGraphNode = this.layoutAlgorithm.getNodeFromKey(recordKey);
 			if (node)
 				bounds.includePoint(node.position);
 		}
 		
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
-			if (layoutAlgorithm)
-				(layoutAlgorithm as IGraphAlgorithm).getOutputBounds(filteredKeySet.keys, output);
+			if (this.layoutAlgorithm)
+				this.layoutAlgorithm.getOutputBounds(this.filteredKeySet.keys, output);
 			else
 				output.reset();
 		}				
@@ -178,10 +178,10 @@ namespace weavejs.plot
 		public fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 
 //		public sizeColumn:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn());
-		public labelColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
-		public nodesColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
-		public edgeSourceColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
-		public edgeTargetColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), handleColumnsChange);
+		public labelColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), this.handleColumnsChange);
+		public nodesColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), this.handleColumnsChange);
+		public edgeSourceColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), this.handleColumnsChange);
+		public edgeTargetColumn:DynamicColumn = Weave.linkableChild(this, new DynamicColumn(IAttributeColumn), this.handleColumnsChange);
 		public radius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2)); // radius of the circles
 
 		public layoutAlgorithm:IGraphAlgorithm = null;

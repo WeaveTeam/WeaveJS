@@ -198,7 +198,7 @@ package weavejs.core
 				return null;
 			if (!class_or_instance.prototype)
 				class_or_instance = class_or_instance.constructor;
-			var info:Object = class_or_instance && class_or_instance.prototype && class_or_instance.prototype.FLEXJS_REFLECTION_INFO;
+			var info:* = class_or_instance && class_or_instance.prototype && class_or_instance.prototype.FLEXJS_REFLECTION_INFO;
 			if (info is Function)
 			{
 				info = info();

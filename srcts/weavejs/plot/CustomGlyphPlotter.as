@@ -15,8 +15,6 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
-	
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -29,36 +27,35 @@ namespace weavejs.plot
 
 	export class CustomGlyphPlotter extends AbstractGlyphPlotter implements ITextPlotter
 	{
-		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, CustomGlyphPlotter, "ActionScript glyphs");
-		
 		public constructor()
 		{
-			setColumnKeySources([dataX, dataY]);
-			vars.childListCallbacks.addImmediateCallback(this, handleVarList);
+			super();
+			this.setColumnKeySources([this.dataX, this.dataY]);
+			this.vars.childListCallbacks.addImmediateCallback(this, this.handleVarList);
 			this.addSpatialDependencies(this.vars, this.function_getDataBoundsFromRecordKey, this.function_getBackgroundDataBounds);
 		}
 		private handleVarList():void
 		{
 			// When a new column is created, register the stats to trigger callbacks and affect busy status.
 			// This will be cleaned up automatically when the column is disposed.
-			var newColumn:IAttributeColumn = vars.childListCallbacks.lastObjectAdded as IAttributeColumn;
+			var newColumn:IAttributeColumn = Weave.AS(this.vars.childListCallbacks.lastObjectAdded, IAttributeColumn);
 			if (newColumn)
-				Weave.linkableChild(vars, WeaveAPI.StatisticsCache.getColumnStatistics(newColumn));
+				Weave.linkableChild(this.vars, WeaveAPI.StatisticsCache.getColumnStatistics(newColumn));
 		}
 		
 		/**
 		 * This can hold any objects that should be stored in the session state.
 		 */
-		publics:ILinkableHashMap = Weave.linkableChild(this, LinkableHashMap);
+		public vars:ILinkableHashMap = Weave.linkableChild(this, LinkableHashMap);
 		public locals:Object = {};
 		
-		public_drawPlot:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_drawPlot, false, true, ['keys','dataBounds','screenBounds','destination']));
-		public static script_drawPlot:string = <![CDATA[
+		public function_drawPlot:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(CustomGlyphPlotter.script_drawPlot, false, ['keys','dataBounds','screenBounds','destination']));
+		public static script_drawPlot:string = `
 			// Parameter types: Array, Bounds2D, Bounds2D, BitmapData
 			function(keys, dataBounds, screenBounds, destination)
 			{
-				import DynamicColumn' = 'weave.data.AttributeColumns.DynamicColumn';
-				import GraphicsBuffer' = 'weave.utils.GraphicsBuffer';
+				import 'weave.data.AttributeColumns.DynamicColumn';
+				import 'weave.utils.GraphicsBuffer';
 			
 				var getStats = WeaveAPI.StatisticsCache.getColumnStatistics;
 				var colorColumn = vars.requestObject('color', DynamicColumn, false);
@@ -71,7 +68,7 @@ namespace weavejs.plot
 				buffer.destination(destination)
 					.lineStyle(1, 0x000000, 0.5); // weight, color, alpha
 			
-				for each (key in keys)
+				for (key of keys)
 				{
 					getCoordsFromRecordKey(key, tempPoint); // uses dataX,dataY
 					// project x,y data coordinates to screen coordinates
@@ -100,7 +97,7 @@ namespace weavejs.plot
 				}
 				buffer.flush();
 			}
-		]]>;
+		`;
 		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			try
@@ -109,22 +106,22 @@ namespace weavejs.plot
 				if (task.iteration <= task.recordKeys.length)
 					return 0;
 				
-				function_drawPlot.call(this, task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
+				this.function_drawPlot.call(this, task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			}
-			catch (e:*)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 			return 1;
 		}
 		
-		public_drawBackground:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_drawBackground, false, true, ['dataBounds', 'screenBounds', 'destination']));
-		public static script_drawBackground:string = <![CDATA[
+		public function_drawBackground:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(CustomGlyphPlotter.script_drawBackground, false, true, ['dataBounds', 'screenBounds', 'destination']));
+		public static script_drawBackground:string = `
 			// Parameter types: Bounds2D, Bounds2D, BitmapData
 			function(dataBounds, screenBounds, destination)
 			{
 				/*
-				import GraphicsBuffer' = 'weave.utils.GraphicsBuffer';
+				import 'weave.utils.GraphicsBuffer';
 			
 				var graphicBuffer = new GraphicsBuffer(destination);
 			
@@ -133,21 +130,21 @@ namespace weavejs.plot
 				graphicsBuffer.flush();
 				*/
 			}
-		]]>;
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		`;
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
 			try
 			{
-				function_drawBackground.apply(this, arguments);
+				this.function_drawBackground.apply(this, arguments);
 			}
-			catch (e:*)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}
 		
-		public_getDataBoundsFromRecordKey:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_getDataBoundsFromRecordKey, false, true, ['key', 'output']));
-		public static script_getDataBoundsFromRecordKey:string = <![CDATA[
+		public function_getDataBoundsFromRecordKey:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(CustomGlyphPlotter.script_getDataBoundsFromRecordKey, false, ['key', 'output']));
+		public static script_getDataBoundsFromRecordKey:string = `
 			// Parameter types: IQualifiedKey, Array
 			function(key, output)
 			{
@@ -160,21 +157,21 @@ namespace weavejs.plot
 				if (isNaN(tempPoint.y))
 					bounds.setYRange(-Infinity, Infinity);
 			}
-		]]>;
+		`;
 		/*override*/ public getDataBoundsFromRecordKey(key:IQualifiedKey, output:Bounds2D[]):void
 		{
 			try
 			{
-				function_getDataBoundsFromRecordKey.apply(this, arguments);
+				this.function_getDataBoundsFromRecordKey.apply(this, arguments);
 			}
-			catch (e:*)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}
 		
-		public_getBackgroundDataBounds:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(script_getBackgroundDataBounds, false, true, ['output']));
-		public static script_getBackgroundDataBounds:string = <![CDATA[
+		public function_getBackgroundDataBounds:LinkableFunction = Weave.linkableChild(this, new LinkableFunction(CustomGlyphPlotter.script_getBackgroundDataBounds, false, ['output']));
+		public static script_getBackgroundDataBounds:string = `
 			// Parameter type: Bounds2D
 			function (output)
 			{
@@ -196,17 +193,20 @@ namespace weavejs.plot
 					);
 				}
 			}
-		]]>;
+		`;
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			try
 			{
-				function_getBackgroundDataBounds.apply(this, arguments);
+				this.function_getBackgroundDataBounds.apply(this, arguments);
 			}
-			catch (e:*)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}
 	}
+
+	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, CustomGlyphPlotter, "ActionScript glyphs");
 }
+

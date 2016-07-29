@@ -15,17 +15,13 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
 	import Graphics = PIXI.Graphics;
-	import Shape = flash.display.Shape;
 	import Point = weavejs.geom.Point;
-	import Dictionary = flash.utils.Dictionary;
-	
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import Bounds2D = weavejs.geom.Bounds2D;
-	import ILayoutAlgorithm = weavejs.api.radviz.ILayoutAlgorithm;
+	import ILayoutAlgorithm = weavejs.geom.radviz.ILayoutAlgorithm;
 	import IPlotTask = weavejs.api.ui.IPlotTask;
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 	import StandardLib = weavejs.util.StandardLib;
@@ -35,62 +31,59 @@ namespace weavejs.plot
 	import LinkableString = weavejs.core.LinkableString;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
-	import Bounds2D = weavejs.geom.Bounds2D;
 	import ColorRamp = weavejs.util.ColorRamp;
-	import BruteForceLayoutAlgorithm = weavejs.radviz.BruteForceLayoutAlgorithm;
-	import GreedyLayoutAlgorithm = weavejs.radviz.GreedyLayoutAlgorithm;
-	import IncrementalLayoutAlgorithm = weavejs.radviz.IncrementalLayoutAlgorithm;
-	import NearestNeighborLayoutAlgorithm = weavejs.radviz.NearestNeighborLayoutAlgorithm;
-	import RandomLayoutAlgorithm = weavejs.radviz.RandomLayoutAlgorithm;
+	import BruteForceLayoutAlgorithm = weavejs.geom.radviz.BruteForceLayoutAlgorithm;
+	import GreedyLayoutAlgorithm = weavejs.geom.radviz.GreedyLayoutAlgorithm;
+	import IncrementalLayoutAlgorithm = weavejs.geom.radviz.IncrementalLayoutAlgorithm;
+	import NearestNeighborLayoutAlgorithm = weavejs.geom.radviz.NearestNeighborLayoutAlgorithm;
+	import RandomLayoutAlgorithm = weavejs.geom.radviz.RandomLayoutAlgorithm;
 	import ColumnUtils = weavejs.data.ColumnUtils;
 	import DrawUtils = weavejs.util.DrawUtils;
-	import RadVizUtils = weavejs.util.RadVizUtils;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
-	
+	import RadVizUtils = weavejs.geom.radviz.RadVizUtils;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
+	import WeaveProperties = weavejs.app.WeaveProperties;
+	import D2D_KeyColumnNumber = weavejs.geom.radviz.D2D_KeyColumnNumber;
+	import Dictionary2D = weavejs.util.Dictionary2D;
+
 	export class CompoundRadVizPlotter extends AbstractPlotter implements ISelectableAttributes
 	{
 		public constructor()
 		{
-			fillStyle.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
-			setNewRandomJitterColumn();		
-			iterations.value = 50;
-			
-			algorithms[RANDOM_LAYOUT] = RandomLayoutAlgorithm;
-			algorithms[GREEDY_LAYOUT] = GreedyLayoutAlgorithm;
-			algorithms[NEAREST_NEIGHBOR] = NearestNeighborLayoutAlgorithm;
-			algorithms[INCREMENTAL_LAYOUT] = IncrementalLayoutAlgorithm;
-			algorithms[BRUTE_FORCE] = BruteForceLayoutAlgorithm;
-			
-			columns.childListCallbacks.addImmediateCallback(this, handleColumnsListChange);
-			Weave.getCallbacks(filteredKeySet).addImmediateCallback(this, handleColumnsChange, true);
-			Weave.getCallbacks(this).addImmediateCallback(this, clearCoordCache);
+			super();
+			this.fillStyle.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
+			this.setNewRandomJitterColumn();
+			this.iterations.value = 50;
+
+			this.columns.childListCallbacks.addImmediateCallback(this, this.handleColumnsListChange);
+			Weave.getCallbacks(this.filteredKeySet).addImmediateCallback(this, this.handleColumnsChange, true);
+			Weave.getCallbacks(this).addImmediateCallback(this, this.clearCoordCache);
 			this.addSpatialDependencies(this.columns, this.localNormalization, this.anchors, this.jitterLevel, this.enableJitter);
 		}
 		private handleColumnsListChange():void
 		{
 			// When a new column is created, register the stats to trigger callbacks and affect busy status.
 			// This will be cleaned up automatically when the column is disposed.
-			var newColumn:IAttributeColumn = columns.childListCallbacks.lastObjectAdded as IAttributeColumn;
+			var newColumn:IAttributeColumn = Weave.AS(this.columns.childListCallbacks.lastObjectAdded, IAttributeColumn);
 			if (newColumn)
 			{
 				var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(newColumn);
 				this.addSpatialDependencies(stats);
-				Weave.getCallbacks(stats).addImmediateCallback(this, handleColumnsChange);
+				Weave.getCallbacks(stats).addImmediateCallback(this, this.handleColumnsChange);
 			}
 		}
 		
-		public getSelectableAttributeNames():Array
+		public getSelectableAttributeNames()
 		{
 			return ["Size", "Color", "Anchor Dimensions"];
 		}
 		
-		public getSelectableAttributes():Array
+		public getSelectableAttributes()
 		{
-			return [radiusColumn, fillStyle.color, columns];
+			return [this.radiusColumn, this.fillStyle.color, this.columns];
 		}
 		
-		public columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), handleColumnsChange);
+		public columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), this.handleColumnsChange);
 		public localNormalization:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
 		
 		/**
@@ -108,140 +101,140 @@ namespace weavejs.plot
 		
 		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		public fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
-		public get alphaColumn():AlwaysDefinedColumn { return fillStyle.alpha; }
-		public colorMap:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampXMLByName("Paired")),fillColorMap);
-		public anchorColorMap:Dictionary;
+		public get alphaColumn():AlwaysDefinedColumn { return this.fillStyle.alpha; }
+		public colorMap:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")),this.fillColorMap);
+		public anchorColorMap:Map<string, number>;
 		
 		/**
 		 * This is the radius of the circle, in screen coordinates.
 		 */
 		public radiusColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		private radiusColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(radiusColumn));
+		private radiusColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.radiusColumn));
 		public radiusConstant:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
 		
-		private static randomValueArray:Array = new Array();
-		private static randomArrayIndexMap:Dictionary;
-		private keyNumberMap:Dictionary;
-		private keyNormMap:Dictionary;
-		private keyGlobalNormMap:Dictionary;
-		private keyMaxMap:Dictionary;
-		private keyMinMap:Dictionary;
-		private columnTitleMap:Dictionary;
+		private static randomValueArray:number[] = [];
+		private static randomArrayIndexMap:WeakMap<IQualifiedKey, number>;
+		private keyNumberMap:D2D_KeyColumnNumber;
+		private keyNormMap:WeakMap<IQualifiedKey, number[]>;
+		private keyGlobalNormMap:WeakMap<IQualifiedKey, number[]>;
+		private keyMaxMap:WeakMap<IQualifiedKey, number>;
+		private keyMinMap:WeakMap<IQualifiedKey, number>;
+		private columnTitleMap:WeakMap<IAttributeColumn, string>;
 		
 		private _currentScreenBounds:Bounds2D = new Bounds2D();
 		
 		private handleColumnsChange():void
 		{
-			if (Weave.isBusy(columns) || Weave.isBusy(spatialCallbacks))
+			if (Weave.isBusy(this.columns) || Weave.isBusy(this.spatialCallbacks))
 				return;
 			
 			var i:int = 0;
-			var keyNormArray:Array;
-			var columnNormArray:Array;
-			var columnNumberMap:Dictionary;
-			var columnNumberArray:Array;
-			_columns = columns.getObjects(IAttributeColumn);
+			var keyNormArray:number[];
+			var columnNormArray:number[];
+			var columnNumberMap:Map<IAttributeColumn, number>;
+			var columnNumberArray:number[];
+			this._columns = this.columns.getObjects(IAttributeColumn);
 			var sum:number = 0;
 			
-			randomArrayIndexMap = 	new Dictionary(true);				
-			keyMaxMap = 			new Dictionary(true);
-			keyMinMap = 			new Dictionary(true);
-			keyNormMap = 			new Dictionary(true);
-			keyGlobalNormMap = 		new Dictionary(true);
-			keyNumberMap = 			new Dictionary(true);
-			columnTitleMap = 		new Dictionary(true);
+			CompoundRadVizPlotter.randomArrayIndexMap = 	new WeakMap();
+			this.keyMaxMap = 			new WeakMap();
+			this.keyMinMap = 			new WeakMap();
+			this.keyNormMap = 			new WeakMap();
+			this.keyGlobalNormMap = 		new WeakMap();
+			this.keyNumberMap = 			new Dictionary2D<IQualifiedKey, IAttributeColumn, number>(true);
+			this.columnTitleMap = 		new WeakMap();
 			
-			if (_columns.length > 0) 
+			if (this._columns.length > 0) 
 			{
-				var keySources:Array = _columns.concat();
-				keySources.unshift(radiusColumn);
-				var sortDirections:Array = keySources.map(function(c:*, i:int, a:*):int { return i == 0 ? -1 : 1; });
-				setColumnKeySources(keySources, sortDirections);
+				var keySources = this._columns.concat();
+				keySources.unshift(this.radiusColumn);
+				var sortDirections = keySources.map(function(c:any, i:int, a:any):int { return i == 0 ? -1 : 1; });
+				this.setColumnKeySources(keySources, sortDirections);
 			
-				for each( var key:IQualifiedKey in filteredKeySet.keys)
+				for (var key of this.filteredKeySet.keys)
 				{					
-					randomArrayIndexMap[key] = i ;										
+					CompoundRadVizPlotter.randomArrayIndexMap.set(key, i);
 					var magnitude:number = 0;
 					columnNormArray = [];
 					columnNumberArray = [];
-					columnNumberMap = new Dictionary(true);
+					columnNumberMap = new Map();
 					sum = 0;
-					for each( var column:IAttributeColumn in _columns)
+					for (var column of this._columns)
 					{
 						var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(column);
-						if(i == 0)
-							columnTitleMap[column] = columns.getName(column);
+						if (i == 0)
+							this.columnTitleMap.set(column, this.columns.getName(column));
 						columnNormArray.push(stats.getNorm(key));
-						columnNumberMap[column] = column.getValueFromKey(key, Number);
-						columnNumberArray.push(columnNumberMap[column]);
+						columnNumberMap.set(column, column.getValueFromKey(key, Number));
+						columnNumberArray.push(columnNumberMap.get(column));
 					}
-					for each(var x:number in columnNumberMap)
+					for (var x of columnNumberMap.values())
 					{
 						magnitude += (x*x);
 					}					
-					keyMaxMap[key] = Math.sqrt(magnitude);
-					keyMinMap[key] = Math.min.apply(null, columnNumberArray);
+					this.keyMaxMap.set(key, Math.sqrt(magnitude));
+					this.keyMinMap.set(key, Math.min.apply(null, columnNumberArray));
 					
-					keyNumberMap[key] = columnNumberMap ;	
-					keyNormMap[key] = columnNormArray ;
+					this.keyNumberMap.map.set(key, columnNumberMap);
+					this.keyNormMap.set(key, columnNormArray);
 					i++
 				}
 				
-				for each( var k:IQualifiedKey in filteredKeySet.keys)
+				for (var k of this.filteredKeySet.keys)
 				{
 					keyNormArray = [];
 					i = 0;
-					for each( var col:IAttributeColumn in _columns)
+					for (var col of this._columns)
 					{
-						keyNormArray.push((keyNumberMap[k][col] - keyMinMap[k])/(keyMaxMap[k] - keyMinMap[k]));
+						keyNormArray.push((this.keyNumberMap.get(k,col) - this.keyMinMap.get(k))/(this.keyMaxMap.get(k) - this.keyMinMap.get(k)));
 						i++;
 					}					
-					keyGlobalNormMap[k] = keyNormArray;
+					this.keyGlobalNormMap.set(k, keyNormArray);
 				}
 			}
 			else
 			{
-				setSingleKeySource(null);
+				this.setSingleKeySource(null);
 			}
 			
-			setAnchorLocations();
-			fillColorMap();
+			this.setAnchorLocations();
+			this.fillColorMap();
 		}
 		
 		public setAnchorLocations():void
-		{			
-			_columns = columns.getObjects(IAttributeColumn);
-			var theta:number = (2*Math.PI)/_columns.length;
+		{
+			this._columns = this.columns.getObjects(IAttributeColumn);
+			var theta:number = (2*Math.PI)/this._columns.length;
 			var anchor:AnchorPoint;
-			anchors.delayCallbacks();
-			anchors.removeAllObjects();
-			for( var i:int = 0; i < _columns.length; i++ )
+			this.anchors.delayCallbacks();
+			this.anchors.removeAllObjects();
+			for ( var i:int = 0; i < this._columns.length; i++ )
 			{
-				anchor = anchors.requestObject(columns.getName(_columns[i]), AnchorPoint, false) as AnchorPoint ;								
+				anchor = this.anchors.requestObject(this.columns.getName(this._columns[i]), AnchorPoint, false);
 				anchor.x.value = Math.cos(theta*i);
 				anchor.y.value = Math.sin(theta*i);		
-				anchor.title.value = ColumnUtils.getTitle(_columns[i]);
+				anchor.title.value = ColumnUtils.getTitle(this._columns[i]);
 			}
-			anchors.resumeCallbacks();
+			this.anchors.resumeCallbacks();
 		}			
 				
 		private fillColorMap():void
 		{
 			var i:int = 0;
-			anchorColorMap = new Dictionary(true);
-			var _anchors:Array = anchors.getObjects(AnchorPoint);
+			this.anchorColorMap = new Map();
+			var _anchors = this.anchors.getObjects(AnchorPoint);
 			
-			for each( var anchor:AnchorPoint in anchors.getObjects())
+			for (var anchor of this.anchors.getObjects())
 			{
-				anchorColorMap[anchors.getName(anchor)] = colorMap.getColorFromNorm(i / (_anchors.length - 1)); 
+				this.anchorColorMap.set(this.anchors.getName(anchor), this.colorMap.getColorFromNorm(i / (_anchors.length - 1)));
 				i++;
 			}
 		}
 		
-		private coordCache:Dictionary = new Dictionary(true);
+		private coordCache:WeakMap<IQualifiedKey, number[]> = new WeakMap();
 		private clearCoordCache():void
 		{
-			coordCache = new Dictionary(true);
+			this.coordCache = new WeakMap();
 		}
 		
 		/**
@@ -249,11 +242,11 @@ namespace weavejs.plot
 		 */
 		private getXYcoordinates(recordKey:IQualifiedKey):number
 		{
-			var cached:Array = coordCache[recordKey] as Array;
+			var cached = this.coordCache.get(recordKey);
 			if (cached)
 			{
-				coordinate.x = cached[0];
-				coordinate.y = cached[1];
+				this.coordinate.x = cached[0];
+				this.coordinate.y = cached[1];
 				return cached[2];
 			}
 			
@@ -262,53 +255,54 @@ namespace weavejs.plot
 			var numeratorY:number = 0;
 			var denominator:number = 0;
 			
-			var anchorArray:Array = anchors.getObjects();			
+			var anchorArray = this.anchors.getObjects(AnchorPoint);
 			
 			var sum:number = 0;			
 			var value:number = 0;			
 			var name:string;
 			var keyMapExists:boolean = true;
 			var anchor:AnchorPoint;
-			var array:Array = (localNormalization.value) ? keyNormMap[recordKey] : keyGlobalNormMap[recordKey];
-			if(!array) keyMapExists = false;
-			var array2:Dictionary = keyNumberMap[recordKey];
+			var array = (this.localNormalization.value) ? this.keyNormMap.get(recordKey) : this.keyGlobalNormMap.get(recordKey);
+			if (!array)
+				keyMapExists = false;
+			var map_column_number = this.keyNumberMap.map.get(recordKey);
 			var i:int = 0;
-			for each( var column:IAttributeColumn in _columns)
-			{				
+			for (var column of this._columns)
+			{
 				var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(column);
 				value = (keyMapExists) ? array[i] : stats.getNorm(recordKey);
-				name = (keyMapExists) ? columnTitleMap[column] : columns.getName(column);	
-				sum += (keyMapExists) ? array2[column] : column.getValueFromKey(recordKey, Number);
-				anchor = anchors.getObject(name) as AnchorPoint;
+				name = (keyMapExists) ? this.columnTitleMap.get(column) : this.columns.getName(column);
+				sum += (keyMapExists) ? map_column_number.get(column) : column.getValueFromKey(recordKey, Number);
+				anchor = this.anchors.getObject(name) as AnchorPoint;
 				numeratorX += value * anchor.x.value;
 				numeratorY += value * anchor.y.value;						
 				denominator += value;
 				i++ ;
 			}
-			if(denominator==0) 
+			if (denominator==0)
 			{
 				denominator = .00001;
 			}
-			coordinate.x = (numeratorX/denominator);
-			coordinate.y = (numeratorY/denominator);
-			if( enableJitter.value )
-				jitterRecords(recordKey);			
+			this.coordinate.x = (numeratorX/denominator);
+			this.coordinate.y = (numeratorY/denominator);
+			if ( this.enableJitter.value )
+				this.jitterRecords(recordKey);			
 			
-			coordCache[recordKey] = [coordinate.x, coordinate.y, sum];
+			this.coordCache.set(recordKey, [this.coordinate.x, this.coordinate.y, sum]);
 			
 			return sum;
 		}
 		
 		private jitterRecords(recordKey:IQualifiedKey):void
 		{
-			var index:number = randomArrayIndexMap[recordKey];
-			var jitter:number = Math.abs(StandardLib.asNumber(jitterLevel.value));
-			var xJitter:number = (randomValueArray[index])/(jitter);
-			if(randomValueArray[index+1] % 2) xJitter *= -1;
-			var yJitter:number = (randomValueArray[index+2])/(jitter);
-			if(randomValueArray[index+3])yJitter *= -1;
-			if(!isNaN(xJitter))coordinate.x += xJitter ;
-			if(!isNaN(yJitter))coordinate.y += yJitter ;
+			var index:number = CompoundRadVizPlotter.randomArrayIndexMap.get(recordKey);
+			var jitter:number = Math.abs(StandardLib.asNumber(this.jitterLevel.value));
+			var xJitter:number = (CompoundRadVizPlotter.randomValueArray[index])/(jitter);
+			if (CompoundRadVizPlotter.randomValueArray[index+1] % 2) xJitter *= -1;
+			var yJitter:number = (CompoundRadVizPlotter.randomValueArray[index+2])/(jitter);
+			if (CompoundRadVizPlotter.randomValueArray[index+3])yJitter *= -1;
+			if (!isNaN(xJitter))this.coordinate.x += xJitter ;
+			if (!isNaN(yJitter))this.coordinate.y += yJitter ;
 		}
 		
 		public drawWedge(destination:Graphics, beginRadians:number, spanRadians:number, projectedPoint:Point, radius:number = 1):void
@@ -326,21 +320,21 @@ namespace weavejs.plot
 		 */
 		public setNewRandomJitterColumn():void
 		{
-			randomValueArray = [] ;
-			if( randomValueArray.length == 0 )
-				for( var i:int = 0; i < 5000 ;i++ )
+			CompoundRadVizPlotter.randomValueArray = [] ;
+			if ( CompoundRadVizPlotter.randomValueArray.length == 0 )
+				for ( var i:int = 0; i < 5000 ;i++ )
 				{
-					randomValueArray.push( Math.random() % 10) ;
-					randomValueArray.push( -(Math.random() % 10)) ;
+					CompoundRadVizPlotter.randomValueArray.push( Math.random() % 10) ;
+					CompoundRadVizPlotter.randomValueArray.push( -(Math.random() % 10)) ;
 				}
-			spatialCallbacks.triggerCallbacks();
+			this.spatialCallbacks.triggerCallbacks();
 		}
 		
 		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
 			if (task.iteration == 0)
 			{
-				if (!keyNumberMap || keyNumberMap[task.recordKeys[0]] == null)
+				if (!this.keyNumberMap || !this.keyNumberMap.map.has(task.recordKeys[0]))
 					return 1;
 			}
 			return super.drawPlotAsyncIteration(task);
@@ -348,31 +342,30 @@ namespace weavejs.plot
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{						
-			var graphics:Graphics = tempShape.graphics;
-			var radius:number = (radiusColumn.getInternalColumn()) ? radiusColumnStats.getNorm(recordKey) : radiusConstant.value;
+			var radius:number = (this.radiusColumn.getInternalColumn()) ? this.radiusColumnStats.getNorm(recordKey) : this.radiusConstant.value;
 			
 			// Get coordinates of record and add jitter (if specified)
-			var sum:number= getXYcoordinates(recordKey);
+			var sum:number= this.getXYcoordinates(recordKey);
 
 			// missing values skipped
-			if(isNaN(coordinate.x) || isNaN(coordinate.y)) return;
+			if (isNaN(this.coordinate.x) || isNaN(this.coordinate.y)) return;
 				
-			if(isNaN(radius) && (radiusColumn.getInternalColumn() != null))
+			if (isNaN(radius) && (this.radiusColumn.getInternalColumn() != null))
 			{			
-				radius = radiusConstant.value;
+				radius = this.radiusConstant.value;
 				
-				lineStyle.beginLineStyle(recordKey, graphics);
-				fillStyle.beginFillStyle(recordKey, graphics);
-				dataBounds.projectPointTo(coordinate, screenBounds);
+				this.lineStyle.beginLineStyle(recordKey, graphics);
+				this.fillStyle.beginFillStyle(recordKey, graphics);
+				dataBounds.projectPointTo(this.coordinate, screenBounds);
 				
 				// draw a square of fixed size for missing size values				
-				graphics.drawRect(coordinate.x - radius/2, coordinate.y - radius/2, radius, radius);		
+				graphics.drawRect(this.coordinate.x - radius/2, this.coordinate.y - radius/2, radius, radius);		
 				graphics.endFill();
 				return ;
 			}
-			if(radius <= Infinity) radius = 2 + (radius *(10-2));
+			if (radius <= Infinity) radius = 2 + (radius *(10-2));
 						
 			sum = (1/sum) *2 * Math.PI ;
 			
@@ -380,31 +373,31 @@ namespace weavejs.plot
 			var beginRadians:number = 0;
 			var spanRadians:number = 0;
 			var value:number = 0;
-			var numberMap:Dictionary = keyNumberMap[recordKey];
+			var numberMap = this.keyNumberMap.map.get(recordKey);
 			
-			var defaultAlpha:number = StandardLib.asNumber(alphaColumn.defaultValue.value);
+			var defaultAlpha:number = StandardLib.asNumber(this.alphaColumn.defaultValue.state);
 			
-			dataBounds.projectPointTo(coordinate,screenBounds);						
+			dataBounds.projectPointTo(this.coordinate,screenBounds);						
 			
-			for each(var column:IAttributeColumn in _columns)
+			for (var column of this._columns)
 			{
-				value = numberMap[column];
+				value = numberMap.get(column);
 				beginRadians += spanRadians;
 				spanRadians = value * sum;
 				
-				lineStyle.beginLineStyle(recordKey, graphics);
-				if(enableWedgeColoring.value && anchorColorMap)
-					graphics.beginFill(anchorColorMap[columnTitleMap[column]], alphaColumn.defaultValue.value as Number);
+				this.lineStyle.beginLineStyle(recordKey, graphics);
+				if (this.enableWedgeColoring.value && this.anchorColorMap)
+					graphics.beginFill(this.anchorColorMap.get(this.columnTitleMap.get(column)), this.alphaColumn.defaultValue.state as number);
 				else
-					fillStyle.beginFillStyle(recordKey, graphics);
+					this.fillStyle.beginFillStyle(recordKey, graphics);
 
-				if (radiusColumn.getInternalColumn())
+				if (this.radiusColumn.getInternalColumn())
 				{
-					drawWedge(graphics, beginRadians, spanRadians, coordinate, radius*radiusConstant.value/3);
+					this.drawWedge(graphics, beginRadians, spanRadians, this.coordinate, radius*this.radiusConstant.value/3);
 				}
 				else
 				{					
-					drawWedge(graphics, beginRadians, spanRadians, coordinate,radiusConstant.value);
+					this.drawWedge(graphics, beginRadians, spanRadians, this.coordinate,this.radiusConstant.value);
 				}
 				graphics.endFill();
 			}
@@ -417,30 +410,26 @@ namespace weavejs.plot
 		 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
 		 * @param destination The sprite to draw the graphics onto.
 		 */
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
-			var g:Graphics = tempShape.graphics;
-			g.clear();
-
-			coordinate.x = -1;
-			coordinate.y = -1;
-			dataBounds.projectPointTo(coordinate, screenBounds);
-			var x:number = coordinate.x;
-			var y:number = coordinate.y;
-			coordinate.x = 1;
-			coordinate.y = 1;
-			dataBounds.projectPointTo(coordinate, screenBounds);
+			this.coordinate.x = -1;
+			this.coordinate.y = -1;
+			dataBounds.projectPointTo(this.coordinate, screenBounds);
+			var x:number = this.coordinate.x;
+			var y:number = this.coordinate.y;
+			this.coordinate.x = 1;
+			this.coordinate.y = 1;
+			dataBounds.projectPointTo(this.coordinate, screenBounds);
 			
 			// draw RadViz circle
 			try {
-				g.lineStyle(2, 0, .2);
-				g.drawEllipse(x, y, coordinate.x - x, coordinate.y - y);
-			} catch (e:Error) { }
+				graphics.lineStyle(2, 0, .2);
+				graphics.drawEllipse(x, y, this.coordinate.x - x, this.coordinate.y - y);
+			} catch (e) { }
 			
-			destination.draw(tempShape);
-			_destination = destination;
+			this._destination = graphics;
 			
-			_currentScreenBounds.copyFrom(screenBounds);
+			this._currentScreenBounds.copyFrom(screenBounds);
 		}
 			
 		/**
@@ -452,12 +441,12 @@ namespace weavejs.plot
 		 */
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			initBoundsArray(output);
-			_columns = columns.getObjects(IAttributeColumn);
-			//if(!unorderedColumns.length) handleColumnsChange();
-			getXYcoordinates(recordKey);
+			this.initBoundsArray(output);
+			this._columns = this.columns.getObjects(IAttributeColumn);
+			//if (!unorderedColumns.length) handleColumnsChange();
+			this.getXYcoordinates(recordKey);
 			
-			(output[0] as Bounds2D).includePoint(coordinate);
+			output[0].includePoint(this.coordinate);
 		}
 		
 		/**
@@ -470,63 +459,73 @@ namespace weavejs.plot
 		}		
 		
 		public drawProbe:boolean = false;
-		public probedKeys:Array = null;
-		private _destination:BitmapData = null;
+		public probedKeys:IQualifiedKey[] = null;
+		private _destination:Graphics = null;
 		
 		public drawProbeLines(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{						
-			if(!drawProbe) return;
-			if(!probedKeys) return;
-			try {
+			if (!this.drawProbe)
+				return;
+			if (!this.probedKeys)
+				return;
+			try
+			{
 				//PlotterUtils.clear(destination);
-			} catch(e:Error) {return;}
+			}
+			catch(e)
+			{
+				return;
+			}
 			var graphics:Graphics = destination;
 			graphics.clear();
-			if(probedKeys.length)
-				if(probedKeys[0].keyType != filteredKeySet.keys[0].keyType) return;
+			if (this.probedKeys.length)
+				if (this.probedKeys[0].keyType != this.filteredKeySet.keys[0].keyType)
+					return;
 			
-			for each( var key:IQualifiedKey in probedKeys)
+			for ( var key of this.probedKeys)
 			{
-				getXYcoordinates(key);
-				dataBounds.projectPointTo(coordinate, screenBounds);
+				this.getXYcoordinates(key);
+				dataBounds.projectPointTo(this.coordinate, screenBounds);
 				
-				for each( var anchor:AnchorPoint in anchors.getObjects(AnchorPoint))
+				for ( var anchor of this.anchors.getObjects(AnchorPoint))
 				{
-					tempPoint.x = anchor.x.value;
-					tempPoint.y = anchor.y.value;
-					dataBounds.projectPointTo(tempPoint, screenBounds);
+					this.tempPoint.x = anchor.x.value;
+					this.tempPoint.y = anchor.y.value;
+					dataBounds.projectPointTo(this.tempPoint, screenBounds);
 					graphics.lineStyle(.5, 0xff0000);
-					graphics.moveTo(coordinate.x, coordinate.y);
-					graphics.lineTo(tempPoint.x, tempPoint.y);					
+					graphics.moveTo(this.coordinate.x, this.coordinate.y);
+					graphics.lineTo(this.tempPoint.x, this.tempPoint.y);					
 				}
 			}
 		}
 						
-		private _columns:Array = null;		
+		private _columns:IAttributeColumn[] = null;
 	
 		private changeAlgorithm():void
 		{
-			if(_currentScreenBounds.isEmpty()) return;
+			if (this._currentScreenBounds.isEmpty())
+				return;
 			
-			var newAlgorithm:Class = algorithms[currentAlgorithm.value];
+			var newAlgorithm = this.algorithms.get(this.currentAlgorithm.value);
 			if (newAlgorithm == null) 
 				return;
 			
-			_algorithm = Weave.linkableChild(this, newAlgorithm);
-			var array:Array = _algorithm.run(columns.getObjects(IAttributeColumn), keyNumberMap);
+			this._algorithm = Weave.linkableChild(this, newAlgorithm);
+			var array = this._algorithm.run(this.columns.getObjects(IAttributeColumn), this.keyNumberMap);
 			
-			RadVizUtils.reorderColumns(columns, array);
+			RadVizUtils.reorderColumns(this.columns, array);
 		}
 		
 		private _algorithm:ILayoutAlgorithm = Weave.linkableChild(this, GreedyLayoutAlgorithm);
 		
-		// algorithms
-		[Bindable] public algorithms:Array = [RANDOM_LAYOUT, GREEDY_LAYOUT, NEAREST_NEIGHBOR, INCREMENTAL_LAYOUT, BRUTE_FORCE];
-		public currentAlgorithm:LinkableString = Weave.linkableChild(this, new LinkableString(GREEDY_LAYOUT), changeAlgorithm);
-		public static RANDOM_LAYOUT:string = "Random layout";
-		public static GREEDY_LAYOUT:string = "Greedy layout";
-		public static NEAREST_NEIGHBOR:string = "Nearest neighbor";
-		public static INCREMENTAL_LAYOUT:string = "Incremental layout";
-		public static BRUTE_FORCE:string = "Brute force";
+		public currentAlgorithm:LinkableString = Weave.linkableChild(this, new LinkableString("Greedy layout"), this.changeAlgorithm);
+
+		public algorithms:Map<string, typeof ILayoutAlgorithm> = new Map()
+			.set("Random layout", RandomLayoutAlgorithm)
+			.set("Greedy layout", GreedyLayoutAlgorithm)
+			.set("Nearest neighbor", NearestNeighborLayoutAlgorithm)
+			.set("Incremental layout", IncrementalLayoutAlgorithm)
+			.set("Brute force", BruteForceLayoutAlgorithm);
 	}
 }
+

@@ -15,11 +15,9 @@
 
 namespace weavejs.plot
 {
-	import Matrix = flash.geom.Matrix;
 	import Point = weavejs.geom.Point;
 	import Rectangle = weavejs.geom.Rectangle;
-	import TextFormat = flash.text.TextFormat;
-	
+
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IPlotTask = weavejs.api.ui.IPlotTask;
@@ -30,22 +28,19 @@ namespace weavejs.plot
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
-	import Bounds2D = weavejs.geom.Bounds2D;
-	import BitmapText = weavejs.util.BitmapText;
-	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
-	import ObjectPool = weavejs.util.ObjectPool;
-	import PlotTask = weavejs.visualization.layers.PlotTask;
-	
+	import LinkableTextFormat = weavejs.plot.LinkableTextFormat;
+	import Matrix = PIXI.Matrix;
+	import WeaveProperties = weavejs.app.WeaveProperties;
+
 	export class TextGlyphPlotter extends AbstractGlyphPlotter implements ITextPlotter
 	{
-		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, TextGlyphPlotter, "Labels");
-		
 		public constructor()
 		{
-			hideOverlappingText.value = false;
-			xScreenOffset.value = 0;
-			yScreenOffset.value = 0;
-			setColumnKeySources([sortColumn, text]);
+			super();
+			this.hideOverlappingText.value = false;
+			this.xScreenOffset.value = 0;
+			this.yScreenOffset.value = 0;
+			this.setColumnKeySources([this.sortColumn, this.text]);
 		}
 		
 		private bitmapText:BitmapText = new BitmapText();
@@ -57,12 +52,12 @@ namespace weavejs.plot
 		
 		public setDefaultTextFormat(ltf:LinkableTextFormat):void
 		{
-			font.defaultValue.value = ltf.font.value;
-			size.defaultValue.value = ltf.size.value;
-			color.defaultValue.value = ltf.color.value;
-			bold.defaultValue.value = ltf.bold.value;
-			italic.defaultValue.value = ltf.italic.value;
-			underline.defaultValue.value = ltf.underline.value;
+			this.font.defaultValue.state = ltf.font.value;
+			this.size.defaultValue.state = ltf.size.value;
+			this.color.defaultValue.state = ltf.color.value;
+			this.bold.defaultValue.state = ltf.bold.value;
+			this.italic.defaultValue.state = ltf.italic.value;
+			this.underline.defaultValue.state = ltf.underline.value;
 		}
 		public font:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(LinkableTextFormat.DEFAULT_FONT));
 		public size:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(LinkableTextFormat.DEFAULT_SIZE));
@@ -84,11 +79,11 @@ namespace weavejs.plot
 		 */
 		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
-			if (!(task.asyncState is Function))
+			if (typeof task.asyncState != 'function')
 			{
 				// these variables are used to save state between function calls
-				const textWasDrawn:Array = [];
-				const reusableBoundsObjects:Array = [];
+				const textWasDrawn:boolean[] = [];
+				const reusableBoundsObjects:Bounds2D[] = [];
 				
 				task.asyncState = function():number
 				{
@@ -97,7 +92,7 @@ namespace weavejs.plot
 					if (task.iteration == 0)
 					{
 						// cleanup
-						for each (bounds in reusableBoundsObjects)
+						for (bounds of reusableBoundsObjects)
 							ObjectPool.returnObject(bounds);
 						reusableBoundsObjects.length = 0; // important so we don't return the same bounds later
 					}
@@ -107,34 +102,34 @@ namespace weavejs.plot
 						var recordKey:IQualifiedKey = task.recordKeys[task.iteration] as IQualifiedKey;
 						
 						// project data coordinates to screen coordinates and draw graphics onto tempShape
-						getCoordsFromRecordKey(recordKey, tempPoint);
-						task.dataBounds.projectPointTo(tempPoint, task.screenBounds);
+						this.getCoordsFromRecordKey(recordKey, TextGlyphPlotter.tempPoint);
+						task.dataBounds.projectPointTo(TextGlyphPlotter.tempPoint, task.screenBounds);
 		
 						// round to nearest pixel to get clearer text
-						bitmapText.x = Math.round(tempPoint.x + xScreenOffset.value);
-						bitmapText.y = Math.round(tempPoint.y + yScreenOffset.value);
-						bitmapText.text = text.getValueFromKey(recordKey, String) as String;
-						bitmapText.verticalAlign = vAlign.getValueFromKey(recordKey, String) as String;
-						bitmapText.horizontalAlign = hAlign.getValueFromKey(recordKey, String) as String;
-						bitmapText.angle = angle.getValueFromKey(recordKey, Number);
-						bitmapText.maxWidth = maxWidth.value - xScreenOffset.value;
+						this.bitmapText.x = Math.round(TextGlyphPlotter.tempPoint.x + this.xScreenOffset.value);
+						this.bitmapText.y = Math.round(TextGlyphPlotter.tempPoint.y + this.yScreenOffset.value);
+						this.bitmapText.text = this.text.getValueFromKey(recordKey, String) as String;
+						this.bitmapText.verticalAlign = this.vAlign.getValueFromKey(recordKey, String) as String;
+						this.bitmapText.horizontalAlign = this.hAlign.getValueFromKey(recordKey, String) as String;
+						this.bitmapText.angle = this.angle.getValueFromKey(recordKey, Number);
+						this.bitmapText.maxWidth = this.maxWidth.value - this.xScreenOffset.value;
 						
 						// init text format			
-						var f:TextFormat = bitmapText.textFormat;
-						f.font = font.getValueFromKey(recordKey, String) as String;
-						f.size = size.getValueFromKey(recordKey, Number);
-						f.color = color.getValueFromKey(recordKey, Number);
-						f.bold = StandardLib.asBoolean(bold.getValueFromKey(recordKey, Number));
-						f.italic = StandardLib.asBoolean(italic.getValueFromKey(recordKey, Number));
-						f.underline = StandardLib.asBoolean(underline.getValueFromKey(recordKey, Number));
+						var f:TextFormat = this.bitmapText.textFormat;
+						f.font = this.font.getValueFromKey(recordKey, String) as String;
+						f.size = this.size.getValueFromKey(recordKey, Number);
+						f.color = this.color.getValueFromKey(recordKey, Number);
+						f.bold = StandardLib.asBoolean(this.bold.getValueFromKey(recordKey, Number));
+						f.italic = StandardLib.asBoolean(this.italic.getValueFromKey(recordKey, Number));
+						f.underline = StandardLib.asBoolean(this.underline.getValueFromKey(recordKey, Number));
 		
 						var shouldRender:boolean = true;
 						
-						if (hideOverlappingText.value)
+						if (this.hideOverlappingText.value)
 						{
 							// grab a bounds object to store the screen size of the bitmap text
 							bounds = reusableBoundsObjects[task.iteration] = ObjectPool.borrowObject(Bounds2D);
-							bitmapText.getUnrotatedBounds(bounds);
+							this.bitmapText.getUnrotatedBounds(bounds);
 							
 							// brute force check to see if this bounds overlaps with any previous bounds
 							for (var j:int = 0; j < task.iteration; j++)
@@ -151,15 +146,15 @@ namespace weavejs.plot
 						
 						if (shouldRender)
 						{
-							drawInvisibleHalo(bitmapText, task);
-							
-							bitmapText.draw(task.buffer);
+							TextGlyphPlotter.drawInvisibleHalo(this.bitmapText, task);
+
+							this.bitmapText.draw(task.buffer);
 						}
 						
 						return task.iteration / task.recordKeys.length;
 					}
 
-					for each (bounds in reusableBoundsObjects)
+					for (bounds of reusableBoundsObjects)
 						ObjectPool.returnObject(bounds);
 					reusableBoundsObjects.length = 0; // important so we don't return the same bounds later
 					
@@ -182,44 +177,47 @@ namespace weavejs.plot
 		 */
 		public static drawInvisibleHalo(bitmapText:BitmapText, task:IPlotTask):void
 		{
-			if (!(task is PlotTask) || (task as PlotTask).taskType != PlotTask.TASK_TYPE_PROBE)
+			if (!(task instanceof PlotTask) || (task as PlotTask).taskType != PlotTask.TASK_TYPE_PROBE)
 				return;
 			
-			if (!Weave.properties.enableBitmapFilters.value)
+			if (!WeaveProperties.getProperties(this).enableBitmapFilters.value)
 				return;
 			
 			if (bitmapText.angle % 90)
 				return;
 			
-			bitmapText.getUnrotatedBounds(tempBounds);
+			bitmapText.getUnrotatedBounds(TextGlyphPlotter.tempBounds);
 			if (bitmapText.angle % 360)
 			{
-				tempMatrix.identity();
-				tempMatrix.translate(-bitmapText.x, -bitmapText.y);
-				tempMatrix.rotate(bitmapText.angle * Math.PI / 180);
-				tempMatrix.translate(bitmapText.x, bitmapText.y);
-				tempBounds.getMinPoint(tempPoint);
-				tempBounds.setMinPoint(tempMatrix.transformPoint(tempPoint));
-				tempBounds.getMaxPoint(tempPoint);
-				tempBounds.setMaxPoint(tempMatrix.transformPoint(tempPoint));
+				TextGlyphPlotter.tempMatrix.identity();
+				TextGlyphPlotter.tempMatrix.translate(-bitmapText.x, -bitmapText.y);
+				TextGlyphPlotter.tempMatrix.rotate(bitmapText.angle * Math.PI / 180);
+				TextGlyphPlotter.tempMatrix.translate(bitmapText.x, bitmapText.y);
+				TextGlyphPlotter.tempBounds.getMinPoint(TextGlyphPlotter.tempPoint);
+				TextGlyphPlotter.tempBounds.setMinPoint(TextGlyphPlotter.tempMatrix.transformPoint(TextGlyphPlotter.tempPoint));
+				TextGlyphPlotter.tempBounds.getMaxPoint(TextGlyphPlotter.tempPoint);
+				TextGlyphPlotter.tempBounds.setMaxPoint(TextGlyphPlotter.tempMatrix.transformPoint(TextGlyphPlotter.tempPoint));
 			}
 			
-			tempBounds.getRectangle(tempRectangle);
+			TextGlyphPlotter.tempBounds.getRectangle(TextGlyphPlotter.tempRectangle);
 			// HACK -- check a pixel to decide how to draw the rectangular halo
-			tempBounds.getCenterPoint(tempPoint);
-			var pixel:uint = task.buffer.getPixel(tempPoint.x, tempPoint.y);
-			var haloColor:uint = 0x20000000 | Weave.properties.probeInnerGlow.color.value;
+			TextGlyphPlotter.tempBounds.getCenterPoint(TextGlyphPlotter.tempPoint);
+			var pixel:uint = task.buffer.getPixel(TextGlyphPlotter.tempPoint.x, TextGlyphPlotter.tempPoint.y);
+			var haloColor:uint = 0x20000000 | WeaveProperties.getProperties(this).probeInnerGlow.color.value;
 			// Check all the pixels and only set the ones that aren't set yet.
-			var pixels:Vector.<uint> = task.buffer.getVector(tempRectangle);
+			var pixels:uint[] = task.buffer.getVector(TextGlyphPlotter.tempRectangle);
 			for (var p:int = 0; p < pixels.length; p++)
 			{
 				pixel = pixels[p] as uint;
 				if (!pixel)
 					pixels[p] = haloColor;
 			}
-			task.buffer.setVector(tempRectangle, pixels);
+			task.buffer.setVector(TextGlyphPlotter.tempRectangle, pixels);
 			
 			//buffer.fillRect(tempRectangle, 0x02808080); // alpha 0.008, invisible
 		}
 	}
+
+	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, TextGlyphPlotter, "Labels");
 }
+

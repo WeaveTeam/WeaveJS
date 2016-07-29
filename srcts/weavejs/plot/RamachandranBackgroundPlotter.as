@@ -15,10 +15,7 @@
 
 namespace weavejs.plot
 {
-	import Bitmap = flash.display.Bitmap;
-	import BitmapData = flash.display.BitmapData;
 	import Graphics = PIXI.Graphics;
-	import Matrix = flash.geom.Matrix;
 	import Point = weavejs.geom.Point;
 	
 	import Bounds2D = weavejs.geom.Bounds2D;
@@ -33,28 +30,28 @@ namespace weavejs.plot
 		{
 			output.setBounds(-180,-180,180,180);
 		}
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
 			var g:Graphics = tempShape.graphics;
 			g.clear();
 			g.lineStyle(2, 0, 1);
 			
 			// project to screen bounds
-			tempBounds.setBounds(-180,180,180,-180);
-			dataBounds.projectCoordsTo(tempBounds, screenBounds);
+			this.tempBounds.setBounds(-180,180,180,-180);
+			dataBounds.projectCoordsTo(this.tempBounds, screenBounds);
 			
 			var matrix:Matrix = new Matrix();
-			matrix.scale(tempBounds.getWidth() / _missingImage.width, tempBounds.getHeight() / _missingImage.height);
-			matrix.translate(tempBounds.getXMin(), tempBounds.getYMin());
-			destination.draw(_missingImage, matrix, null, null, null, true);
+			matrix.scale(this.tempBounds.getWidth() / RamachandranBackgroundPlotter._missingImage.width, this.tempBounds.getHeight() / RamachandranBackgroundPlotter._missingImage.height);
+			matrix.translate(this.tempBounds.getXMin(), this.tempBounds.getYMin());
+			destination.draw(RamachandranBackgroundPlotter._missingImage, matrix, null, null, null, true);
 			
 			// draw vertical line through x=0
-			g.moveTo(tempBounds.getXCenter(), tempBounds.getYMin());
-			g.lineTo(tempBounds.getXCenter(), tempBounds.getYMax());
+			g.moveTo(this.tempBounds.getXCenter(), this.tempBounds.getYMin());
+			g.lineTo(this.tempBounds.getXCenter(), this.tempBounds.getYMax());
 				
 			// draw horizontal line through y=0
-			g.moveTo(tempBounds.getXMin(), tempBounds.getYCenter());
-			g.lineTo(tempBounds.getXMax(), tempBounds.getYCenter());
+			g.moveTo(this.tempBounds.getXMin(), this.tempBounds.getYCenter());
+			g.lineTo(this.tempBounds.getXMax(), this.tempBounds.getYCenter());
 			
 			destination.draw(tempShape);
 		}
@@ -65,6 +62,6 @@ namespace weavejs.plot
 		// background image
 		[Embed(source="/weave/resources/images/RamaPlot.png")]
 		private static _missingImageClass:Class;
-		private static _missingImage:BitmapData = Bitmap(new _missingImageClass()).bitmapData;
+		private static _missingImage:BitmapData = Bitmap(new RamachandranBackgroundPlotter._missingImageClass()).bitmapData;
 	}
 }

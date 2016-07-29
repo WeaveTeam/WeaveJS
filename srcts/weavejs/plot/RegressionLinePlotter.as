@@ -15,7 +15,6 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
 	import Graphics = PIXI.Graphics;
 	import Point = weavejs.geom.Point;
 	
@@ -33,26 +32,26 @@ namespace weavejs.plot
 	import addAsyncResponder = weavejs.services.addAsyncResponder;
 	import LinearRegressionResult = weavejs.services.beans.LinearRegressionResult;
 	import ColumnUtils = weavejs.data.ColumnUtils;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	
 	export class RegressionLinePlotter extends AbstractPlotter implements IDisposableObject
 	{
 		public constructor()
 		{
-			Weave.properties.rServiceURL.addImmediateCallback(this, resetRService, true);
-			spatialCallbacks.addImmediateCallback(this, resetRegressionLine );
-			spatialCallbacks.addGroupedCallback(this, calculateRRegression );
-			setColumnKeySources([xColumn, yColumn]);
+			Weave.properties.rServiceURL.addImmediateCallback(this, this.resetRService, true);
+			this.spatialCallbacks.addImmediateCallback(this, this.resetRegressionLine );
+			this.spatialCallbacks.addGroupedCallback(this, this.calculateRRegression );
+			this.setColumnKeySources([this.xColumn, this.yColumn]);
 			
 			// hack to fix old session states
-			_filteredKeySet.addImmediateCallback(this, function():void {
+			this._filteredKeySet.addImmediateCallback(this, function():void {
 				if (_filteredKeySet.keyFilter.internalObject == null)
 					_filteredKeySet.keyFilter.targetPath = [WeaveProperties.DEFAULT_SUBSET_KEYFILTER];
 			});
 		}
 		
 		public drawLine:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-		public currentTrendline:LinkableString = Weave.linkableChild(this, new LinkableString(LINEAR));
+		public currentTrendline:LinkableString = Weave.linkableChild(this, new LinkableString(RegressionLinePlotter.LINEAR));
 		public polynomialDegree:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(2));
 		
 		public xColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
@@ -60,7 +59,7 @@ namespace weavejs.plot
 		
 		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
-		public static trendlines:Array = [LINEAR, POLYNOMIAL, LOGARITHMIC, EXPONENTIAL, POWER];
+		public static trendlines:Array = [RegressionLinePlotter.LINEAR, RegressionLinePlotter.POLYNOMIAL, RegressionLinePlotter.LOGARITHMIC, RegressionLinePlotter.EXPONENTIAL, RegressionLinePlotter.POWER];
 		public static LINEAR:string = "Linear";
 		public static POLYNOMIAL:string = "Polynomial";
 		public static LOGARITHMIC:string = "Logarithmic";
@@ -71,101 +70,101 @@ namespace weavejs.plot
 		
 		private resetRService():void
 		{
-			rService = new WeaveRServlet(Weave.properties.rServiceURL.value);
+			this.rService = new WeaveRServlet(Weave.properties.rServiceURL.value);
 		}
 		
 		private resetRegressionLine():void
 		{
-			result = null;
+			this.result = null;
 		}
 		private calculateRRegression():void
 		{
-			if (drawLine.value)
+			if (this.drawLine.value)
 			{
-				var dataXY:Array = ColumnUtils.joinColumns([xColumn, yColumn], Number, false, filteredKeySet.keys);
+				var dataXY:Array = ColumnUtils.joinColumns([this.xColumn, this.yColumn], Number, false, this.filteredKeySet.keys);
 				if (dataXY[1].length == 0)
 					return;
 				addAsyncResponder(
-					rService.linearRegression(currentTrendline.value, dataXY[1], dataXY[2], polynomialDegree.value),
-					handleLinearRegressionResult,
-					handleLinearRegressionFault,
-					++requestID
+					this.rService.linearRegression(this.currentTrendline.value, dataXY[1], dataXY[2], this.polynomialDegree.value),
+					this.handleLinearRegressionResult,
+					this.handleLinearRegressionFault,
+					++this.requestID
 				);
 			}
 		}
 		
-		private requestID:int = 0; // ID of the latest request, used to ignore old results
+		private requestID = 0; // ID of the latest request, used to ignore old results
 		private result:LinearRegressionResult;
 		
 		private handleLinearRegressionResult(event:ResultEvent, token:Object=null):void
 		{
-			if (this.requestID != int(token))
+			if (this.requestID != (token|0))
 			{
 				// ignore outdated results
 				return;
 			}
 			
-			result = new LinearRegressionResult(event.result);
+			this.result = new LinearRegressionResult(event.result);
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
 		private handleLinearRegressionFault(event:FaultEvent, token:Object = null):void
 		{
-			if (this.requestID != int(token))
+			if (this.requestID != (token|0))
 			{
 				// ignore outdated results
 				return;
 			}
 			
-			result = null;
-			JS.error(event);
+			this.result = null;
+			console.error(event);
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
 		public get coefficients():Array
 		{
-			return result ? result.coefficients : null;
+			return this.result ? this.result.coefficients : null;
 		}
 		public get rSquared():number
 		{
-			return result ? result.rSquared : NaN;
+			return this.result ? this.result.rSquared : NaN;
 		}
 		
 		private tempRange:Range = new Range();
 		private tempPoint:Point = new Point();
 		private tempPoint2:Point = new Point();
 
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
 			var g:Graphics = tempShape.graphics;
 			g.clear();
 			
-			if(currentTrendline.value == LINEAR)
+			if (this.currentTrendline.value == RegressionLinePlotter.LINEAR)
 			{
-				if (coefficients)
+				if (this.coefficients)
 				{
-					tempPoint.x = dataBounds.getXMin();
-					tempPoint2.x = dataBounds.getXMax();
+					this.tempPoint.x = dataBounds.getXMin();
+					this.tempPoint2.x = dataBounds.getXMax();
 					
-					tempPoint.y = (coefficients[1] * tempPoint.x) + coefficients[0];
-					tempPoint2.y = (coefficients[1] * tempPoint2.x) + coefficients[0];
+					this.tempPoint.y = (this.coefficients[1] * this.tempPoint.x) + this.coefficients[0];
+					this.tempPoint2.y = (this.coefficients[1] * this.tempPoint2.x) + this.coefficients[0];
 					
-					tempRange.setRange( dataBounds.getYMin(), dataBounds.getYMax() );
+					this.tempRange.setRange( dataBounds.getYMin(), dataBounds.getYMax() );
 					
 					// constrain yMin to be within y range and derive xMin from constrained yMin
-					tempPoint.x = tempPoint.x + (tempRange.constrain(tempPoint.y) - tempPoint.y) / coefficients[1];
-					tempPoint.y = tempRange.constrain(tempPoint.y);
+					this.tempPoint.x = this.tempPoint.x + (this.tempRange.constrain(this.tempPoint.y) - this.tempPoint.y) / this.coefficients[1];
+					this.tempPoint.y = this.tempRange.constrain(this.tempPoint.y);
 					
 					// constrain yMax to be within y range and derive xMax from constrained yMax
-					tempPoint2.x = tempPoint.x + (tempRange.constrain(tempPoint2.y) - tempPoint.y) / coefficients[1];
-					tempPoint2.y = tempRange.constrain(tempPoint2.y);
+					this.tempPoint2.x = this.tempPoint.x + (this.tempRange.constrain(this.tempPoint2.y) - this.tempPoint.y) / this.coefficients[1];
+					this.tempPoint2.y = this.tempRange.constrain(this.tempPoint2.y);
 					
-					dataBounds.projectPointTo(tempPoint,screenBounds);
-					dataBounds.projectPointTo(tempPoint2,screenBounds);
-					lineStyle.beginLineStyle(null,g);
+					dataBounds.projectPointTo(this.tempPoint,screenBounds);
+					dataBounds.projectPointTo(this.tempPoint2,screenBounds);
+					this.lineStyle.beginLineStyle(null,g);
 					//g.lineStyle(lineThickness.value, lineColor.value,lineAlpha.value,true,LineScaleMode.NONE);
-					g.moveTo(tempPoint.x,tempPoint.y);
-					g.lineTo(tempPoint2.x,tempPoint2.y);
+					g.moveTo(this.tempPoint.x,this.tempPoint.y);
+					g.lineTo(this.tempPoint2.x,this.tempPoint2.y);
 					
 					destination.draw(tempShape);
 				}
@@ -173,10 +172,10 @@ namespace weavejs.plot
 			else 
 			{
 				
-				if (coefficients != null)
+				if (this.coefficients != null)
 				{
-					points = new Vector.<Number>;
-					drawCommand = new Vector.<int>;
+					this.points = [];
+					this.drawCommand = [];
 					var previousPoint:Point = null;
 					
 					// Use dataBounds to determine how many points should be drawn
@@ -210,27 +209,27 @@ namespace weavejs.plot
 					var flag:boolean = true;
 					for (var x:number = dataBounds.getXMin(); x <= dataBounds.getXMax(); x = x + increment)
 					{
-						tempPoint.x = x;
-						tempPoint.y = evalFunction(currentTrendline.value, coefficients, x);
-						dataBounds.projectPointTo(tempPoint, screenBounds);
-						points.push(tempPoint.x);
-						points.push(tempPoint.y);
+						this.tempPoint.x = x;
+						this.tempPoint.y = this.evalFunction(this.currentTrendline.value, this.coefficients, x);
+						dataBounds.projectPointTo(this.tempPoint, screenBounds);
+						this.points.push(this.tempPoint.x);
+						this.points.push(this.tempPoint.y);
 						
 						if (flag == true)
 						{
-							drawCommand.push(1);
+							this.drawCommand.push(1);
 							flag = false;
 						}
-						else if (screenBounds.containsPoint(previousPoint) && screenBounds.containsPoint(tempPoint))
-							drawCommand.push(2);
+						else if (screenBounds.containsPoint(previousPoint) && screenBounds.containsPoint(this.tempPoint))
+							this.drawCommand.push(2);
 						else
-							drawCommand.push(1);
+							this.drawCommand.push(1);
 						
-						previousPoint = tempPoint.clone();
+						previousPoint = this.tempPoint.clone();
 					}
 					
-					lineStyle.beginLineStyle(null,g);
-					g.drawPath(drawCommand, points);					
+					this.lineStyle.beginLineStyle(null,g);
+					g.drawPath(this.drawCommand, this.points);					
 					
 					destination.draw(tempShape);
 				}
@@ -239,15 +238,14 @@ namespace weavejs.plot
 
 		public dispose():void
 		{
-			requestID = 0; // forces all results from previous requests to be ignored
+			this.requestID = 0; // forces all results from previous requests to be ignored
 		}
 		
-		private points:Vector.<Number> = null;
-		private drawCommand:Vector.<int> = null;
+		private points:number[] = null;
+		private drawCommand:int[] = null;
 		
 		/**
-		 * 	@author Yen-Fu 
-		 *	This function evaluate the regression functions, given the type, the coefficients (a, b, c,..) and the value x. 
+		 *	This function evaluate the regression functions, given the type, the coefficients (a, b, c,..) and the value x.
 		 * 	ax^n-1+bx^n-2+...
 		 **/
 		private evalFunction(type:string, coefficients:Array, xValue:number):number
@@ -256,11 +254,11 @@ namespace weavejs.plot
 			var b:number = coefficients[0] || 0;
 			var a:number = coefficients[1] || 0;
 			
-			if (type == POLYNOMIAL) 
+			if (type == RegressionLinePlotter.POLYNOMIAL) 
 			{
-				var result:number = 0;
-				var degree:int = coefficients.length - 1;
-				for (var i:int = 0; i <= degree; i++)
+				var result = 0;
+				var degree = coefficients.length - 1;
+				for (var i = 0; i <= degree; i++)
 				{
 					result += (coefficients[i] || 0) * Math.pow(xValue, i);
 				}
@@ -274,7 +272,7 @@ namespace weavejs.plot
 			// Model y = a*ln(x) + b
 			// called with (y, ln(x))
 			// => A = a, B = b			
-			else if (type == LOGARITHMIC) 
+			else if (type == RegressionLinePlotter.LOGARITHMIC) 
 			{					
 				return a*Math.log(xValue) + b;
 			}
@@ -283,7 +281,7 @@ namespace weavejs.plot
 			// => ln(y) = ln(b) + a*x
 			// called with (ln(y), x)
 			// => A = a, B = ln(b)
-			else if (type == EXPONENTIAL) 
+			else if (type == RegressionLinePlotter.EXPONENTIAL) 
 			{
 				return Math.exp(b)*Math.exp(a*xValue);
 			}
@@ -292,7 +290,7 @@ namespace weavejs.plot
 			// => ln(y) = ln(b) + a*ln(x)
 			// called with (ln(y), a*ln(x)
 			// => A = a, B = ln(b)
-			else if (type == POWER) 
+			else if (type == RegressionLinePlotter.POWER) 
 			{
 				return Math.exp(b) * Math.pow(xValue, a);	
 			}
@@ -303,3 +301,4 @@ namespace weavejs.plot
 		}
 	}
 }
+

@@ -15,34 +15,29 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
 	import Point = weavejs.geom.Point;
-	import TextFormat = flash.text.TextFormat;
-	
+
 	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IPlotTask = weavejs.api.ui.IPlotTask;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
-	import Bounds2D = weavejs.geom.Bounds2D;
-	import BitmapText = weavejs.util.BitmapText;
-	import ObjectPool = weavejs.util.ObjectPool;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
-	
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
+	import Graphics = PIXI.Graphics;
+
 	export class WeaveWordlePlotter extends AbstractPlotter
 	{
-		
 		public constructor()
 		{
-			
+			super();
 			// default fill color
-			fillStyle.color.defaultValue.setSessionState(0x808080);
+			this.fillStyle.color.defaultValue.setSessionState(0x808080);
 			
 			// set up session state
-			setColumnKeySources([wordColumn], [-1]);
+			this.setColumnKeySources([this.wordColumn], [-1]);
 			
-			Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(wordColumn));
+			Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.wordColumn));
 			this.addSpatialDependencies(this.wordColumn);
 		}	
 		
@@ -52,29 +47,29 @@ namespace weavejs.plot
 		
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
-			var words:Array = wordColumn.keys;
+			var words = this.wordColumn.keys;
 			var i:int;
 			var bounds:Bounds2D = output as Bounds2D;
-			for( i = 0; i < words.length; i++ ){
+			for ( i = 0; i < words.length; i++ ){
 				//This sets the intial points of every word.
-				if( randPoints[words[i]] == undefined ){
-					randPoints[words[i]] = [ Math.random(), Math.random() ];
+				if ( this.randPoints.get(words[i]) == undefined ){
+					this.randPoints.set(words[i], [ Math.random(), Math.random() ]);
 				}
-				else if( randPoints[words[i]] != undefined ) {
-					if( i == 0 ){
-						bounds.xMin = randPoints[words[i]][0];
-						bounds.xMax = randPoints[words[i]][0];
-						bounds.yMin = randPoints[words[i]][1];
-						bounds.yMax = randPoints[words[i]][1];					
+				else if ( this.randPoints.get(words[i]) != undefined ) {
+					if ( i == 0 ){
+						bounds.xMin = this.randPoints.get(words[i])[0];
+						bounds.xMax = this.randPoints.get(words[i])[0];
+						bounds.yMin = this.randPoints.get(words[i])[1];
+						bounds.yMax = this.randPoints.get(words[i])[1];					
 					}
-					if( bounds.xMin > randPoints[words[i]][0] )
-						bounds.xMin = randPoints[words[i]][0];
-					if( bounds.xMax < randPoints[words[i]][0] )
-						bounds.xMax = randPoints[words[i]][0];
-					if( bounds.yMin > randPoints[words[i]][1] )
-						bounds.yMin = randPoints[words[i]][1];
-					if( bounds.yMax < randPoints[words[i]][1] )
-						bounds.yMax = randPoints[words[i]][1];				
+					if ( bounds.xMin > this.randPoints.get(words[i])[0] )
+						bounds.xMin = this.randPoints.get(words[i])[0];
+					if ( bounds.xMax < this.randPoints.get(words[i])[0] )
+						bounds.xMax = this.randPoints.get(words[i])[0];
+					if ( bounds.yMin > this.randPoints.get(words[i])[1] )
+						bounds.yMin = this.randPoints.get(words[i])[1];
+					if ( bounds.yMax < this.randPoints.get(words[i])[1] )
+						bounds.yMax = this.randPoints.get(words[i])[1];				
 				}
 			}
 		}
@@ -84,10 +79,10 @@ namespace weavejs.plot
 		 */
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			if( randPoints[recordKey] != undefined )
-				initBoundsArray(output).setBounds(0, 0, 1, 1);
+			if ( this.randPoints.get(recordKey) != undefined )
+				this.initBoundsArray(output).setBounds(0, 0, 1, 1);
 			else
-				initBoundsArray(output, 0);
+				this.initBoundsArray(output, 0);
 		}
 		/**
 		 * This function retrieves a max and min value from the keys to later be used for sizing purposes.
@@ -98,94 +93,93 @@ namespace weavejs.plot
 		 */
 		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
-			drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
+			this.drawAll(task.recordKeys, task.dataBounds, task.screenBounds, task.buffer);
 			return 1;
 		}
-		private drawAll(recordKeys:Array, dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		private drawAll(recordKeys:IQualifiedKey[], dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
 			var normalized:number;
 			var j:int;
 			var maxDisplay:uint;
-			screenBoundaries = screenBounds;
-			var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(wordColumn);
+			this.screenBoundaries = screenBounds;
+			var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(this.wordColumn);
 			var lowest:number = stats.getMin();
 			var highest:number = stats.getMax();
-			if( highest == lowest )
+			if ( highest == lowest )
 				highest = highest + 1;
 			//maxDisplay is used for putting a word limit if necessary, 200 seems to fill the screen.
 			maxDisplay = recordKeys.length;
 			
-			if( maxDisplay > 200 )
+			if ( maxDisplay > 200 )
 				maxDisplay = 200;
 			
 			for (var i:int = 0; i < maxDisplay; i++)
 			{
-				
 				var recordKey:IQualifiedKey = recordKeys[i] as IQualifiedKey;
 				
-				normalized = wordColumn.getValueFromKey(recordKey, Number);
+				normalized = this.wordColumn.getValueFromKey(recordKey, Number);
 				
-				tempPoint.x = randPoints[recordKey][0] * screenBounds.getWidth() + screenBounds.getXMin();
-				tempPoint.y = randPoints[recordKey][1] * screenBounds.getHeight() + screenBounds.getYMin();
+				this.tempPoint.x = this.randPoints.get(recordKey)[0] * screenBounds.getWidth() + screenBounds.getXMin();
+				this.tempPoint.y = this.randPoints.get(recordKey)[1] * screenBounds.getHeight() + screenBounds.getYMin();
 				
-				var tf:TextFormat = new TextFormat("Arial", null ,Math.random() * uint.MAX_VALUE );
+				var tf:TextFormat = new TextFormat("Arial", null, Math.random() * 0xFFFFFF);
 				tf.size = ( 50 * ( ( normalized - lowest ) / ( highest - lowest ) ) ) + 20;
-				bitMapper.textFormat = tf;
-				bitMapper.text = recordKey.localName;
-				bitMapper.x = tempPoint.x;
-				bitMapper.y = tempPoint.y;
-				bitMapper.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_CENTER;
-				bitMapper.verticalAlign = BitmapText.VERTICAL_ALIGN_MIDDLE;
-				bitMapper.getUnrotatedBounds( tempBounds );
+				this.bitMapper.textFormat = tf;
+				this.bitMapper.text = recordKey.localName;
+				this.bitMapper.x = this.tempPoint.x;
+				this.bitMapper.y = this.tempPoint.y;
+				this.bitMapper.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_CENTER;
+				this.bitMapper.verticalAlign = BitmapText.VERTICAL_ALIGN_MIDDLE;
+				this.bitMapper.getUnrotatedBounds( this.tempBounds );
 				//findOpeningLeft will check to make sure there is no overlapping, and adjust as necessary.
-				findOpeningLeft();
-				increment = 4;
-				orientation = 0;
-				count = 1;
-				flag = false;
-				if( tooLong == false ) {
-					(boundaries[added++] = ObjectPool.borrowObject(Bounds2D) as Bounds2D).setBounds( tempBounds.xMin, tempBounds.yMin, tempBounds.xMax, tempBounds.yMax );
+				this.findOpeningLeft();
+				this.increment = 4;
+				this.orientation = 0;
+				this.count = 1;
+				this.flag = false;
+				if ( this.tooLong == false ) {
+					this.boundaries[this.added++] = new Bounds2D(this.tempBounds.xMin, this.tempBounds.yMin, this.tempBounds.xMax, this.tempBounds.yMax);
 					//destination.fillRect( new Rectangle( tempBounds.xMin, tempBounds.yMin, tempBounds.width, tempBounds.height ), 0x80ff0000 );
-					bitMapper.draw(destination);
+					this.bitMapper.draw(destination);
 				}
 				else
-					tooLong = false;
+					this.tooLong = false;
 			}
-			added = 0;
-			boundaries.length = 0;
+			this.added = 0;
+			this.boundaries.length = 0;
 		}
+
 		/**
 		 * This function will look for an possible overlapping and adjust as necessary.
 		 */
-		
 		private findOpeningLeft():void
 		{
 			var i:int;
 			var j:int;
 			
-			for( i = 0; i < boundaries.length; i++ ){
-				if( tempBounds.overlaps( boundaries[i] ) ){
-					while( flag == false ) {
-						for( j = 0; j < count; j++ ){
-							if( orientation == 0 )
-								bitMapper.x = bitMapper.x - increment;
-							if( orientation == 1 )
-								bitMapper.y = bitMapper.y - increment;
-							if( orientation == 2 )
-								bitMapper.x = bitMapper.x + increment;
-							if( orientation == 3 )
-								bitMapper.y = bitMapper.y + increment;
-							bitMapper.getUnrotatedBounds( tempBounds );
-							checkBounds();
-							if( flag == true )
+			for ( i = 0; i < this.boundaries.length; i++ ){
+				if ( this.tempBounds.overlaps( this.boundaries[i] ) ){
+					while( this.flag == false ) {
+						for ( j = 0; j < this.count; j++ ){
+							if ( this.orientation == 0 )
+								this.bitMapper.x = this.bitMapper.x - this.increment;
+							if ( this.orientation == 1 )
+								this.bitMapper.y = this.bitMapper.y - this.increment;
+							if ( this.orientation == 2 )
+								this.bitMapper.x = this.bitMapper.x + this.increment;
+							if ( this.orientation == 3 )
+								this.bitMapper.y = this.bitMapper.y + this.increment;
+							this.bitMapper.getUnrotatedBounds( this.tempBounds );
+							this.checkBounds();
+							if ( this.flag == true )
 								return;
-							if( tooLong == true )
+							if ( this.tooLong == true )
 								return;
 						}
-						orientation++;
-						if( orientation > 3 )
-							orientation = 0;
-						count++;
+						this.orientation++;
+						if ( this.orientation > 3 )
+							this.orientation = 0;
+						this.count++;
 					}
 				}
 			}
@@ -198,30 +192,30 @@ namespace weavejs.plot
 			var i:int;
 			var j:int;
 			
-			for( i = 0; i < boundaries.length; i++ ){
-				if( tempBounds.overlaps( boundaries[i] ) ){
-					for( j = 0; j < count; j++ ){
+			for ( i = 0; i < boundaries.length; i++ ){
+				if ( tempBounds.overlaps( boundaries[i] ) ){
+					for ( j = 0; j < count; j++ ){
 						bitMapper.y = bitMapper.y - 4;
 						bitMapper.getBounds( tempBounds );
 						checkBounds();
-						if( flag == true )
+						if ( flag == true )
 							return;
 					}
-					if( flag == true )
+					if ( flag == true )
 						return;
 					count++;
 					findOpeningRight();
-					if( flag == true )
+					if ( flag == true )
 						return;
 				}
 			}
 			checkBounds();
-			if( flag == false ){
-				for( j = 0; j < count; j++ ){
+			if ( flag == false ){
+				for ( j = 0; j < count; j++ ){
 					bitMapper.y = bitMapper.y - 4;
 					bitMapper.getBounds( tempBounds );
 					checkBounds();
-					if( flag == true )
+					if ( flag == true )
 						return;
 				}
 				count++;
@@ -237,30 +231,30 @@ namespace weavejs.plot
 			var i:int;
 			var j:int;
 			
-			for( i = 0; i < boundaries.length; i++ ){
-				if( tempBounds.overlaps( boundaries[i] ) ){
-					for( j = 0; j < count; j++ ){
+			for ( i = 0; i < boundaries.length; i++ ){
+				if ( tempBounds.overlaps( boundaries[i] ) ){
+					for ( j = 0; j < count; j++ ){
 						bitMapper.x = bitMapper.x + 4;
 						bitMapper.getBounds( tempBounds );
 						checkBounds();
-						if( flag == true )
+						if ( flag == true )
 							return;
 					}
-					if( flag == true )
+					if ( flag == true )
 						return;
 					count++;
 					findOpeningUp();
-					if( flag == true )
+					if ( flag == true )
 						return;
 				}
 			}
 			checkBounds();
-			if( flag == false ){
-				for( j = 0; j < count; j++ ){
+			if ( flag == false ){
+				for ( j = 0; j < count; j++ ){
 					bitMapper.x = bitMapper.x + 4;
 					bitMapper.getBounds( tempBounds );
 					checkBounds();
-					if( flag == true )
+					if ( flag == true )
 						return;
 				}
 				count++;
@@ -276,30 +270,30 @@ namespace weavejs.plot
 			var i:int;
 			var j:int;
 			
-			for( i = 0; i < boundaries.length; i++ ){
-				if( tempBounds.overlaps( boundaries[i] ) ){
-					for( j = 0; j < count; j++ ){
+			for ( i = 0; i < boundaries.length; i++ ){
+				if ( tempBounds.overlaps( boundaries[i] ) ){
+					for ( j = 0; j < count; j++ ){
 						bitMapper.y = bitMapper.y + 4;
 						bitMapper.getBounds( tempBounds );
 						checkBounds();
-						if( flag == true )
+						if ( flag == true )
 							return;
 					}
-					if( flag == true )
+					if ( flag == true )
 						return;
 					count++;
 					findOpeningLeft();
-					if( flag == true )
+					if ( flag == true )
 						return;
 				}
 			}
 			checkBounds();
-			if( flag == false ){
-				for( j = 0; j < count; j++ ){
+			if ( flag == false ){
+				for ( j = 0; j < count; j++ ){
 					bitMapper.y = bitMapper.y + 4;
 					bitMapper.getBounds( tempBounds );
 					checkBounds();
-					if( flag == true )
+					if ( flag == true )
 						return;
 				}
 				count++;
@@ -319,36 +313,36 @@ namespace weavejs.plot
 			var i:int;
 			
 			/*
-			if( count > 150 )
+			if ( count > 150 )
 				increment = 15;
-			else if( count > 100 )
+			else if ( count > 100 )
 				increment = 12;
-			else if( count > 50 )
+			else if ( count > 50 )
 				increment = 8;
 			*/
-			if( count > 150 ){
-				tooLong = true;
-				flag = true;
+			if ( this.count > 150 ){
+				this.tooLong = true;
+				this.flag = true;
 				return;
 			}
 			/*
-			if( !( screenBoundaries.containsBounds( tempBounds ) ) ){
+			if ( !( screenBoundaries.containsBounds( tempBounds ) ) ){
 				flag = false;
 				return;
 			}
 			
-			if( screenBoundaries.equals( tempBounds ) ){
+			if ( screenBoundaries.equals( tempBounds ) ){
 				flag = false;
 				return;
 			}
 			*/
-			for( i = 0; i < boundaries.length; i++ )
-				if( tempBounds.overlaps( boundaries[i] ) ){
-					flag = false;
+			for ( i = 0; i < this.boundaries.length; i++ )
+				if ( this.tempBounds.overlaps( this.boundaries[i] ) ){
+					this.flag = false;
 					return;
 				}
 	
-			flag = true;						
+			this.flag = true;						
 		}
 		
 		private count:number = 1;
@@ -356,8 +350,8 @@ namespace weavejs.plot
 		private bitMapper:BitmapText = new BitmapText();
 		private tempPoint:Point = new Point();
 		private tempBounds:Bounds2D = new Bounds2D(); // reusable temporary object	
-		private static randPoints:Object = new Object();
-		private boundaries:Array = new Array();
+		private randPoints:Map<any, [number, number]> = new Map();
+		private boundaries:Bounds2D[] = [];
 		private screenBoundaries:Bounds2D = new Bounds2D();
 		private tooLong:boolean = false;
 		private added:int = 0;
@@ -365,3 +359,4 @@ namespace weavejs.plot
 		private increment:int = 4;
 	}
 }
+

@@ -15,9 +15,6 @@
 
 namespace weavejs.plot
 {
-	import Bitmap = flash.display.Bitmap;
-	import BitmapData = flash.display.BitmapData;
-	import Matrix = flash.geom.Matrix;
 	import Point = weavejs.geom.Point;
 	import URLRequest = weavejs.net.URLRequest;
 	
@@ -34,14 +31,14 @@ namespace weavejs.plot
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import BitmapText = weavejs.util.BitmapText;
 	import BitmapUtils = weavejs.util.BitmapUtils;
+	import Matrix = PIXI.Matrix;
+	import Graphics = PIXI.Graphics;
 
 	/**
 	 * A plotter for drawing a single image onto a tool.
 	 */
 	export class SingleImagePlotter extends AbstractPlotter implements ILinkableObjectWithNewProperties
 	{
-		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, SingleImagePlotter, "Single image");
-		
 		public constructor()
 		{
 			this.addSpatialDependencies(
@@ -57,9 +54,9 @@ namespace weavejs.plot
 		
 		public set defaultImage(value:BitmapData):void
 		{
-			if (_bitmapData == BitmapUtils.MISSING_IMAGE || _bitmapData == _defaultImage)
-				_bitmapData = value;
-			_defaultImage = value;
+			if (this._bitmapData == BitmapUtils.MISSING_IMAGE || this._bitmapData == this._defaultImage)
+				this._bitmapData = value;
+			this._defaultImage = value;
 		}
 		
 		private _defaultImage:BitmapData;
@@ -83,8 +80,8 @@ namespace weavejs.plot
 		public dataHeight:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 		public useImageSize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		public horizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER, verifyHAlign));
-		public verticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE, verifyVAlign));
+		public horizontalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.HORIZONTAL_ALIGN_CENTER, this.verifyHAlign));
+		public verticalAlign:LinkableString = Weave.linkableChild(this, new LinkableString(BitmapText.VERTICAL_ALIGN_MIDDLE, this.verifyVAlign));
 		
 		private verifyHAlign(value:string):boolean
 		{
@@ -101,98 +98,98 @@ namespace weavejs.plot
 		
 		private getImageDataWidth():number
 		{
-			if (useImageSize.value)
-				return _bitmapData ? _bitmapData.width : 0;
-			return dataWidth.value || 0
+			if (this.useImageSize.value)
+				return this._bitmapData ? this._bitmapData.width : 0;
+			return this.dataWidth.value || 0
 		}
 		
 		private getImageDataHeight():number
 		{
-			if (useImageSize.value)
-				return _bitmapData ? _bitmapData.height : 0;
-			return dataHeight.value || 0
+			if (this.useImageSize.value)
+				return this._bitmapData ? this._bitmapData.height : 0;
+			return this.dataHeight.value || 0
 		}
 		
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
-			var x:number = dataX.value;
-			var y:number = dataY.value;
-			var w:number = getImageDataWidth();
-			var h:number = getImageDataHeight();
+			var x:number = this.dataX.value;
+			var y:number = this.dataY.value;
+			var w:number = this.getImageDataWidth();
+			var h:number = this.getImageDataHeight();
 			
-			if (horizontalAlign.value == BitmapText.HORIZONTAL_ALIGN_LEFT)
+			if (this.horizontalAlign.value == BitmapText.HORIZONTAL_ALIGN_LEFT)
 				output.setXRange(x, x + w);
-			if (horizontalAlign.value == BitmapText.HORIZONTAL_ALIGN_CENTER)
+			if (this.horizontalAlign.value == BitmapText.HORIZONTAL_ALIGN_CENTER)
 				output.setCenteredXRange(x, w);
-			if (horizontalAlign.value == BitmapText.HORIZONTAL_ALIGN_RIGHT)
+			if (this.horizontalAlign.value == BitmapText.HORIZONTAL_ALIGN_RIGHT)
 				output.setXRange(x - w, x);
 			
-			if (verticalAlign.value == BitmapText.VERTICAL_ALIGN_TOP)
+			if (this.verticalAlign.value == BitmapText.VERTICAL_ALIGN_TOP)
 				output.setYRange(y - h, y);
-			if (verticalAlign.value == BitmapText.VERTICAL_ALIGN_MIDDLE)
+			if (this.verticalAlign.value == BitmapText.VERTICAL_ALIGN_MIDDLE)
 				output.setCenteredYRange(y, h);
-			if (verticalAlign.value == BitmapText.VERTICAL_ALIGN_BOTTOM)
+			if (this.verticalAlign.value == BitmapText.VERTICAL_ALIGN_BOTTOM)
 				output.setYRange(y, y + h);
 		}
 		
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
-			if (Weave.detectChange(drawBackground, imageURL))
+			if (Weave.detectChange(this.drawBackground, this.imageURL))
 			{
-				if (imageURL.value)
+				if (this.imageURL.value)
 				{
-					_bitmapData = null;
-					WeaveAPI.URLRequestUtils.getContent(this, new URLRequest(imageURL.value), handleImage, handleImageFault, imageURL.value);
+					this._bitmapData = null;
+					WeaveAPI.URLRequestUtils.getContent(this, new URLRequest(this.imageURL.value), this.handleImage, this.handleImageFault, this.imageURL.value);
 				}
 				else
 				{
-					_bitmapData = _defaultImage || BitmapUtils.MISSING_IMAGE;
+					this._bitmapData = this._defaultImage || BitmapUtils.MISSING_IMAGE;
 				}
 			}
 			
-			if (!_bitmapData)
+			if (!this._bitmapData)
 				return;
 			
-			var tempPoint:Point = new Point(dataX.value, dataY.value);
+			var tempPoint:Point = new Point(this.dataX.value, this.dataY.value);
 			dataBounds.projectPointTo(tempPoint, screenBounds);
 			
-			_tempMatrix.identity();
+			this._tempMatrix.identity();
 			
 			var xOffset:number = 0;
 			var yOffset:number = 0;
 			
-			switch (horizontalAlign.value)
+			switch (this.horizontalAlign.value)
 			{
 				case BitmapText.HORIZONTAL_ALIGN_LEFT: // x is aligned to left side of text
 					xOffset = 0;
 					break;
 				case BitmapText.HORIZONTAL_ALIGN_CENTER: 
-					xOffset = -_bitmapData.width / 2;
+					xOffset = -this._bitmapData.width / 2;
 					break;
 				case BitmapText.HORIZONTAL_ALIGN_RIGHT: // x is aligned to right side of text
-					xOffset = -_bitmapData.width;
+					xOffset = -this._bitmapData.width;
 					break;
 			}
-			switch (verticalAlign.value)
+			switch (this.verticalAlign.value)
 			{
 				case BitmapText.VERTICAL_ALIGN_TOP: 
 					yOffset = 0;
 					break;
 				
 				case BitmapText.VERTICAL_ALIGN_MIDDLE: 
-					yOffset = -_bitmapData.height / 2;
+					yOffset = -this._bitmapData.height / 2;
 					break;
 				
 				case BitmapText.VERTICAL_ALIGN_BOTTOM:
-					yOffset = -_bitmapData.height;
+					yOffset = -this._bitmapData.height;
 					break;
 			}
-			_tempMatrix.translate(xOffset, yOffset);
+			this._tempMatrix.translate(xOffset, yOffset);
 			
-			var w:number = getImageDataWidth();
-			var h:number = getImageDataHeight();
-			var scaleWidth:number = w * screenBounds.getXCoverage() / dataBounds.getXCoverage() / _bitmapData.width;
-			var scaleHeight:number = h * screenBounds.getYCoverage() / dataBounds.getYCoverage() / _bitmapData.height;
+			var w:number = this.getImageDataWidth();
+			var h:number = this.getImageDataHeight();
+			var scaleWidth:number = w * screenBounds.getXCoverage() / dataBounds.getXCoverage() / this._bitmapData.width;
+			var scaleHeight:number = h * screenBounds.getYCoverage() / dataBounds.getYCoverage() / this._bitmapData.height;
 			
 			if (!isFinite(w))
 			{
@@ -206,43 +203,43 @@ namespace weavejs.plot
 				tempPoint.y = Math.round(tempPoint.y);
 			}
 			
-			_tempMatrix.scale(scaleWidth, scaleHeight);
+			this._tempMatrix.scale(scaleWidth, scaleHeight);
 			
-			_tempMatrix.translate(tempPoint.x, tempPoint.y);
-			destination.draw(_bitmapData, _tempMatrix);
+			this._tempMatrix.translate(tempPoint.x, tempPoint.y);
+			destination.draw(this._bitmapData, this._tempMatrix);
 		}
 		
 		private handleImage(event:ResultEvent, url:string):void
 		{
-			if (objectWasDisposed(this) || url != imageURL.value)
+			if (objectWasDisposed(this) || url != this.imageURL.value)
 				return;
 			
 			try
 			{
-				_bitmapData = Bitmap(event.result).bitmapData;
+				this._bitmapData = Bitmap(event.result).bitmapData;
 				Weave.getCallbacks(this).triggerCallbacks();
 			}
-			catch (e:Error)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}
 		
 		private handleImageFault(event:FaultEvent, url:string):void
 		{
-			if (objectWasDisposed(this) || url != imageURL.value)
+			if (objectWasDisposed(this) || url != this.imageURL.value)
 				return;
 			
-			_bitmapData = BitmapUtils.MISSING_IMAGE;
-			JS.error(event);
+			this._bitmapData = BitmapUtils.MISSING_IMAGE;
+			console.error(event);
 		}
 		
 		public handleMissingSessionStateProperty(newState:Object, missingProperty:string):void
 		{
 			if (missingProperty == 'useImageSize')
 			{
-				if (!imageURL.value)
-					imageURL.value = RED_CIRCLE_IMAGE_URL;
+				if (!this.imageURL.value)
+					this.imageURL.value = SingleImagePlotter.RED_CIRCLE_IMAGE_URL;
 			}
 		}
 		
@@ -257,8 +254,10 @@ namespace weavejs.plot
 		{
 			var name:string = 'red-circle.png';
 			if (!WeaveAPI.URLRequestUtils.getLocalFile(name))
-				_redCircleUrl = WeaveAPI.URLRequestUtils.saveLocalFile(name, new _redCircle())
-			return _redCircleUrl;
+				SingleImagePlotter._redCircleUrl = WeaveAPI.URLRequestUtils.saveLocalFile(name, new SingleImagePlotter._redCircle())
+			return SingleImagePlotter._redCircleUrl;
 		}
 	}
+
+	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, SingleImagePlotter, "Single image");
 }

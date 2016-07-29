@@ -21,6 +21,7 @@ namespace weavejs.plot
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
+	import Graphics = PIXI.Graphics;
 	import WeaveProperties = weavejs.app.WeaveProperties;
 
 	export class ScatterPlotPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
@@ -93,14 +94,14 @@ namespace weavejs.plot
 			this._filteredKeySet.setColumnKeySources(columns, sortDirections, null, this._keyInclusionLogic);
 		}
 		
-		public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
 		}
 		
 		/**
 		 * This may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		protected addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:PIXI.Graphics):void
+		protected addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
 			// project data coordinates to screen coordinates and draw graphics
 			this.getCoordsFromRecordKey(recordKey, this.tempPoint);

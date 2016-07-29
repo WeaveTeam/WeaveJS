@@ -15,7 +15,6 @@
 
 namespace weavejs.plot
 {
-	import setSessionState = weavejs.api.setSessionState;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
 	import IPlotter = weavejs.api.ui.IPlotter;
@@ -29,27 +28,25 @@ namespace weavejs.plot
 	 */
 	export class GeometryLabelPlotter extends TextGlyphPlotter implements IObjectWithDescription
 	{
-		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, GeometryLabelPlotter, "Geometry labels");
-
 		public constructor()
 		{
 			// hide dataX,dataY because they don't need to be shown in the session state.
-			(WeaveAPI.SessionManager as SessionManager).excludeLinkableChildFromSessionState(this, dataX);
-			(WeaveAPI.SessionManager as SessionManager).excludeLinkableChildFromSessionState(this, dataY);
-			hideOverlappingText.value = true;
+			(WeaveAPI.SessionManager as SessionManager).excludeLinkableChildFromSessionState(this, this.dataX);
+			(WeaveAPI.SessionManager as SessionManager).excludeLinkableChildFromSessionState(this, this.dataY);
+			this.hideOverlappingText.value = true;
 
 			// set up x,y columns to be derived from the geometry column
-			Weave.linkState(geometryColumn, dataX.requestLocalObject(ReprojectedGeometryColumn, true));
-			Weave.linkState(geometryColumn, dataY.requestLocalObject(ReprojectedGeometryColumn, true));
+			Weave.linkState(this.geometryColumn, this.dataX.requestLocalObject(ReprojectedGeometryColumn, true));
+			Weave.linkState(this.geometryColumn, this.dataY.requestLocalObject(ReprojectedGeometryColumn, true));
 			
-			_sortCopyKeys = SortedKeySet.generateSortCopyFunction([getGeometryArea, sortColumn, text], [-1, 1, 1]);
-			_filteredKeySet.setColumnKeySources([geometryColumn, sortColumn, text], null, _sortCopyKeys);
+			this._sortCopyKeys = SortedKeySet.generateSortCopyFunction([this.getGeometryArea, this.sortColumn, this.text], [-1, 1, 1]);
+			this._filteredKeySet.setColumnKeySources([this.geometryColumn, this.sortColumn, this.text], null, this._sortCopyKeys);
 			this.addSpatialDependencies(this.geometryColumn);
 		}
 		
 		/*override*/ public getDescription():string
 		{
-			return geometryColumn.getDescription();
+			return this.geometryColumn.getDescription();
 		}
 		
 		public geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
@@ -60,10 +57,10 @@ namespace weavejs.plot
 		{
 			try
 			{
-				var geom:GeneralizedGeometry = geometryColumn.getValueFromKey(key, Array)[0] as GeneralizedGeometry;
+				var geom:GeneralizedGeometry = this.geometryColumn.getValueFromKey(key, Array)[0] as GeneralizedGeometry;
 				return geom.bounds.getArea();
 			}
-			catch (e:Error)
+			catch (e)
 			{
 				// we don't care if this fails
 			}
@@ -76,4 +73,7 @@ namespace weavejs.plot
 			Weave.setState(geometryColumn.internalDynamicColumn, value);
 		}*/
 	}
+
+	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, GeometryLabelPlotter, "Geometry labels");
 }
+

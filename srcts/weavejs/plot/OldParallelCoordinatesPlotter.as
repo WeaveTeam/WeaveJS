@@ -16,10 +16,8 @@
 namespace weavejs.plot
 {
 	import Graphics = PIXI.Graphics;
-	import Shape = flash.display.Shape;
 	import Point = weavejs.geom.Point;
-	import Dictionary = flash.utils.Dictionary;
-	
+
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 	import DataType = weavejs.api.data.DataType;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -46,33 +44,35 @@ namespace weavejs.plot
 	import SimpleGeometry = weavejs.geom.SimpleGeometry;
 	import ColumnUtils = weavejs.data.ColumnUtils;
 	import DrawUtils = weavejs.util.DrawUtils;
-	import ObjectPool = weavejs.util.ObjectPool;
 	import ArrayUtils = weavejs.util.ArrayUtils;
-	import ExtendedLineStyle = weavejs.geom.ExtendedLineStyle;
+	import WeaveProperties = weavejs.app.WeaveProperties;
+	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
+	import AsyncSort = weavejs.util.AsyncSort;
+	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	
 	export class OldParallelCoordinatesPlotter extends AbstractPlotter implements IPlotterWithGeometries, ISelectableAttributes
 	{
 		public constructor()
 		{
-			lineStyle.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
-			lineStyle.weight.defaultValue.value = 1;
-			lineStyle.alpha.defaultValue.value = 1.0;
-			
-			zoomToSubset.value = true;
-			clipDrawing = false;
-			
+			super();
+			this.lineStyle.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
+			this.lineStyle.weight.defaultValue.state = 1;
+			this.lineStyle.alpha.defaultValue.state = 1.0;
+
+			this.zoomToSubset.value = true;
+
 			// bounds need to be re-indexed when this option changes
-			this.addSpatialDependencies(Weave.properties.enableGeometryProbing);
-			columns.childListCallbacks.addImmediateCallback(this, handleColumnsListChange);
-			xColumns.childListCallbacks.addImmediateCallback(this, handleColumnsListChange);
+			this.columns.childListCallbacks.addImmediateCallback(this, this.handleColumnsListChange);
+			this.xColumns.childListCallbacks.addImmediateCallback(this, this.handleColumnsListChange);
 			
-			Weave.linkState(_filteredXData.filter, filteredKeySet.keyFilter);
-			Weave.linkState(_filteredYData.filter, filteredKeySet.keyFilter);
-			Weave.linkableChild(this, xData, updateFilterEquationColumns);
-			Weave.linkableChild(this, yData, updateFilterEquationColumns);
+			Weave.linkState(this._filteredXData.filter, this.filteredKeySet.keyFilter);
+			Weave.linkState(this._filteredYData.filter, this.filteredKeySet.keyFilter);
+			Weave.linkableChild(this, this.xData, this.updateFilterEquationColumns);
+			Weave.linkableChild(this, this.yData, this.updateFilterEquationColumns);
 			
-			lineStyle.color.internalDynamicColumn.addImmediateCallback(this, handleColor, true);
-			Weave.getCallbacks(colorDataWatcher).addImmediateCallback(this, updateFilterEquationColumns, true);
+			this.lineStyle.color.internalDynamicColumn.addImmediateCallback(this, this.handleColor, true);
+			Weave.getCallbacks(this.colorDataWatcher).addImmediateCallback(this, this.updateFilterEquationColumns, true);
 			
 			// updateFilterEquationColumns sets key source
 			this.addSpatialDependencies(
@@ -90,109 +90,112 @@ namespace weavejs.plot
 		}
 		private handleColumnsListChange():void
 		{
+			// hacky location for doing this
+			this.addSpatialDependencies(WeaveProperties.getProperties(this).enableGeometryProbing);
+
 			// When a new column is created, register the stats to trigger callbacks and affect busy status.
 			// This will be cleaned up automatically when the column is disposed.
-			var newColumn:IAttributeColumn = columns.childListCallbacks.lastObjectAdded as IAttributeColumn;
+			var newColumn:IAttributeColumn = this.columns.childListCallbacks.lastObjectAdded as IAttributeColumn;
 			if (newColumn)
-				Weave.linkableChild(spatialCallbacks, WeaveAPI.StatisticsCache.getColumnStatistics(newColumn));
+				Weave.linkableChild(this.spatialCallbacks, WeaveAPI.StatisticsCache.getColumnStatistics(newColumn));
 			
-			var newXColumn:IAttributeColumn = xColumns.childListCallbacks.lastObjectAdded as IAttributeColumn;
+			var newXColumn:IAttributeColumn = this.xColumns.childListCallbacks.lastObjectAdded as IAttributeColumn;
 			if (newXColumn)
-				Weave.linkableChild(spatialCallbacks, WeaveAPI.StatisticsCache.getColumnStatistics(newXColumn));
+				Weave.linkableChild(this.spatialCallbacks, WeaveAPI.StatisticsCache.getColumnStatistics(newXColumn));
 			
-			_yColumns = columns.getObjects();
-			_xColumns = xColumns.getObjects();
-            if(_yColumns.length != _xColumns.length)
+			this._yColumns = this.columns.getObjects();
+			this._xColumns = this.xColumns.getObjects();
+            if (this._yColumns.length != this._xColumns.length)
 			{
-				_xColumns.length = 0;
+				this._xColumns.length = 0;
 				// if there is only one column, push a copy of it so lines will be drawn
-				if (_yColumns.length == 1)
-					_yColumns.push(_yColumns[0]);
+				if (this._yColumns.length == 1)
+					this._yColumns.push(this._yColumns[0]);
 			}
 			
-			updateFilterEquationColumns();
+			this.updateFilterEquationColumns();
 		}
 		
 		
-		public getSelectableAttributeNames():Array
+		public getSelectableAttributeNames()
 		{
-			if (enableGroupBy.value)
+			if (this.enableGroupBy.value)
 				return ["X values", "Y values", "Group by", "Color"];
 			else
 				return ["Color", "Y Columns"];
 		}
-		public getSelectableAttributes():Array
+		public getSelectableAttributes():(IColumnWrapper|ILinkableHashMap)[]
 		{
-			if (enableGroupBy.value)
-				return [xData, yData, groupBy, lineStyle.color];
+			if (this.enableGroupBy.value)
+				return [this.xData, this.yData, this.groupBy, this.lineStyle.color];
 			else
-				return [lineStyle.color, columns];
+				return [this.lineStyle.color, this.columns];
 		}
 
 		/*
 		 * This is the line style used to draw the lines.
 		 */
-		public lineStyle:ExtendedLineStyle = Weave.linkableChild(this, ExtendedLineStyle);
+		public lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 		
 		public columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 		public xColumns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 		
-		public enableGroupBy:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), updateFilterEquationColumns);
-		public groupBy:DynamicColumn = Weave.linkableChild(this, DynamicColumn, updateFilterEquationColumns);
-		public groupKeyType:LinkableString = Weave.linkableChild(this, LinkableString, updateFilterEquationColumns);
-		public get xData():DynamicColumn { return _filteredXData.internalDynamicColumn; }
-		public get yData():DynamicColumn { return _filteredYData.internalDynamicColumn; }
-		public xValues:LinkableString = Weave.linkableChild(this, LinkableString, updateFilterEquationColumns);
+		public enableGroupBy:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.updateFilterEquationColumns);
+		public groupBy:DynamicColumn = Weave.linkableChild(this, DynamicColumn, this.updateFilterEquationColumns);
+		public groupKeyType:LinkableString = Weave.linkableChild(this, LinkableString, this.updateFilterEquationColumns);
+		public get xData():DynamicColumn { return this._filteredXData.internalDynamicColumn; }
+		public get yData():DynamicColumn { return this._filteredYData.internalDynamicColumn; }
+		public xValues:LinkableString = Weave.linkableChild(this, LinkableString, this.updateFilterEquationColumns);
 		
 		private _filteredXData:FilteredColumn = Weave.linkableChild(this, FilteredColumn);
 		private _filteredYData:FilteredColumn = Weave.linkableChild(this, FilteredColumn);
 		private _keySet_groupBy:KeySet = Weave.disposableChild(this, KeySet);
 		
-		private _yColumns:Array = [];
-		private _xColumns:Array = [];
+		private _yColumns:IAttributeColumn[] = [];
+		private _xColumns:IAttributeColumn[] = [];
 		
 		private colorDataWatcher:LinkableWatcher = Weave.disposableChild(this, LinkableWatcher);
 		private handleColor():void
 		{
-			var cc:ColorColumn = lineStyle.color.getInternalColumn() as ColorColumn;
-			var bc:BinnedColumn = cc ? cc.getInternalColumn() as BinnedColumn : null;
-			var fc:FilteredColumn = bc ? bc.getInternalColumn() as FilteredColumn : null;
+			var cc:ColorColumn = Weave.AS(this.lineStyle.color.getInternalColumn(), ColorColumn);
+			var bc:BinnedColumn = cc ? Weave.AS(cc.getInternalColumn(), BinnedColumn) : null;
+			var fc:FilteredColumn = bc ? Weave.AS(bc.getInternalColumn(), FilteredColumn) : null;
 			var dc:DynamicColumn = fc ? fc.internalDynamicColumn : null;
-			colorDataWatcher.target = dc || fc || bc || cc;
+			this.colorDataWatcher.target = dc || fc || bc || cc;
 		}
 		
-		private _xValues:Array;
-		public getXValues():Array
+		private _xValues:string[];
+		public getXValues():string[]
 		{
-			if (!Weave.detectChange(getXValues, xValues, xData))
-				return _xValues;
+			if (!Weave.detectChange(this.getXValues, this.xValues, this.xData))
+				return this._xValues;
 			
-			var values:Array;
+			var values:string[];
 			// if session state is defined, use that. otherwise, get the values from xData
-			if (xValues.value)
+			if (this.xValues.value)
 			{
-				values = WeaveAPI.CSVParser.parseCSVRow(xValues.value) || [];
+				values = WeaveAPI.CSVParser.parseCSVRow(this.xValues.value) || [];
 			}
 			else
 			{
 				// calculate from column
 				values = [];
-				for each (var key:IQualifiedKey in xData.keys)
-					values.push(xData.getValueFromKey(key, String));
-				StandardLib.sort(values);
+				for (var key of this.xData.keys)
+					values.push(this.xData.getValueFromKey(key, String));
+				AsyncSort.sortImmediately(values);
 				ArrayUtils.removeDuplicatesFromSortedArray(values);
 			}
-			return _xValues = values.filter(function(value:string, ..._):boolean { return value ? true : false; });
+			return this._xValues = values.filter(value => !!value);
 		}
 		
 		public getForeignKeyType():string
 		{
-			var foreignKeyType:string = groupKeyType.value;
+			var foreignKeyType:string = this.groupKeyType.value;
 			if (foreignKeyType)
 				return foreignKeyType;
-			foreignKeyType = groupBy.getMetadata(ColumnMetadata.DATA_TYPE);
-			var groupByKeyType:string = groupBy.getMetadata(ColumnMetadata.KEY_TYPE);
-			var lineColorKeyType:string = lineStyle.color.getMetadata(ColumnMetadata.KEY_TYPE);
+			foreignKeyType = this.groupBy.getMetadata(ColumnMetadata.DATA_TYPE);
+			var groupByKeyType:string = this.groupBy.getMetadata(ColumnMetadata.KEY_TYPE);
+			var lineColorKeyType:string = this.lineStyle.color.getMetadata(ColumnMetadata.KEY_TYPE);
 			if ((!foreignKeyType || foreignKeyType == DataType.STRING) && groupByKeyType != lineColorKeyType)
 				foreignKeyType = lineColorKeyType;
 			return foreignKeyType;
@@ -201,83 +204,83 @@ namespace weavejs.plot
 		private _in_updateFilterEquationColumns:boolean = false;
 		private updateFilterEquationColumns():void
 		{
-			if (_in_updateFilterEquationColumns)
+			if (this._in_updateFilterEquationColumns)
 				return;
-			_in_updateFilterEquationColumns = true;
+			this._in_updateFilterEquationColumns = true;
 			
-			if (enableGroupBy.value)
+			if (this.enableGroupBy.value)
 			{
-				setColumnKeySources([_keySet_groupBy, groupBy]);
+				this.setColumnKeySources([this._keySet_groupBy, this.groupBy]);
 			}
 			else
 			{
-				var list:Array = _yColumns.concat();
-				if (colorDataWatcher.target)
-					list.unshift(colorDataWatcher.target);
-				setColumnKeySources(list);
+				var list = this._yColumns.concat();
+				if (this.colorDataWatcher.target)
+					list.unshift(this.colorDataWatcher.target as IAttributeColumn);
+				this.setColumnKeySources(list);
 				
-				_in_updateFilterEquationColumns = false;
+				this._in_updateFilterEquationColumns = false;
 				return;
 			}
 			
 			// update keys
-			_keySet_groupBy.delayCallbacks();
-			var reverseKeys:Array = []; // a list of the keys returned as values from keyColumn
-			var lookup:Dictionary = new Dictionary(); // keeps track of what keys were already seen
-			var foreignKeyType:string = getForeignKeyType();
-			for each (var key:IQualifiedKey in groupBy.keys)
+			this._keySet_groupBy.delayCallbacks();
+			var reverseKeys:IQualifiedKey[] = []; // a list of the keys returned as values from keyColumn
+			var lookup:Set<IQualifiedKey> = new Set(); // keeps track of what keys were already seen
+			var foreignKeyType:string = this.getForeignKeyType();
+			for (var key of this.groupBy.keys)
 			{
-				var localName:string = groupBy.getValueFromKey(key, String) as String;
+				var localName:string = this.groupBy.getValueFromKey(key, String) as string;
 				var filterKey:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(foreignKeyType, localName);
-				if (filterKey && !lookup[filterKey])
+				if (filterKey && !lookup.has(filterKey))
 				{
-					lookup[filterKey] = true;
+					lookup.add(filterKey);
 					reverseKeys.push(filterKey);
 				}
 			}
-			_keySet_groupBy.replaceKeys(reverseKeys);
-			_keySet_groupBy.resumeCallbacks();
+			this._keySet_groupBy.replaceKeys(reverseKeys);
+			this._keySet_groupBy.resumeCallbacks();
 
 			// check for missing columns
-			if (!(xData.getInternalColumn() && yData.getInternalColumn() && groupBy.getInternalColumn()))
+			if (!(this.xData.getInternalColumn() && this.yData.getInternalColumn() && this.groupBy.getInternalColumn()))
 			{
-				if (groupBy.getInternalColumn())
-					columns.removeAllObjects();
+				if (this.groupBy.getInternalColumn())
+					this.columns.removeAllObjects();
 				
-				if(_xColumns.length > 0)
-					xColumns.removeAllObjects();
-				_in_updateFilterEquationColumns = false;
+				if (this._xColumns.length > 0)
+					this.xColumns.removeAllObjects();
+				this._in_updateFilterEquationColumns = false;
 				return;
 			}
 			
 			// check that column keytypes are the same
-			var keyType:string = ColumnUtils.getKeyType(groupBy);
-			if (keyType != ColumnUtils.getKeyType(xData) || keyType != ColumnUtils.getKeyType(yData))
+			var keyType:string = ColumnUtils.getKeyType(this.groupBy);
+			if (keyType != ColumnUtils.getKeyType(this.xData) || keyType != ColumnUtils.getKeyType(this.yData))
 			{
-				_in_updateFilterEquationColumns = false;
+				this._in_updateFilterEquationColumns = false;
 				return;
 			}
 			
-			columns.delayCallbacks();
+			this.columns.delayCallbacks();
 
-			var values:Array = getXValues();
+			var values = this.getXValues();
 			
 			// remove columns with names not appearing in values list
-			for each (var name:string in columns.getNames())
+			for (var name of this.columns.getNames())
 				if (values.indexOf(name) < 0)
-					columns.removeObject(name);
+					this.columns.removeObject(name);
 			
 			// create an equation column for each filter value
-			for (var i:int = 0; i < values.length; i++)
+			for (var i = 0; i < values.length; i++)
 			{
-				var value:string = values[i];
-				var col:EquationColumn = columns.requestObject(value, EquationColumn, false);
+				var value = values[i];
+				var col:EquationColumn = this.columns.requestObject(value, EquationColumn, false);
 				col.delayCallbacks();
-				col.variables.requestObjectCopy("keyCol", groupBy);
-				col.variables.requestObjectCopy("filterCol", _filteredXData);
-				col.variables.requestObjectCopy("dataCol", _filteredYData);
+				col.variables.requestObjectCopy("keyCol", this.groupBy);
+				col.variables.requestObjectCopy("filterCol", this._filteredXData);
+				col.variables.requestObjectCopy("dataCol", this._filteredYData);
 				var filterValue:LinkableString = col.variables.requestObject('filterValue', LinkableString, false);
-				filterValue.value = value;
+				filterValue.state = value;
 				
 				col.setMetadataProperty(ColumnMetadata.TITLE, value);
 				col.setMetadataProperty(ColumnMetadata.MIN, '{ getMin(dataCol) }');
@@ -286,19 +289,19 @@ namespace weavejs.plot
 				col.equation.value = 'getValueFromFilterColumn(keyCol, filterCol, dataCol, filterValue.value, dataType)';
 				col.resumeCallbacks();
 			}
-			columns.setNameOrder(values);
+			this.columns.setNameOrder(values);
 			
-			columns.resumeCallbacks();
+			this.columns.resumeCallbacks();
 			
-			_in_updateFilterEquationColumns = false;
+			this._in_updateFilterEquationColumns = false;
 		}
 		
 		public normalize:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
-		public curveType:LinkableString = Weave.linkableChild(this, new LinkableString(CURVE_NONE, curveTypeVerifier));
+		public curveType:LinkableString = Weave.linkableChild(this, new LinkableString(OldParallelCoordinatesPlotter.CURVE_NONE, this.curveTypeVerifier));
 		public zoomToSubset:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 
 		public shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(5));
-		public shapeToDraw:LinkableString = Weave.linkableChild(this, new LinkableString(SOLID_CIRCLE, shapeTypeVerifier));
+		public shapeToDraw:LinkableString = Weave.linkableChild(this, new LinkableString(OldParallelCoordinatesPlotter.SOLID_CIRCLE, this.shapeTypeVerifier));
 		public shapeBorderThickness:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
 		public shapeBorderColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x000000));
 		public shapeBorderAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0.5));
@@ -312,19 +315,19 @@ namespace weavejs.plot
 			//BACKWARDS COMPATIBILITY 0.9.6
 			// technically, the verifier function is not supposed to do this.
 			if (type == "ParallelCoordinatesPlotter.LINE_STRAIGHT")
-				curveType.value = CURVE_NONE;
+				this.curveType.value = OldParallelCoordinatesPlotter.CURVE_NONE;
 			if (type == "ParallelCoordinatesPlotter.LINE_CURVE_TOWARDS")
-				curveType.value = CURVE_TOWARDS;
+				this.curveType.value = OldParallelCoordinatesPlotter.CURVE_TOWARDS;
 			if (type == "ParallelCoordinatesPlotter.LINE_CURVE_AWAY")
-				curveType.value = CURVE_AWAY;
+				this.curveType.value = OldParallelCoordinatesPlotter.CURVE_AWAY;
 			if (type == "ParallelCoordinatesPlotter.LINE_DOUBLE_CURVE")
-				curveType.value = CURVE_DOUBLE;
+				this.curveType.value = OldParallelCoordinatesPlotter.CURVE_DOUBLE;
 			
-			var types:Array = [CURVE_NONE, CURVE_TOWARDS, CURVE_AWAY, CURVE_DOUBLE];
+			var types = [OldParallelCoordinatesPlotter.CURVE_NONE, OldParallelCoordinatesPlotter.CURVE_TOWARDS, OldParallelCoordinatesPlotter.CURVE_AWAY, OldParallelCoordinatesPlotter.CURVE_DOUBLE];
 			return types.indexOf(type) >= 0;
 		}
 
-		public static shapesAvailable:Array = [NO_SHAPE, SOLID_CIRCLE, SOLID_SQUARE, EMPTY_CIRCLE, EMPTY_SQUARE];
+		public static shapesAvailable = [OldParallelCoordinatesPlotter.NO_SHAPE, OldParallelCoordinatesPlotter.SOLID_CIRCLE, OldParallelCoordinatesPlotter.SOLID_SQUARE, OldParallelCoordinatesPlotter.EMPTY_CIRCLE, OldParallelCoordinatesPlotter.EMPTY_SQUARE];
 		
 		public static NO_SHAPE:string 	  = "No Shape";
 		public static SOLID_CIRCLE:string   = "Solid Circle";
@@ -333,12 +336,12 @@ namespace weavejs.plot
 		public static EMPTY_SQUARE:string   = "Empty Square";
 		private shapeTypeVerifier(type:string):boolean
 		{
-			return shapesAvailable.indexOf(type) >= 0;
+			return OldParallelCoordinatesPlotter.shapesAvailable.indexOf(type) >= 0;
 		}
 		
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			getBoundsCoords(recordKey, output, false);
+			this.getBoundsCoords(recordKey, output, false);
 		}
 		
 		/**
@@ -347,39 +350,38 @@ namespace weavejs.plot
 		 * @param output Used to store the Bounds2D objects.
 		 * @param includeUndefinedBounds If this is set to true, the output is guaranteed to have the same length as _yColumns.
 		 */
-		protected function getBoundsCoords(recordKey:IQualifiedKey, output:Array, includeUndefinedBounds:boolean):void
+		protected getBoundsCoords(recordKey:IQualifiedKey, output:Bounds2D[], includeUndefinedBounds:boolean):void
 		{
-			var enableGeomProbing:boolean = Weave.properties.enableGeometryProbing.value;
+			var enableGeomProbing:boolean = WeaveProperties.getProperties(this).enableGeometryProbing.value;
 			
-			initBoundsArray(output, _yColumns.length);
+			this.initBoundsArray(output, this._yColumns.length);
 			
 			var outIndex:int = 0;
-			for (var i:int = 0; i < _yColumns.length; ++i)
+			for (var i:int = 0; i < this._yColumns.length; ++i)
 			{
-				getCoords(recordKey, i, tempPoint);
-				if (includeUndefinedBounds || isFinite(tempPoint.x) && isFinite(tempPoint.y))
-					(output[outIndex] as Bounds2D).includePoint(tempPoint);
+				this.getCoords(recordKey, i, OldParallelCoordinatesPlotter.tempPoint);
+				if (includeUndefinedBounds || isFinite(OldParallelCoordinatesPlotter.tempPoint.x) && isFinite(OldParallelCoordinatesPlotter.tempPoint.y))
+					output[outIndex].includePoint(OldParallelCoordinatesPlotter.tempPoint);
 				// when geom probing is enabled, report a single data bounds
 				if (includeUndefinedBounds || !enableGeomProbing)
 					outIndex++;
 			}
-			while (output.length > outIndex + 1)
-				ObjectPool.returnObject(output.pop());
+			output.length = outIndex + 1;
 		}
 		
-		private tempBoundsArray:Array = [];
+		private tempBoundsArray:Bounds2D[] = [];
 		
-		public getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:number = 0, dataBounds:Bounds2D = null):Array
+		public getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:number = 0, dataBounds:Bounds2D = null):(GeneralizedGeometry | ISimpleGeometry)[]
 		{
-			getBoundsCoords(recordKey, tempBoundsArray, true);
+			this.getBoundsCoords(recordKey, this.tempBoundsArray, true);
 			
-			var results:Array = [];
+			var results:ISimpleGeometry[] = [];
 			var geometry:ISimpleGeometry;
 			
-			for (var i:int = 0; i < _yColumns.length; ++i)
+			for (var i:int = 0; i < this._yColumns.length; ++i)
 			{
-				var current:Bounds2D = tempBoundsArray[i] as Bounds2D;
-				var next:Bounds2D = tempBoundsArray[i + 1] as Bounds2D;
+				var current = this.tempBoundsArray[i];
+				var next = this.tempBoundsArray[i + 1];
 				
 				if (next && !next.isUndefined())
 				{
@@ -417,7 +419,7 @@ namespace weavejs.plot
 			return results;
 		}
 		
-		public getBackgroundGeometries():Array
+		public getBackgroundGeometries():ISimpleGeometry[]
 		{
 			return [];
 		}
@@ -430,34 +432,35 @@ namespace weavejs.plot
 				//------------------------
 				// draw one record
 				var key:IQualifiedKey = task.recordKeys[task.iteration] as IQualifiedKey;
-				if (enableGroupBy.value)
+				if (this.enableGroupBy.value)
 				{
 					// reset lookup on first iteration
 					if (task.iteration == 0)
-						task.asyncState = new Dictionary();
+						task.asyncState = new Set();
 						
 					// replace groupBy keys with foreign keys so we only render lines for foreign keys
-					var foreignKeyType:string = getForeignKeyType();
+					var foreignKeyType:string = this.getForeignKeyType();
 					if (key.keyType != foreignKeyType)
-						key = WeaveAPI.QKeyManager.getQKey(foreignKeyType, groupBy.getValueFromKey(key, String));
+						key = WeaveAPI.QKeyManager.getQKey(foreignKeyType, this.groupBy.getValueFromKey(key, String));
 					
 					// avoid rendering duplicate lines
-					if (task.asyncState[key])
+					if ((task.asyncState as Set<IQualifiedKey>).has(key))
 						return task.iteration / task.recordKeys.length;
-					task.asyncState[key] = true;
+					(task.asyncState as Set<IQualifiedKey>).add(key);
 				}
 				
-				tempShape.graphics.clear();
-				addRecordGraphicsToTempShape(key, task.dataBounds, task.screenBounds, tempShape);
+				this.addRecordGraphics(key, task.dataBounds, task.screenBounds, task.buffer);
+				/*
 				if (clipDrawing)
 				{
 					// get clipRectangle
-					task.screenBounds.getRectangle(clipRectangle);
+					task.screenBounds.getRectangle(this.clipRectangle);
 					// increase width and height by 1 to avoid clipping rectangle borders drawn with vector graphics.
-					clipRectangle.width++;
-					clipRectangle.height++;
+					this.clipRectangle.width++;
+					this.clipRectangle.height++;
 				}
-				task.buffer.draw(tempShape, null, null, null, clipDrawing ? clipRectangle : null);
+				task.buffer.draw(tempShape, null, null, null, clipDrawing ? this.clipRectangle : null);
+				*/
 				//------------------------
 				
 				// report progress
@@ -471,55 +474,53 @@ namespace weavejs.plot
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
-			var graphics:Graphics = tempShape.graphics;
-
 			// project data coordinates to screen coordinates and draw graphics onto tempShape
 			var i:int;
 			var _shapeSize:number = this.shapeSize.value;
 			var _prevX:number = 0;
 			var _prevY:number = 0;
 			var continueLine:boolean = false;
-			var skipLines:boolean = enableGroupBy.value && groupBy.containsKey(recordKey);
+			var skipLines:boolean = this.enableGroupBy.value && this.groupBy.containsKey(recordKey);
 			
-			for (i = 0; i < _yColumns.length; i++)
+			for (i = 0; i < this._yColumns.length; i++)
 			{
 				// project data coordinates to screen coordinates and draw graphics
 				
-				getCoords(recordKey, i, tempPoint);
+				this.getCoords(recordKey, i, OldParallelCoordinatesPlotter.tempPoint);
 				
-				if (!isFinite(tempPoint.x) || !isFinite(tempPoint.y))
+				if (!isFinite(OldParallelCoordinatesPlotter.tempPoint.x) || !isFinite(OldParallelCoordinatesPlotter.tempPoint.y))
 				{
 					continueLine = false;
 					continue;
 				}
 				
-				dataBounds.projectPointTo(tempPoint, screenBounds);				
-				var x:number = tempPoint.x;
-				var y:number = tempPoint.y;
+				dataBounds.projectPointTo(OldParallelCoordinatesPlotter.tempPoint, screenBounds);				
+				var x:number = OldParallelCoordinatesPlotter.tempPoint.x;
+				var y:number = OldParallelCoordinatesPlotter.tempPoint.y;
 				
-				var recordColor:number = lineStyle.color.getValueFromKey(recordKey, Number);
+				var recordColor:number = this.lineStyle.color.getValueFromKey(recordKey, Number);
 				
 				// thickness of the line around each shape
-				var shapeLineThickness:int = shapeBorderThickness.value;
+				var shapeLineThickness:int = this.shapeBorderThickness.value;
 				// use a border around each shape
-				graphics.lineStyle(shapeLineThickness, shapeBorderColor.value, shapeLineThickness == 0 ? 0 : shapeBorderAlpha.value);
+				graphics.lineStyle(shapeLineThickness, this.shapeBorderColor.value, shapeLineThickness == 0 ? 0 : this.shapeBorderAlpha.value);
 				if (_shapeSize > 0)
 				{
 					var shapeSize:number = _shapeSize;
 					
 					var shapeColor:number = recordColor;
-					if (isNaN(shapeColor) && enableGroupBy.value)
+					if (isNaN(shapeColor) && this.enableGroupBy.value)
 					{
-						var shapeKey:IQualifiedKey = (_yColumns[i] as IAttributeColumn).getValueFromKey(recordKey, IQualifiedKey);
-						shapeColor = lineStyle.color.getValueFromKey(shapeKey, Number);
+						var shapeKey:IQualifiedKey = this._yColumns[i].getValueFromKey(recordKey, IQualifiedKey);
+						shapeColor = this.lineStyle.color.getValueFromKey(shapeKey, Number);
 					}
 					// draw a different shape for each option
-					switch (shapeToDraw.value)
+					switch (this.shapeToDraw.value)
 					{
 						// solid circle
-						case SOLID_CIRCLE:
+						case OldParallelCoordinatesPlotter.SOLID_CIRCLE:
 							if (isFinite(shapeColor))
 								graphics.beginFill(shapeColor);
 							else
@@ -528,12 +529,12 @@ namespace weavejs.plot
 							graphics.drawCircle(x, y, shapeSize/2);
 							break;
 						// empty circle
-						case EMPTY_CIRCLE:
+						case OldParallelCoordinatesPlotter.EMPTY_CIRCLE:
 							graphics.lineStyle(shapeLineThickness, shapeColor, shapeLineThickness == 0 ? 0 : 1);
 							graphics.drawCircle(x, y, shapeSize/2);
 							break;
 						// solid square
-						case SOLID_SQUARE:
+						case OldParallelCoordinatesPlotter.SOLID_SQUARE:
 							if (isFinite(shapeColor))
 								graphics.beginFill(shapeColor);
 							else
@@ -541,7 +542,7 @@ namespace weavejs.plot
 							graphics.drawRect(x-_shapeSize/2, y-_shapeSize/2, _shapeSize, _shapeSize);
 							break;
 						// empty square
-						case EMPTY_SQUARE:
+						case OldParallelCoordinatesPlotter.EMPTY_SQUARE:
 							graphics.lineStyle(shapeLineThickness, shapeColor, shapeLineThickness == 0 ? 0 : 1);
 							graphics.drawRect(x-_shapeSize/2, y-_shapeSize/2, _shapeSize, _shapeSize);
 							break;
@@ -558,11 +559,11 @@ namespace weavejs.plot
 					// begin the line style for the parallel coordinates line
 					// we want to use the missing data line style since the line is the shape we are showing 
 					// (rather than just a border of another shape)
-					lineStyle.beginLineStyle(recordKey, graphics);
+					this.lineStyle.beginLineStyle(recordKey, graphics);
 				}
 				else
 				{
-					graphics.lineStyle(shapeLineThickness, shapeBorderColor.value, shapeLineThickness == 0 ? 0 : shapeBorderAlpha.value);
+					graphics.lineStyle(shapeLineThickness, this.shapeBorderColor.value, shapeLineThickness == 0 ? 0 : this.shapeBorderAlpha.value);
 				}
 				
 				// if we aren't continuing a new line (it is a new line segment)	
@@ -573,17 +574,17 @@ namespace weavejs.plot
 					_prevY = y;
 				}
 				
-				if (curveType.value == CURVE_NONE)
+				if (this.curveType.value == OldParallelCoordinatesPlotter.CURVE_NONE)
 				{
 					graphics.moveTo(_prevX, _prevY);
 					graphics.lineTo(x, y);
 					//DrawUtils.drawDashedLine(tempShape.graphics, _prevX, _prevY, x, y, 3, 2); 
 				}
-				else if (curveType.value == CURVE_DOUBLE)
+				else if (this.curveType.value == OldParallelCoordinatesPlotter.CURVE_DOUBLE)
 					DrawUtils.drawDoubleCurve(graphics, _prevX, _prevY, x, y, true, 1);
-				else if (curveType.value == CURVE_TOWARDS)
+				else if (this.curveType.value == OldParallelCoordinatesPlotter.CURVE_TOWARDS)
 					DrawUtils.drawCurvedLine(graphics, _prevX,  _prevY, x, y, -1);
-				else if (curveType.value == CURVE_AWAY)
+				else if (this.curveType.value == OldParallelCoordinatesPlotter.CURVE_AWAY)
 					DrawUtils.drawCurvedLine(graphics, _prevX,  _prevY, x, y,  1);
 				
 				continueLine = true;
@@ -595,7 +596,7 @@ namespace weavejs.plot
 		
 		public yAxisLabelFunction(value:number):string
 		{
-			var _yColumns:Array = columns.getObjects();
+			var _yColumns:IAttributeColumn[] = this.columns.getObjects(IAttributeColumn);
 			if (_yColumns.length > 0)
 				return ColumnUtils.deriveStringFromNumber(_yColumns[0], value); // always use the first column to format the axis labels
 			return null;
@@ -605,19 +606,19 @@ namespace weavejs.plot
 		{
 			try
 			{
-				if (usingXAttributes)
-					return ColumnUtils.deriveStringFromNumber(_xColumns[0], value);
+				if (this.usingXAttributes)
+					return ColumnUtils.deriveStringFromNumber(this._xColumns[0], value);
 				else
-					return ColumnUtils.getTitle(_yColumns[value]);
+					return ColumnUtils.getTitle(this._yColumns[value]);
 			}
-			catch(e:Error) { };
+			catch(e) { };
 			
 			return "";
 		}
 		
 		public get usingXAttributes():boolean
 		{
-			if (_xColumns.length == _yColumns.length)
+			if (this._xColumns.length == this._yColumns.length)
 				return true;
 			else
 				return false;
@@ -626,19 +627,19 @@ namespace weavejs.plot
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
 			// normalized data coordinates
-			if (zoomToSubset.value)
+			if (this.zoomToSubset.value)
 			{
 				output.reset();
 			}
 			else
 			{
-				output.setBounds(0, 0, Math.max(1, columns.getNames().length - 1), 1);
+				output.setBounds(0, 0, Math.max(1, this.columns.getNames().length - 1), 1);
 				
-				if (!normalize.value)
+				if (!this.normalize.value)
 				{
 					// reset y coords
 					output.setYRange(NaN, NaN);
-					for each (var column:IAttributeColumn in columns.getObjects())
+					for (var column of this.columns.getObjects(IAttributeColumn))
 					{
 						var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(column);
 						// expand y range to include all data coordinates
@@ -646,10 +647,10 @@ namespace weavejs.plot
 						output.includeCoords(0, stats.getMax());
 					}
 					
-					if(_xColumns.length > 0)
+					if (this._xColumns.length > 0)
 					{
 						output.setXRange(NaN,NaN);
-						for each (var col:IAttributeColumn in _xColumns)
+						for (var col of this._xColumns)
 						{
 							var colStats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(col);
 							// expand x range to include all data coordinates
@@ -674,23 +675,23 @@ namespace weavejs.plot
 			output.x = NaN;
 			output.y = NaN;
 			
-			if (enableGroupBy.value && groupBy.containsKey(recordKey))
+			if (this.enableGroupBy.value && this.groupBy.containsKey(recordKey))
 			{
-				if (xData.getValueFromKey(recordKey, String) != getXValues()[columnIndex])
+				if (this.xData.getValueFromKey(recordKey, String) != this.getXValues()[columnIndex])
 					return;
-				recordKey = WeaveAPI.QKeyManager.getQKey(getForeignKeyType(), groupBy.getValueFromKey(recordKey, String));
+				recordKey = WeaveAPI.QKeyManager.getQKey(this.getForeignKeyType(), this.groupBy.getValueFromKey(recordKey, String));
 			}
 			
 			// X
-			var xCol:IAttributeColumn = _xColumns[columnIndex] as IAttributeColumn;
+			var xCol = this._xColumns[columnIndex];
 			if (xCol)
 				output.x = xCol.getValueFromKey(recordKey, Number);
-			else if (_xColumns.length == 0)
+			else if (this._xColumns.length == 0)
 				output.x = columnIndex;
 			
 			// Y
-			var yCol:IAttributeColumn = _yColumns[columnIndex] as IAttributeColumn;
-			if (yCol && normalize.value)
+			var yCol = this._yColumns[columnIndex];
+			if (yCol && this.normalize.value)
 				output.y = WeaveAPI.StatisticsCache.getColumnStatistics(yCol).getNorm(recordKey);
 			else if (yCol)
 				output.y = yCol.getValueFromKey(recordKey, Number);
@@ -708,3 +709,4 @@ namespace weavejs.plot
 		[Deprecated(replacement="xColumns")] public set xAttributeColumns(value:Object):void { Weave.setState(xColumns, value, true); }*/
 	}
 }
+

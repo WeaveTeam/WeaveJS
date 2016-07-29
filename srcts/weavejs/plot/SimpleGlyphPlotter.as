@@ -16,7 +16,6 @@
 namespace weavejs.plot
 {
 	import Graphics = PIXI.Graphics;
-	import Shape = flash.display.Shape;
 	import Point = weavejs.geom.Point;
 	
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -25,28 +24,30 @@ namespace weavejs.plot
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import LinkableString = weavejs.core.LinkableString;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 
 	/**
 	 * Plots squares or circles.
 	 */
 	export class SimpleGlyphPlotter extends AbstractGlyphPlotter
 	{
-		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, SimpleGlyphPlotter, "Simple glyphs");
-		
 		public constructor()
 		{
-			fillStyle.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
-			setColumnKeySources([screenSize, dataX, dataY], [-1, 1, -1]);
+			this.fillStyle.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
+			this.setColumnKeySources([this.screenSize, this.dataX, this.dataY], [-1, 1, -1]);
 		}
 		
-		private static LEFT:string = 'left', CENTER:string = 'center', RIGHT:string = 'right';
-		private static TOP:string = 'top', MIDDLE:string = 'middle', BOTTOM:string = 'bottom';
-		private static HORIZONTAL_MODES:Array = [LEFT,CENTER,RIGHT];
-		private static VERTICAL_MODES:Array = [TOP,MIDDLE,BOTTOM];
-		private static verifyHorizontal(value:string):boolean { return HORIZONTAL_MODES.indexOf(value) >= 0; }
-		private static verifyVertical(value:string):boolean { return VERTICAL_MODES.indexOf(value) >= 0; }
+		private static LEFT:string = 'left';
+		private static CENTER:string = 'center';
+		private static RIGHT:string = 'right';
+		private static TOP:string = 'top';
+		private static MIDDLE:string = 'middle';
+		private static BOTTOM:string = 'bottom';
+		private static HORIZONTAL_MODES = [SimpleGlyphPlotter.LEFT,SimpleGlyphPlotter.CENTER,SimpleGlyphPlotter.RIGHT];
+		private static VERTICAL_MODES = [SimpleGlyphPlotter.TOP,SimpleGlyphPlotter.MIDDLE,SimpleGlyphPlotter.BOTTOM];
+		private static verifyHorizontal(value:string):boolean { return SimpleGlyphPlotter.HORIZONTAL_MODES.indexOf(value) >= 0; }
+		private static verifyVertical(value:string):boolean { return SimpleGlyphPlotter.VERTICAL_MODES.indexOf(value) >= 0; }
 		
 		/**
 		 * This is the line style used to draw the outline of the rectangle.
@@ -67,43 +68,46 @@ namespace weavejs.plot
 		/**
 		 * This determines how the glyphs are aligned horizontally to the data coordinates.
 		 */		
-		public horizontalPosition:LinkableString = Weave.linkableChild(this, new LinkableString(CENTER, verifyHorizontal));
+		public horizontalPosition:LinkableString = Weave.linkableChild(this, new LinkableString(SimpleGlyphPlotter.CENTER, SimpleGlyphPlotter.verifyHorizontal));
 		/**
 		 * This determines how the glyphs are aligned vertically to the data coordinates.
 		 */		
-		public verticalPosition:LinkableString = Weave.linkableChild(this, new LinkableString(MIDDLE, verifyVertical));
+		public verticalPosition:LinkableString = Weave.linkableChild(this, new LinkableString(SimpleGlyphPlotter.MIDDLE, SimpleGlyphPlotter.verifyVertical));
 		
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, buffer:Graphics):void
 		{
-			getCoordsFromRecordKey(recordKey, tempPoint);
-			var size:number = screenSize.getValueFromKey(recordKey, Number);
+			this.getCoordsFromRecordKey(recordKey, SimpleGlyphPlotter.tempPoint);
+			var size:number = this.screenSize.getValueFromKey(recordKey, Number);
 			
-			if (isNaN(tempPoint.x) || isNaN(tempPoint.y) || isNaN(size))
+			if (isNaN(SimpleGlyphPlotter.tempPoint.x) || isNaN(SimpleGlyphPlotter.tempPoint.y) || isNaN(size))
 				return;
 			
 			// project x,y data coordinates to screen coordinates
-			dataBounds.projectPointTo(tempPoint, screenBounds);
+			dataBounds.projectPointTo(SimpleGlyphPlotter.tempPoint, screenBounds);
 			
 			// add screen offsets
-			tempPoint.x += size * (HORIZONTAL_MODES.indexOf(horizontalPosition.value) / 2 - 1);
-			tempPoint.y += size * (VERTICAL_MODES.indexOf(verticalPosition.value) / 2 - 1);
+			SimpleGlyphPlotter.tempPoint.x += size * (SimpleGlyphPlotter.HORIZONTAL_MODES.indexOf(this.horizontalPosition.value) / 2 - 1);
+			SimpleGlyphPlotter.tempPoint.y += size * (SimpleGlyphPlotter.VERTICAL_MODES.indexOf(this.verticalPosition.value) / 2 - 1);
 			
 			// draw graphics
 			var graphics:Graphics = tempShape.graphics;
-			lineStyle.beginLineStyle(recordKey, graphics);
-			fillStyle.beginFillStyle(recordKey, graphics);
+			this.lineStyle.beginLineStyle(recordKey, graphics);
+			this.fillStyle.beginFillStyle(recordKey, graphics);
 			
-			if (drawEllipse.value)
-				graphics.drawEllipse(tempPoint.x, tempPoint.y, size, size);
+			if (this.drawEllipse.value)
+				graphics.drawEllipse(SimpleGlyphPlotter.tempPoint.x, SimpleGlyphPlotter.tempPoint.y, size, size);
 			else
-				graphics.drawRect(tempPoint.x, tempPoint.y, size, size);
+				graphics.drawRect(SimpleGlyphPlotter.tempPoint.x, SimpleGlyphPlotter.tempPoint.y, size, size);
 			
 			graphics.endFill();
 		}
 		
 		private static tempPoint:Point = new Point(); // reusable object
 	}
+
+	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, SimpleGlyphPlotter, "Simple glyphs");
 }
+

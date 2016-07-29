@@ -15,42 +15,41 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
-	
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IPlotter = weavejs.api.ui.IPlotter;
 	import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 	import LinkableFunction = weavejs.core.LinkableFunction;
-	import BitmapText = weavejs.util.BitmapText;
-	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import LinkableTextFormat = weavejs.plot.LinkableTextFormat;
+	import Graphics = PIXI.Graphics;
 	
 	export class BackgroundTextPlotter extends AbstractPlotter
 	{
-		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, BackgroundTextPlotter, "Background text");
-		
 		public textFormat:LinkableTextFormat = Weave.linkableChild(this, LinkableTextFormat);
-		public textFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('target && target.getSessionState()', true, false, ['target']));
+		public textFunction:LinkableFunction = Weave.linkableChild(this, new LinkableFunction('target && target.getSessionState()', true, ['target']));
 		public dependency:LinkableDynamicObject = Weave.linkableChild(this, LinkableDynamicObject);
 		private bitmapText:BitmapText = new BitmapText();
 		
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
-			bitmapText.x = screenBounds.getXCenter();
-			bitmapText.y = screenBounds.getYCenter();
-			bitmapText.maxWidth = screenBounds.getXCoverage();
-			bitmapText.maxHeight = screenBounds.getYCoverage();
-			bitmapText.verticalAlign = BitmapText.VERTICAL_ALIGN_MIDDLE;
-			bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_CENTER;
-			textFormat.copyTo(bitmapText.textFormat);
+			this.bitmapText.x = screenBounds.getXCenter();
+			this.bitmapText.y = screenBounds.getYCenter();
+			this.bitmapText.maxWidth = screenBounds.getXCoverage();
+			this.bitmapText.maxHeight = screenBounds.getYCoverage();
+			this.bitmapText.verticalAlign = BitmapText.VERTICAL_ALIGN_MIDDLE;
+			this.bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_CENTER;
+			let style = this.textFormat.getStyle();
 			try
 			{
-				bitmapText.text = textFunction.apply(this, [dependency.target]);
-				bitmapText.draw(destination);
+				this.bitmapText.text = this.textFunction.apply(this, [this.dependency.target]);
+				this.bitmapText.draw(destination);
 			}
-			catch (e:Error)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}
 	}
+
+	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, BackgroundTextPlotter, "Background text");
 }
+

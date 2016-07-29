@@ -34,16 +34,17 @@ namespace weavejs.plot
 		
 		//the column whose value drives this meter 
 		public meterColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		protected meterColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(meterColumn));
+		protected meterColumnStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.meterColumn));
 		
 //		private mode:number = PROBE_MODE;
 		public constructor()
 		{
 			//this line causes only the currently probed records to be drawn.			
-			setSingleKeySource(WeaveProperties.defaultProbeKeySet);
+			this.setSingleKeySource(WeaveProperties.defaultProbeKeySet);
 			this.addSpatialDependencies(this.meterColumn);
 		}
 	}
 }
+
 
 

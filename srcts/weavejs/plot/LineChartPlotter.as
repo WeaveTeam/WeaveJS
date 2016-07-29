@@ -28,7 +28,7 @@ namespace weavejs.plot
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import FilteredKeySet = weavejs.data.key.FilteredKeySet;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	import Bounds2D = weavejs.geom.Bounds2D;
 	
 	export class LineChartPlotter extends AbstractPlotter
@@ -122,7 +122,7 @@ namespace weavejs.plot
 						return this.keyIndex / this.allKeys.length;
 					}
 					
-					var key:IQualifiedKey = this.allKeys[this.keyIndex] as IQualifiedKey;
+					var key:IQualifiedKey = this.allKeys[this.keyIndex];
 					
 					if (this.taskKeySet ? this.taskKeySet.has(key) : this.plotter.filteredKeySet.containsKey(key))
 					{
@@ -155,6 +155,7 @@ namespace weavejs.plot
 			return 1;
 		}
 	}
+
 	class AsyncLineRenderer
 	{
 		public constructor(graphics:Graphics)

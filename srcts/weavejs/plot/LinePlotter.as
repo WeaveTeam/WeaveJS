@@ -16,7 +16,6 @@
 namespace weavejs.plot
 {
 	import Graphics = PIXI.Graphics;
-	import Shape = flash.display.Shape;
 	import Point = weavejs.geom.Point;
 	
 	import DynamicState = weavejs.api.core.DynamicState;
@@ -24,7 +23,7 @@ namespace weavejs.plot
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 
 	/**
 	 * This plotter plots lines using x1,y1,x2,y2 values.
@@ -34,7 +33,7 @@ namespace weavejs.plot
 	{
 		public constructor()
 		{
-			setColumnKeySources([x1Data, y1Data, x2Data, y2Data]);
+			this.setColumnKeySources([this.x1Data, this.y1Data, this.x2Data, this.y2Data]);
 			this.addSpatialDependencies(this.x1Data, this.y1Data, this.x2Data, this.y2Data);
 		}
 
@@ -85,43 +84,43 @@ namespace weavejs.plot
 		 */
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			initBoundsArray(output, 2);
-			(output[0] as Bounds2D).includeCoords(
-					x1Data.getValueFromKey(recordKey, Number),
-					y1Data.getValueFromKey(recordKey, Number)
+			this.initBoundsArray(output, 2);
+			output[0].includeCoords(
+					this.x1Data.getValueFromKey(recordKey, Number),
+					this.y1Data.getValueFromKey(recordKey, Number)
 				);
-			(output[1] as Bounds2D).includeCoords(
-					x2Data.getValueFromKey(recordKey, Number),
-					y2Data.getValueFromKey(recordKey, Number)
+			output[1].includeCoords(
+					this.x2Data.getValueFromKey(recordKey, Number),
+					this.y2Data.getValueFromKey(recordKey, Number)
 				);
 		}
 
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, buffer:Graphics):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 
 			// project data coordinates to screen coordinates and draw graphics onto tempShape
-			line.beginLineStyle(recordKey, graphics);				
+			this.line.beginLineStyle(recordKey, graphics);				
 			
 			// project data coordinates to screen coordinates and draw graphics
-			tempPoint.x = x1Data.getValueFromKey(recordKey, Number);
-			tempPoint.y = y1Data.getValueFromKey(recordKey, Number);
-			dataBounds.projectPointTo(tempPoint, screenBounds);
-			tempPoint.x += x1ScreenOffset.getValueFromKey(recordKey, Number);
-			tempPoint.y += y1ScreenOffset.getValueFromKey(recordKey, Number);
+			LinePlotter.tempPoint.x = this.x1Data.getValueFromKey(recordKey, Number);
+			LinePlotter.tempPoint.y = this.y1Data.getValueFromKey(recordKey, Number);
+			dataBounds.projectPointTo(LinePlotter.tempPoint, screenBounds);
+			LinePlotter.tempPoint.x += this.x1ScreenOffset.getValueFromKey(recordKey, Number);
+			LinePlotter.tempPoint.y += this.y1ScreenOffset.getValueFromKey(recordKey, Number);
 			
-			graphics.moveTo(tempPoint.x, tempPoint.y);
+			graphics.moveTo(LinePlotter.tempPoint.x, LinePlotter.tempPoint.y);
 			
-			tempPoint.x = x2Data.getValueFromKey(recordKey, Number);
-			tempPoint.y = y2Data.getValueFromKey(recordKey, Number);
-			dataBounds.projectPointTo(tempPoint, screenBounds);
-			tempPoint.x += x2ScreenOffset.getValueFromKey(recordKey, Number);
-			tempPoint.y += y2ScreenOffset.getValueFromKey(recordKey, Number);
+			LinePlotter.tempPoint.x = this.x2Data.getValueFromKey(recordKey, Number);
+			LinePlotter.tempPoint.y = this.y2Data.getValueFromKey(recordKey, Number);
+			dataBounds.projectPointTo(LinePlotter.tempPoint, screenBounds);
+			LinePlotter.tempPoint.x += this.x2ScreenOffset.getValueFromKey(recordKey, Number);
+			LinePlotter.tempPoint.y += this.y2ScreenOffset.getValueFromKey(recordKey, Number);
 			
-			graphics.lineTo(tempPoint.x, tempPoint.y);
+			graphics.lineTo(LinePlotter.tempPoint.x, LinePlotter.tempPoint.y);
 		}
 		
 		private static tempPoint:Point = new Point(); // reusable object
@@ -132,10 +131,11 @@ namespace weavejs.plot
 			{
 				Weave.setState(line, value[0][DynamicState.SESSION_STATE]);
 			}
-			catch (e:Error)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}*/
 	}
 }
+

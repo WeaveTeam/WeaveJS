@@ -43,9 +43,8 @@ namespace weavejs.util
 		 * @param radius The radius of the circle that contains the arc
 		 * @param yRadius Optional y radius for an elliptical arc instead of a circular one
 		 * @param outputStartCoords A Point object used to output the starting coordinates of the arc.
-		 * @author adufilie
-		 */		
-		public static arcTo(graphics:Graphics, continueLine:Boolean, xCenter:number, yCenter:number, startAngle:number, endAngle:number, radius:number, yRadius:number = NaN, outputStartCoords:Point = null):void
+		 */
+		public static arcTo(graphics:Graphics, continueLine:boolean, xCenter:number, yCenter:number, startAngle:number, endAngle:number, radius:number, yRadius:number = NaN, outputStartCoords:Point = null):void
 		{
 			if (isNaN(yRadius))
 				yRadius = radius;
@@ -94,8 +93,9 @@ namespace weavejs.util
 		 * @param curveNormValue Values that produce nice curves range from 0 to 1, 0 being a straight line.
 		 * @param continuingLine If true, the graphics cursor is assumed to be already at (startX,startY) and moveTo will not be used prior to drawing the curve.
 		 */
-		public static drawDoubleCurve(graphics:Graphics, startX:number, startY:number, endX:number, endY:number, horizontalEndPoints:Boolean, curveNormValue:number = 1, continuingLine:Boolean = false):void
+		public static drawDoubleCurve(graphics:Graphics, startX:number, startY:number, endX:number, endY:number, horizontalEndPoints:boolean, curveNormValue:number = 1, continuingLine:boolean = false):void
 		{
+			/*
 			if (!continuingLine)
 				graphics.moveTo(startX, startY);
 			
@@ -113,16 +113,19 @@ namespace weavejs.util
 				graphics.curveTo(startX, startY + dy / 4 * curveNormValue, centerX, centerY);
 				graphics.curveTo(endX, endY - dy / 4 * curveNormValue, endX, endY);
 			}
+			*/
 		}
 		
 		public static drawCurvedLine(graphics:Graphics, startX:number, startY:number, endX:number, endY:number, curvature:number):void
 		{
+			/*
 			graphics.moveTo(startX, startY);
 			
 			if(curvature == 0)
 				graphics.lineTo(endX, endY);
 			else
 				graphics.curveTo(startX + (endX - startX)/2, startY + (1 - curvature)/2*(endY - startY), endX, endY);
+			*/
 		}
 		
 		/**

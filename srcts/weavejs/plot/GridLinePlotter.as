@@ -15,8 +15,6 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
-	import CapsStyle = flash.display.CapsStyle;
 	import Graphics = PIXI.Graphics;
 	import Point = weavejs.geom.Point;
 	
@@ -24,16 +22,14 @@ namespace weavejs.plot
 	import IPlotter = weavejs.api.ui.IPlotter;
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import Bounds2D = weavejs.geom.Bounds2D;
-	import LinkableBounds2D = weavejs.primitives.LinkableBounds2D;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
-	
+	import LinkableBounds2D = weavejs.geom.LinkableBounds2D;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
+
 	export class GridLinePlotter extends AbstractPlotter
 	{
-		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, GridLinePlotter, "Grid lines");
-		
 		public constructor()
 		{
-			lineStyle.caps.defaultValue.value = CapsStyle.NONE;
+			this.lineStyle.caps.defaultValue.value = CapsStyle.NONE;
 			this.addSpatialDependencies(this.bounds);
 		}
 		
@@ -50,32 +46,32 @@ namespace weavejs.plot
 		
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
-			bounds.copyTo(output);
+			this.bounds.copyTo(output);
 		}
 		
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
 			var graphics:Graphics = tempShape.graphics;
 			graphics.clear();
-			lineStyle.beginLineStyle(null, graphics);
+			this.lineStyle.beginLineStyle(null, graphics);
 			
-			bounds.copyTo(lineBounds);
+			this.bounds.copyTo(this.lineBounds);
 
 			// find appropriate bounds for lines
-			var xMin:number = numericMax(lineBounds.getXNumericMin(), dataBounds.getXNumericMin());
-			var yMin:number = numericMax(lineBounds.getYNumericMin(), dataBounds.getYNumericMin());
-			var xMax:number = numericMin(lineBounds.getXNumericMax(), dataBounds.getXNumericMax());
-			var yMax:number = numericMin(lineBounds.getYNumericMax(), dataBounds.getYNumericMax());
+			var xMin:number = this.numericMax(this.lineBounds.getXNumericMin(), dataBounds.getXNumericMin());
+			var yMin:number = this.numericMax(this.lineBounds.getYNumericMin(), dataBounds.getYNumericMin());
+			var xMax:number = this.numericMin(this.lineBounds.getXNumericMax(), dataBounds.getXNumericMax());
+			var yMax:number = this.numericMin(this.lineBounds.getYNumericMax(), dataBounds.getYNumericMax());
 			
 			// x
 			if (yMin < yMax)
 			{
-				var x0:number = xOffset.value || 0;
-				var dx:number = Math.abs(xInterval.value);
+				var x0:number = this.xOffset.value || 0;
+				var dx:number = Math.abs(this.xInterval.value);
 				var xScale:number = dataBounds.getXCoverage() / screenBounds.getXCoverage();
 				
 				if (xMin < xMax && ((xMin - x0) % dx == 0 || dx == 0))
-					drawLine(xMin, yMin, xMin, yMax, graphics, dataBounds, screenBounds);
+					this.drawLine(xMin, yMin, xMin, yMax, graphics, dataBounds, screenBounds);
 				
 				if (dx > xScale) // don't draw sub-pixel intervals
 				{
@@ -83,24 +79,24 @@ namespace weavejs.plot
 					if (xStart <= xMin)
 						xStart += dx;
 					for (var ix:int = 0, x:number = xStart; x < xMax; x = xStart + dx * ++ix)
-						drawLine(x, yMin, x, yMax, graphics, dataBounds, screenBounds);
+						this.drawLine(x, yMin, x, yMax, graphics, dataBounds, screenBounds);
 				}
-				else if (isFinite(xOffset.value) && xMin < x0 && x0 < xMax)
-					drawLine(x0, yMin, x0, yMax, graphics, dataBounds, screenBounds);
+				else if (isFinite(this.xOffset.value) && xMin < x0 && x0 < xMax)
+					this.drawLine(x0, yMin, x0, yMax, graphics, dataBounds, screenBounds);
 				
 				if (xMin <= xMax && ((xMax - x0) % dx == 0 || dx == 0))
-					drawLine(xMax, yMin, xMax, yMax, graphics, dataBounds, screenBounds);
+					this.drawLine(xMax, yMin, xMax, yMax, graphics, dataBounds, screenBounds);
 			}
 			
 			// y
 			if (xMin < xMax)
 			{
-				var y0:number = yOffset.value || 0;
-				var dy:number = Math.abs(yInterval.value);
+				var y0:number = this.yOffset.value || 0;
+				var dy:number = Math.abs(this.yInterval.value);
 				var yScale:number = dataBounds.getYCoverage() / screenBounds.getYCoverage();
 				
 				if (yMin < yMax && ((yMin - y0) % dy == 0 || dy == 0))
-					drawLine(xMin, yMin, xMax, yMin, graphics, dataBounds, screenBounds);
+					this.drawLine(xMin, yMin, xMax, yMin, graphics, dataBounds, screenBounds);
 				
 				if (dy > yScale) // don't draw sub-pixel intervals
 				{
@@ -108,13 +104,13 @@ namespace weavejs.plot
 					if (yStart <= yMin)
 						yStart += dy;
 					for (var iy:int = 0, y:number = yStart; y < yMax; y = yStart + dy * ++iy)
-						drawLine(xMin, y, xMax, y, graphics, dataBounds, screenBounds);
+						this.drawLine(xMin, y, xMax, y, graphics, dataBounds, screenBounds);
 				}
-				else if (isFinite(yOffset.value) && yMin < y0 && y0 < yMax)
-					drawLine(xMin, y0, xMax, y0, graphics, dataBounds, screenBounds);
+				else if (isFinite(this.yOffset.value) && yMin < y0 && y0 < yMax)
+					this.drawLine(xMin, y0, xMax, y0, graphics, dataBounds, screenBounds);
 				
 				if (yMin <= yMax && ((yMax - y0) % dy == 0 || dy == 0))
-					drawLine(xMin, yMax, xMax, yMax, graphics, dataBounds, screenBounds);
+					this.drawLine(xMin, yMax, xMax, yMax, graphics, dataBounds, screenBounds);
 			}
 			
 			// flush buffer
@@ -133,15 +129,15 @@ namespace weavejs.plot
 		
 		private drawLine(xMin:number, yMin:number, xMax:number, yMax:number, graphics:Graphics, dataBounds:Bounds2D, screenBounds:Bounds2D):void
 		{
-			tempPoint.x = xMin;
-			tempPoint.y = yMin;
-			dataBounds.projectPointTo(tempPoint, screenBounds);
-			graphics.moveTo(tempPoint.x, tempPoint.y);
+			this.tempPoint.x = xMin;
+			this.tempPoint.y = yMin;
+			dataBounds.projectPointTo(this.tempPoint, screenBounds);
+			graphics.moveTo(this.tempPoint.x, this.tempPoint.y);
 			
-			tempPoint.x = xMax;
-			tempPoint.y = yMax;
-			dataBounds.projectPointTo(tempPoint, screenBounds);
-			graphics.lineTo(tempPoint.x, tempPoint.y);
+			this.tempPoint.x = xMax;
+			this.tempPoint.y = yMax;
+			dataBounds.projectPointTo(this.tempPoint, screenBounds);
+			graphics.lineTo(this.tempPoint.x, this.tempPoint.y);
 		}
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////
@@ -153,7 +149,7 @@ namespace weavejs.plot
 		[Deprecated] public set horizontal(value:boolean):void { handleDeprecated('alongXAxis', !value); }
 		[Deprecated] public set alongXAxis(value:boolean):void { handleDeprecated('alongXAxis', value); }
 		private _deprecated:Object;
-		private handleDeprecated(name:string, value:*):void
+		private handleDeprecated(name:string, value:any):void
 		{
 			if (!_deprecated)
 				_deprecated = {};
@@ -178,4 +174,7 @@ namespace weavejs.plot
 			_deprecated = null;
 		}*/
 	}
+
+	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, GridLinePlotter, "Grid lines");
 }
+

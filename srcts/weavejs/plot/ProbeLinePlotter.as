@@ -15,11 +15,9 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
 	import Graphics = PIXI.Graphics;
 	import Point = weavejs.geom.Point;
-	
-	import Bounds2D;
+	import Bounds2D = weavejs.geom.Bounds2D;
 	
 	export class ProbeLinePlotter extends AbstractPlotter
 	{
@@ -36,28 +34,28 @@ namespace weavejs.plot
 		
 		public clearCoordinates():void
 		{
-			drawLine = false;
+			this.drawLine = false;
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
 		public setCoordinates(x_yAxis:number, y_yAxis:number, xPlot:number, yPlot:number, x_xAxis:number, y_xAxis:number, yToPlotBool:boolean, xToPlotBool:boolean):void
 		{
-			yAxis.x = x_yAxis;
-			yAxis.y = y_yAxis;
+			this.yAxis.x = x_yAxis;
+			this.yAxis.y = y_yAxis;
 			plot.x = xPlot;
 			plot.y = yPlot;
-			xAxis.x = x_xAxis;
-			xAxis.y = y_xAxis;
-			drawLine = true;
-			yToPlot = yToPlotBool ;
-			xToPlot = xToPlotBool ;
+			this.xAxis.x = x_xAxis;
+			this.xAxis.y = y_xAxis;
+			this.drawLine = true;
+			this.yToPlot = yToPlotBool ;
+			this.xToPlot = xToPlotBool ;
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
 		
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
-			if(drawLine)
+			if (this.drawLine)
 			{
 				var graphics:Graphics = tempShape.graphics;
 				graphics.clear();
@@ -67,15 +65,15 @@ namespace weavejs.plot
 				graphics.beginFill(0xff0000);
 				graphics.lineStyle(1,0xff0000);
 				dataBounds.projectPointTo(plot, screenBounds);
-				if(yToPlot)
+				if (this.yToPlot)
 				{
-					dataBounds.projectPointTo(yAxis, screenBounds);
+					dataBounds.projectPointTo(this.yAxis, screenBounds);
 					
 					// Start at X axis
-					graphics.moveTo(yAxis.x, yAxis.y);
+					graphics.moveTo(this.yAxis.x, this.yAxis.y);
 					
-					graphics.drawCircle(yAxis.x, yAxis.y,2);
-					graphics.moveTo(yAxis.x, yAxis.y);
+					graphics.drawCircle(this.yAxis.x, this.yAxis.y,2);
+					graphics.moveTo(this.yAxis.x, this.yAxis.y);
 					
 					// Finish line at point
 					graphics.lineTo(plot.x, plot.y);
@@ -84,13 +82,13 @@ namespace weavejs.plot
 				}
 				graphics.drawCircle(plot.x,plot.y,2);
 				
-				if( xToPlot)
+				if ( this.xToPlot)
 				{
 					graphics.moveTo(plot.x, plot.y);
-					dataBounds.projectPointTo(xAxis, screenBounds);
+					dataBounds.projectPointTo(this.xAxis, screenBounds);
 					
-					graphics.lineTo(xAxis.x, xAxis.y);
-					graphics.drawCircle(xAxis.x, xAxis.y, 2);
+					graphics.lineTo(this.xAxis.x, this.xAxis.y);
+					graphics.drawCircle(this.xAxis.x, this.xAxis.y, 2);
 				}
 				
 				graphics.endFill();

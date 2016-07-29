@@ -16,23 +16,22 @@
 namespace weavejs.plot
 {
 	import Graphics = PIXI.Graphics;
-	import Shape = flash.display.Shape;
 	import Point = weavejs.geom.Point;
 	
 	import DynamicState = weavejs.api.core.DynamicState;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-	import Bounds2D = weavejs.geom.Bounds2D;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import DrawUtils = weavejs.util.DrawUtils;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	
 	export class WedgePlotter extends AbstractPlotter
 	{
 		public constructor()
 		{
-			setColumnKeySources([beginRadians]);
+			super();
+			this.setColumnKeySources([this.beginRadians]);
 			this.addSpatialDependencies(this.beginRadians, this.spanRadians);
 		}
 		
@@ -45,18 +44,18 @@ namespace weavejs.plot
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, buffer:Graphics):void
 		{
 			// project data coordinates to screen coordinates and draw graphics
-			var _beginRadians:number = beginRadians.getValueFromKey(recordKey, Number);
-			var _spanRadians:number = spanRadians.getValueFromKey(recordKey, Number);
+			var _beginRadians:number = this.beginRadians.getValueFromKey(recordKey, Number);
+			var _spanRadians:number = this.spanRadians.getValueFromKey(recordKey, Number);
 
 			var graphics:Graphics = tempShape.graphics;
 			// begin line & fill
-			line.beginLineStyle(recordKey, graphics);				
-			fill.beginFillStyle(recordKey, graphics);
+			this.line.beginLineStyle(recordKey, graphics);				
+			this.fill.beginFillStyle(recordKey, graphics);
 			// move to center point
-			drawProjectedWedge(graphics, dataBounds, screenBounds, _beginRadians, _spanRadians);
+			WedgePlotter.drawProjectedWedge(graphics, dataBounds, screenBounds, _beginRadians, _spanRadians);
 			// end fill
 			graphics.endFill();
 		}
@@ -71,9 +70,9 @@ namespace weavejs.plot
 		 */
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			var _beginRadians:number = beginRadians.getValueFromKey(recordKey, Number);
-			var _pieWidthRadians:number = spanRadians.getValueFromKey(recordKey, Number);
-			getWedgeBounds(initBoundsArray(output), _beginRadians, _pieWidthRadians);
+			var _beginRadians:number = this.beginRadians.getValueFromKey(recordKey, Number);
+			var _pieWidthRadians:number = this.spanRadians.getValueFromKey(recordKey, Number);
+			WedgePlotter.getWedgeBounds(this.initBoundsArray(output), _beginRadians, _pieWidthRadians);
 		}
 		
 		// gets data bounds for a wedge
@@ -90,7 +89,7 @@ namespace weavejs.plot
 			// This is the number of points on the arc used to generate the bounding box of a wedge.
 			var numAnchors:number = 25;
 			var differentialRadians:number = spanRadians/numAnchors;
-			for(var counter:number = 0; counter <= numAnchors; ++counter)
+			for (var counter:number = 0; counter <= numAnchors; ++counter)
 			{
 				var x:number = xDataCenter + dataRadius * Math.cos(beginRadians + counter * differentialRadians);
 				var y:number = yDataCenter + dataRadius * Math.sin(beginRadians + counter * differentialRadians);
@@ -102,17 +101,17 @@ namespace weavejs.plot
 		// projects data coordinates to screen coordinates and draws wedge
 		public static drawProjectedWedge(destination:Graphics, dataBounds:Bounds2D, screenBounds:Bounds2D, beginRadians:number, spanRadians:number, xDataCenter:number = 0, yDataCenter:number = 0, dataOuterRadius:number = 1, dataInnerRadius:number = 0):void
 		{
-			tempPoint.x = xDataCenter;
-			tempPoint.y = yDataCenter;
-			dataBounds.projectPointTo(tempPoint, screenBounds);
-			var xScreenCenter:number = tempPoint.x;
-			var yScreenCenter:number = tempPoint.y;
+			WedgePlotter.tempPoint.x = xDataCenter;
+			WedgePlotter.tempPoint.y = yDataCenter;
+			dataBounds.projectPointTo(WedgePlotter.tempPoint, screenBounds);
+			var xScreenCenter:number = WedgePlotter.tempPoint.x;
+			var yScreenCenter:number = WedgePlotter.tempPoint.y;
 			// convert x,y distance from data coordinates to screen coordinates to get screen radius
 			var xScreenRadius:number = dataOuterRadius * screenBounds.getWidth() / dataBounds.getWidth();
 			var yScreenRadius:number = dataOuterRadius * screenBounds.getHeight() / dataBounds.getHeight();
 			
 			// move to beginning of outer arc, draw outer arc and output start coordinates to tempPoint
-			DrawUtils.arcTo(destination, false, xScreenCenter, yScreenCenter, beginRadians, beginRadians + spanRadians, xScreenRadius, yScreenRadius, tempPoint);
+			DrawUtils.arcTo(destination, false, xScreenCenter, yScreenCenter, beginRadians, beginRadians + spanRadians, xScreenRadius, yScreenRadius, WedgePlotter.tempPoint);
 			if (dataInnerRadius == 0)
 			{
 				// continue line to center
@@ -126,7 +125,7 @@ namespace weavejs.plot
 				DrawUtils.arcTo(destination, true, xScreenCenter, yScreenCenter, beginRadians + spanRadians, beginRadians, xScreenRadius, yScreenRadius);
 			}
 			// continue line back to start of outer arc
-			destination.lineTo(tempPoint.x, tempPoint.y);
+			destination.lineTo(WedgePlotter.tempPoint.x, WedgePlotter.tempPoint.y);
 		}
 		
 		/*[Deprecated(replacement="line")] public set lineStyle(value:Object):void
@@ -135,9 +134,9 @@ namespace weavejs.plot
 			{
 				Weave.setState(line, value[0][DynamicState.SESSION_STATE]);
 			}
-			catch (e:Error)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}
 		[Deprecated(replacement="fill")] public set fillStyle(value:Object):void
@@ -146,10 +145,11 @@ namespace weavejs.plot
 			{
 				Weave.setState(fill, value[0][DynamicState.SESSION_STATE]);
 			}
-			catch (e:Error)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}*/
 	}
 }
+

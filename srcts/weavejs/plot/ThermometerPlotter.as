@@ -15,29 +15,28 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
-	import CapsStyle = flash.display.CapsStyle;
 	import Graphics = PIXI.Graphics;
 	import Point = weavejs.geom.Point;
 	
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IPlotTask = weavejs.api.ui.IPlotTask;
-	import ISelectableAttributes;
-	
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+
 	export class ThermometerPlotter extends MeterPlotter implements ISelectableAttributes
 	{
-		public getSelectableAttributeNames():Array
+		public getSelectableAttributeNames()
 		{
 			return ["Meter"];
 		}
-		public getSelectableAttributes():Array
+		public getSelectableAttributes()
 		{
-			return [meterColumn];
+			return [this.meterColumn];
 		}
 		
 		// reusable point objects
-		private bottom:Point = new Point(), top:Point = new Point();
+		private bottom:Point = new Point();
+		private top:Point = new Point();
 		
 		//the radius of the thermometer bulb (circle at bottom) in pixels
 		private bulbRadius:number = 30;
@@ -52,7 +51,7 @@ namespace weavejs.plot
 		private backgroundCenterLineColor:uint = 0x777777;
 		
 		//the x offset (in pixels) used when drawing all shapes (so axis line is fully visible) 
-		private xOffset:number = backgroundCenterLineThickness/2+1;
+		private xOffset:number = this.backgroundCenterLineThickness/2+1;
 		
 		/*override*/ public drawPlotAsyncIteration(task:IPlotTask):number
 		{
@@ -60,33 +59,30 @@ namespace weavejs.plot
 			var meterValue:number = 0;
 			var n:number = task.recordKeys.length;
 			
-			for (var i:int = 0; i < n; i++)//TODO handle missing values
-				meterValue += meterColumn.getValueFromKey(task.recordKeys[i] as IQualifiedKey, Number);
+			for (var i = 0; i < n; i++)//TODO handle missing values
+				meterValue += this.meterColumn.getValueFromKey(task.recordKeys[i] as IQualifiedKey, Number);
 			meterValue /= n;
 					
 			if (isFinite(meterValue))
 			{
 				//clear the graphics
-				var graphics:Graphics = tempShape.graphics;
-				graphics.clear();
-				
+				var graphics:Graphics = task.buffer;
+
 				//project bottom point
-				bottom.x = bottom.y = 0;
-				task.dataBounds.projectPointTo(bottom, task.screenBounds);
-				bottom.x += xOffset;
+				this.bottom.x = this.bottom.y = 0;
+				task.dataBounds.projectPointTo(this.bottom, task.screenBounds);
+				this.bottom.x += this.xOffset;
 				
 				//project top point (data value)
-				top.x = 0;
-				top.y = meterValue;
-				task.dataBounds.projectPointTo(top, task.screenBounds);
-				top.x += xOffset;
+				this.top.x = 0;
+				this.top.y = meterValue;
+				task.dataBounds.projectPointTo(this.top, task.screenBounds);
+				this.top.x += this.xOffset;
 				
 				//draw the center line (from zero to data value)
-				graphics.lineStyle(centerLineThickness,0xff0000,1.0, false, "normal", CapsStyle.NONE, null, 3);
-				graphics.moveTo(bottom.x, bottom.y+bulbRadius);
-				graphics.lineTo(top.x, top.y);
-				
-				task.buffer.draw(tempShape);
+				graphics.lineStyle(this.centerLineThickness, 0xff0000/*, 1.0, false, "normal", CapsStyle.NONE, null, 3*/);
+				graphics.moveTo(this.bottom.x, this.bottom.y+this.bulbRadius);
+				graphics.lineTo(this.top.x, this.top.y);
 			}
 			return 1;
 		}
@@ -98,34 +94,29 @@ namespace weavejs.plot
 		 * @param screenBounds The coordinates on the given sprite that correspond to the given dataBounds.
 		 * @param destination The sprite to draw the graphics onto.
 		 */
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
-			var graphics:Graphics = tempShape.graphics;
-			graphics.clear();
-			
 			//project bottom point
-			bottom.x = bottom.y = 0;
-			dataBounds.projectPointTo(bottom, screenBounds);
-			bottom.x += xOffset;
+			this.bottom.x = this.bottom.y = 0;
+			dataBounds.projectPointTo(this.bottom, screenBounds);
+			this.bottom.x += this.xOffset;
 			
 			//project data max top point
-			top.x = 0;
-			top.y = meterColumnStats.getMax();
-			dataBounds.projectPointTo(top, screenBounds);
-			top.x += xOffset;
+			this.top.x = 0;
+			this.top.y = this.meterColumnStats.getMax();
+			dataBounds.projectPointTo(this.top, screenBounds);
+			this.top.x += this.xOffset;
 			
 			//draw the background line (from zero to data max)
-			graphics.lineStyle(backgroundCenterLineThickness,backgroundCenterLineColor);
-			graphics.moveTo(bottom.x, bottom.y+bulbRadius);
-			graphics.lineTo(top.x, top.y);
+			graphics.lineStyle(this.backgroundCenterLineThickness,this.backgroundCenterLineColor);
+			graphics.moveTo(this.bottom.x, this.bottom.y+this.bulbRadius);
+			graphics.lineTo(this.top.x, this.top.y);
 				
 			//draw background circle
-			graphics.lineStyle(5,backgroundCenterLineColor);
+			graphics.lineStyle(5,this.backgroundCenterLineColor);
 			graphics.beginFill(0xFF0000);
-			graphics.drawCircle(bottom.x,bottom.y+bulbRadius,bulbRadius);
+			graphics.drawCircle(this.bottom.x,this.bottom.y+this.bulbRadius,this.bulbRadius);
 			graphics.endFill();
-			
-			destination.draw(tempShape);
 		}
 		
 		/**
@@ -134,14 +125,15 @@ namespace weavejs.plot
 		 */
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
-			output.setBounds(0, 0, 1, meterColumnStats.getMax());
+			output.setBounds(0, 0, 1, this.meterColumnStats.getMax());
 		}
 		
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			initBoundsArray(output).setBounds(0, 0, 1, meterColumnStats.getMax());
+			this.initBoundsArray(output).setBounds(0, 0, 1, this.meterColumnStats.getMax());
 		}
 	}
 }
+
 
 

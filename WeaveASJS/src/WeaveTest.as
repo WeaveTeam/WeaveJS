@@ -79,7 +79,9 @@ package
 	import weavejs.data.source.WebSocketDataSource;
 	import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
+	import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
+	import weavejs.geom.LinkableBounds2D;
 	import weavejs.net.Admin;
 	import weavejs.path.ExternalTool;
 	import weavejs.util.BackwardsCompatibility;
@@ -159,6 +161,8 @@ package
 			Admin,
 			EventCallbackCollection,
 			BackwardsCompatibility,
+			Range,
+			LinkableBounds2D,
 
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null

@@ -91,7 +91,7 @@ namespace weavejs.plot
 		 * @param sortDirections Array of sort directions corresponding to the columns and given as integers (1=ascending, -1=descending, 0=none).
 		 * @see weave.data.KeySets.FilteredKeySet#setColumnKeySources()
 		 */
-		protected setColumnKeySources(columns:IAttributeColumn[], sortDirections:number[] = null):void
+		protected setColumnKeySources(columns:IKeySet[], sortDirections:number[] = null):void
 		{
 			this._filteredKeySet.setColumnKeySources(columns, sortDirections);
 		}

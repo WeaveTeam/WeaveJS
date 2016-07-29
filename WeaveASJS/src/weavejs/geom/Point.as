@@ -31,5 +31,12 @@ package weavejs.geom
 			var dy:Number = p2.y - p1.y;
 			return Math.sqrt(dx * dx + dy * dy);
 		}
+
+		public static function interpolate(p1:Point, p2:Point, percentage:Number):Point
+		{
+			var dx:Number = p2.x - p1.x;
+			var dy:Number = p2.y - p1.y;
+			return new Point(p1.x + percentage * dx, p1.y + percentage * dy);
+		}
 	}
 }

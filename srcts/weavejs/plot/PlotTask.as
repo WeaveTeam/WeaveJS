@@ -2,15 +2,6 @@ namespace weavejs.plot
 {
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import Graphics = PIXI.Graphics;
-	import IDisposableObject = weavejs.api.core.IDisposableObject;
-	import ILinkableObject = weavejs.api.core.ILinkableObject;
-	import IDynamicKeyFilter = weavejs.api.data.IDynamicKeyFilter;
-	import IKeyFilter = weavejs.api.data.IKeyFilter;
-	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-	import CallbackCollection = weavejs.core.CallbackCollection;
-	import Bounds2D = weavejs.geom.Bounds2D;
-	import AsyncSort = weavejs.util.AsyncSort;
-
 	import ZoomBounds = weavejs.geom.ZoomBounds;
 	import StandardLib = weavejs.util.StandardLib;
 	import IDynamicKeyFilter = weavejs.api.data.IDynamicKeyFilter;
@@ -22,6 +13,8 @@ namespace weavejs.plot
 	import CallbackCollection = weavejs.core.CallbackCollection;
 	import WeaveAPI = weavejs.WeaveAPI;
 	import IDisposableObject = weavejs.api.core.IDisposableObject;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import IPlotter = weavejs.api.ui.IPlotter;
 
 	/**
 	 * Callbacks are triggered when the rendering task completes, or the plotter becomes busy during rendering.
@@ -334,7 +327,7 @@ namespace weavejs.plot
 						return 0; // not done yet
 
 					// next key iteration - add key if included in filter and on screen
-					var key:IQualifiedKey = this._pendingKeys[this._iPendingKey] as IQualifiedKey;
+					var key:IQualifiedKey = this._pendingKeys[this._iPendingKey];
 					if (!this._keyFilter || this._keyFilter.containsKey(key)) // accept all keys if _keyFilter is null
 					{
 						for (var keyBounds of this._spatialIndex.getBoundsFromKey(key))

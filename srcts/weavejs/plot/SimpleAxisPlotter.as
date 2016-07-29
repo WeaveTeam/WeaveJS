@@ -35,7 +35,7 @@ namespace weavejs.plot
 	import LooseAxisDescription = weavejs.geom.LooseAxisDescription;
 	import BitmapText = weavejs.util.BitmapText;
 	import DrawUtils = weavejs.util.DrawUtils;
-	import LinkableTextFormat = weavejs.util.LinkableTextFormat;
+	import LinkableTextFormat = weavejs.plot.LinkableTextFormat;
 	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 
 	export class SimpleAxisPlotter extends AbstractPlotter
@@ -385,7 +385,7 @@ namespace weavejs.plot
 		 * @param destination
 		 * 
 		 */		
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:BitmapData):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:Graphics):void
 		{
 			// draw the axis border
 			if (this.axesThickness.value != 0)
@@ -423,7 +423,7 @@ namespace weavejs.plot
 			}
 			if (this.showAxisName.value && this.axisName != null)
 			{
-				setupAxisNameBitmapText(dataBounds,screenBounds);
+				this.setupAxisNameBitmapText(dataBounds,screenBounds);
 //				getAxisNameScreenBounds(dataBounds,screenBounds,_tempBounds);
 //				destination.fillRect(new Rectangle(_tempBounds.xMin,_tempBounds.yMin,_tempBounds.width,_tempBounds.height),0x80FF0000);
 				this._bitmapText.draw(destination);
@@ -432,19 +432,19 @@ namespace weavejs.plot
 		
 		private _tempBounds:Bounds2D = new Bounds2D();
 		
-		protected function setupBitmapText(whichTextFormat:LinkableWatcher):void
+		protected setupBitmapText(whichTextFormat:LinkableWatcher):void
 		{
 			var ltf:LinkableTextFormat = whichTextFormat.target as LinkableTextFormat || LinkableTextFormat.defaultTextFormat;
 			ltf.copyTo(this._bitmapText.textFormat);
 			try {
 				this._bitmapText.textFormat.align = this.labelTextAlignment.value;
-			} catch (e:Error) { }
+			} catch (e) { }
 			
 			this._bitmapText.horizontalAlign = this.labelHorizontalAlign.value;
 			this._bitmapText.verticalAlign = this.labelVerticalAlign.value;
 		}
 		
-		protected function setupAxisNameBitmapText(dataBounds:Bounds2D, screenBounds:Bounds2D):void
+		protected setupAxisNameBitmapText(dataBounds:Bounds2D, screenBounds:Bounds2D):void
 		{
 			this.initPrivateAxisLineBoundsVariables(dataBounds, screenBounds);
 
@@ -470,20 +470,20 @@ namespace weavejs.plot
 					this._bitmapText.y = this._axisLineScreenBounds.yMin + this._axisNameYDistance;
 					this._bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_LEFT;
 				}
-				if(this._labelPosition == this.LABEL_POSITION_AT_AXIS_MAX)
+				if (this._labelPosition == this.LABEL_POSITION_AT_AXIS_MAX)
 				{
 					this._bitmapText.x = this._axisLineScreenBounds.xMax + this._axisNameXDistance;
 					this._bitmapText.y = this._axisLineScreenBounds.yMax + this._axisNameYDistance;
 					this._bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_RIGHT;
 				}
-				if(this._labelPosition == this.LABEL_POSITION_AT_AXIS_CENTER)
+				if (this._labelPosition == this.LABEL_POSITION_AT_AXIS_CENTER)
 				{
 					this._bitmapText.x = this._axisLineScreenBounds.getXCenter() + this._axisNameXDistance;
 					this._bitmapText.y = this._axisLineScreenBounds.getYCenter() + this._axisNameYDistance;
 					this._bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_CENTER;
 				}
 				
-				if(this._labelAlignment)
+				if (this._labelAlignment)
 					this._bitmapText.horizontalAlign = this._labelAlignment;
 
 				//_titleBounds = new Bounds2D(_bitmapText.x, _bitmapText.y, _bitmapText.width + _bitmapText.x, _bitmapText.height + _bitmapText.y)
@@ -494,7 +494,7 @@ namespace weavejs.plot
 		
 		/*override*/ public getBackgroundDataBounds(output:Bounds2D):void
 		{
-			axisLineDataBounds.copyTo(output);
+			this.axisLineDataBounds.copyTo(output);
 		}
 		
 		private initPrivateAxisLineBoundsVariables(dataBounds:Bounds2D, screenBounds:Bounds2D):void
@@ -544,7 +544,7 @@ namespace weavejs.plot
 				if (this.labelFunction.value)
 					result = this.labelFunction.apply(null, [tickValue, result, this.columnWatcher.target]);
 			}
-			catch (e:Error)
+			catch (e)
 			{
 				result = '';
 			}
@@ -568,7 +568,7 @@ namespace weavejs.plot
 		/*[Deprecated] public set axisLabelDistance(value:number):void { handleDeprecated('distance', value); }
 		[Deprecated] public set labelDistanceIsVertical(value:boolean):void { handleDeprecated('isVertical', value); }
 		private _deprecated:Object;
-		private handleDeprecated(name:string, value:*):void
+		private handleDeprecated(name:string, value:any):void
 		{
 			if (!_deprecated)
 				_deprecated = {};

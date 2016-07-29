@@ -15,7 +15,6 @@
 
 namespace weavejs.plot
 {
-	import BitmapData = flash.display.BitmapData;
 	import Graphics = PIXI.Graphics;
 	import Point = weavejs.geom.Point;
 	
@@ -26,13 +25,10 @@ namespace weavejs.plot
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import GeometryType = weavejs.geom.GeometryType;
 	import SimpleGeometry = weavejs.geom.SimpleGeometry;
+	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 
 	export class CirclePlotter extends AbstractPlotter implements IPlotterWithGeometries
 	{
-		public constructor()
-		{
-		}
-		
 		/**
 		 * The x position of the circle. 
 		 */		
@@ -57,22 +53,22 @@ namespace weavejs.plot
 		 * The color of the circle.
 		 * @default 0 
 		 */		
-		public lineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyColor));
+		public lineColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, this.verifyColor));
 		/**
 		 * The alpha of the circle.
 		 * @default 1 
 		 */		
-		public lineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1, verifyAlpha));
+		public lineAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1, this.verifyAlpha));
 		/**
 		 * The color of the fill inside the circle.
 		 * @default 0 
 		 */		
-		public fillColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyColor));
+		public fillColor:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, this.verifyColor));
 		/**
 		 * The alpha of the fill inside the circle.
 		 * @default 0 
 		 */		
-		public fillAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, verifyAlpha));
+		public fillAlpha:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0, this.verifyAlpha));
 
 		/**
 		 * The thickness of the edge of the circle. 
@@ -89,57 +85,51 @@ namespace weavejs.plot
 		 * least <code>3</code>. <br>
 		 * @default <code>25</code>
 		 */		
-		public polygonVertexCount:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25, verifyPolygonVertexCount));
+		public polygonVertexCount:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25, this.verifyPolygonVertexCount));
 		private verifyPolygonVertexCount(value:number):boolean
 		{
 			return value >= 3; 
 		}
 
 		
-		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void
+		/*override*/ public drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
-			_tempDataBounds = dataBounds;
-			_tempScreenBounds = screenBounds;
+			this._tempDataBounds = dataBounds;
+			this._tempScreenBounds = screenBounds;
 			
-			if(isNaN(dataX.value) || isNaN(dataY.value) || isNaN(radius.value))
+			if (isNaN(this.dataX.value) || isNaN(this.dataY.value) || isNaN(this.radius.value))
 				return;
 			
-			var g:Graphics = tempShape.graphics;
-			g.clear();
-			
-			//project center point 
-			var centerPoint:Point = new Point(dataX.value, dataY.value);
-			_tempDataBounds.projectPointTo(centerPoint, _tempScreenBounds);
+			//project center point
+			var centerPoint:Point = new Point(this.dataX.value, this.dataY.value);
+			this._tempDataBounds.projectPointTo(centerPoint, this._tempScreenBounds);
 			
 			//project a point on the circle
-			var circumferencePoint:Point = new Point(dataX.value + radius.value, dataY.value);
-			_tempDataBounds.projectPointTo(circumferencePoint, _tempScreenBounds);
+			var circumferencePoint:Point = new Point(this.dataX.value + this.radius.value, this.dataY.value);
+			this._tempDataBounds.projectPointTo(circumferencePoint, this._tempScreenBounds);
 			
 			//calculate projected distance
 			var distance:number = Point.distance(centerPoint, circumferencePoint);
 			
 			//draw circle
-			g.lineStyle(thickness.value, lineColor.value, lineAlpha.value);
-			g.beginFill(fillColor.value, fillAlpha.value);
-			g.drawCircle(centerPoint.x, centerPoint.y, distance);
-			
-			destination.draw(tempShape);
+			graphics.lineStyle(this.thickness.value, this.lineColor.value, this.lineAlpha.value);
+			graphics.beginFill(this.fillColor.value, this.fillAlpha.value);
+			graphics.drawCircle(centerPoint.x, centerPoint.y, distance);
 		}
 
-		public getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:number = 0, bounds:Bounds2D = null):Array
+		public getGeometriesFromRecordKey(recordKey:IQualifiedKey, minImportance:number = 0, bounds:Bounds2D = null):(GeneralizedGeometry | ISimpleGeometry)[]
 		{
 			// no keys in this plotter
 			return [];
 		}
 		
-		public getBackgroundGeometries():Array
+		public getBackgroundGeometries():ISimpleGeometry[]
 		{
-			_tempArray.length = 0;
-			
-			var geometryVector:Array = [];
+			var vertices:Point[] = [];
+			var geometryVector:ISimpleGeometry[] = [];
 			var simpleGeom:ISimpleGeometry = new SimpleGeometry(GeometryType.POLYGON);
-			var numVertices:int = polygonVertexCount.value;
-			var radiusValue:number = radius.value;
+			var numVertices:int = this.polygonVertexCount.value;
+			var radiusValue:number = this.radius.value;
 			var angle:number = 0;
 			var dAngle:number = 2 * Math.PI / numVertices;
 			for (var i:int = 0; i < numVertices; ++i)
@@ -150,14 +140,14 @@ namespace weavejs.plot
 				var p:Point = new Point(x, y);
 				
 				// offset to the X,Y provided
-				p.x += dataX.value;
-				p.y += dataY.value;
+				p.x += this.dataX.value;
+				p.y += this.dataY.value;
 				
-				_tempArray.push(p);
+				vertices.push(p);
 				angle += dAngle;
 			}
 
-			(simpleGeom as SimpleGeometry).setVertices(_tempArray);
+			simpleGeom.setVertices(vertices);
 			geometryVector.push(simpleGeom);
 			
 			return geometryVector;
@@ -173,10 +163,8 @@ namespace weavejs.plot
 		{
 			return value >= 0 && value <= 1;
 		}
-		// reusable objects
-		
+
 		private _tempDataBounds:Bounds2D;
 		private _tempScreenBounds:Bounds2D;
-		private _tempArray:Array = [];
 	}
 }

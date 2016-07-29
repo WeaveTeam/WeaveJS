@@ -16,17 +16,16 @@
 namespace weavejs.plot
 {
 	import Graphics = PIXI.Graphics;
-	import Shape = flash.display.Shape;
 	import Point = weavejs.geom.Point;
 	
 	import DynamicState = weavejs.api.core.DynamicState;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-	import Bounds2D = weavejs.geom.Bounds2D;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import Bounds2D = weavejs.geom.Bounds2D;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
+	import WeaveProperties = weavejs.app.WeaveProperties;
 
 	/**
 	 * This plotter plots rectangles using xMin,yMin,xMax,yMax values.
@@ -36,11 +35,11 @@ namespace weavejs.plot
 	{
 		public constructor()
 		{
-			this.addSpatialDependencies(this.xMinData, this.yMinData, this.xMaxData, this.yMaxData);
+			super();
 
+			this.addSpatialDependencies(this.xMinData, this.yMinData, this.xMaxData, this.yMaxData);
 			this.fill.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
-			
-			setColumnKeySources([this.xMinData, this.yMinData, this.xMaxData, this.yMaxData]);
+			this.setColumnKeySources([this.xMinData, this.yMinData, this.xMaxData, this.yMaxData]);
 		}
 
 		// spatial properties
@@ -94,43 +93,41 @@ namespace weavejs.plot
 		 */
 		/*override*/ public getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
 		{
-			initBoundsArray(output);
-			(output[0] as Bounds2D).setBounds(
-				xMinData.getValueFromKey(recordKey, Number),
-				yMinData.getValueFromKey(recordKey, Number),
-				xMaxData.getValueFromKey(recordKey, Number),
-				yMaxData.getValueFromKey(recordKey, Number)
+			this.initBoundsArray(output);
+			output[0].setBounds(
+				this.xMinData.getValueFromKey(recordKey, Number),
+				this.yMinData.getValueFromKey(recordKey, Number),
+				this.xMaxData.getValueFromKey(recordKey, Number),
+				this.yMaxData.getValueFromKey(recordKey, Number)
 			);
 		}
 
 		/**
 		 * This function may be defined by a class that extends AbstractPlotter to use the basic template code in AbstractPlotter.drawPlot().
 		 */
-		/*override*/ protected function addRecordGraphicsToTempShape(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, tempShape:Shape):void
+		/*override*/ protected addRecordGraphics(recordKey:IQualifiedKey, dataBounds:Bounds2D, screenBounds:Bounds2D, graphics:Graphics):void
 		{
 			// project data coordinates to screen coordinates and draw graphics
-			tempPoint.x = xMinData.getValueFromKey(recordKey, Number);
-			tempPoint.y = yMinData.getValueFromKey(recordKey, Number);
-			dataBounds.projectPointTo(tempPoint, screenBounds);
-			tempPoint.x += xMinScreenOffset.getValueFromKey(recordKey, Number);
-			tempPoint.y += yMinScreenOffset.getValueFromKey(recordKey, Number);
-			tempBounds.setMinPoint(tempPoint);
+			BoundsPlotter.tempPoint.x = this.xMinData.getValueFromKey(recordKey, Number);
+			BoundsPlotter.tempPoint.y = this.yMinData.getValueFromKey(recordKey, Number);
+			dataBounds.projectPointTo(BoundsPlotter.tempPoint, screenBounds);
+			BoundsPlotter.tempPoint.x += this.xMinScreenOffset.getValueFromKey(recordKey, Number);
+			BoundsPlotter.tempPoint.y += this.yMinScreenOffset.getValueFromKey(recordKey, Number);
+			BoundsPlotter.tempBounds.setMinPoint(BoundsPlotter.tempPoint);
 			
-			tempPoint.x = xMaxData.getValueFromKey(recordKey, Number);
-			tempPoint.y = yMaxData.getValueFromKey(recordKey, Number);
-			dataBounds.projectPointTo(tempPoint, screenBounds);
-			tempPoint.x += xMaxScreenOffset.getValueFromKey(recordKey, Number);
-			tempPoint.y += yMaxScreenOffset.getValueFromKey(recordKey, Number);
-			tempBounds.setMaxPoint(tempPoint);
+			BoundsPlotter.tempPoint.x = this.xMaxData.getValueFromKey(recordKey, Number);
+			BoundsPlotter.tempPoint.y = this.yMaxData.getValueFromKey(recordKey, Number);
+			dataBounds.projectPointTo(BoundsPlotter.tempPoint, screenBounds);
+			BoundsPlotter.tempPoint.x += this.xMaxScreenOffset.getValueFromKey(recordKey, Number);
+			BoundsPlotter.tempPoint.y += this.yMaxScreenOffset.getValueFromKey(recordKey, Number);
+			BoundsPlotter.tempBounds.setMaxPoint(BoundsPlotter.tempPoint);
 				
 			// draw graphics
-			var graphics:Graphics = tempShape.graphics;
-
-			line.beginLineStyle(recordKey, graphics);
-			fill.beginFillStyle(recordKey, graphics);
+			this.line.beginLineStyle(recordKey, graphics);
+			this.fill.beginFillStyle(recordKey, graphics);
 
 			//trace(recordKey,tempBounds);
-			graphics.drawRect(tempBounds.getXMin(), tempBounds.getYMin(), tempBounds.getWidth(), tempBounds.getHeight());
+			graphics.drawRect(BoundsPlotter.tempBounds.getXMin(), BoundsPlotter.tempBounds.getYMin(), BoundsPlotter.tempBounds.getWidth(), BoundsPlotter.tempBounds.getHeight());
 
 			graphics.endFill();
 		}
@@ -144,9 +141,9 @@ namespace weavejs.plot
 			{
 				Weave.setState(line, value[0][DynamicState.SESSION_STATE]);
 			}
-			catch (e:Error)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}
 		[Deprecated(replacement="fill")] public set fillStyle(value:Object):void
@@ -155,10 +152,11 @@ namespace weavejs.plot
 			{
 				Weave.setState(fill, value[0][DynamicState.SESSION_STATE]);
 			}
-			catch (e:Error)
+			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}*/
 	}
 }
+

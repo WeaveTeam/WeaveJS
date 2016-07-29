@@ -21,8 +21,8 @@ namespace weavejs.plot
 
 	export class AnchorPoint implements ILinkableObject
 	{
-		public x:LinkableNumber = Weave.linkableChild(this,LinkableNumber,convertCoords);
-		public y:LinkableNumber = Weave.linkableChild(this,LinkableNumber,convertCoords);
+		public x:LinkableNumber = Weave.linkableChild(this,LinkableNumber,this.convertCoords);
+		public y:LinkableNumber = Weave.linkableChild(this,LinkableNumber,this.convertCoords);
 		
 		public polarRadians:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
 		public radius:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
@@ -30,10 +30,10 @@ namespace weavejs.plot
 		public title:LinkableString = Weave.linkableChild(this, LinkableString);
 		
 		//metric used to calculate the class discrimiation for eg t-stat, p value, mean ratio etc
-		export classDiscriminationMetric:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
+		public classDiscriminationMetric:LinkableNumber = Weave.linkableChild(this,LinkableNumber);
 		
 		//is the class to which an anchor belongs after the class discimination algorithm is done
-		export classType:LinkableString = Weave.linkableChild(this, LinkableString);
+		public classType:LinkableString = Weave.linkableChild(this, LinkableString);
 		
 		public constructor()
 		{
@@ -41,15 +41,16 @@ namespace weavejs.plot
 		
 		private convertCoords():void
 		{
-			var xval:number = x.value; 
-			var yval:number = y.value;
+			var xval:number = this.x.value; 
+			var yval:number = this.y.value;
 			
-			radius.value = Math.sqrt(xval * xval + yval * yval);
+			this.radius.value = Math.sqrt(xval * xval + yval * yval);
 
 			var pi:number = Math.PI;
-			polarRadians.value = Math.atan2(yval,xval);
-			if( polarRadians.value < 0 )
-				polarRadians.value += 2 * pi;				
+			this.polarRadians.value = Math.atan2(yval,xval);
+			if ( this.polarRadians.value < 0 )
+				this.polarRadians.value += 2 * pi;				
 		}
 	}
 }
+

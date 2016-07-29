@@ -16,8 +16,7 @@
 namespace weavejs.plot
 {
 	import Point = weavejs.geom.Point;
-	import TextFormat = flash.text.TextFormat;
-	
+
 	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import Bounds2D = weavejs.geom.Bounds2D;
@@ -34,19 +33,17 @@ namespace weavejs.plot
 
 	export class GeometryRelationPlotter extends AbstractPlotter implements IObjectWithDescription
 	{
-		WeaveAPI.ClassRegistry.registerImplementation(IPlotter, GeometryRelationPlotter, "Geometry relations");
-
 		public constructor()
 		{
-			valueStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(valueColumn));
+			this.valueStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.valueColumn));
 			
-			setColumnKeySources([geometryColumn]);
+			this.setColumnKeySources([this.geometryColumn]);
 			this.addSpatialDependencies(this.geometryColumn, this.sourceKeyColumn, this.destinationKeyColumn);
 		}
 		
 		public getDescription():string
 		{
-			return geometryColumn.getDescription();
+			return this.geometryColumn.getDescription();
 		}
 		
 		public geometryColumn:ReprojectedGeometryColumn = Weave.linkableChild(this, ReprojectedGeometryColumn);
@@ -70,12 +67,12 @@ namespace weavejs.plot
 		 * @param output
 		 * @return true on success 
 		 */
-		protected function getGeomCoords(geomKey:IQualifiedKey, output:Point):boolean
+		protected getGeomCoords(geomKey:IQualifiedKey, output:Point):boolean
 		{
-			var geoms:Array = geometryColumn.getValueFromKey(geomKey, Array) as Array;
+			var geoms:GeneralizedGeometry[] = this.geometryColumn.getValueFromKey(geomKey, Array);
 			var geom:GeneralizedGeometry;
 			if (geoms && geoms.length)
-				geom = geoms[0] as GeneralizedGeometry;
+				geom = Weave.AS(geoms[0], GeneralizedGeometry);
 			if (geom)
 			{
 				geom.bounds.getCenterPoint(output);
@@ -92,22 +89,22 @@ namespace weavejs.plot
 		
 		/*override*/ public getDataBoundsFromRecordKey(geomKey:IQualifiedKey, output:Array):void
 		{
-			getGeomCoords(geomKey, tempPoint);
+			this.getGeomCoords(geomKey, this.tempPoint);
 			
-			if (includeDestPointsInDataBounds)
+			if (this.includeDestPointsInDataBounds)
 			{
-				var rowKeys:Array = EquationColumnLib.getAssociatedKeys(sourceKeyColumn, geomKey);
+				var rowKeys:Array = EquationColumnLib.getAssociatedKeys(this.sourceKeyColumn, geomKey);
 				var n:int = rowKeys ? rowKeys.length : 0;
-				initBoundsArray(output, n + 1).includePoint(tempPoint);
+				this.initBoundsArray(output, n + 1).includePoint(this.tempPoint);
 				for (var i:int = 0; i < n; i++)
 				{
-					getGeomCoords(destinationKeyColumn.getValueFromKey(rowKeys[i], IQualifiedKey), tempPoint);
-					(output[i + 1] as Bounds2D).includePoint(tempPoint);
+					this.getGeomCoords(this.destinationKeyColumn.getValueFromKey(rowKeys[i], IQualifiedKey), this.tempPoint);
+					output[i + 1].includePoint(this.tempPoint);
 				}
 			}
 			else
 			{
-				initBoundsArray(output).includePoint(tempPoint);
+				this.initBoundsArray(output).includePoint(this.tempPoint);
 			}
 		}
 		
@@ -115,10 +112,10 @@ namespace weavejs.plot
 		{
 			// Make sure all four column are populated
 			if (task.iteration == 0 && (
-					sourceKeyColumn.keys.length == 0
-					|| destinationKeyColumn.keys.length == 0
-					|| valueColumn.keys.length == 0
-					|| geometryColumn.keys.length == 0))
+					this.sourceKeyColumn.keys.length == 0
+					|| this.destinationKeyColumn.keys.length == 0
+					|| this.valueColumn.keys.length == 0
+					|| this.geometryColumn.keys.length == 0))
 				return 1;
 			
 			// this template from AbstractPlotter will draw one record per iteration
@@ -127,67 +124,67 @@ namespace weavejs.plot
 				
 				//------------------------
 				// draw one record
-				var geoKey:IQualifiedKey = task.recordKeys[task.iteration] as IQualifiedKey;
+				var geoKey:IQualifiedKey = task.recordKeys[task.iteration];
 				tempShape.graphics.clear();
 
-				if (!getGeomCoords(geoKey, tempSourcePoint))
+				if (!this.getGeomCoords(geoKey, this.tempSourcePoint))
 					return task.iteration / task.recordKeys.length;
 				
-				task.dataBounds.projectPointTo(tempSourcePoint, task.screenBounds);
+				task.dataBounds.projectPointTo(this.tempSourcePoint, task.screenBounds);
 
-				var rowKeys:Array = EquationColumnLib.getAssociatedKeys(sourceKeyColumn, geoKey);
+				var rowKeys = EquationColumnLib.getAssociatedKeys(this.sourceKeyColumn, geoKey);
 				var rowKey:IQualifiedKey;
 				var destKey:IQualifiedKey;
 				var value:number;
 				
 				// Draw lines from source to destinations
-				var absMax:number = Math.max(Math.abs(valueStats.getMin()), Math.abs(valueStats.getMax()));
+				var absMax:number = Math.max(Math.abs(this.valueStats.getMin()), Math.abs(this.valueStats.getMax()));
 				
 				// Value normalization
-				for each (rowKey in rowKeys)
+				for (rowKey of rowKeys)
 				{
-					destKey = destinationKeyColumn.getValueFromKey(rowKey, IQualifiedKey);
-					value = valueColumn.getValueFromKey(rowKey, Number);
+					destKey = this.destinationKeyColumn.getValueFromKey(rowKey, IQualifiedKey);
+					value = this.valueColumn.getValueFromKey(rowKey, Number);
 					
 					if (geoKey == destKey)
 						continue;
 					
-					var color:uint = value < 0 ? negLineColor.value : posLineColor.value;
-					var thickness:number = Math.abs(value / absMax) * lineWidth.value;
+					var color:uint = value < 0 ? this.negLineColor.value : this.posLineColor.value;
+					var thickness:number = Math.abs(value / absMax) * this.lineWidth.value;
 					var ceil:number = Math.ceil(thickness);
 					var floor:number = Math.floor(thickness);
 					var fractional:number = thickness - floor;
 					var alpha:number = floor/ceil + (1.0 - floor/ceil) * fractional; // between floor/ceil and 1
 					tempShape.graphics.lineStyle(thickness, color, alpha);
-					tempShape.graphics.moveTo(tempSourcePoint.x, tempSourcePoint.y);
-					if (!getGeomCoords(destKey, tempPoint))
+					tempShape.graphics.moveTo(this.tempSourcePoint.x, this.tempSourcePoint.y);
+					if (!this.getGeomCoords(destKey, this.tempPoint))
 						continue;
-					task.dataBounds.projectPointTo(tempPoint, task.screenBounds);
-					tempShape.graphics.lineTo(tempPoint.x, tempPoint.y);
+					task.dataBounds.projectPointTo(this.tempPoint, task.screenBounds);
+					tempShape.graphics.lineTo(this.tempPoint.x, this.tempPoint.y);
 				}
 								
 				task.buffer.draw(tempShape);
 				
-				if (showValue.value)
+				if (this.showValue.value)
 				{
-					for each (rowKey in rowKeys)
+					for (rowKey of rowKeys)
 					{
-						destKey = destinationKeyColumn.getValueFromKey(rowKey, IQualifiedKey);
-						if (!getGeomCoords(destKey, tempPoint))
+						destKey = this.destinationKeyColumn.getValueFromKey(rowKey, IQualifiedKey);
+						if (!this.getGeomCoords(destKey, this.tempPoint))
 							continue;
-						task.dataBounds.projectPointTo(tempPoint, task.screenBounds);
+						task.dataBounds.projectPointTo(this.tempPoint, task.screenBounds);
 						
-						bitmapText.x = Math.round((tempSourcePoint.x + tempPoint.x) / 2);
-						bitmapText.y = Math.round((tempSourcePoint.y + tempPoint.y) / 2);
-						bitmapText.text = valueColumn.getValueFromKey(rowKey, String);
-						bitmapText.verticalAlign = BitmapText.VERTICAL_ALIGN_MIDDLE;
-						bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_CENTER;
+						this.bitmapText.x = Math.round((this.tempSourcePoint.x + this.tempPoint.x) / 2);
+						this.bitmapText.y = Math.round((this.tempSourcePoint.y + this.tempPoint.y) / 2);
+						this.bitmapText.text = this.valueColumn.getValueFromKey(rowKey, String);
+						this.bitmapText.verticalAlign = BitmapText.VERTICAL_ALIGN_MIDDLE;
+						this.bitmapText.horizontalAlign = BitmapText.HORIZONTAL_ALIGN_CENTER;
 						
-						var f:TextFormat = bitmapText.textFormat;
-						f.size = fontSize.value;
-						f.color = fontColor.value;
+						var f:TextFormat = this.bitmapText.textFormat;
+						f.size = this.fontSize.value;
+						f.color = this.fontColor.value;
 						
-						bitmapText.draw(task.buffer);
+						this.bitmapText.draw(task.buffer);
 					}
 				}
 				
@@ -199,4 +196,6 @@ namespace weavejs.plot
 			return 1; // avoids division by zero in case task.recordKeys.length == 0
 		}
 	}
+
+	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, GeometryRelationPlotter, "Geometry relations");
 }
