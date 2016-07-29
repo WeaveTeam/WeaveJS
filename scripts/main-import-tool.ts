@@ -1,6 +1,6 @@
 module.exports = function()
 {
-	let debug = false;
+	let debug = true;
 
 	let FileUtils = require('./FileUtils');
 	let fs = require('fs');
@@ -83,7 +83,7 @@ module.exports = function()
 
 		// check for extends class in same package
 		// Example: export class Foo extends Bar<Baz>
-		var extendsPattern = /^\s*(?:export\s+)?(?:abstract\s+)?class\s+(?:[^\s]+)\s+(?:implements\s+(?:[^\s]+)\s+)?extends\s+([^\s<]+)/gm;
+		var extendsPattern = /^\s*(?:export\s+)?(?:abstract\s+)?(?:class|interface)\s+(?:[^\s]+)\s+(?:implements\s+(?:[^\s]+)\s+)?extends\s+([^\s<]+)/gm;
 		while (match = extendsPattern.exec(fileContent))
 		{
 			let fileNoExt = path.join(path.dirname(file), match[1]);
