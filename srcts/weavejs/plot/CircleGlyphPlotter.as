@@ -33,7 +33,7 @@ namespace weavejs.plot
 	{
 		public constructor()
 		{
-			fill.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			fill.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 		}
 
 		public minScreenRadius:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(3, isFinite));

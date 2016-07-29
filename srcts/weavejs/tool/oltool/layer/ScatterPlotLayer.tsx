@@ -5,8 +5,8 @@ namespace weavejs.tool.oltool.layer
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import NormalizedColumn = weavejs.data.column.NormalizedColumn;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import AbstractGlyphLayer = weavejs.tool.oltool.layer.AbstractGlyphLayer;
@@ -34,7 +34,7 @@ namespace weavejs.tool.oltool.layer
 		constructor()
 		{
 			super();
-			this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
+			this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
 			this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
 			this.radiusNorm.min.value = 3;
 			this.radiusNorm.max.value = 25;

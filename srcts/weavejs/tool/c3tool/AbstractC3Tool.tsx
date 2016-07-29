@@ -16,8 +16,8 @@ namespace weavejs.tool.c3tool
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import NormalizedColumn = weavejs.data.column.NormalizedColumn;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import LinkableString = weavejs.core.LinkableString;
 	import FilteredKeySet = weavejs.data.key.FilteredKeySet;

@@ -84,7 +84,8 @@ namespace weavejs.app
 			this.state = {
 				toolPathToEdit: null
 			};
-			
+
+			WeaveProperties.getProperties(this.props.weave);
 			this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 			if (this.props.rootApp)
 			{
@@ -100,6 +101,7 @@ namespace weavejs.app
 		
 		componentWillReceiveProps(props:WeaveAppProps)
 		{
+			WeaveProperties.getProperties(this.props.weave);
 			this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 		}
 		
@@ -128,31 +130,6 @@ namespace weavejs.app
 			return this.props.weave.getObject(this.getRenderPath()) as React.Component<any, any>;
 		}
 
-		private createDefaultSessionElements()
-		{
-			let DEFAULT_COLOR_COLUMN = "defaultColorColumn";
-			let DEFAULT_COLOR_BIN_COLUMN = "defaultColorBinColumn";
-			let DEFAULT_COLOR_DATA_COLUMN = "defaultColorDataColumn";
-
-			let DEFAULT_SUBSET_KEYFILTER = "defaultSubsetKeyFilter";
-			let DEFAULT_SELECTION_KEYSET = "defaultSelectionKeySet";
-			let DEFAULT_PROBE_KEYSET = "defaultProbeKeySet";
-			let ALWAYS_HIGHLIGHT_KEYSET = "alwaysHighlightKeySet";
-			let SAVED_SELECTION_KEYSETS = "savedSelections";
-			let SAVED_SUBSETS_KEYFILTERS = "savedSubsets";
-
-			let root = this.props.weave.root;
-			/* default keysets */
-			root.requestObject(DEFAULT_PROBE_KEYSET, weavejs.data.key.KeySet, true);
-			root.requestObject(DEFAULT_SELECTION_KEYSET, weavejs.data.key.KeySet, true);
-			root.requestObject(DEFAULT_SUBSET_KEYFILTER, weavejs.data.key.KeyFilter, true);
-			/* default color column stuff */
-			let cc = root.requestObject(DEFAULT_COLOR_COLUMN, weavejs.data.column.ColorColumn, true);
-			let bc = cc.internalDynamicColumn.requestGlobalObject(DEFAULT_COLOR_BIN_COLUMN, weavejs.data.column.BinnedColumn, true);
-			let fc = bc.internalDynamicColumn.requestGlobalObject(DEFAULT_COLOR_DATA_COLUMN, weavejs.data.column.FilteredColumn, true);
-			fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
-		}
-
 		urlParams:{ file: string, editable: boolean, layout: string};
 		
 		get openedFromAdminConsole():boolean
@@ -177,7 +154,6 @@ namespace weavejs.app
 				window.addEventListener("unload", this.handleUnload);
 			}
 
-			this.createDefaultSessionElements();
 			if (this.props.readUrlParams)
 			{
 				this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable) || this.openedFromAdminConsole;
@@ -369,7 +345,7 @@ namespace weavejs.app
 			this.tabLayout.activeTabIndex = -1;
 		}
 
-		createObject=(type:new(..._:any[])=>any):void=>
+		createObject=(type:Class):void=>
 		{
 			var weave = this.props.weave;
 

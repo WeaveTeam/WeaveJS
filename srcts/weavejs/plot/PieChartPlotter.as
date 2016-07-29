@@ -38,7 +38,7 @@ namespace weavejs.plot
 	{
 		public constructor()
 		{
-			fill.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			fill.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 			
 			_beginRadians = Weave.linkableChild(this, EquationColumn);
 			_beginRadians.equation.value = "0.5 * PI + getRunningTotal(spanRadians) - getNumber(spanRadians)";

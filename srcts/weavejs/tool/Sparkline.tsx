@@ -25,8 +25,8 @@ namespace weavejs.tool
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
 	import IColumnReference = weavejs.api.data.IColumnReference;
@@ -156,8 +156,8 @@ namespace weavejs.tool
 			super(props);
 			Weave.getCallbacks(this).addGroupedCallback(this, this.forceUpdate);
 			
-			this.line.color.internalDynamicColumn.globalName = "defaultColorColumn";
-			this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
+			this.line.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
+			this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
 			this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 			this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 			this.probeFilter.targetPath = ['defaultProbeKeySet'];

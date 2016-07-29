@@ -34,7 +34,7 @@ namespace weavejs.tool
 	import FilteredColumn = weavejs.data.column.FilteredColumn;
 	import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 	import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	import KeySet = weavejs.data.key.KeySet;
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;

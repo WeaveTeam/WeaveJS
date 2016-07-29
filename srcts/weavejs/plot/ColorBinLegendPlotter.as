@@ -52,7 +52,7 @@ namespace weavejs.plot
 	{
 		public constructor()
 		{
-			dynamicColorColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			dynamicColorColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 			
 			setSingleKeySource(dynamicColorColumn);
 			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes

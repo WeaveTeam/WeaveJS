@@ -52,7 +52,7 @@ namespace weavejs.plot
 	{
 		public constructor()
 		{
-			fillStyle.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			fillStyle.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 			setNewRandomJitterColumn();		
 			iterations.value = 50;
 			

@@ -55,7 +55,7 @@ namespace weavejs.tool.oltool.layer
 
 			this.styleResolutionDependent = true;
 
-			//this.color.internalDynamicColumn.globalName = "defaultColorColumn";
+			//this.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
 		}
 
 		onLayerReady()

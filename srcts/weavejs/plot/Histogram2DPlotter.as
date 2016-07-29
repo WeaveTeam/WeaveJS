@@ -44,7 +44,7 @@ namespace weavejs.plot
 		
 		public constructor()
 		{
-			colorColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			colorColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 
 			setColumnKeySources([xColumn, yColumn]);
 			this.addSpatialDependencies(this.xBinnedColumn, this.yBinnedColumn);

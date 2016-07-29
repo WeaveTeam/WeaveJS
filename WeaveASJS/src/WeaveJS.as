@@ -41,8 +41,8 @@ package
 	import weavejs.data.source.GroupedDataTransform;
 	import weavejs.data.source.SpatialJoinTransform;
 	import weavejs.data.source.WeaveDataSource;
-	import weavejs.geom.SolidFillStyle;
-	import weavejs.geom.SolidLineStyle;
+	import weavejs.geom.TempHack_SolidFillStyle;
+	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.net.URLRequestUtils;
 	
 	public class WeaveJS
@@ -102,8 +102,8 @@ package
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Transform, GroupedDataTransform, "Grouped data transform");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Transform, SpatialJoinTransform, "Spatial Join transform");
 			
-			Weave.registerClass(SolidFillStyle, "ExtendedFillStyle");
-			Weave.registerClass(SolidLineStyle, "ExtendedLineStyle");
+			Weave.registerClass(TempHack_SolidFillStyle, "ExtendedFillStyle");
+			Weave.registerClass(TempHack_SolidLineStyle, "ExtendedLineStyle");
 			
 			// TEMPORARY
 			//WeaveTest.test(weave);

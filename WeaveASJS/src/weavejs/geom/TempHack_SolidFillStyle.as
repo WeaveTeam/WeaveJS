@@ -20,7 +20,7 @@ package weavejs.geom
 	import weavejs.core.LinkableBoolean;
 	import weavejs.data.column.AlwaysDefinedColumn;
 	
-	public class SolidFillStyle implements ILinkableObject
+	public class TempHack_SolidFillStyle implements ILinkableObject
 	{
 		/**
 		 * Used to enable or disable fill patterns.

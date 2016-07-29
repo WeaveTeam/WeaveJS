@@ -67,7 +67,7 @@ namespace weavejs.plot
 				var buffer = locals.buffer || (locals.buffer = new GraphicsBuffer());
 				var key;
 			
-				colorColumn.globalName = 'defaultColorColumn';
+				colorColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 				buffer.destination(destination)
 					.lineStyle(1, 0x000000, 0.5); // weight, color, alpha
 			

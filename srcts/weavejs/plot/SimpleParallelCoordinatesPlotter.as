@@ -55,7 +55,7 @@ namespace weavejs.plot
 		
 		public constructor()
 		{
-			lineStyle.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			lineStyle.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 			lineStyle.weight.defaultValue.value = 1;
 			lineStyle.alpha.defaultValue.value = 1.0;
 			

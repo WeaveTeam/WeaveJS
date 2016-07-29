@@ -38,7 +38,7 @@ namespace weavejs.plot
 		{
 			this.addSpatialDependencies(this.xMinData, this.yMinData, this.xMaxData, this.yMaxData);
 
-			this.fill.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			this.fill.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 			
 			setColumnKeySources([this.xMinData, this.yMinData, this.xMaxData, this.yMaxData]);
 		}

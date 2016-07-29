@@ -33,8 +33,8 @@ namespace weavejs.tool.c3tool
 	import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 	import LinkableString = weavejs.core.LinkableString;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
 	import StandardLib = weavejs.util.StandardLib;

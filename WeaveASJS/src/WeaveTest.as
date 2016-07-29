@@ -77,8 +77,8 @@ package
 	import weavejs.data.source.GroupedDataTransform;
 	import weavejs.data.source.WeaveDataSource;
 	import weavejs.data.source.WebSocketDataSource;
-	import weavejs.geom.SolidFillStyle;
-	import weavejs.geom.SolidLineStyle;
+	import weavejs.geom.TempHack_SolidFillStyle;
+	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.geom.ZoomBounds;
 	import weavejs.net.Admin;
 	import weavejs.path.ExternalTool;
@@ -154,8 +154,8 @@ package
 			WeaveMenuItem,
 			ZoomBounds,
 			WeaveRootDataTreeNode,
-			SolidLineStyle,
-			SolidFillStyle,
+			TempHack_SolidLineStyle,
+			TempHack_SolidFillStyle,
 			Admin,
 			EventCallbackCollection,
 			BackwardsCompatibility,

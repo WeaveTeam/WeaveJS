@@ -55,7 +55,7 @@ namespace weavejs.plot
 			lineStyle.scaleMode.defaultValue.value = LineScaleMode.NORMAL;
 			lineStyle.weight.defaultValue.value = 1.5;
 
-			fillStyle.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			fillStyle.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 			Weave.linkableChild(this, LinkableTextFormat.defaultTextFormat); // redraw when text format changes
 			setSingleKeySource(nodesColumn);
 
@@ -482,7 +482,7 @@ namespace weavejs.plot
 			
 			// if there isn't a specified color column or if the color column's keytype differs from node column, request default
 			if (fillStyle.color.keys.length == 0 || (fillStyle.color.keys[0] as IQualifiedKey).keyType != sourceKey.keyType)
-				fillStyle.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+				fillStyle.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 		}
 
 		public resetIterations(newMaxValue:int):void

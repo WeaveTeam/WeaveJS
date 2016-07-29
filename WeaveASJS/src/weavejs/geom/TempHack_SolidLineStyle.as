@@ -24,9 +24,9 @@ package weavejs.geom
 	import weavejs.data.column.NormalizedColumn;
 	import weavejs.util.JS;
 
-	public class SolidLineStyle implements ILinkableObject
+	public class TempHack_SolidLineStyle implements ILinkableObject
 	{
-		public function SolidLineStyle()
+		public function TempHack_SolidLineStyle()
 		{
 			_callbackCollection = Weave.getCallbacks(this);
 			weight.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);

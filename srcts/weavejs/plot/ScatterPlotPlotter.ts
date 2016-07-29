@@ -7,14 +7,13 @@ namespace weavejs.plot
 	import FilteredColumn = weavejs.data.column.FilteredColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import LinkableNumber = weavejs.core.LinkableNumber;
-	import SolidFillStyle = weavejs.geom.SolidFillStyle;
+	import SolidFillStyle = weavejs.plot.SolidFillStyle;
 	import StandardLib = weavejs.util.StandardLib;
 	import IPlotter = weavejs.api.ui.IPlotter;
 	import AbstractGlyphPlotter = weavejs.plot.AbstractGlyphPlotter;
-	import GraphicsUtils = weavejs.util.GraphicsUtils;
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -22,13 +21,14 @@ namespace weavejs.plot
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
+	import WeaveProperties = weavejs.app.WeaveProperties;
 
 	export class ScatterPlotPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
 	{
 		public constructor()
 		{
 			super();
-			this.fill.color.internalDynamicColumn.globalName = 'defaultColorColumn';
+			this.fill.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 			this.fill.color.internalDynamicColumn.addImmediateCallback(this, this.handleColor, true);
 			Weave.getCallbacks(this.colorDataWatcher).addImmediateCallback(this, this.updateKeySources, true);
 		}
@@ -107,8 +107,8 @@ namespace weavejs.plot
 			
 			dataBounds.projectPointTo(this.tempPoint, screenBounds);
 
-			GraphicsUtils.beginLineStyle(graphics, this.line, recordKey);
-			GraphicsUtils.beginFillStyle(graphics, this.fill, recordKey);
+			this.line.beginLineStyle(recordKey, graphics);
+			this.fill.beginFillStyle(recordKey, graphics);
 
 			var radius:number;
 			if (this.colorBySize.value)

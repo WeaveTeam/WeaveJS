@@ -138,7 +138,7 @@ namespace weavejs.tool.c3tool
 		{
 			super(props);
 
-			this.colorColumn.internalDynamicColumn.globalName = "defaultColorColumn";
+			this.colorColumn.internalDynamicColumn.targetPath = ["defaultColorColumn"];
 			this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 			this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 			this.probeFilter.targetPath = ['defaultProbeKeySet'];

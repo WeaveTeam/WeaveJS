@@ -16,7 +16,7 @@ namespace weavejs.tool.c3tool
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
-	import SolidLineStyle = weavejs.geom.SolidLineStyle;
+	import SolidLineStyle = weavejs.plot.SolidLineStyle;
 	import LinkableString = weavejs.core.LinkableString;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
@@ -63,7 +63,7 @@ namespace weavejs.tool.c3tool
 			super(props);
 
 
-			this.line.color.internalDynamicColumn.globalName = "defaultColorColumn";
+			this.line.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
 			this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 			this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 			this.probeFilter.targetPath = ['defaultProbeKeySet'];

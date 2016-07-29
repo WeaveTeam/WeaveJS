@@ -61,7 +61,7 @@ namespace weavejs.plot
 		{
 			// initialize default line & fill styles
 			line.scaleMode.defaultValue.setSessionState(LineScaleMode.NONE);
-			fill.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			fill.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 			line.color.defaultValue.value = 0x000000;
 
 			Weave.linkState(StreamedGeometryColumn.geometryMinimumScreenArea, pixellation);

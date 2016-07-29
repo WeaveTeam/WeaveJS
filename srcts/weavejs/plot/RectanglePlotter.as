@@ -45,7 +45,7 @@ namespace weavejs.plot
 		public constructor()
 		{
 			// initialize default line & fill styles
-			fill.color.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			fill.color.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 			
 			setColumnKeySources(
 				[xData, yData, widthData, heightData, xMinScreenOffset, yMinScreenOffset, xMaxScreenOffset, yMaxScreenOffset],

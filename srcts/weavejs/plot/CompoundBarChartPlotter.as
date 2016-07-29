@@ -57,7 +57,7 @@ namespace weavejs.plot
 		{
 			clipDrawing = true;
 			
-			colorColumn.internalDynamicColumn.globalName = WeaveProperties.DEFAULT_COLOR_COLUMN;
+			colorColumn.internalDynamicColumn.targetPath = [WeaveProperties.DEFAULT_COLOR_COLUMN];
 
 			// get the keys from the sort column
 			setColumnKeySources([sortColumn]);
