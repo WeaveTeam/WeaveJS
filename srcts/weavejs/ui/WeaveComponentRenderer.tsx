@@ -146,5 +146,5 @@ namespace weavejs.ui
 			return <VBox {...props}>{ content }</VBox>;
 		}
 	}
-	weavejs.WeaveAPI.ClassRegistry.registerClass(WeaveComponentRenderer, 'weavejs.ui.WeaveComponentRenderer');
+	WeaveAPI.ClassRegistry.registerClass(WeaveComponentRenderer, 'weavejs.ui.WeaveComponentRenderer');
 }

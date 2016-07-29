@@ -10,7 +10,7 @@ namespace weavejs.ui
 		visible:boolean;
 	}
 
-	var ProgressIndicator = weavejs.WeaveAPI.ProgressIndicator;
+	var ProgressIndicator = WeaveAPI.ProgressIndicator;
 
 	export class WeaveProgressBar extends SmartComponent<WeaveProgressBarProps, WeaveProgressBarState>
 	{
@@ -18,7 +18,7 @@ namespace weavejs.ui
 		{
 			super(props);
 			Weave.getCallbacks(ProgressIndicator).addGroupedCallback(this, this.forceUpdate);
-			weavejs.WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.toggleVisible);
+			WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.toggleVisible);
 			this.state = {
 				visible: false
 			};

@@ -51,8 +51,8 @@ namespace weavejs.plot
 
 		public zoomToSubset:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-		protected statsX:IColumnStatistics = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.dataX));
-		protected statsY:IColumnStatistics = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.dataY));
+		protected statsX:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.dataX));
+		protected statsY:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.dataY));
 
 		hack_setSingleKeySource(keySet:IKeySet):void
 		{
@@ -89,7 +89,7 @@ namespace weavejs.plot
 
 			if (sourceSRS && destinationSRS)
 			{
-				console.log('TODO: this._projector = weavejs.WeaveAPI.ProjectionManager.getProjector(sourceSRS, destinationSRS);');
+				console.log('TODO: this._projector = WeaveAPI.ProjectionManager.getProjector(sourceSRS, destinationSRS);');
 			}
 			else
 				this._projector = null;

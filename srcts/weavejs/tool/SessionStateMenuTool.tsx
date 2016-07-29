@@ -31,6 +31,7 @@ namespace weavejs.tool
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IVisTool = weavejs.api.ui.IVisTool;
 
 	const LAYOUT_LIST:string = "List";
 	const LAYOUT_COMBO:string = "ComboBox";
@@ -184,7 +185,7 @@ namespace weavejs.tool
 	Weave.registerClass(
 		SessionStateMenuTool,
 		["weavejs.tool.SessionStateMenu", "weave.ui::SessionStateMenuTool"],
-		[weavejs.api.ui.IVisTool/*, weavejs.api.core.ILinkableObjectWithNewProperties*/],
+		[IVisTool/*, ILinkableObjectWithNewProperties*/],
 		"Session State Menu Tool"
 	);
 

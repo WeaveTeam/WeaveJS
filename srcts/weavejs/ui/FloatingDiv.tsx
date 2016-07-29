@@ -28,7 +28,7 @@ namespace weavejs.ui
 		constructor(props:FloatingDivProps)
 		{
 			super(props);
-			weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
+			WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
 		}	
 		
 		outerDiv:HTMLDivElement;
@@ -65,7 +65,7 @@ namespace weavejs.ui
 		
 		componentWillUnmount()
 		{
-			weavejs.WeaveAPI.Scheduler.frameCallbacks.removeCallback(this, this.handleFrame);
+			WeaveAPI.Scheduler.frameCallbacks.removeCallback(this, this.handleFrame);
 		}
 		
 		render()

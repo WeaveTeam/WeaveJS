@@ -22,6 +22,11 @@ namespace weavejs.tool.c3tool
 	import IAltText = weavejs.api.ui.IAltText;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
+	import ArrayUtils = weavejs.util.ArrayUtils;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import ColumnUtils = weavejs.data.ColumnUtils;
 
 	declare type Record = {
 		id: IQualifiedKey,
@@ -166,7 +171,7 @@ namespace weavejs.tool.c3tool
 			var dataChanged = Weave.detectChange(this, this.data, this.label, this.innerRadius, this.fill, this.line, this.filteredKeySet);
 			if (dataChanged)
 			{
-				this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+				this.records = ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 
 				//minimizing the number of records displayed
 				if (this.records.length > recordsToBeDisplayed)
@@ -202,7 +207,7 @@ namespace weavejs.tool.c3tool
 			
 			// update c3 selection
 			var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-			var keyToIndex = weavejs.util.ArrayUtils.createLookup(this.records, "id");
+			var keyToIndex = ArrayUtils.createLookup(this.records, "id");
 			var selectedIndices:number[] = selectedKeys.map(key => Number(keyToIndex.get(key)));
 			this.chart.select(null, selectedIndices, true);
 			
@@ -222,7 +227,7 @@ namespace weavejs.tool.c3tool
 
 		get defaultPanelTitle():string
 		{
-			return Weave.lang("Pie Chart of {0}", weavejs.data.ColumnUtils.getTitle(this.data));
+			return Weave.lang("Pie Chart of {0}", ColumnUtils.getTitle(this.data));
 		}
 
 		//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
@@ -280,9 +285,9 @@ namespace weavejs.tool.c3tool
 		C3PieChart,
 		["weavejs.tool.c3tool.C3PieChart", "weave.visualization.tools::PieChartTool"],
 		[
-			weavejs.api.ui.IVisTool,
-			weavejs.api.core.ILinkableObjectWithNewProperties,
-			weavejs.api.data.ISelectableAttributes,
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
 			IAltText
 		],
 		"Pie Chart"

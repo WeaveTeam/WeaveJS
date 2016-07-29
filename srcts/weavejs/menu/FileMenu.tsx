@@ -24,8 +24,9 @@ namespace weavejs.menu
 	import IDataSource = weavejs.api.data.IDataSource;
 	import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
 	import WeaveProperties = weavejs.app.WeaveProperties;
+	import Admin = weavejs.net.Admin;
 
-	var ProgressIndicator = weavejs.WeaveAPI.ProgressIndicator;
+	var ProgressIndicator = WeaveAPI.ProgressIndicator;
 
 	export class FileMenu implements MenuBarItemProps
 	{
@@ -84,7 +85,7 @@ namespace weavejs.menu
 					click: () => {
 						this.owner.login.conditionalOpen(this.saveToServer);
 					},
-					shown: weavejs.net.Admin.service.initialized
+					shown: Admin.service.initialized
 				}
 			];
 		}
@@ -235,7 +236,7 @@ namespace weavejs.menu
 			else if (url)
 			{
 				var fileName = this.fileName;
-				weavejs.WeaveAPI.URLRequestUtils
+				WeaveAPI.URLRequestUtils
 					.request(this.owner.weave.root, new URLRequest(url))
 					.then(
 						(result) => {
@@ -412,7 +413,7 @@ namespace weavejs.menu
 			promise.then(
 				(result: Uint8Array)=>
 				{
-					weavejs.net.Admin.service.saveWeaveFileByteArray(result, newFileName, overwrite);
+					Admin.service.saveWeaveFileByteArray(result, newFileName, overwrite);
 					WeaveProperties.notify(this.owner.weave, 'success', Weave.lang("Session saved to server"));
 				},
 				(error:any)=>

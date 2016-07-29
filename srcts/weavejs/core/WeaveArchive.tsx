@@ -158,8 +158,8 @@ namespace weavejs.core
 		
 		static setSessionFromUrl(weave:Weave, url:string)
 		{
-			return weavejs.WeaveAPI.URLRequestUtils
-				.request(weave.root, new weavejs.net.URLRequest(url))
+			return WeaveAPI.URLRequestUtils
+				.request(weave.root, new URLRequest(url))
 				.then(WeaveArchive.deserialize)
 				.then((archive) => {
 					archive.setSessionFromArchive(weave);

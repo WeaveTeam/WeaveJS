@@ -25,7 +25,7 @@ namespace weavejs.ui
 		componentDidMount()
 		{
 			this.outerDiv = ReactDOM.findDOMNode(this) as HTMLDivElement;
-			weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
+			WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
 		}
 
 		handleFrame()
@@ -48,7 +48,7 @@ namespace weavejs.ui
 
 		componentWillUnmount()
 		{
-			weavejs.WeaveAPI.Scheduler.frameCallbacks.removeCallback(this, this.handleFrame);
+			WeaveAPI.Scheduler.frameCallbacks.removeCallback(this, this.handleFrame);
 		}
 		
 		render()

@@ -15,6 +15,7 @@ namespace weavejs.layout
 	import LayoutState = weavejs.layout.flexiblelayout.LayoutState;
 	import HORIZONTAL = weavejs.layout.flexiblelayout.DirectionTypes.HORIZONTAL;
 	import VERTICAL = weavejs.layout.flexiblelayout.DirectionTypes.VERTICAL;
+	import ILinkableVariable = weavejs.api.core.ILinkableVariable;
 
 	export enum DropZone {
 		NONE,
@@ -39,7 +40,7 @@ namespace weavejs.layout
 
 	export type FlexibleLayoutState = {title?: string} & LayoutState;
 
-	export class FlexibleLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
+	export class FlexibleLayout extends AbstractLayout<LayoutProps, {}> implements ILinkableVariable
 	{
 		private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, this.simplifyState({flex: 1, title: ""})), this.forceUpdate, true);
 		private nextState:Object;
@@ -56,7 +57,7 @@ namespace weavejs.layout
 		constructor(props:LayoutProps)
 		{
 			super(props);
-			weavejs.WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.frameHandler, true);
+			WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.frameHandler, true);
 		}
 		
 		getSessionState():FlexibleLayoutState
@@ -466,7 +467,7 @@ namespace weavejs.layout
 			}
 			else
 			{
-				if (weavejs.WeaveAPI.Locale.reverseLayout)
+				if (WeaveAPI.Locale.reverseLayout)
 				{
 					if (dropZone === DropZone.LEFT)
 						dropZone = DropZone.RIGHT;
@@ -671,7 +672,7 @@ namespace weavejs.layout
 	Weave.registerClass(
 		FlexibleLayout,
 		'weavejs.layout.FlexibleLayout',
-		[weavejs.api.core.ILinkableVariable],
+		[ILinkableVariable],
 		'Flexible Layout'
 	);
 }

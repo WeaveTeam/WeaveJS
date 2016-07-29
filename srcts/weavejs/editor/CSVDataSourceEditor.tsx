@@ -58,7 +58,7 @@ namespace weavejs.editor
 			let newState:{[key:string]:any} = ds.metadata.getSessionState() || {};
 			selectedIds.forEach( (id:number|string, index:number) => {
 				var currentMeta:Object = ds.generateMetadataForColumnId(id);
-				newState[id] = weavejs.WeaveAPI.SessionManager.combineDiff(currentMeta, newMeta);
+				newState[id] = WeaveAPI.SessionManager.combineDiff(currentMeta, newMeta);
 
 				// remove missing values
 				_.forEach(newState[id], (value:any, key:string) => {
@@ -181,7 +181,7 @@ namespace weavejs.editor
 			var columnNames = ds.getColumnNames();
 			var columns = columnNames.map((name) => ds.getColumnByName(name));
 		
-			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			if (WeaveAPI.Locale.reverseLayout)
 			{
 				columns.reverse();
 				columnNames.reverse();

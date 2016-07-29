@@ -55,7 +55,7 @@ namespace weavejs.tool.c3tool
 		destroyChart():void
 		{
 			if (this.chart)
-				weavejs.WeaveAPI.Scheduler.callLater(null, (chart:c3.ChartAPI) => chart.destroy(), [this.chart]);
+				WeaveAPI.Scheduler.callLater(null, (chart:c3.ChartAPI) => chart.destroy(), [this.chart]);
 			this.chart = null;
 		}
 	}

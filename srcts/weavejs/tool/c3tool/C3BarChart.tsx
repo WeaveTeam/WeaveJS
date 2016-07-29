@@ -29,6 +29,10 @@ namespace weavejs.tool.c3tool
 	import StandardLib = weavejs.util.StandardLib;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
+	import ArrayUtils = weavejs.util.ArrayUtils;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 
 	declare type Record = {
 		id: IQualifiedKey,
@@ -309,10 +313,10 @@ namespace weavejs.tool.c3tool
 
 			this.yLabelColumnDataType = this.yLabelColumn.getMetadata("dataType");
 
-			this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+			this.records = ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 			this.records = _.sortByOrder(this.records, ["numericValues.sort"], ["asc"]);
 
-			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			if (WeaveAPI.Locale.reverseLayout)
 			{
 				this.records = this.records.reverse();
 			}
@@ -456,7 +460,7 @@ namespace weavejs.tool.c3tool
 			if (columns.length == 0)
 				return Weave.lang('');
 
-			return Weave.lang("{0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
+			return Weave.lang("{0}", columns.map(column=>ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
 		}
 
 		public getAutomaticDescription():string
@@ -478,7 +482,7 @@ namespace weavejs.tool.c3tool
 			if (heights.length == 1)
 			{
 				var heightColumn:IAttributeColumn = heights[0] as IAttributeColumn;
-				var statsHeight:IColumnStatistics = weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(heightColumn);
+				var statsHeight:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(heightColumn);
 				var max = statsHeight.getMin();
 				var min = statsHeight.getMax();
 				var average = statsHeight.getMean();
@@ -563,7 +567,7 @@ namespace weavejs.tool.c3tool
 				if (this.heightColumnNames && this.heightColumnNames.length)
 				{
 					var axes:any = {};
-					if (weavejs.WeaveAPI.Locale.reverseLayout)
+					if (WeaveAPI.Locale.reverseLayout)
 					{
 						this.heightColumnNames.forEach( (name) => {
 							axes[name] = 'y2';
@@ -621,7 +625,7 @@ namespace weavejs.tool.c3tool
 			
 			// update C3 selection and style on already-rendered chart
 			var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-			var keyToIndex = weavejs.util.ArrayUtils.createLookup(this.records, "id");
+			var keyToIndex = ArrayUtils.createLookup(this.records, "id");
 			var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
 				return Number(keyToIndex.get(key));
 			});
@@ -647,7 +651,7 @@ namespace weavejs.tool.c3tool
 			if (columns.length == 0)
 				return Weave.lang('Bar Chart');
 
-			return Weave.lang("Bar Chart of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
+			return Weave.lang("Bar Chart of {0}", columns.map(column=>ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
 		}
 
 		getMarginEditor():React.ReactChild[][]
@@ -742,9 +746,9 @@ namespace weavejs.tool.c3tool
 		C3BarChart,
 		["weavejs.tool.c3tool.C3BarChart", "weave.visualization.tools::CompoundBarChartTool"],
 		[
-			weavejs.api.ui.IVisTool,
-			weavejs.api.core.ILinkableObjectWithNewProperties,
-			weavejs.api.data.ISelectableAttributes,
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
 			IAltText
 		],
 		"Bar Chart"

@@ -28,6 +28,8 @@ namespace weavejs.editor
 	import StreamedGeometryColumn = weavejs.data.column.StreamedGeometryColumn;
 	import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import LinkableString = weavejs.core.LinkableString;
+	import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 
 	export const PREVIEW:"preview" = "preview";
 	export const METADATA:"metadata" = "metadata";
@@ -85,7 +87,7 @@ namespace weavejs.editor
 			ColumnUtils.map_root_firstDataSet.delete(this.weaveRoot);
 		}
 
-		getLabelEditor(labelLinkableString:weavejs.core.LinkableString):[React.ReactChild, React.ReactChild]
+		getLabelEditor(labelLinkableString:LinkableString):[React.ReactChild, React.ReactChild]
 		{
 			return [
 				<HBox padded style={{alignItems: "center", justifyContent: "flex-end"}}>
@@ -127,7 +129,7 @@ namespace weavejs.editor
 
 		private static isNotGeometryList(node:IWeaveTreeNode):boolean
 		{
-			let glnClass = (weavejs.data.source.WeaveDataSource as any).GeomListNode;
+			let glnClass = (WeaveDataSource as any).GeomListNode;
 			return !(node instanceof glnClass);
 		}
 		
@@ -167,8 +169,8 @@ namespace weavejs.editor
 		
 		renderConfigureView():JSX.Element
 		{
-			let registry = weavejs.WeaveAPI.ClassRegistry;
-			let displayName:string = Weave.lang(weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.props.dataSource.constructor as typeof IDataSource));
+			let registry = WeaveAPI.ClassRegistry;
+			let displayName:string = Weave.lang(WeaveAPI.ClassRegistry.getDisplayName(this.props.dataSource.constructor as typeof IDataSource));
 			return (
 				<Section overflow>
 					<div aria-label={Weave.lang("Configure {0}:{1}", displayName, Weave.lang(this.props.dataSource.getLabel()))}>
@@ -199,7 +201,7 @@ namespace weavejs.editor
 					var meta = columnRef.getColumnMetadata();
 
 					if (meta) {
-						var column = weavejs.WeaveAPI.AttributeColumnCache.getColumn(columnRef.getDataSource(), meta);
+						var column = WeaveAPI.AttributeColumnCache.getColumn(columnRef.getDataSource(), meta);
 						// request all metadata for each geometry column so we get the list of keys
 						for (var sgc of Weave.getDescendants(column, StreamedGeometryColumn))
 							sgc.requestAllMetadata();
@@ -249,9 +251,9 @@ namespace weavejs.editor
 				return !!(ref && ref.getColumnMetadata());
 			});
 			if (leaves.length)
-				weavejs.data.ColumnUtils.map_root_firstDataSet.set(weaveRoot, leaves as any[]);
+				ColumnUtils.map_root_firstDataSet.set(weaveRoot, leaves as any[]);
 			else
-				weavejs.data.ColumnUtils.map_root_firstDataSet.delete(weaveRoot);
+				ColumnUtils.map_root_firstDataSet.delete(weaveRoot);
 			
 			// select the first leaf by default
 			if (leaves.indexOf(leaf) < 0)

@@ -6,6 +6,7 @@ namespace weavejs.util
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import IDisposableObject = weavejs.api.core.IDisposableObject;
 	import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
+	import SessionManager = weavejs.core.SessionManager;
 
 	// This makes Weave handle linkable React classes appropriately.
 	Weave.registerAsyncClass(
@@ -15,7 +16,7 @@ namespace weavejs.util
 				component,
 				component => {
 					if (Weave.findPath(Weave.getOwner(component), component))
-						weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(component);
+						LinkablePlaceholder.replaceInstanceWithPlaceholder(component);
 					Weave.dispose(component);
 				}
 			);
@@ -38,7 +39,7 @@ namespace weavejs.util
 
 		static linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 0):(component:ReactComponent)=>void
 		{
-			if (weavejs.WeaveAPI.debugAsyncStack)
+			if (WeaveAPI.debugAsyncStack)
 				var stackTrace = new Error("Stack trace for WeaveReactUtils.linkReactStateRef()");
 			
 			var prevComponent:ReactComponent;
@@ -78,7 +79,7 @@ namespace weavejs.util
 				if (ReactUtils.hasFocus(component))
 				{
 					authority = updateReactState;
-					weavejs.WeaveAPI.Scheduler.callLater(localContext, updateReactState, [true]);
+					WeaveAPI.Scheduler.callLater(localContext, updateReactState, [true]);
 					return;
 				}
 				authority = null;
@@ -111,7 +112,7 @@ namespace weavejs.util
 
 				// update weave state
 				authority = null;
-				weavejs.core.SessionManager.traverseAndSetState(reactState, mapping);
+				SessionManager.traverseAndSetState(reactState, mapping);
 
 				// Always update react state after setting weave state because
 				// callbacks won't get triggered if the weave state didn't change,
@@ -136,7 +137,7 @@ namespace weavejs.util
 						}
 					};
 				}
-				return weavejs.util.JS.isPrimitive(value) ? value : _.mapValues(value, mapValue);
+				return JS.isPrimitive(value) ? value : _.mapValues(value, mapValue);
 			};
 			reactUpdateSpec = mapValue(mapping);
 

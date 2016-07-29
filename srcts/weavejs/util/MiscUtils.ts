@@ -196,7 +196,7 @@ namespace weavejs.util
 		{
 			try
 			{
-				return str && weavejs.util.JS.compile('`' + str + '`').call(thisArg);
+				return str && JS.compile('`' + str + '`').call(thisArg);
 			}
 			catch (e)
 			{
@@ -277,15 +277,15 @@ namespace weavejs.util
 			}
 			else if (structure == "string")
 			{
-				return weavejs.util.StandardLib.asString(value);
+				return StandardLib.asString(value);
 			}
 			else if (structure == "number")
 			{
-				return weavejs.util.StandardLib.asNumber(value);
+				return StandardLib.asNumber(value);
 			}
 			else if (structure == "boolean")
 			{
-				return weavejs.util.StandardLib.asBoolean(value);
+				return StandardLib.asBoolean(value);
 			}
 			return value === undefined ? null : value;
 		}

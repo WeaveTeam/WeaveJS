@@ -12,6 +12,7 @@ namespace weavejs.editor
 	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
+	import ColumnUtils = weavejs.data.ColumnUtils;
 
 	export class NumericRangeDataFilterEditor extends AbstractFilterEditor
 	{
@@ -43,7 +44,7 @@ namespace weavejs.editor
 		{
 			if (Weave.detectChange(this, this.column))
 			{
-				this.options = weavejs.data.ColumnUtils.getRecords(
+				this.options = ColumnUtils.getRecords(
 					{ value: this.column, label: this.column },
 					this.column.keys,
 					{ value: Number, label: String }
@@ -70,5 +71,5 @@ namespace weavejs.editor
 		}
 	}
 
-	Weave.registerClass(NumericRangeDataFilterEditor, "weavejs.editor.NumericRangeDataFilterEditor", [weavejs.api.core.ILinkableObjectWithNewProperties]);
+	Weave.registerClass(NumericRangeDataFilterEditor, "weavejs.editor.NumericRangeDataFilterEditor", [ILinkableObjectWithNewProperties]);
 }

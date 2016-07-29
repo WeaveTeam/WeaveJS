@@ -3,6 +3,7 @@ namespace weavejs.util
 	import WeaveApp = weavejs.app.WeaveApp;
 	import LandingPage = weavejs.dialog.LandingPage;
 	import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
+	import WeaveArchive = weavejs.core.WeaveArchive;
 
 	export class EmbedUtils
 	{
@@ -25,7 +26,7 @@ namespace weavejs.util
 			(element as HTMLElement).style.display = "flex";
 
 			/* Check if WeaveJS's class registries have been initialized. */
-			if (!((weavejs.WeaveAPI.ClassRegistry as any)['defaultPackages'] as any).length)
+			if (!((WeaveAPI.ClassRegistry as any)['defaultPackages'] as any).length)
 			{
 				new WeaveJS().start();
 			}
@@ -81,7 +82,7 @@ namespace weavejs.util
 					jsxElement = <LandingPage
 						weave={weave}
 						initialView={mode == "splash" ? "splash" : "file"}
-						weaveAppRef={(weaveApp:weavejs.app.WeaveApp) => (window as any).weaveApp = weaveApp}
+						weaveAppRef={(weaveApp:WeaveApp) => (window as any).weaveApp = weaveApp}
 					/>;
 					break;
 				case "app":
@@ -99,7 +100,7 @@ namespace weavejs.util
 
 			if (options.sessionUrl)
 			{
-				weavejs.core.WeaveArchive.setSessionFromUrl(weave, options.sessionUrl);
+				WeaveArchive.setSessionFromUrl(weave, options.sessionUrl);
 			}
 
 			return weave;

@@ -24,5 +24,5 @@ namespace weavejs.tool.oltool
 		static MAP_TOOL = "IOpenLayersMapTool";
 	}
 	
-	weavejs.WeaveAPI.ClassRegistry.registerClass(IOpenLayersMapTool, 'weavejs.api.ui.IOpenLayersMapTool');
+	WeaveAPI.ClassRegistry.registerClass(IOpenLayersMapTool, 'weavejs.api.ui.IOpenLayersMapTool');
 }

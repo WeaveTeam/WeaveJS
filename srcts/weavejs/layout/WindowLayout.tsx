@@ -11,6 +11,7 @@ namespace weavejs.layout
 	import WeavePath = weavejs.path.WeavePath;
 	import MouseUtils = weavejs.util.MouseUtils;
 	import MiscUtils = weavejs.util.MiscUtils;
+	import ILinkableVariable = weavejs.api.core.ILinkableVariable;
 
 	export interface PanelState
 	{
@@ -41,7 +42,7 @@ namespace weavejs.layout
 		title: "string"
 	};
 
-	export class WindowLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
+	export class WindowLayout extends AbstractLayout<LayoutProps, {}> implements ILinkableVariable
 	{
 		private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, MiscUtils.normalizeStructure({}, stateStructure)), this.forceUpdate, true);
 		private overlay:Div;
@@ -329,7 +330,7 @@ namespace weavejs.layout
 	Weave.registerClass(
 		WindowLayout,
 		'weavejs.layout.WindowLayout',
-		[weavejs.api.core.ILinkableVariable],
+		[ILinkableVariable],
 		"Window Layout"
 	);
 }

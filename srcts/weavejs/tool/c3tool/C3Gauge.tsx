@@ -21,6 +21,10 @@ namespace weavejs.tool.c3tool
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import IVisTool = weavejs.api.ui.IVisTool;
 
 	declare type Record = {
 		id: IQualifiedKey,
@@ -32,7 +36,7 @@ namespace weavejs.tool.c3tool
 		meterColumn = Weave.linkableChild(this, DynamicColumn);
 		binningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
 		colorRamp = Weave.linkableChild(this, ColorRamp);
-		private colStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.meterColumn));
+		private colStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.meterColumn));
 
 		private RECORD_FORMAT = {
 			id: IQualifiedKey,
@@ -118,7 +122,7 @@ namespace weavejs.tool.c3tool
 				changeDetected = true;
 				var name = this.meterColumn.getMetadata('title');
 
-				this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+				this.records = ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 
 				this.keyToIndex = {};
 
@@ -201,7 +205,7 @@ namespace weavejs.tool.c3tool
 
 		get defaultPanelTitle():string
 		{
-			return Weave.lang("Gauge of {0}", weavejs.data.ColumnUtils.getTitle(this.meterColumn));
+			return Weave.lang("Gauge of {0}", ColumnUtils.getTitle(this.meterColumn));
 		}
 
 		get deprecatedStateMapping()
@@ -229,9 +233,9 @@ namespace weavejs.tool.c3tool
 		C3Gauge,
 		["weavejs.tool.c3tool.C3Gauge", "weave.visualization.tools::GaugeTool"],
 		[
-			weavejs.api.ui.IVisTool,
-			weavejs.api.core.ILinkableObjectWithNewProperties,
-			weavejs.api.data.ISelectableAttributes
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes
 		],
 		"Gauge"
 	);

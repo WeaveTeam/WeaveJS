@@ -37,7 +37,7 @@ namespace weavejs.editor
 		{
 			super(props);
 
-			this.rootWeaveTreeItem = (weavejs.WeaveAPI.SessionManager as SessionManager).getSessionStateTree(this.props.weaveRoot,"Weave") as WeaveTreeItem;
+			this.rootWeaveTreeItem = (WeaveAPI.SessionManager as SessionManager).getSessionStateTree(this.props.weaveRoot,"Weave") as WeaveTreeItem;
 
 			if (this.props.name)
 			{
@@ -57,7 +57,7 @@ namespace weavejs.editor
 		{
 			if (nextProps.weaveRoot != this.props.weaveRoot)
 			{
-				this.rootWeaveTreeItem = (weavejs.WeaveAPI.SessionManager as SessionManager).getSessionStateTree(nextProps.weaveRoot,"Weave") as WeaveTreeItem;
+				this.rootWeaveTreeItem = (WeaveAPI.SessionManager as SessionManager).getSessionStateTree(nextProps.weaveRoot,"Weave") as WeaveTreeItem;
 			}
 			if (nextProps.name != this.props.name)
 			{
@@ -125,7 +125,7 @@ namespace weavejs.editor
 
 		get isDynamicLinkableObject():boolean
 		{
-			return (this.props.item.dependency instanceof weavejs.core.LinkableDynamicObject);
+			return (this.props.item.dependency instanceof LinkableDynamicObject);
 		}
 
 
@@ -137,7 +137,7 @@ namespace weavejs.editor
 			var activeItem:WeaveTreeItem = item ? item : this.props.item;
 			var state:any = Weave.getState(activeItem.data);
 			var str:string;
-			/*if (activeItem.data instanceof weavejs.core.LinkableString)
+			/*if (activeItem.data instanceof LinkableString)
 				str = state as string;
 			else*/
 			//to display null, we have to use stringify even for LinkableString
@@ -149,7 +149,7 @@ namespace weavejs.editor
 		private saveSessionValue = ():void =>
 		{
 			var value:string = this.state.sessionValue;
-			if (this.props.item.data instanceof weavejs.core.LinkableString)
+			if (this.props.item.data instanceof LinkableString)
 				(this.props.item.data as LinkableString).value = value;
 			else
 				Weave.setState(this.props.item.data, JSON.parse(value));

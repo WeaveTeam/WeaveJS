@@ -7,6 +7,8 @@ namespace weavejs.tool.oltool.layer
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import AbstractGlyphLayer = weavejs.tool.oltool.layer.AbstractGlyphLayer;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
 	interface LabelRecord
 	{
@@ -15,7 +17,7 @@ namespace weavejs.tool.oltool.layer
 		color: string;
 		font: string;
 		sort: number;
-		bounds: weavejs.geom.Bounds2D;
+		bounds: Bounds2D;
 	}
 
 	export class LabelLayer extends AbstractGlyphLayer
@@ -73,7 +75,7 @@ namespace weavejs.tool.oltool.layer
 			/* Do we actually need this check? */
 			if (!this.parent || !this.parent.map)
 			{
-				weavejs.WeaveAPI.Scheduler.callLater(this, this.updateStyleData);
+				WeaveAPI.Scheduler.callLater(this, this.updateStyleData);
 				return;
 			}
 			let map = this.parent.map;
@@ -204,7 +206,7 @@ namespace weavejs.tool.oltool.layer
 	Weave.registerClass(
 		LabelLayer,
 		["weavejs.tool.oltool.layer.LabelLayer", "weave.visualization.plotters::TextGlyphPlotter", "weave.visualization.plotters::GeometryLabelPlotter"],
-		[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
+		[ILinkableObjectWithNewProperties, ISelectableAttributes],
 		"Labels"
 	);
 }

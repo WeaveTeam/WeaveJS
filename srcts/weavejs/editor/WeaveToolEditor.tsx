@@ -24,7 +24,7 @@ namespace weavejs.editor
 
 	export class WeaveToolEditor extends React.Component<WeaveToolEditorProps, WeaveToolEditorState>
 	{
-		private toolWatcher:LinkableWatcher = WeaveReactUtils.forceUpdateWatcher(this, weavejs.api.ui.IVisTool);
+		private toolWatcher:LinkableWatcher = WeaveReactUtils.forceUpdateWatcher(this, IVisTool);
 		public get tool():IVisTool { return this.toolWatcher.target as IVisTool; }
 		public set tool(value:IVisTool) { this.toolWatcher.target = value; }
 		private displayName:string;
@@ -83,7 +83,7 @@ namespace weavejs.editor
 			if (tool && !Weave.wasDisposed(tool))
 			{
 				this.tool = tool;
-				this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.tool.constructor as new (..._: any[]) => any);
+				this.displayName = WeaveAPI.ClassRegistry.getDisplayName(this.tool.constructor as new (..._: any[]) => any);
 				var state = {
 					activeCrumb: this.displayName
 				};

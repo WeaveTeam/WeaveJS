@@ -125,7 +125,7 @@ namespace weavejs.layout.flexiblelayout
 		{
 			var element1Index = resizerIndex;
 			var element2Index = resizerIndex + 1;
-			if (this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout)
+			if (this.state.direction === HORIZONTAL && WeaveAPI.Locale.reverseLayout)
 			{
 				element1Index = resizerIndex + 1;
 				element2Index = resizerIndex
@@ -153,7 +153,7 @@ namespace weavejs.layout.flexiblelayout
 
 					var element1Index = index;
 					var element2Index = index + 1;
-					if (this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout)
+					if (this.state.direction === HORIZONTAL && WeaveAPI.Locale.reverseLayout)
 					{
 						element1Index = index + 1;
 						element2Index = index
@@ -247,7 +247,7 @@ namespace weavejs.layout.flexiblelayout
 					);
 				});
 				
-				if (state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout)
+				if (state.direction === HORIZONTAL && WeaveAPI.Locale.reverseLayout)
 					elements.reverse();
 			}
 

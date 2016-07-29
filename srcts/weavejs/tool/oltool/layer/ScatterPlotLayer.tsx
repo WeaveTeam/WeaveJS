@@ -10,6 +10,9 @@ namespace weavejs.tool.oltool.layer
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import AbstractGlyphLayer = weavejs.tool.oltool.layer.AbstractGlyphLayer;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
 	export class ScatterPlotLayer extends AbstractGlyphLayer
 	{
@@ -64,12 +67,12 @@ namespace weavejs.tool.oltool.layer
 
 			for (let column of Weave.getPath(this.fill).getChildren().concat(Weave.getPath(this.line).getChildren()))
 			{
-				let internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column.getObject());
+				let internalColumn = ColumnUtils.hack_findInternalDynamicColumn(column.getObject());
 				if (internalColumn)
 					additionalColumns.push(internalColumn);
 			}
 
-			additionalColumns.push(weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(this.radius as IColumnWrapper));
+			additionalColumns.push(ColumnUtils.hack_findInternalDynamicColumn(this.radius as IColumnWrapper));
 
 			return additionalColumns;
 		}
@@ -132,7 +135,7 @@ namespace weavejs.tool.oltool.layer
 		{
 			let fillEnabled = this.fill.enable.value;
 			let strokeEnabled = this.line.enable.value;
-			var styleRecords:any[] = weavejs.data.ColumnUtils.getRecords(
+			var styleRecords:any[] = ColumnUtils.getRecords(
 				{
 					id: IQualifiedKey,
 					fill: this.fill.recordFormat,
@@ -194,7 +197,7 @@ namespace weavejs.tool.oltool.layer
 	Weave.registerClass(
 		ScatterPlotLayer,
 		["weavejs.tool.oltool.layer.ScatterPlotLayer", "weave.visualization.plotters::ScatterPlotPlotter"],
-		[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
+		[ILinkableObjectWithNewProperties, ISelectableAttributes],
 		"Bubbles"
 	);
 }

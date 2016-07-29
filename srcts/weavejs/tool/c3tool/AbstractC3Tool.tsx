@@ -27,6 +27,7 @@ namespace weavejs.tool.c3tool
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import AbstractVisTool = weavejs.tool.AbstractVisTool;
 	import C3Chart = weavejs.tool.c3tool.C3Chart;
+	import JS = weavejs.util.JS;
 
 	function finiteOrNull(n:number):number { return isFinite(n) ? n : null; }
 
@@ -102,7 +103,7 @@ namespace weavejs.tool.c3tool
 			this.handlePointClick = this.handlePointClick.bind(this);
 			Weave.getCallbacks(this).addGroupedCallback(this, this.debouncedHandleChange, true);
 			
-			weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.validateSize);
+			WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.validateSize);
 		}
 		
 		componentDidMount()
@@ -165,7 +166,7 @@ namespace weavejs.tool.c3tool
 					onMouseLeave={ () => this.toolTip.hide() }
 				>
 					<C3Chart
-						config={weavejs.util.JS.copyObject(this.c3Config, true)}
+						config={JS.copyObject(this.c3Config, true)}
 						ref={(c:C3Chart) => {
 							this.chartComponent = c;
 							this.chart = c && c.chart;
@@ -270,7 +271,7 @@ namespace weavejs.tool.c3tool
 			else
 				this.c3Config.padding.bottom = this.margin.bottom.value;
 			
-			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			if (WeaveAPI.Locale.reverseLayout)
 			{
 				this.c3Config.padding.left = this.margin.right.value;
 				this.c3Config.padding.right = this.margin.left.value;
@@ -341,7 +342,7 @@ namespace weavejs.tool.c3tool
 		protected cullAxes()
 		{
 			this.cullAxis(this.internalWidth, this.xAxisClass);
-			this.cullAxis(this.internalHeight, weavejs.WeaveAPI.Locale.reverseLayout ? this.y2AxisClass : this.yAxisClass);
+			this.cullAxis(this.internalHeight, WeaveAPI.Locale.reverseLayout ? this.y2AxisClass : this.yAxisClass);
 		}
 
 		customStyle(array:Array<number>, type:string, filter:string, style:any)
@@ -454,7 +455,7 @@ namespace weavejs.tool.c3tool
 			let adjustment = 0;
 			let labelWidth = DOMUtils.getTextWidth(label, this.getFontString());
 			let truncatedLabel:string = label;
-			while (labelWidth > (weavejs.WeaveAPI.Locale.reverseLayout ? this.margin.right.value : this.margin.left.value) && adjustment < label.length)
+			while (labelWidth > (WeaveAPI.Locale.reverseLayout ? this.margin.right.value : this.margin.left.value) && adjustment < label.length)
 			{
 				adjustment++;
 				truncatedLabel = this.centerEllipseString(label, adjustment, "\u2026"); //unicode "..."

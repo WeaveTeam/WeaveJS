@@ -73,7 +73,7 @@ namespace weavejs.admin
 		}
 
 		updateSchemas = () => {
-			weavejs.net.Admin.service.getSQLSchemaNames().then(
+			Admin.service.getSQLSchemaNames().then(
 				(schemaNames: string[]) => this.setState({ schemaOptions: schemaNames }),
 				this.handleError
 			);

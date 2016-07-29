@@ -107,7 +107,7 @@ namespace weavejs.ui
 				var right = style.left + this.element.clientWidth;
 				var bottom = style.top + this.element.clientHeight;
 				
-				if ((right > window.innerWidth || weavejs.WeaveAPI.Locale.reverseLayout) && mirrorLeft > 0)
+				if ((right > window.innerWidth || WeaveAPI.Locale.reverseLayout) && mirrorLeft > 0)
 					style.left = mirrorLeft;
 				if (bottom > window.innerHeight && mirrorTop > 0)
 					style.top = mirrorTop;
@@ -120,7 +120,7 @@ namespace weavejs.ui
 				tableRows = columnNames.map((columnName:string) => {
 					var colorSpan:JSX.Element = this.state.columnNamesToColor[columnName] ? (<span style={{backgroundColor: this.state.columnNamesToColor[columnName]}}/>) : (null);
 					var returnElements:JSX.Element[] = [];
-					if (weavejs.WeaveAPI.Locale.reverseLayout)
+					if (WeaveAPI.Locale.reverseLayout)
 					{
 						returnElements.push(<td key={returnElements.length} className="value">{this.valueFormat(Weave.lang(this.state.columnNamesToValue[columnName]))}</td>);
 						returnElements.push(<td key={returnElements.length} className="name"><div style={{display:"inline"}}>{this.nameFormat(Weave.lang(columnName))}</div>{colorSpan}</td>);

@@ -80,7 +80,7 @@ namespace weavejs.ui
 		render():JSX.Element
 		{
 			var weaveRoot:ILinkableHashMap = Weave.getRoot(this.props.dynamicObject);
-			var weaveTreeItem:WeaveTreeItem = (weavejs.WeaveAPI.SessionManager as SessionManager).getSessionStateTree(weaveRoot,"Dynamic Objects") as WeaveTreeItem;
+			var weaveTreeItem:WeaveTreeItem = (WeaveAPI.SessionManager as SessionManager).getSessionStateTree(weaveRoot,"Dynamic Objects") as WeaveTreeItem;
 			var popOverStyle:React.CSSProperties = {
 				position:"absolute",
 				display:(this.state.openSessionNav?"block":"none"),

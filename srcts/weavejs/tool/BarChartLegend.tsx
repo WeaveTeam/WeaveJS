@@ -17,12 +17,13 @@ namespace weavejs.tool
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisTool = weavejs.api.ui.IVisTool;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
 	const SHAPE_TYPE_CIRCLE:string = "circle";
 	const SHAPE_TYPE_SQUARE:string = "square";
 	const SHAPE_TYPE_LINE:string = "line";
 
-	export class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties
+	export class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 	{
 		chartColors = Weave.linkableChild(this, ColorRamp);
 		columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
@@ -191,7 +192,7 @@ namespace weavejs.tool
 	Weave.registerClass(
 		BarChartLegend,
 		["weavejs.tool.BarChartLegend", "weave.visualization.tools::BarChartLegendTool"],
-		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
+		[IVisTool, ILinkableObjectWithNewProperties],
 		"Bar Chart Legend"
 	);
 }

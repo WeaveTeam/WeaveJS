@@ -87,7 +87,7 @@ namespace weavejs.tool.oltool.layer
 			if (!image)
 			{
 				image = new Image();
-				weavejs.WeaveAPI.URLRequestUtils.request(this.context, {url, responseType: "datauri", mimeType: ""} as any).then(
+				WeaveAPI.URLRequestUtils.request(this.context, {url, responseType: "datauri", mimeType: ""} as any).then(
 					(dataUri:string) =>
 					{
 						this.requestDataUrl(dataUri, color, function (dataUrl:any) {

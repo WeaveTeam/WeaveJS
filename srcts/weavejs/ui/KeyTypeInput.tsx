@@ -28,7 +28,7 @@ namespace weavejs.ui
 		};
 
 		render(): JSX.Element {
-			let options = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) =>
+			let options = WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) =>
 							{
 								if (keyType == "string")
 								{

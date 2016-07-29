@@ -64,7 +64,7 @@ namespace weavejs.admin
 						currentConnectionName: info.connection,
 						connectionName: info.connection,
 						schemaName: info.schema,
-						metadataIdFields: weavejs.WeaveAPI.CSVParser.createCSVRow(info.idFields || [])
+						metadataIdFields: WeaveAPI.CSVParser.createCSVRow(info.idFields || [])
 					});
 				},
 				this.handleError
@@ -92,7 +92,7 @@ namespace weavejs.admin
 
 		save=(): void=>
 		{
-			let idFields: string[] = weavejs.WeaveAPI.CSVParser.parseCSVRow(this.state.metadataIdFields);
+			let idFields: string[] = WeaveAPI.CSVParser.parseCSVRow(this.state.metadataIdFields);
 			this.props.service.setDatabaseConfigInfo(this.state.connectionName, this.state.connectionPassword, this.state.schemaName, idFields).then(
 				this.handleMessage,
 				this.handleError

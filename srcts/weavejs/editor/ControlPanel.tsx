@@ -17,7 +17,7 @@ namespace weavejs.editor
 			popup = PopupWindow.open(
 				_.merge(
 					{
-						title: weavejs.WeaveAPI.ClassRegistry.getDisplayName(ComponentType),
+						title: WeaveAPI.ClassRegistry.getDisplayName(ComponentType),
 						width: 800,
 						height: 600
 					},

@@ -28,6 +28,9 @@ namespace weavejs.tool
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisTool = weavejs.api.ui.IVisTool;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import JS = weavejs.util.JS;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 
 	const LAYOUT_LIST:string = "List";
 	const LAYOUT_COMBO:string = "ComboBox";
@@ -89,7 +92,7 @@ namespace weavejs.tool
 		{
 			return this.choices.getObjects(IAttributeColumn).map(column => {
 				return {
-					label: column.getMetadata(weavejs.api.data.ColumnMetadata.TITLE) || "",
+					label: column.getMetadata(ColumnMetadata.TITLE) || "",
 					value: column
 				};
 			});
@@ -150,7 +153,7 @@ namespace weavejs.tool
 	Weave.registerClass(
 		AttributeMenuTool,
 		["weavejs.tool.AttributeMenu", "weave.ui::AttributeMenuTool"],
-		[weavejs.api.ui.IVisTool, weavejs.api.data.ISelectableAttributes],
+		[IVisTool, ISelectableAttributes],
 		"Attribute Menu Tool"
 	);
 
@@ -202,7 +205,7 @@ namespace weavejs.tool
 		{
 			var openToolNames:{label:string, value:any}[] = [];
 
-			Weave.getDescendants(this.weaveRoot, weavejs.api.data.ISelectableAttributes).forEach((toolOrLayer:any):void => {
+			Weave.getDescendants(this.weaveRoot, ISelectableAttributes).forEach((toolOrLayer:any):void => {
 
 				// excluding AttributeMenuTool from the list
 				if (Weave.className(toolOrLayer) != Weave.className(this.props.attributeMenuTool))
@@ -235,7 +238,7 @@ namespace weavejs.tool
 
 		getTargetToolAttributeOptions():string[]
 		{
-			return this.tool ? weavejs.util.JS.mapKeys(this.tool.selectableAttributes) : [];
+			return this.tool ? JS.mapKeys(this.tool.selectableAttributes) : [];
 		}
 
 		getTargetToolPath= ():string[] =>

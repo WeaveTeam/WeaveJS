@@ -44,6 +44,9 @@ namespace weavejs.tool
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisTool = weavejs.api.ui.IVisTool;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
 	export declare type Record = {
 		id: IQualifiedKey,
@@ -206,7 +209,7 @@ namespace weavejs.tool
 			var columns = this.columns.getObjects() as IAttributeColumn[];
 			if (columns.length == 0)
 				return Weave.lang('Sparkline');
-			return Weave.lang("Sparkline of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
+			return Weave.lang("Sparkline of {0}", columns.map(column=>ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
 		}
 
 		initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
@@ -340,7 +343,7 @@ namespace weavejs.tool
 
 			this.filteredKeySet.setColumnKeySources(columns);
 
-			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			if (WeaveAPI.Locale.reverseLayout)
 			{
 				columns.reverse();
 				names.reverse();
@@ -367,7 +370,7 @@ namespace weavejs.tool
 				});
 
 
-				this.records = weavejs.data.ColumnUtils.getRecords(format, this.filteredKeySet.keys, datatype);
+				this.records = ColumnUtils.getRecords(format, this.filteredKeySet.keys, datatype);
 				this.records = _.sortByOrder(this.records, ["sort"], ["asc"]);
 
 				if (this.records.length) {
@@ -550,7 +553,7 @@ namespace weavejs.tool
 									label = record.id.toString();
 								} else {
 									let columns = this.columns.getObjects(IAttributeColumn);
-									label = Weave.lang(weavejs.data.ColumnUtils.getTitle(columns[index]));
+									label = Weave.lang(ColumnUtils.getTitle(columns[index]));
 									style = {};
 								}
 								return (
@@ -580,7 +583,7 @@ namespace weavejs.tool
 	Weave.registerClass(
 		Sparkline,
 		["weavejs.tool.Sparkline", "weave.visualization.tools::Sparkline"],
-		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
+		[IVisTool, ILinkableObjectWithNewProperties, ISelectableAttributes],
 		"Sparkline"
 	);
 }

@@ -17,6 +17,8 @@ namespace weavejs.editor
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import MenuButton = weavejs.ui.menu.MenuButton;
 	import PopupWindow = weavejs.dialog.PopupWindow;
+	import WeaveAdminService = weavejs.net.WeaveAdminService;
+	import WeaveDataServlet = weavejs.net.WeaveDataServlet;
 
 
 	const SQL:string = "SQL";
@@ -62,7 +64,7 @@ namespace weavejs.editor
 
 		get service()
 		{
-			return weavejs.net.WeaveAdminService.getInstance(WeaveDataSourceEditor.getBaseUrl((this.props.dataSource as WeaveDataSource).url.value));
+			return WeaveAdminService.getInstance(WeaveDataSourceEditor.getBaseUrl((this.props.dataSource as WeaveDataSource).url.value));
 		}
 
 		private static getBaseUrl(serviceUrl: string): string {
@@ -124,7 +126,7 @@ namespace weavejs.editor
 					Weave.lang("Service URL"), 
 					<StatefulTextField style={{width: "100%"}} 
 									   ref={WeaveReactUtils.linkReactStateRef(this, { value: ds.url }, 500) }
-									   placeholder={weavejs.net.WeaveDataServlet.DEFAULT_URL}/>
+									   placeholder={WeaveDataServlet.DEFAULT_URL}/>
 				],
 				[
 					Weave.lang("Root hierarchy ID"),

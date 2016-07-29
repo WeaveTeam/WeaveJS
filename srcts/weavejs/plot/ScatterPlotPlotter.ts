@@ -56,7 +56,7 @@ namespace weavejs.plot
 		public colorPositive:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x008000));
 		
 		// declare dependency on statistics (for norm values)
-		private _sizeByStats:IColumnStatistics = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.sizeBy));
+		private _sizeByStats:IColumnStatistics = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.sizeBy));
 		
 		private colorDataWatcher:LinkableWatcher = Weave.disposableChild(this, LinkableWatcher);
 		
@@ -187,5 +187,5 @@ namespace weavejs.plot
 
 	Weave.registerClass(ScatterPlotPlotter, 'weavejs.plot.ScatterPlotPlotter', [IPlotter, IObjectWithDescription, ISelectableAttributes]);
 
-	weavejs.WeaveAPI.ClassRegistry.registerImplementation(IPlotter, ScatterPlotPlotter, "Scatterplot");
+	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, ScatterPlotPlotter, "Scatterplot");
 }

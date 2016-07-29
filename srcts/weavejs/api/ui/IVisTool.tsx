@@ -6,6 +6,7 @@ namespace weavejs.api.ui
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import JS = weavejs.util.JS;
 
 	export interface IVisToolProps
 	{
@@ -25,7 +26,7 @@ namespace weavejs.api.ui
 	{
 		static renderSelectableAttributes(selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>, pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void):React.ReactChild[][]
 		{
-			return weavejs.util.JS.mapEntries(selectableAttributes).map(([key, value]) => {
+			return JS.mapEntries(selectableAttributes).map(([key, value]) => {
 				return [
 					Weave.lang(key),
 					<SelectableAttributeComponent attributeName={key} attributes={ selectableAttributes } pushCrumb={ pushCrumb }/>
@@ -34,5 +35,5 @@ namespace weavejs.api.ui
 		}
 	}
 	
-	weavejs.WeaveAPI.ClassRegistry.registerClass(IVisTool, 'weavejs.api.ui.IVisTool', [ISelectableAttributes]);
+	WeaveAPI.ClassRegistry.registerClass(IVisTool, 'weavejs.api.ui.IVisTool', [ISelectableAttributes]);
 }

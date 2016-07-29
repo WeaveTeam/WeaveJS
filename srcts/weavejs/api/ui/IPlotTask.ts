@@ -47,5 +47,5 @@ namespace weavejs.api.ui
 		asyncState:any;
 	}
 
-	weavejs.WeaveAPI.ClassRegistry.registerClass(IPlotTask, 'weavejs.api.ui.IPlotTask');
+	WeaveAPI.ClassRegistry.registerClass(IPlotTask, 'weavejs.api.ui.IPlotTask');
 }

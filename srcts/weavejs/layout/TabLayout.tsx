@@ -14,6 +14,8 @@ namespace weavejs.layout
 
 	import LinkableVariable = weavejs.core.LinkableVariable;
 	import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
+	import ILinkableVariable = weavejs.api.core.ILinkableVariable;
+	import StandardLib = weavejs.util.StandardLib;
 
 	export interface TabState
 	{
@@ -51,7 +53,7 @@ namespace weavejs.layout
 		title: "string"
 	};
 
-	export class TabLayout extends AbstractLayout<TabLayoutProps, {}> implements weavejs.api.core.ILinkableVariable
+	export class TabLayout extends AbstractLayout<TabLayoutProps, {}> implements ILinkableVariable
 	{
 		static get DEFAULT_TAB_PREFIX():string
 		{
@@ -228,7 +230,7 @@ namespace weavejs.layout
 				{
 					if (tabState.label.indexOf(prefix) == 0)
 					{
-						var num = weavejs.util.StandardLib.asNumber(tabState.label.substr(prefix.length));
+						var num = StandardLib.asNumber(tabState.label.substr(prefix.length));
 						if (num >= next)
 							next = Math.floor(num) + 1;
 					}
@@ -398,7 +400,7 @@ namespace weavejs.layout
 	Weave.registerClass(
 		TabLayout,
 		'weavejs.layout.TabLayout',
-		[weavejs.api.core.ILinkableVariable],
+		[ILinkableVariable],
 		'Tab Layout'
 	);
 }

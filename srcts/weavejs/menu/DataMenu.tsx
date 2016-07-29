@@ -38,6 +38,14 @@ namespace weavejs.menu
 	import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
 	import GroupedDataTransformEditor = weavejs.editor.GroupedDataTransformEditor;
 	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import ReferencedColumn = weavejs.data.column.ReferencedColumn;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import DataType = weavejs.api.data.DataType;
+	import IKeyFilter = weavejs.api.data.IKeyFilter;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import JS = weavejs.util.JS;
+	import ClassRegistryImpl = weavejs.core.ClassRegistryImpl;
 
 	export class DataMenu implements MenuBarItemProps
 	{
@@ -92,14 +100,14 @@ namespace weavejs.menu
 
 		static getDataSourceItems(weave:Weave, onCreateItem?:(dataSource:IDataSource)=>void)
 		{
-			var registry = weavejs.WeaveAPI.ClassRegistry;
+			var registry = WeaveAPI.ClassRegistry;
 			var impls = registry.getImplementations(IDataSource);
 			
 			// filter out those data sources without editors
 			impls = impls.filter(impl => DataMenu.editorRegistry.has(impl));
 		
 			var items:MenuItemProps[] = [];
-			for (var partition of weavejs.core.ClassRegistryImpl.partitionClassList(impls, IDataSource_File, IDataSource_Service))
+			for (var partition of ClassRegistryImpl.partitionClassList(impls, IDataSource_File, IDataSource_Service))
 			{
 				if (items.length)
 					items.push({});
@@ -115,7 +123,7 @@ namespace weavejs.menu
 							return label;
 						},
 						click: () => {
-							var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(impl);
+							var baseName = WeaveAPI.ClassRegistry.getDisplayName(impl);
 							var path = [weave.root.generateUniqueName(baseName)];
 							var dataSource = weave.requestObject(path, impl);
 							if (onCreateItem)
@@ -130,28 +138,28 @@ namespace weavejs.menu
 
 		static isBeta(impl:new()=>IDataSource):boolean
 		{
-			return impl == weavejs.data.source.CensusDataSource
-				|| impl == weavejs.data.source.GroupedDataTransform
-				|| impl == weavejs.data.source.SpatialJoinTransform;
+			return impl == CensusDataSource
+				|| impl == GroupedDataTransform
+				|| impl == SpatialJoinTransform;
 		}
 		
 		getColumnsToExport=()=>
 		{
-			var columnSet = new Set<weavejs.api.data.IAttributeColumn>();
-			for (var rc of Weave.getDescendants(this.owner.weave.root, weavejs.data.column.ReferencedColumn))
+			var columnSet = new Set<IAttributeColumn>();
+			for (var rc of Weave.getDescendants(this.owner.weave.root, ReferencedColumn))
 			{
 				var col = rc.getInternalColumn();
-				if (col && col.getMetadata(weavejs.api.data.ColumnMetadata.DATA_TYPE) != weavejs.api.data.DataType.GEOMETRY)
+				if (col && col.getMetadata(ColumnMetadata.DATA_TYPE) != DataType.GEOMETRY)
 					columnSet.add(col)
 			}
-			return weavejs.util.JS.toArray(columnSet.values());
+			return JS.toArray(columnSet.values());
 		}
 
 		exportCSV=()=>
 		{
 			var columns = this.getColumnsToExport();
-			var filter = Weave.AS(this.owner.weave.getObject('defaultSubsetKeyFilter'), weavejs.api.data.IKeyFilter);
-			var csv = weavejs.data.ColumnUtils.generateTableCSV(columns, filter);	
+			var filter = Weave.AS(this.owner.weave.getObject('defaultSubsetKeyFilter'), IKeyFilter);
+			var csv = ColumnUtils.generateTableCSV(columns, filter);
 			FileSaver.saveAs(new Blob([csv]), "Weave-data-export.csv");
 		}
 	}

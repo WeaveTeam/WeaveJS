@@ -32,6 +32,7 @@ namespace weavejs.tool
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisTool = weavejs.api.ui.IVisTool;
+	import JS = weavejs.util.JS;
 
 	export class Margin
 	{
@@ -145,7 +146,7 @@ namespace weavejs.tool
 		
 		static initSelectableAttributes(selectableAttributes:Map<string, (IColumnWrapper|ILinkableHashMap)>, input:(IAttributeColumn | IColumnReference)[]):void
 		{
-			var attrs = weavejs.util.JS.mapValues(selectableAttributes);
+			var attrs = JS.mapValues(selectableAttributes);
 			ColumnUtils.initSelectableAttributes(attrs, input);
 		}
 		
@@ -164,7 +165,7 @@ namespace weavejs.tool
 			filter.replaceKeys(true, true);
 		}
 
-		private static localProbeKeySet = new weavejs.data.key.KeySet();
+		private static localProbeKeySet = new KeySet();
 
 		static getMenuItems(target:VisToolGroup):MenuItemProps[]
 		{

@@ -38,7 +38,7 @@ namespace weavejs.menu
 		
 		getCreateObjectItems()
 		{
-			var registry = weavejs.WeaveAPI.ClassRegistry;
+			var registry = WeaveAPI.ClassRegistry;
 			
 			// temporary solution - only include tools we want
 			var impls = [

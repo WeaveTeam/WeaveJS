@@ -27,6 +27,10 @@ namespace weavejs.tool.c3tool
 	import IAltText = weavejs.api.ui.IAltText;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 
 	declare type Record = {
 		id: IQualifiedKey,
@@ -214,7 +218,7 @@ namespace weavejs.tool.c3tool
 				this.dataXType = this.dataX.getMetadata('dataType');
 				this.dataYType = this.dataY.getMetadata('dataType');
 
-				this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+				this.records = ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 				this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
 
 				this.keyToIndex.clear();
@@ -235,7 +239,7 @@ namespace weavejs.tool.c3tool
 				var xLabel:string = Weave.lang(this.xAxisName.value) || this.defaultXAxisLabel;
 				var yLabel:string = Weave.lang(this.yAxisName.value) || this.defaultYAxisLabel;
 
-				if (weavejs.WeaveAPI.Locale.reverseLayout)
+				if (WeaveAPI.Locale.reverseLayout)
 				{
 					this.c3Config.data.axes = {'y': 'y2'};
 					this.c3Config.axis.y2 = this.c3ConfigYAxis;
@@ -347,7 +351,7 @@ namespace weavejs.tool.c3tool
 
 		get defaultPanelTitle():string
 		{
-			return Weave.lang("Scatter Plot of {0} -vs- {1}", weavejs.data.ColumnUtils.getTitle(this.dataX), weavejs.data.ColumnUtils.getTitle(this.dataY));
+			return Weave.lang("Scatter Plot of {0} -vs- {1}", ColumnUtils.getTitle(this.dataX), ColumnUtils.getTitle(this.dataY));
 		}
 
 		get defaultXAxisLabel():string
@@ -421,9 +425,9 @@ namespace weavejs.tool.c3tool
 		C3ScatterPlot,
 		["weavejs.tool.c3tool.C3ScatterPlot", "weave.visualization.tools::ScatterPlotTool"],
 		[
-			weavejs.api.ui.IVisTool,
-			weavejs.api.core.ILinkableObjectWithNewProperties,
-			weavejs.api.data.ISelectableAttributes,
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
 			IAltText
 		],
 		"Scatter Plot"

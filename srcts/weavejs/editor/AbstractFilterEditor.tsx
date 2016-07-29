@@ -47,7 +47,7 @@ namespace weavejs.editor
 		componentWillReceiveProps(props:FilterEditorProps):void
 		{
 			this.filterWatcher.target = props.filter;
-			this.statsWatcher.target = this.column ? weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.column) : null;
+			this.statsWatcher.target = this.column ? WeaveAPI.StatisticsCache.getColumnStatistics(this.column) : null;
 		}
 		
 		get filter():ColumnDataFilter 

@@ -60,6 +60,8 @@ namespace weavejs.tool
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisTool = weavejs.api.ui.IVisTool;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 
 	const SHAPE_TYPE_CIRCLE:string = "circle";
 	const SHAPE_TYPE_SQUARE:string = "square";
@@ -72,7 +74,7 @@ namespace weavejs.tool
 		{label: "Box", value: SHAPE_TYPE_BOX}
 	];
 
-	export class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties, IVisTool, IInitSelectableAttributes
+	export class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements ILinkableObjectWithNewProperties, IVisTool, IInitSelectableAttributes
 	{
 		panelTitle = Weave.linkableChild(this, LinkableString);
 		filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
@@ -537,7 +539,7 @@ namespace weavejs.tool
 	Weave.registerClass(
 		ColorLegend,
 		["weavejs.tool.ColorLegend", "weave.visualization.tools::ColorBinLegendTool"],
-		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
+		[IVisTool, ILinkableObjectWithNewProperties, ISelectableAttributes],
 		"Color Legend"
 	);
 }

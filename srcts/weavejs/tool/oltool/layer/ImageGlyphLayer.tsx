@@ -6,6 +6,9 @@ namespace weavejs.tool.oltool.layer
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import ImageGlyphCache = weavejs.tool.oltool.layer.ImageGlyphCache;
 	import AbstractGlyphLayer = weavejs.tool.oltool.layer.AbstractGlyphLayer;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 
 	export class ImageGlyphLayer extends AbstractGlyphLayer
 	{
@@ -52,7 +55,7 @@ namespace weavejs.tool.oltool.layer
 
 			for (let column of [this.imageSize, this.imageURL, this.dataAlpha, this.dataColor])
 			{
-				let internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column);
+				let internalColumn = ColumnUtils.hack_findInternalDynamicColumn(column);
 				if (internalColumn)
 					additionalColumns.push(internalColumn);
 			}
@@ -117,7 +120,7 @@ namespace weavejs.tool.oltool.layer
 			/* Update feature styles */
 
 			var recordIds:IQualifiedKey[] = this.dataX.keys;
-			var records:any[] = weavejs.data.ColumnUtils.getRecords({
+			var records:any[] = ColumnUtils.getRecords({
 				"alpha": this.dataAlpha,
 				"color": this.dataColor,
 				"imageURL": this.imageURL,
@@ -168,7 +171,7 @@ namespace weavejs.tool.oltool.layer
 	Weave.registerClass(
 		ImageGlyphLayer,
 		["weavejs.tool.oltool.layer.ImageGlyphLayer", "weave.visualization.plotters::ImageGlyphPlotter"],
-		[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
+		[ILinkableObjectWithNewProperties, ISelectableAttributes],
 		"Icons"
 	);
 }

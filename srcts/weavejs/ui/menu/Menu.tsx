@@ -291,7 +291,7 @@ namespace weavejs.ui.menu
 				}
 			}
 
-			if (this.element && weavejs.WeaveAPI.Locale.reverseLayout)
+			if (this.element && WeaveAPI.Locale.reverseLayout)
 			{
 				// TODO fix this logic
 				// var menuRect = this.element.getBoundingClientRect();

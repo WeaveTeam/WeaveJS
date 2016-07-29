@@ -8,6 +8,7 @@ namespace weavejs.editor
 	import ListOption = weavejs.ui.ListOption;
 	import VBox = weavejs.ui.flexbox.VBox;
 	import HBox = weavejs.ui.flexbox.HBox;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 
 	export interface CSVMetadataEditorProps extends React.Props<CSVMetadataEditor>
 	{
@@ -67,7 +68,7 @@ namespace weavejs.editor
 		{
 			let listOptions:ListOption[] = this.state.columnIds.map( (columnId:number|string) => {
 				return {
-					label: this.props.datasource.getColumnById(columnId).getMetadata(weavejs.api.data.ColumnMetadata.TITLE),
+					label: this.props.datasource.getColumnById(columnId).getMetadata(ColumnMetadata.TITLE),
 					value: columnId
 				};
 			});

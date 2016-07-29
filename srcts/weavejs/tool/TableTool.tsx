@@ -34,6 +34,8 @@ namespace weavejs.tool
 	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 	import DataTable = weavejs.ui.DataTable;
+	import KeyColumn = weavejs.data.column.KeyColumn;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 
 	export interface IDataTableState extends IVisToolState
 	{
@@ -105,17 +107,17 @@ namespace weavejs.tool
 		{
 			if (value)
 			{
-				let keyCols = this.columns.getObjects(weavejs.data.column.KeyColumn); 
+				let keyCols = this.columns.getObjects(KeyColumn);
 				if (keyCols.length == 0)
 				{
 					let nameOrder:string[] = this.columns.getNames();
-					this.columns.requestObject(null, weavejs.data.column.KeyColumn);
+					this.columns.requestObject(null, KeyColumn);
 					this.columns.setNameOrder(nameOrder);
 				}
 			}
 			else
 			{
-				let keyColNames = this.columns.getNames(weavejs.data.column.KeyColumn); 
+				let keyColNames = this.columns.getNames(KeyColumn);
 				for (let keyColName of keyColNames)
 				{
 					this.columns.removeObject(keyColName);
@@ -125,7 +127,7 @@ namespace weavejs.tool
 
 		get keyColumnShown():boolean
 		{
-			let keyCols = this.columns.getObjects(weavejs.data.column.KeyColumn);
+			let keyCols = this.columns.getObjects(KeyColumn);
 			return keyCols.length > 0;
 		}
 
@@ -188,14 +190,14 @@ namespace weavejs.tool
 			if (!this.probeKeySet)
 				return;
 			if (ids && ids.length)
-				this.probeKeySet.replaceKeys(ids && ids.map((id) => weavejs.WeaveAPI.QKeyManager.stringToQKey(id)));
+				this.probeKeySet.replaceKeys(ids && ids.map((id) => WeaveAPI.QKeyManager.stringToQKey(id)));
 			else
 				this.probeKeySet.clearKeys();
 		};
 
 		handleSelection=(ids:string[]) =>
 		{
-			this.selectionKeySet.replaceKeys(ids && ids.map((id) => weavejs.WeaveAPI.QKeyManager.stringToQKey(id)));
+			this.selectionKeySet.replaceKeys(ids && ids.map((id) => WeaveAPI.QKeyManager.stringToQKey(id)));
 		};
 
 		get selectableAttributes()
@@ -210,7 +212,7 @@ namespace weavejs.tool
 			if (columns.length == 0)
 				return Weave.lang('Table');
 
-			return Weave.lang("Table of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
+			return Weave.lang("Table of {0}", columns.map(column=>ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
 		}
 
 		static MAX_DEFAULT_COLUMNS = 10;
@@ -268,7 +270,7 @@ namespace weavejs.tool
 
 		handleCellDoubleClick = (rowId:string, columnKey:string)=>
 		{
-			let key: IQualifiedKey = weavejs.WeaveAPI.QKeyManager.stringToQKey(rowId);
+			let key: IQualifiedKey = WeaveAPI.QKeyManager.stringToQKey(rowId);
 			let column: IAttributeColumn = this.columns.getObject(columnKey) as IAttributeColumn;
 
 			this.events.dispatch({ key, column });
@@ -296,14 +298,14 @@ namespace weavejs.tool
 			else
 			{
 				let column = this.columns.getObject(columnKey) as IAttributeColumn;
-				return column && column.getMetadata(weavejs.api.data.ColumnMetadata.TITLE);
+				return column && column.getMetadata(ColumnMetadata.TITLE);
 			}
 		}
 
 		render()
 		{
 			var columnNames = this.columns.getNames(IAttributeColumn);
-			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			if (WeaveAPI.Locale.reverseLayout)
 				columnNames.reverse();
 			
 			return (

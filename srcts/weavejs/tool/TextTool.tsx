@@ -18,6 +18,7 @@ namespace weavejs.tool
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisTool = weavejs.api.ui.IVisTool;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
 	export class TextTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
 	{
@@ -143,7 +144,7 @@ namespace weavejs.tool
 	Weave.registerClass(
 		TextTool,
 		["weavejs.tool.Text", "weave.ui::TextTool"],
-		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
+		[IVisTool, ILinkableObjectWithNewProperties],
 		"Text"
 	);
 }

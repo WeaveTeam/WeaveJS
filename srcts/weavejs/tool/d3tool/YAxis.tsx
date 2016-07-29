@@ -7,7 +7,7 @@ namespace weavejs.tool.d3tool
 		constructor(props:AxisProps)
 		{
 			super(props);
-			this.orientation = weavejs.WeaveAPI.Locale.reverseLayout ? "right" : "left";
+			this.orientation = WeaveAPI.Locale.reverseLayout ? "right" : "left";
 		}
 
 		componentDidUpdate()

@@ -1,8 +1,11 @@
 namespace weavejs.ui
 {
-	export class LinkableDynamicComponent extends React.Component<any, any> implements weavejs.api.core.ILinkableVariable
+	import ILinkableVariable = weavejs.api.core.ILinkableVariable;
+	import LinkableVariable = weavejs.core.LinkableVariable;
+
+	export class LinkableDynamicComponent extends React.Component<any, any> implements ILinkableVariable
 	{
-		private linkableState = Weave.linkableChild(this, weavejs.core.LinkableVariable, this.forceUpdate, true);
+		private linkableState = Weave.linkableChild(this, LinkableVariable, this.forceUpdate, true);
 		
 		getSessionState():any
 		{
@@ -48,5 +51,5 @@ namespace weavejs.ui
 		}
 	}
 
-	Weave.registerClass(LinkableDynamicComponent, 'weavejs.ui.LinkableDynamicComponent', [weavejs.api.core.ILinkableVariable]);
+	Weave.registerClass(LinkableDynamicComponent, 'weavejs.ui.LinkableDynamicComponent', [ILinkableVariable]);
 }

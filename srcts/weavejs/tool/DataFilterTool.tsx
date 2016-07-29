@@ -30,6 +30,7 @@ namespace weavejs.tool
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
 	import IVisTool = weavejs.api.ui.IVisTool;
+	import CallbackCollection = weavejs.core.CallbackCollection;
 
 	export class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 	{
@@ -51,7 +52,7 @@ namespace weavejs.tool
 		private initLater():void
 		{
 			// only set default path if session state hasn't been set yet
-			if (this.filter.triggerCounter == weavejs.core.CallbackCollection.DEFAULT_TRIGGER_COUNT)
+			if (this.filter.triggerCounter == CallbackCollection.DEFAULT_TRIGGER_COUNT)
 				this.filter.targetPath = ["defaultSubsetKeyFilter", "filters", Weave.getRoot(this).getName(this)];
 			if (!this.getFilter())
 				this.setEditorType(DiscreteValuesDataFilterEditor, null);
@@ -190,7 +191,7 @@ namespace weavejs.tool
 	Weave.registerClass(
 		DataFilterTool,
 		["weavejs.tool.DataFilter", "weave.ui::DataFilterTool"],
-		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
+		[IVisTool, ILinkableObjectWithNewProperties],
 		"Data Filter"
 	);
 

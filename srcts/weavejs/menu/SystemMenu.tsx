@@ -6,6 +6,7 @@ namespace weavejs.menu
 	import ServiceLogin = weavejs.admin.ServiceLogin;
 	import PopupWindow = weavejs.dialog.PopupWindow;
 	import IWeaveMenus = weavejs.menu.IWeaveMenus;
+	import Admin = weavejs.net.Admin;
 
 	export class SystemMenu implements MenuBarItemProps
 	{
@@ -46,14 +47,14 @@ namespace weavejs.menu
 				},
 				{},
 				{
-					label: weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", weavejs.net.Admin.instance.activeConnectionName) : Weave.lang("Sign in..."),
+					label: Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", Admin.instance.activeConnectionName) : Weave.lang("Sign in..."),
 					click: this.owner.login.open,
-					shown: weavejs.net.Admin.service.initialized
+					shown: Admin.service.initialized
 				},
 				{
-					enabled: weavejs.net.Admin.instance.userHasAuthenticated,
+					enabled: Admin.instance.userHasAuthenticated,
 					label: Weave.lang("Sign out"),
-					shown: weavejs.net.Admin.service.initialized,
+					shown: Admin.service.initialized,
 					click: () => {
 						let signedOutPopup = () => PopupWindow.open(
 							{
@@ -63,7 +64,7 @@ namespace weavejs.menu
 							}
 						);
 						/* Log in with invalid credentials to drop session */
-						weavejs.net.Admin.service.authenticate("", "").then(signedOutPopup, signedOutPopup);
+						Admin.service.authenticate("", "").then(signedOutPopup, signedOutPopup);
 					}
 				}
 			);

@@ -109,7 +109,7 @@ namespace weavejs.app
 		{
 			var renderPath:WeavePathArray = null;
 			if (this.props.readUrlParams)
-				renderPath = weavejs.WeaveAPI.CSVParser.parseCSVRow(this.urlParams.layout);
+				renderPath = WeaveAPI.CSVParser.parseCSVRow(this.urlParams.layout);
 			return renderPath || this.props.renderPath || WeaveApp.defaultProps.renderPath;
 		}
 
@@ -353,7 +353,7 @@ namespace weavejs.app
 			var firstDataSet = ColumnUtils.map_root_firstDataSet.get(weave.root);
 
 			// need to generate path here instead of letting LinkableHashMap generate a name because async types can't be instantiated immediately
-			var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type);
+			var baseName = WeaveAPI.ClassRegistry.getDisplayName(type);
 			var path = [weave.root.generateUniqueName(baseName)];
 			weave.requestObject(path, type);
 			var possiblePlaceholder = weave.getObject(path);
@@ -478,7 +478,7 @@ namespace weavejs.app
 						// create a window layout and select its tab
 						activeTabIndex = 0;
 						WeaveReactUtils.requestObject(this.props.weave, this.getDefaultLayoutPath(), WindowLayout, (windowLayout:WindowLayout) => {
-							var ids:WeavePathArray[] = this.props.weave.root.getNames(weavejs.api.ui.IVisTool, true).map(name => [name]);
+							var ids:WeavePathArray[] = this.props.weave.root.getNames(IVisTool, true).map(name => [name]);
 							windowLayout.setSessionState({
 								panels: ids.map(id => {
 									var state = DynamicState.traverseState(history.currentState, id);

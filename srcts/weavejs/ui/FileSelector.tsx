@@ -13,7 +13,7 @@ namespace weavejs.ui
 
 	import LinkableFile = weavejs.core.LinkableFile;
 	import LinkableString = weavejs.core.LinkableString;
-	var URLRequestUtils = weavejs.WeaveAPI.URLRequestUtils;
+	var URLRequestUtils = WeaveAPI.URLRequestUtils;
 
 	export interface IFileSelectorProps extends React.HTMLProps<FileSelector>
 	{

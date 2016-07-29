@@ -58,6 +58,10 @@ namespace weavejs.tool.oltool
 	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 	import ILinkableObjectWithNewPaths = weavejs.api.core.ILinkableObjectWithNewPaths;
 	import Projections = weavejs.tool.oltool.Projections;
+	import CallbackCollection = weavejs.core.CallbackCollection;
+	import StreamedGeometryColumn = weavejs.data.column.StreamedGeometryColumn;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import ColorColumn = weavejs.data.column.ColorColumn;
 
 	interface Alignment
 	{
@@ -88,10 +92,10 @@ namespace weavejs.tool.oltool
 
 	export class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> implements IOpenLayersMapTool, IAltText
 	{
-		static isGeomColumnOrRef(column: (weavejs.api.data.IAttributeColumn | weavejs.api.data.IColumnReference)):boolean
+		static isGeomColumnOrRef(column: (IAttributeColumn | IColumnReference)):boolean
 		{
-			let iac = Weave.AS(column, weavejs.api.data.IAttributeColumn);
-			let icr = Weave.AS(column, weavejs.api.data.IColumnReference);
+			let iac = Weave.AS(column, IAttributeColumn);
+			let icr = Weave.AS(column, IColumnReference);
 
 			let dataType: string;
 			if (iac) {
@@ -216,12 +220,12 @@ namespace weavejs.tool.oltool
 			/* Force the inclusion of the layers. */
 			GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
 
-			weavejs.WeaveAPI.Scheduler.callLater(this, this.initLater);
+			WeaveAPI.Scheduler.callLater(this, this.initLater);
 		}
 		
 		private initLater():void
 		{
-			if (this.interactionMode.triggerCounter == weavejs.core.CallbackCollection.DEFAULT_TRIGGER_COUNT)
+			if (this.interactionMode.triggerCounter == CallbackCollection.DEFAULT_TRIGGER_COUNT)
 			{
 				/* use global interaction mode as default local mode */
 				var defaultDragMode = Weave.getWeave(this).getObject("WeaveProperties", "toolInteractions", "defaultDragMode") as LinkableString;
@@ -234,7 +238,7 @@ namespace weavejs.tool.oltool
 
 
 
-		initSelectableAttributes(input: (weavejs.api.data.IAttributeColumn | weavejs.api.data.IColumnReference)[]): void
+		initSelectableAttributes(input: (IAttributeColumn | IColumnReference)[]): void
 		{
 			this.layers.requestObject('', TileLayer);
 			let geoColumns = input.filter(OpenLayersMapTool.isGeomColumnOrRef);
@@ -246,7 +250,7 @@ namespace weavejs.tool.oltool
 				let geoLayer = this.layers.requestObject('', GeometryLayer) as GeometryLayer;
 				if (geoLayer) ColumnUtils.initSelectableAttribute(geoLayer.geometryColumn, geoColumns[0]);
 				let selectableAttributes = geoLayer.selectableAttributes;
-				let colorDataColumn = (Weave.getWeave(this).getObject(["defaultColorDataColumn"]) as weavejs.data.column.DynamicColumn);
+				let colorDataColumn = (Weave.getWeave(this).getObject(["defaultColorDataColumn"]) as DynamicColumn);
 				if (!colorDataColumn.getInternalColumn() && nonGeoColumns[0])
 				{
 					ColumnUtils.initSelectableAttribute(colorDataColumn, nonGeoColumns[0]);
@@ -446,7 +450,7 @@ namespace weavejs.tool.oltool
 			this.layers.childListCallbacks.addImmediateCallback(this, this.updatePlotters_weaveToOl, true);
 			Weave.getCallbacks(this.zoomBounds).addGroupedCallback(this, this.updateZoomAndCenter_weaveToOl, true);
 
-			weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
+			WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
 		}
 
 
@@ -560,7 +564,7 @@ namespace weavejs.tool.oltool
 		{
 			var [xCenter, yCenter] = this.map.getView().getCenter();
 
-			var dataBounds = new weavejs.geom.Bounds2D();
+			var dataBounds = new Bounds2D();
 			this.zoomBounds.getDataBounds(dataBounds);
 			dataBounds.setXCenter(xCenter);
 			dataBounds.setYCenter(yCenter);
@@ -589,8 +593,8 @@ namespace weavejs.tool.oltool
 			let view = this.map.getView();
 			var resolution = view.getResolution();
 
-			var dataBounds = new weavejs.geom.Bounds2D();
-			var screenBounds = new weavejs.geom.Bounds2D();
+			var dataBounds = new Bounds2D();
+			var screenBounds = new Bounds2D();
 			this.zoomBounds.getDataBounds(dataBounds);
 			this.zoomBounds.getScreenBounds(screenBounds);
 			dataBounds.setWidth(screenBounds.getWidth() * resolution);
@@ -603,7 +607,7 @@ namespace weavejs.tool.oltool
 
 		updateZoomAndCenter_weaveToOl():void
 		{
-			var dataBounds = new weavejs.geom.Bounds2D();
+			var dataBounds = new Bounds2D();
 			this.zoomBounds.getDataBounds(dataBounds);
 
 			if (dataBounds.isEmpty())
@@ -656,17 +660,17 @@ namespace weavejs.tool.oltool
 				var layer:AbstractFeatureLayer = this.layers.getObject(name) as AbstractFeatureLayer;
 				if (!(layer instanceof AbstractFeatureLayer))
 					continue;
-				for (var sgc of Weave.getDescendants(this.layers.getObject(name), weavejs.data.column.StreamedGeometryColumn))
+				for (var sgc of Weave.getDescendants(this.layers.getObject(name), StreamedGeometryColumn))
 				{
 					if (layer.inputProjection == layer.outputProjection)
 					{
-						weavejs.data.column.StreamedGeometryColumn.metadataRequestMode = 'xyz';
+						StreamedGeometryColumn.metadataRequestMode = 'xyz';
 						sgc.requestGeometryDetailForZoomBounds(this.zoomBounds);
 					}
 					else
 					{
 						//TODO - don't request everything when reprojecting
-						weavejs.data.column.StreamedGeometryColumn.metadataRequestMode = 'all';
+						StreamedGeometryColumn.metadataRequestMode = 'all';
 						sgc.requestGeometryDetail(sgc.collectiveBounds, 0);
 					}
 				}
@@ -747,22 +751,22 @@ namespace weavejs.tool.oltool
 
 		get defaultPanelTitle():string
 		{
-			let columns = Weave.getDescendants(this, weavejs.data.column.ColorColumn) as weavejs.data.column.ColorColumn[];
+			let columns = Weave.getDescendants(this, ColorColumn) as ColorColumn[];
 
 			if (!columns.length)
 			{
 				return Weave.lang("Map");
 			}
 
-			return Weave.lang("Map of {0}", weavejs.data.ColumnUtils.getTitle(columns[0]));
+			return Weave.lang("Map of {0}", ColumnUtils.getTitle(columns[0]));
 		}
 
 
 
 
-		getExtent():weavejs.geom.Bounds2D
+		getExtent():Bounds2D
 		{
-			let bounds = new weavejs.geom.Bounds2D();
+			let bounds = new Bounds2D();
 			let viewExtent:ol.Extent = this.map.getView().get("extent");
 			if (viewExtent)
 			{
@@ -839,7 +843,7 @@ namespace weavejs.tool.oltool
 			if (!Projections.projectionDbReadyOrFailed)
 			{
 				console.log("Projection database not ready; delaying initialization of map");
-				weavejs.WeaveAPI.Scheduler.callLater(this, this.componentDidMount);
+				WeaveAPI.Scheduler.callLater(this, this.componentDidMount);
 				return;
 			}
 			this.initializeMap();
@@ -893,7 +897,7 @@ namespace weavejs.tool.oltool
 		// so then when it mounted back , state object can re applied and maintained.
 		// todo: makes a Base class for all Editor Class with componentWillUnmount implemented
 		componentWillUnmount(){
-			let displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.props.tool.constructor as new (..._: any[]) => any)
+			let displayName = WeaveAPI.ClassRegistry.getDisplayName(this.props.tool.constructor as new (..._: any[]) => any)
 			this.props.pushCrumb(displayName,null,this.state);
 		}
 

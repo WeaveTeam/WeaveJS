@@ -12,6 +12,7 @@ namespace weavejs.dialog
 	import ObjectDataTable = weavejs.ui.ObjectDataTable;
 	import Button = weavejs.ui.Button;
 	import FileInfoView = weavejs.ui.FileInfoView;
+	import Admin = weavejs.net.Admin;
 
 	export class WeaveServerFileOpenComponent extends SmartComponent<IOpenFileProps, IOpenFileState>
 	{
@@ -27,7 +28,7 @@ namespace weavejs.dialog
 				fileNames:[],
 				allFiles:true
 			}
-			this.login = new ServiceLogin(this.props.context, weavejs.net.Admin.service);
+			this.login = new ServiceLogin(this.props.context, Admin.service);
 		}
 
 		handleSuccess=(fields:any) =>
@@ -36,7 +37,7 @@ namespace weavejs.dialog
 		};
 
 		getWeaveFiles=() => {
-			weavejs.net.Admin.service.getWeaveFileNames(this.state.allFiles).then( (fileNames:string[]) => {
+			Admin.service.getWeaveFileNames(this.state.allFiles).then( (fileNames:string[]) => {
 				this.setState({
 					fileNames
 				});
@@ -155,7 +156,7 @@ namespace weavejs.dialog
 												rowHeight={40}
 												onSelection={(selectedFiles:string[]) => {
 													if (selectedFiles[0])
-														weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then(
+														Admin.service.getWeaveFileInfo(selectedFiles[0]).then(
 															(fileInfo:WeaveFileInfo) => {
 																if (this.element)
 																	this.setState({
@@ -169,13 +170,13 @@ namespace weavejs.dialog
 							</VBox>
 						</VBox>
 						<VBox style={ {flex: 1, paddingLeft: 20} }>
-							<span style={{alignSelf: "flex-end"}}>{weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", weavejs.net.Admin.instance.activeConnectionName) : Weave.lang("Not signed in")}</span>
+							<span style={{alignSelf: "flex-end"}}>{Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", Admin.instance.activeConnectionName) : Weave.lang("Not signed in")}</span>
 							<Button
 								colorClass="primary"
 								onClick={() => {
-									if (weavejs.net.Admin.instance.userHasAuthenticated)
+									if (Admin.instance.userHasAuthenticated)
 									{
-										weavejs.net.Admin.service.authenticate("","").then(() => {
+										Admin.service.authenticate("","").then(() => {
 											this.setState({
 												fileNames: [],
 												fileInfo: null
@@ -193,7 +194,7 @@ namespace weavejs.dialog
 								}}
 								style={{alignSelf: "flex-end"}}
 							>
-								{weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Sign Out") : Weave.lang("Sign in")}
+								{Admin.instance.userHasAuthenticated ? Weave.lang("Sign Out") : Weave.lang("Sign in")}
 							</Button>
 							<FileInfoView fileInfo={this.state.fileInfo}>
 								{this.state.fileInfo ?

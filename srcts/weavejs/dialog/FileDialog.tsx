@@ -127,7 +127,7 @@ namespace weavejs.dialog
 									if (selectedValues[0] == FileDialog.NEW_SESSION)
 									{
 										this.forceUpdate();
-										weavejs.WeaveAPI.Scheduler.callLater(this, this.confirmOpenHandler, [null]);
+										WeaveAPI.Scheduler.callLater(this, this.confirmOpenHandler, [null]);
 									}
 									else
 									{

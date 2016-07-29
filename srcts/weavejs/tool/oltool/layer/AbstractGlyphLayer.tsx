@@ -6,6 +6,7 @@ namespace weavejs.tool.oltool.layer
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 	import Projections = weavejs.tool.oltool.Projections;
+	import ColumnUtils = weavejs.data.ColumnUtils;
 
 	interface LocationRecord
 	{
@@ -79,7 +80,7 @@ namespace weavejs.tool.oltool.layer
 		{
 			/* Update feature locations */
 			var recordIds = _.intersection.apply(null, this.requiredAttributes.map((attr) => attr.keys));
-			var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, recordIds);
+			var records:Array<LocationRecord> = ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, recordIds);
 			var removedIds = _.difference(this._getFeatureIds(), recordIds);
 
 			var rawProj = Projections.getProjection(this.inputProjection);

@@ -8,6 +8,7 @@ namespace weavejs.menu
 	import ChartsMenu = weavejs.menu.ChartsMenu;
 	import ControllersMenu = weavejs.menu.ControllersMenu;
 	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
+	import Admin = weavejs.net.Admin;
 
 	export type CreateObjectFunction = (type:Class)=>void;
 
@@ -38,8 +39,8 @@ namespace weavejs.menu
 			
 			/* Forces the initialization of the service. */
 			/* Hopefully the init flag gets set before our first 'get menu'. */
-			weavejs.net.Admin.service.getAuthenticatedUser().then(_.noop, _.noop);
-			this.login = new ServiceLogin(context, weavejs.net.Admin.service);
+			Admin.service.getAuthenticatedUser().then(_.noop, _.noop);
+			this.login = new ServiceLogin(context, Admin.service);
 			
 			this.fileMenu = new FileMenu(this);
 			this.systemMenu = new SystemMenu(this);

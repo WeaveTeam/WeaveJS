@@ -45,9 +45,13 @@ namespace weavejs.tool.c3tool
 	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
 	import IColumnReference = weavejs.api.data.IColumnReference;
 	import ColumnUtils = weavejs.data.ColumnUtils;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import JS = weavejs.util.JS;
 
 	declare type Record = {
-		id: weavejs.api.data.IQualifiedKey,
+		id: IQualifiedKey,
 		binnedColumn: number,
 		columnToAggregate: number
 	};
@@ -182,7 +186,7 @@ namespace weavejs.tool.c3tool
 						if (d && d.hasOwnProperty("index"))
 						{
 							var binIndex = d.index;
-							if (weavejs.WeaveAPI.Locale.reverseLayout)
+							if (WeaveAPI.Locale.reverseLayout)
 								binIndex = this.histData.length - 1 - binIndex;
 							var cc = this.internalColorColumn;
 							if (cc)
@@ -271,7 +275,7 @@ namespace weavejs.tool.c3tool
 
 		private getLabelString(num:number):string
 		{
-			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			if (WeaveAPI.Locale.reverseLayout)
 			{
 				//handle case where labels need to be reversed
 				var temp:number = this.histData.length-1;
@@ -411,7 +415,7 @@ namespace weavejs.tool.c3tool
 
 		private dataChanged()
 		{
-			this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+			this.records = ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 
 			this.histData = [];
 
@@ -440,7 +444,7 @@ namespace weavejs.tool.c3tool
 			}
 
 			this.keys = { value: ["height"] };
-			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			if (WeaveAPI.Locale.reverseLayout)
 			{
 				this.histData = this.histData.reverse();
 			}
@@ -487,7 +491,7 @@ namespace weavejs.tool.c3tool
 				if (this.records)
 				{
 					var temp:string = "height";
-					if (weavejs.WeaveAPI.Locale.reverseLayout)
+					if (WeaveAPI.Locale.reverseLayout)
 					{
 						this.c3Config.data.axes = {[temp]:'y2'};
 						this.c3Config.axis.y2 = this.c3ConfigYAxis;
@@ -534,7 +538,7 @@ namespace weavejs.tool.c3tool
 					if (isFinite(index))
 						set_indices.add(index);
 				}
-				this.chart.select(["height"], weavejs.util.JS.toArray(set_indices), true);
+				this.chart.select(["height"], JS.toArray(set_indices), true);
 			}
 			else
 			{
@@ -557,7 +561,7 @@ namespace weavejs.tool.c3tool
 		get defaultPanelTitle():string
 		{
 			if (this.binnedColumn.numberOfBins)
-				return Weave.lang("Histogram of {0}", weavejs.data.ColumnUtils.getTitle(this.binnedColumn));
+				return Weave.lang("Histogram of {0}", ColumnUtils.getTitle(this.binnedColumn));
 
 			return Weave.lang("Histogram");
 		}
@@ -690,9 +694,9 @@ namespace weavejs.tool.c3tool
 		C3Histogram,
 		["weavejs.tool.c3tool.C3Histogram", "weave.visualization.tools::HistogramTool"],
 		[
-			weavejs.api.ui.IVisTool,
-			weavejs.api.core.ILinkableObjectWithNewProperties,
-			weavejs.api.data.ISelectableAttributes,
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
 			IAltText
 		],
 		"Histogram"

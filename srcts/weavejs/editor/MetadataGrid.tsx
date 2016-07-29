@@ -11,6 +11,7 @@ namespace weavejs.editor
 	import HBox = weavejs.ui.flexbox.HBox;
 	import ComboBoxOption = weavejs.ui.ComboBoxOption;
 	import IRow = weavejs.ui.IRow;
+	import EntityMetadata = weavejs.api.net.beans.EntityMetadata;
 
 	export type MetadataEntry = {[key:string]:any};
 
@@ -167,7 +168,7 @@ namespace weavejs.editor
 			let columnIds = ["property","value"];
 			let columnTitles: {[columnId: string]: string|JSX.Element} = {property:Weave.lang("Property"),value:Weave.lang("Value")};
 
-			let options:ComboBoxOption[] = _.difference(weavejs.api.net.beans.EntityMetadata.getSuggestedPublicPropertyNames(),_.keys(entry)).map( (name:any,index:number) => {
+			let options:ComboBoxOption[] = _.difference(EntityMetadata.getSuggestedPublicPropertyNames(),_.keys(entry)).map( (name:any,index:number) => {
 				return {label: String(name), value: name} as ComboBoxOption;
 			});
 

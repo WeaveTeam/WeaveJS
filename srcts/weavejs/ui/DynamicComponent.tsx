@@ -55,5 +55,5 @@ namespace weavejs.ui
 		}
 	}
 
-	weavejs.WeaveAPI.ClassRegistry.registerClass(DynamicComponent, 'weavejs.ui.DynamicComponent');
+	WeaveAPI.ClassRegistry.registerClass(DynamicComponent, 'weavejs.ui.DynamicComponent');
 }

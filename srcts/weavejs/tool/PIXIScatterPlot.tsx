@@ -8,6 +8,9 @@ namespace weavejs.tool
 	import DOMUtils = weavejs.util.DOMUtils;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import IVisTool = weavejs.api.ui.IVisTool;
 
 	export interface PIXIScatterPlotProps extends IVisToolProps
 	{
@@ -81,9 +84,9 @@ namespace weavejs.tool
 		PIXIScatterPlot,
 		["weavejs.tool.PIXIScatterPlot"/*, "weave.visualization.tools::ScatterPlotTool"*/],
 		[
-			weavejs.api.ui.IVisTool,
-			weavejs.api.core.ILinkableObjectWithNewProperties,
-			weavejs.api.data.ISelectableAttributes,
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
 		],
 		"Scatter Plot"
 	);

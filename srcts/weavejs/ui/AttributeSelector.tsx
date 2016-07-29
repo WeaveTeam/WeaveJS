@@ -84,7 +84,7 @@ namespace weavejs.ui
 				/* Update rootNode and callbacks on rootnode */
 				if (this.rootNode)
 					Weave.getCallbacks(this.rootNode).removeCallback(this, this.forceUpdate);
-				this.rootNode = new weavejs.data.hierarchy.WeaveRootDataTreeNode(Weave.getRoot(nextAttribute));
+				this.rootNode = new WeaveRootDataTreeNode(Weave.getRoot(nextAttribute));
 				Weave.getCallbacks(this.rootNode).addGroupedCallback(this, this.forceUpdate);
 			}
 		}
@@ -125,7 +125,7 @@ namespace weavejs.ui
 				{
 					var lhm = Weave.AS(this.selectedAttribute, ILinkableHashMap);
 					if (lhm)
-						lhm.requestObject(null, weavejs.data.column.ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+						lhm.requestObject(null, ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
 				}
 			}
 		}
@@ -151,7 +151,7 @@ namespace weavejs.ui
 
 		onSelectColumn=(selectedItems:Array<IWeaveTreeNode>):void =>
 		{
-			var ref = Weave.AS(selectedItems[0], weavejs.api.data.IColumnReference);
+			var ref = Weave.AS(selectedItems[0], IColumnReference);
 			if (ref && !this.usingHashMap)
 			{
 				var meta = ref.getColumnMetadata();

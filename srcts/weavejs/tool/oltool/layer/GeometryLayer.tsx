@@ -15,6 +15,9 @@ namespace weavejs.tool.oltool.layer
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import NormalizedColumn = weavejs.data.column.NormalizedColumn;
 	import AbstractFeatureLayer = weavejs.tool.oltool.layer.AbstractFeatureLayer;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 
 	export class GeometryLayer extends AbstractFeatureLayer
 	{
@@ -106,7 +109,7 @@ namespace weavejs.tool.oltool.layer
 			var keys:Array<IQualifiedKey> = this.filteredKeySet.keys;
 			if (idc.getMetadata(ColumnMetadata.DATA_TYPE) != DataType.GEOMETRY)
 				return;
-			var rawGeometries = weavejs.data.ColumnUtils.getGeoJsonGeometries(idc, keys);
+			var rawGeometries = ColumnUtils.getGeoJsonGeometries(idc, keys);
 
 			for (let idx = 0; idx < keys.length; idx++)
 			{
@@ -142,7 +145,7 @@ namespace weavejs.tool.oltool.layer
 
 			for (let column of Weave.getPath(this.fill).getChildren().concat(Weave.getPath(this.line).getChildren()))
 			{
-				let internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column.getObject());
+				let internalColumn = ColumnUtils.hack_findInternalDynamicColumn(column.getObject());
 				if (internalColumn)
 					additionalColumns.push(internalColumn);
 			}
@@ -215,7 +218,7 @@ namespace weavejs.tool.oltool.layer
 	Weave.registerClass(
 		GeometryLayer,
 		["weavejs.tool.oltool.layer.GeometryLayer", "weave.visualization.plotters::GeometryPlotter"],
-		[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
+		[ILinkableObjectWithNewProperties, ISelectableAttributes],
 		"Geometries"
 	);
 }

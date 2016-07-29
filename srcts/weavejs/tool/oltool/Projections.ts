@@ -38,7 +38,7 @@ namespace weavejs.tool.oltool
 
 		static loadProjDatabase():WeavePromise<boolean>
 		{
-			return weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip")).then(
+			return WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip")).then(
 				(result: Uint8Array) => JSZip().loadAsync(result)
 			).then(
 				(zip: JSZip) => zip.file("ProjDatabase.json").async("string")

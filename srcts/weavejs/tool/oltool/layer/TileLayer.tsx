@@ -10,6 +10,7 @@ namespace weavejs.tool.oltool.layer
 
 	import LinkableString = weavejs.core.LinkableString;
 	import LinkableVariable = weavejs.core.LinkableVariable;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
 	interface ITileLayerEditorProps
 	{
@@ -339,7 +340,7 @@ namespace weavejs.tool.oltool.layer
 	Weave.registerClass(
 		TileLayer,
 		["weavejs.tool.oltool.layer.TileLayer", "weave.visualization.plotters::WMSPlotter"],
-		[weavejs.api.core.ILinkableObjectWithNewProperties],
+		[ILinkableObjectWithNewProperties],
 		"Base map"
 	);
 }

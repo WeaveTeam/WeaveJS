@@ -18,6 +18,8 @@ namespace weavejs.tool.d3tool
 	import StandardLib = weavejs.util.StandardLib;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
 	export declare type ScatterPlotRecord = {
 		id: IQualifiedKey,
@@ -68,14 +70,14 @@ namespace weavejs.tool.d3tool
 		lineY = Weave.linkableChild(this, DynamicColumn);
 		lineGrouBy = Weave.linkableChild(this, DynamicColumn);
 
-		private boxWhiskerXStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.boxwhiskerX));
-		private boxWhiskerYStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.boxwhiskerY));
+		private boxWhiskerXStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.boxwhiskerX));
+		private boxWhiskerYStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.boxwhiskerY));
 
-		private scatterXStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.scatterX));
-		private scatterYStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.scatterY));
+		private scatterXStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.scatterX));
+		private scatterYStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.scatterY));
 
-		private lineXStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.lineX));
-		private lineYStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.lineY));
+		private lineXStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.lineX));
+		private lineYStats = Weave.linkableChild(this, WeaveAPI.StatisticsCache.getColumnStatistics(this.lineY));
 		// selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 		// probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
 		// filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
@@ -330,7 +332,7 @@ namespace weavejs.tool.d3tool
 	Weave.registerClass(
 		BoxWhiskerPlot,
 		"weavejs.tool.d3tool.BoxWhiskerPlot",
-		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
+		[IVisTool, ILinkableObjectWithNewProperties],
 		"Box and Whisker Plot"
 	);
 }

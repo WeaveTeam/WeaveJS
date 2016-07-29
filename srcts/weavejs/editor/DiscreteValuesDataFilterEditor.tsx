@@ -12,6 +12,7 @@ namespace weavejs.editor
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import DataType = weavejs.api.data.DataType;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import ColumnUtils = weavejs.data.ColumnUtils;
 
 	export const LAYOUT_LIST:string = "List";
 	export const LAYOUT_COMBO:string = "ComboBox";
@@ -55,7 +56,7 @@ namespace weavejs.editor
 		getChoices():FilterOption[]
 		{
 			var dataType = DataType.getClass(this.column.getMetadata(ColumnMetadata.DATA_TYPE));
-			this.options = weavejs.data.ColumnUtils.getRecords(
+			this.options = ColumnUtils.getRecords(
 				{ value: this.column, label: this.column },
 				this.column.keys,
 				{ value: dataType, label: String }
@@ -79,5 +80,5 @@ namespace weavejs.editor
 		}
 	}
 
-	Weave.registerClass(DiscreteValuesDataFilterEditor, "weavejs.editor.DiscreteValuesDataFilterEditor", [weavejs.api.core.ILinkableObjectWithNewProperties]);
+	Weave.registerClass(DiscreteValuesDataFilterEditor, "weavejs.editor.DiscreteValuesDataFilterEditor", [ILinkableObjectWithNewProperties]);
 }

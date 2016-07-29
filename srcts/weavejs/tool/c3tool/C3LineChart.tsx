@@ -24,6 +24,10 @@ namespace weavejs.tool.c3tool
 	import IAltText = weavejs.api.ui.IAltText;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
 	declare type Record = {
 		id: IQualifiedKey,
@@ -134,7 +138,7 @@ namespace weavejs.tool.c3tool
 							multiline: false,
 							rotate: this.xAxisLabelAngle.value,
 							format: (d:number):string => {
-								if (weavejs.WeaveAPI.Locale.reverseLayout)
+								if (WeaveAPI.Locale.reverseLayout)
 								{
 									//handle case where labels need to be reversed
 									var temp:number = this.columnLabels.length-1;
@@ -202,7 +206,7 @@ namespace weavejs.tool.c3tool
 				var columns = this.columns.getObjects(IAttributeColumn);
 				this.filteredKeySet.setColumnKeySources(columns);
 			
-				if (weavejs.WeaveAPI.Locale.reverseLayout)
+				if (WeaveAPI.Locale.reverseLayout)
 					columns.reverse();
 				this.RECORD_FORMAT.columns = [IQualifiedKey as any].concat(columns);
 
@@ -213,7 +217,7 @@ namespace weavejs.tool.c3tool
 					this.columnLabels.push(title);
 				}
 
-				this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+				this.records = ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 				this.records = _.sortBy(this.records, [0, "id"]);
 
 				this.keyToIndex = {};
@@ -242,7 +246,7 @@ namespace weavejs.tool.c3tool
 				if (this.records)
 				{
 					var axes:any =  {};
-					if (weavejs.WeaveAPI.Locale.reverseLayout)
+					if (WeaveAPI.Locale.reverseLayout)
 					{
 						this.records.forEach( (record:Record) => {
 							axes[record.id as any] = 'y2';
@@ -376,7 +380,7 @@ namespace weavejs.tool.c3tool
 			if (columns.length == 0)
 				return Weave.lang('Line chart');
 
-			return Weave.lang("Line chart of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
+			return Weave.lang("Line chart of {0}", columns.map(column=>ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
 		}
 
 		//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
@@ -433,9 +437,9 @@ namespace weavejs.tool.c3tool
 		C3LineChart,
 		["weavejs.tool.c3tool.C3LineChart", "weave.visualization.tools::LineChartTool"],
 		[
-			weavejs.api.ui.IVisTool,
-			weavejs.api.core.ILinkableObjectWithNewProperties,
-			weavejs.api.data.ISelectableAttributes,
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
 			IAltText
 		],
 		"Line Chart"
