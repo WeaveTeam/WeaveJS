@@ -43,6 +43,8 @@ namespace weavejs.tool.c3tool
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
+	import IColumnReference = weavejs.api.data.IColumnReference;
+	import ColumnUtils = weavejs.data.ColumnUtils;
 
 	declare type Record = {
 		id: weavejs.api.data.IQualifiedKey,
@@ -70,6 +72,11 @@ namespace weavejs.tool.c3tool
 		private verifyBarRatio(ratio:number):boolean
 		{
 			return (0.0 < ratio) && (ratio < 1.0);
+		}
+
+		initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
+		{
+			ColumnUtils.initSelectableAttribute(this.fill.color, input[0]);
 		}
 
 		get colorColumn()

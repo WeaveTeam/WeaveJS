@@ -857,10 +857,10 @@ package weavejs.data
 		/**
 		 * This will initialize one selectable attribute using a column or column reference. 
 		 * @param selectableAttribute A selectable attribute (IColumnWrapper/ILinkableHashMap/ReferencedColumn)
-		 * @param column_or_columnReference Either an IAttributeColumn or an ILinkableHashMap
+		 * @param column_or_columnReference Either an IAttributeColumn or an IColumnReference
 		 * @param clearHashMap If the selectableAttribute is an ILinkableHashMap, all objects will be removed from it prior to adding a column.
 		 */
-		public static function initSelectableAttribute(selectableAttribute:Object, column_or_columnReference:Object, clearHashMap:Boolean = true):void
+		public static function initSelectableAttribute(selectableAttribute:/*/IColumnWrapper|ILinkableHashMap/*/Object, column_or_columnReference:/*/IAttributeColumn|IColumnReference/*/Object, clearHashMap:Boolean = true):void
 		{
 			var inputCol:IAttributeColumn = column_or_columnReference as IAttributeColumn;
 			var inputRef:IColumnReference = column_or_columnReference as IColumnReference;
