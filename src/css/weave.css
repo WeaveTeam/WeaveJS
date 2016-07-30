@@ -1310,6 +1310,14 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	opacity: .45;
 }
 
+.weave-error-border {
+	border: 1px solid indianred;
+}
+
+.weave-normal-border {
+	border: 1px solid lightgrey;
+}
+
 .ReactCodeMirror {
 	display: flex;
 	flex: 1;

@@ -6,6 +6,7 @@ import * as Clipboard from "clipboard";
 import * as classNames from "classnames";
 import * as CodeMirror from "codemirror";
 import * as ReactCodeMirrorNamespace from "react-codemirror";
+import 'codemirror/mode/javascript/javascript';
 import * as ReactColorPicker from "react-color";
 import * as Slider from "rc-slider";
 import * as ReactDropzone from "react-dropzone";
