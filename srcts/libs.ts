@@ -4,6 +4,9 @@ import * as FileSaver from "filesaver.js";
 import * as JSZip from "jszip";
 import * as Clipboard from "clipboard";
 import * as classNames from "classnames";
+import * as CodeMirror from "codemirror";
+import * as ReactCodeMirrorNamespace from "react-codemirror";
+import 'codemirror/mode/javascript/javascript';
 import * as ReactColorPicker from "react-color";
 import * as Slider from "rc-slider";
 import * as ReactDropzone from "react-dropzone";
@@ -44,6 +47,8 @@ import * as d3 from "d3";
 (window as any).ReactColorPicker = (ReactColorPicker as any).default; /* Workaround for incorrect typings. */
 (window as any).classNames = (classNames as any).default;
 (window as any).Clipboard = (Clipboard as any).default;
+(window as any).CodeMirror = (CodeMirror as any);
+(window as any).ReactCodeMirror = (ReactCodeMirrorNamespace as any).default;
 (window as any).JSZip = (JSZip as any).default;
 (window as any).FileSaver = FileSaver;
 (window as any).sparkline = sparkline;

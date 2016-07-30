@@ -13,7 +13,6 @@ namespace weavejs.editor
 	import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 	import LinkableString = weavejs.core.LinkableString;
 	import SmartComponent = weavejs.ui.SmartComponent;
-	import FormEvent = React.FormEvent;
 
 	export interface ISessionStateEditorProps extends React.HTMLProps<SessionStateEditor>
 	{
@@ -83,7 +82,7 @@ namespace weavejs.editor
 		{
 			return (<HDividedBox style={ {flex:1,border:"1px solid lightgrey"} } resizerStyle={ {background:"black"} }>
 						<div style={ {padding:"4px",fontSize:"14px"} }>
-							<SessionStateTree root={ this.rootWeaveTreeItem } clickHandler= { this.nodeClickHandler } open={true} enableAccordion={true}/>
+							<SessionStateTree root={ this.rootWeaveTreeItem } clickHandler={ this.nodeClickHandler } open={true} enableAccordion={true}/>
 						</div>
 						<WeaveTreeItemEditor item={ this.state.activeItem } style={ {padding:"8px",fontSize:"14px"} }/>
 					</HDividedBox>
@@ -155,17 +154,15 @@ namespace weavejs.editor
 				Weave.setState(this.props.item.data, JSON.parse(value));
 		}
 
-		changeSessionStateValue=(e:FormEvent):void=>
+		changeSessionStateValue=(newValue:string):void=>
 		{
-			this.setState({
-				sessionValue: (e.target as HTMLTextAreaElement).value
-			})
+			this.setState({ sessionValue: newValue });
 		}
 
 		render():JSX.Element
 		{
 			var linkableDynamicObjectUI:JSX.Element = null;
-			var title:string="";
+			var title:string = "";
 			if (this.props.item)
 			{
 				if (this.isDynamicLinkableObject)
@@ -175,7 +172,6 @@ namespace weavejs.editor
 				title = this.props.item.label;
 			}
 
-
 			let headerStyle:React.CSSProperties = {
 				alignItems:"center",
 				fontSize:"inherit",
@@ -183,22 +179,34 @@ namespace weavejs.editor
 				borderBottom:"1px solid lightgrey"
 			}
 
-			return (<VBox className = "weave-padded-vbox" style={ this.props.style }>
-						<HBox className = "weave-padded-hbox weave-window-header" style= { headerStyle }>
-							{title}
-							<span style={ {flex:"1"} }/>
-							{linkableDynamicObjectUI}
-							<IconButton clickHandler={ this.saveSessionValue }
-										toolTip={"click to save Session State of " + title}
-										style={ {borderColor:"grey",fontSize:"inherit"} }>
-								Apply
-							</IconButton>
-						</HBox>
-						<form style={ {display:"flex",flexWrap:"wrap",overflow:"auto", flex:"1"} }>
-							<textarea ref="textArea" style={ {border:"none",flex:"1"} }
-									   value={this.state.sessionValue} onChange={this.changeSessionStateValue}/>
-						</form>
-					</VBox>
+			return (
+				<VBox padded style={ this.props.style }>
+					<HBox padded className="weave-window-header" style={ headerStyle }>
+						{title}
+						<span style={ {flex:"1"} }/>
+						{linkableDynamicObjectUI}
+						<IconButton
+							clickHandler={ this.saveSessionValue }
+							toolTip={"click to save Session State of " + title}
+							style={ {borderColor:"grey",fontSize:"inherit"} }
+						>
+							Apply
+						</IconButton>
+					</HBox>
+					<ReactCodeMirror
+						options={{
+							mode: "javascript",
+							lineNumbers: false,
+							lineWrapping: true,
+							smartIndent: false,
+							//matchBrackets: true,
+							theme: "eclipse",
+							readOnly: false
+						}}
+						value={this.state.sessionValue}
+						onChange={this.changeSessionStateValue}
+					/>
+				</VBox>
 			);
 		}
 	}

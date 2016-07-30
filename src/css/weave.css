@@ -1309,3 +1309,13 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	pointer-events: none;
 	opacity: .45;
 }
+
+.ReactCodeMirror {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+}
+
+.ReactCodeMirror > .CodeMirror {
+	flex: 1
+}

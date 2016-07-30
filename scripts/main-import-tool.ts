@@ -1,6 +1,6 @@
 module.exports = function()
 {
-	let debug = true;
+	let debug = false;
 
 	let FileUtils = require('./FileUtils');
 	let fs = require('fs');
