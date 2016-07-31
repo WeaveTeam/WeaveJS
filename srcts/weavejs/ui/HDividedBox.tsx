@@ -46,6 +46,7 @@ namespace weavejs.ui
 		// string for percentage values
 		private leftChildWidths:number[] = [];
 		private containerWidth:number = NaN;
+		private children:React.ReactInstance[];
 
 		state:IHDividedBoxState = {
 			activeResizerIndex: NaN,
@@ -58,7 +59,7 @@ namespace weavejs.ui
 		private resizerMouseDownHandler = (index:number, event:React.MouseEvent):void=>
 		{
 			// as resizer index is same as left child index , easy to identify from refs
-			var leftChild:Element = ReactDOM.findDOMNode(this.refs["child" + index]);
+			var leftChild:Element = ReactDOM.findDOMNode(this.children[index]);
 			this.containerWidth = ReactDOM.findDOMNode(this).getBoundingClientRect().width;
 			this.setState({
 				mouseXPos:event.clientX,
@@ -139,6 +140,7 @@ namespace weavejs.ui
 
 			// summing up all child width , helps to set the last child width by subtracting from container width
 			let leftChildWidthSum:number = 0;
+			this.children = [];
 			React.Children.forEach(this.props.children, (child:React.ReactNode, index:number) => {
 				if (!child)// this case happen in react Composite element based on a condition sometimes null or empty string will come in place of react element
 					return;
@@ -185,15 +187,21 @@ namespace weavejs.ui
 					leftChildWidthSum = leftChildWidthSum + childStyle.width;
 				}
 
-				var childRef:string = "child"+index;
+				var childElement = child as React.ComponentElement<any, any> | React.DOMElement<any, any>;
+				if (typeof childElement.ref == 'string')
+					console.error("Children of HDividedBox cannot have string ref names. Please use ref functions instead.");
 				// make sure the child Style overflow property is set along with calculated width
-				var mutateProps:any = _.merge({},(child as React.ReactElement<any>).props, {
-					key:childRef,
-					ref:childRef,
-					style:prefixer(childStyle)
+				var mutateProps:any = _.merge({}, childElement.props, {
+					key: "child" + index,
+					ref: (instance:React.ReactInstance) => {
+						if (typeof childElement.ref == 'function')
+							(childElement.ref as (instance:React.ReactInstance)=>void)(instance);
+						this.children[index] = instance;
+					},
+					style: prefixer(childStyle)
 				});
 
-				var childUI:any = React.cloneElement(child as React.ReactElement<any>, mutateProps);
+				var childUI:any = React.cloneElement(childElement, mutateProps);
 				childrenUI.push(childUI);
 
 				/* ***** Resizer ****** */
@@ -224,9 +232,14 @@ namespace weavejs.ui
 			var styleObj:React.CSSProperties = HDividedBox.style(this.props.style);
 			styleObj.position = "relative"; //important to accommodate if any children is absolute
 
-			return <div {...this.props as React.HTMLAttributes} style={ styleObj }>
-				{childrenUI}
-			</div>;
+			return (
+				<div
+					{...this.props as React.HTMLAttributes}
+					className={classNames("weave-hDividedBox", this.props.className)}
+					style={ styleObj }
+					children={childrenUI}
+				/>
+			);
 		}
 	}
 

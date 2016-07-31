@@ -359,6 +359,10 @@ div.table-row-selected>div>div>div>div>div {
 	margin-left: 0;
 }
 
+.weave-hDividedBox > * {
+	margin: 4px;
+}
+
 .weave-hDividedBox-resizer {
 	width:2px;
 	background-color: #fff;
