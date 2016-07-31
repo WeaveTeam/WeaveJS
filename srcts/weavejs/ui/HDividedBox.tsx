@@ -161,16 +161,7 @@ namespace weavejs.ui
 				}
 				else if (childCount - 1 == index)//last child takes rest of the space of the container
 				{
-					if (isNaN(this.containerWidth)) // when render called from constructor for first time
-					{
-						childStyle.flex = 1;
-					}
-					else // when mousedown sets the containerWidth
-					{
-						// setting flex 1 instead of width wont work, if parent has flexible size, while resizing
-						// flex 1 will work if parent get fixed width in DOM tree
-						childStyle.width  = this.containerWidth - leftChildWidthSum;
-					}
+					childStyle.flex = 1;
 				}
 				else
 				{
