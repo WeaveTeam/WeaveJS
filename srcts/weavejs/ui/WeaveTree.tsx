@@ -114,11 +114,14 @@ namespace weavejs.ui
 			if (!node)
 				return;
 			let isOpen = this.getOpen(node);
+			if (value == isOpen)
+				return;
+
 			let openItems = this.state.openItems;
 			let selectedItems = this.state.selectedItems;
-			if (value && !isOpen)
+			if (!isOpen)
 				openItems = openItems.concat([node]);
-			else if (!value && isOpen)
+			else if (isOpen)
 				openItems = openItems.filter((other) => !node.equals(other));
 
 			this.setState({ openItems, selectedItems });
@@ -223,6 +226,8 @@ namespace weavejs.ui
 		{
 			let nodes = indices.map((index) => this.lastEnumeration[Number(index)][1]);
 			this.setState({ selectedItems: nodes });
+			for (let node of nodes)
+				this.internalSetOpen(node, true);
 		}
 
 		computeRowWidth(rowJSX:React.ReactChild):number
