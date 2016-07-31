@@ -28,7 +28,8 @@ package weavejs.core
 	import weavejs.api.core.ILinkableObjectWithNewProperties;
 	import weavejs.api.core.ILinkableVariable;
 	import weavejs.api.core.ISessionManager;
-	import weavejs.util.Dictionary2D;
+import weavejs.api.data.IWeaveTreeNode;
+import weavejs.util.Dictionary2D;
 	import weavejs.util.JS;
 	import weavejs.util.StandardLib;
 	import weavejs.util.WeavePromise;
@@ -211,14 +212,14 @@ package weavejs.core
 		/**
 		 * Cached WeaveTreeItems that are auto-generated when they are accessed
 		 */
-		private var d2d_object_name_tree:Dictionary2D = new Dictionary2D(true, false, WeaveTreeItem);
+		private var d2d_object_name_tree:Dictionary2D = new Dictionary2D(true, false, WeaveTreeItemExt);
 		
 		/**
 		 * @param root The linkable object to be placed at the root node of the tree.
 		 * @param objectName The label for the root node.
 		 * @return A tree of nodes with the properties "data", "label", "children"
 		 */
-		public function getSessionStateTree(root:ILinkableObject, objectName:String):WeaveTreeItem
+		public function getSessionStateTree(root:ILinkableObject, objectName:String):/*/WeaveTreeItem & IWeaveTreeNode/*/WeaveTreeItem
 		{
 			if (!root)
 				return null;
@@ -1563,5 +1564,40 @@ package weavejs.core
 			JS.log('diffs', diffs);
 			JS.log('combined', combined);
 		}
+	}
+}
+
+import weavejs.api.data.IWeaveTreeNode;
+import weavejs.util.WeaveTreeItem;
+
+internal class WeaveTreeItemExt extends WeaveTreeItem implements IWeaveTreeNode
+{
+	public function equals(other:IWeaveTreeNode):Boolean
+	{
+		var otherExt:WeaveTreeItemExt = other as WeaveTreeItemExt;
+		return this.data == otherExt.data;
+	}
+
+	public function getLabel():String
+	{
+		return this.label;
+	}
+
+	public function isBranch():Boolean
+	{
+		return this.children != null;
+	}
+
+	public function hasChildBranches():Boolean
+	{
+		for each (var child:WeaveTreeItemExt in this.children)
+			if (child.isBranch())
+				return true;
+		return false;
+	}
+
+	public function getChildren():Array/*/<IWeaveTreeNode>/*/
+	{
+		return this.children;
 	}
 }
