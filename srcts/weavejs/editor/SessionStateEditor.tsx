@@ -94,17 +94,21 @@ namespace weavejs.editor
 					style={ {flex: 1} }
 					resizerStyle={ {background: "black"} }
 				>
-					<DynamicComponent dependencies={[this.props.rootObject]} render={() =>
-						<WeaveTree
-							root={rootNode}
-							initialOpenItems={initialOpenItems}
-							initialSelectedItems={[initialSelectedNode]}
-							multipleSelection={false}
-							onSelect={this.onSelect}
-							onDoubleClick={this.onDoubleClick}
-						/>
-					}/>
-					<JSONEditor ref={WeaveReactUtils.linkReactStateRef(this, {value: this.selectedObject})}/>
+					<VBox style={ {width: "50%"} }>
+						<DynamicComponent dependencies={[this.props.rootObject]} render={() =>
+							<WeaveTree
+								root={rootNode}
+								initialOpenItems={initialOpenItems}
+								initialSelectedItems={[initialSelectedNode]}
+								multipleSelection={false}
+								onSelect={this.onSelect}
+								onDoubleClick={this.onDoubleClick}
+							/>
+						}/>
+					</VBox>
+					<VBox style={ {width: "50%"} }>
+						<JSONEditor ref={WeaveReactUtils.linkReactStateRef(this, {value: this.selectedObject})}/>
+					</VBox>
 				</HDividedBox>
 			);
 		}
