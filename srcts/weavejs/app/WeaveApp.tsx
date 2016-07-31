@@ -219,7 +219,7 @@ namespace weavejs.app
 			if (obj && !(obj as any).renderEditor) // hack
 			{
 				var toolName = path[0]; // hack
-				SessionStateEditor.openInstance(this, toolName, this.props.weave.root);
+				SessionStateEditor.openInstance(this, obj);
 				return;
 			}
 			

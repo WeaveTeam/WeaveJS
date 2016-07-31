@@ -40,9 +40,7 @@ namespace weavejs.editor
 
 		openSessionStateEditor=()=>
 		{
-			var weaveRoot = Weave.getRoot(this.tool);
-			var toolName = weaveRoot.getName(this.tool);
-			SessionStateEditor.openInstance(this, toolName, weaveRoot);
+			SessionStateEditor.openInstance(this, this.tool);
 		};
 
 		//todo : find a better way to get linked children
@@ -257,15 +255,11 @@ namespace weavejs.editor
 							{crumbUI}
 						</HBox>
 						<span style={ {flex: "1"} }/>
-						{
-							Weave.beta
-							?	<Button
-									onClick={ this.openSessionStateEditor }
-									title="Edit session state">
-									<i className="fa fa-code"/>
-								</Button>
-							:	null
-						}
+						<Button
+							onClick={ this.openSessionStateEditor }
+							title="Edit session state">
+							<i className="fa fa-code"/>
+						</Button>
 						<Button
 							onClick={ this.closeEditor }
 							title="Close editor">
