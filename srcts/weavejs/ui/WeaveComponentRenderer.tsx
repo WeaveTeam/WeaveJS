@@ -118,7 +118,7 @@ namespace weavejs.ui
 			if (this.watcher.target instanceof React.Component && this.watcher.target != this.generatedComponent)
 			{
 				content = (
-					<VBox style={{flex: 1, justifyContent: "center", alignItems: "center", padding: 10}}>
+					<VBox style={{flex: 1, justifyContent: "center", alignItems: "center", padding: 10}} className="weave-app">
 						<span>{Weave.lang('This component was already mounted elsewhere in the DOM')}</span>
 					</VBox>
 				);
