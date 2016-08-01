@@ -51,14 +51,11 @@ package weavejs.data.source
 
 		public function WebSocketDataSource()
 		{
-			this.selectionFilter.targetPath = ["defaultSelectionKeySet"];
 		}
 
 		public const keyType:LinkableString = Weave.linkableChild(this, LinkableString);
 		public const keyProperty:LinkableString = Weave.linkableChild(this, LinkableString);
 		public const keepLast:LinkableNumber = Weave.linkableChild(this, LinkableNumber, onKeepLastChange);
-		public const selectionFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter, onSelectionFilterChange);
-		//public const selectionFeedback:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 		public const url:LinkableString = Weave.linkableChild(this, LinkableString, onUrlChange);
 
 		override protected function initialize(forceRefresh:Boolean = false):void
@@ -67,15 +64,11 @@ package weavejs.data.source
 			super.initialize(true);
 		}
 
-		private function onSelectionFilterChange():void
+		public function sendMessage(payload:Object):void
 		{
 			if (_socket && _socket.readyState == 1)
 			{
-				var ks:IKeySet = selectionFilter.getInternalKeyFilter() as IKeySet;
-				if (!ks || !ks.keys) return;
-				_socket.send(JSON.stringify(ks.keys.map(function (key:IQualifiedKey, idx:int, a:Array):String {
-					return key.localName;
-				})));
+				_socket.send(JSON.stringify(payload));
 			}
 		}
 
