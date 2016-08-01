@@ -43,7 +43,7 @@
 /* Dowloaded Fonts*/
 @font-face {
 	font-family: 'Michroma';
-	src: url('fonts/Michroma.ttf');
+	src: url('../fonts/Michroma.ttf');
 }
 
 /* d3 css override */
