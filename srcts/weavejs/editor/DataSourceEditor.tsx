@@ -15,7 +15,6 @@ namespace weavejs.editor
 	import ChartsMenu = weavejs.menu.ChartsMenu;
 	import WeaveReactUtils = weavejs.util.WeaveReactUtils
 	import HelpIcon = weavejs.ui.HelpIcon;
-
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
@@ -30,6 +29,9 @@ namespace weavejs.editor
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import LinkableString = weavejs.core.LinkableString;
 	import WeaveDataSource = weavejs.data.source.WeaveDataSource;
+	import IWeaveTreeProps = weavejs.ui.IWeaveTreeProps;
+	import WeaveTreeNodeDescriptor = weave.ui.WeaveTreeNodeDescriptor;
+	import WeaveDataTree = weavejs.ui.WeaveDataTree;
 
 	export const PREVIEW:"preview" = "preview";
 	export const METADATA:"metadata" = "metadata";
@@ -43,8 +45,8 @@ namespace weavejs.editor
 
 	export interface IDataSourceEditorState
 	{
-		selectedBranch?: IWeaveTreeNode;
-		selectedLeaf?: IWeaveTreeNode;
+		selectedBranch?: IWeaveTreeNode & IColumnReference;
+		selectedLeaf?: IWeaveTreeNode & IColumnReference;
 		showPreviewView?: boolean;
 		guideToTab?:string;
 	};
@@ -52,9 +54,6 @@ namespace weavejs.editor
 	export class DataSourceEditor extends SmartComponent<IDataSourceEditorProps, IDataSourceEditorState>
 	{
 		dataSourceWatcher = WeaveReactUtils.forceUpdateWatcher(this, IDataSource);
-		protected enablePreview:boolean = true;
-		protected tree:WeaveTree;
-		protected editorButtons:Map<React.ReactChild, Function>;
 		protected weaveRoot:ILinkableHashMap;
 
 		constructor(props:IDataSourceEditorProps)
@@ -147,7 +146,7 @@ namespace weavejs.editor
 						style={{flex: 1, border: "none"}}
 					>
 						<VBox style={{flex: root && root.hasChildBranches() ? 1 : 0, overflow: 'auto'}}>
-							<WeaveTree
+							<WeaveDataTree
 								root={root}
 								hideLeaves={true}
 								filterFunc={DataSourceEditor.isNotGeometryList}
@@ -228,13 +227,13 @@ namespace weavejs.editor
 			);
 		};
 
-		setSelection(props:IDataSourceEditorProps, newBranch:IWeaveTreeNode, newLeaf:IWeaveTreeNode)
+		setSelection(props:IDataSourceEditorProps, newBranch:IWeaveTreeNode & IColumnReference, newLeaf:IWeaveTreeNode & IColumnReference)
 		{
 			let root = props.dataSource.getHierarchyRoot();
 
 			let hasChildren:boolean = false;
 			if (newBranch)
-				hasChildren = (newBranch.getChildren() as  IWeaveTreeNode[]).length > 0;
+				hasChildren = newBranch.getChildren().length > 0;
 			var branch =  hasChildren ? newBranch : root;
 			var leaf = newLeaf;
 		
@@ -245,7 +244,7 @@ namespace weavejs.editor
 				ColumnUtils.map_root_firstDataSet.delete(this.weaveRoot);
 				this.weaveRoot = weaveRoot;
 			}
-			var leaves = branch && branch.getChildren() || [];
+			var leaves = (branch && branch.getChildren() || []) as (IWeaveTreeNode & IColumnReference)[];
 			leaves = leaves.filter(leaf => {
 				var ref = Weave.AS(leaf, IColumnReference);
 				return !!(ref && ref.getColumnMetadata());

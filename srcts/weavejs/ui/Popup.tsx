@@ -74,8 +74,8 @@ namespace weavejs.ui
 
 		onContextMenu=(event:React.MouseEvent)=>
 		{
-			// disable the context menu on all popups
-			event.preventDefault();
+			//ContextMenu.open(event); // this would create a circular dependency...
+
 			if (this.props.onContextMenu)
 				this.props.onContextMenu(event);
 		}

@@ -84,7 +84,7 @@ package weavejs.data.source
 			return typeof value == 'object';
 		}
 		
-		override public function getHierarchyRoot():IWeaveTreeNode
+		override public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
 		{
 			if (!_rootNode)
 				_rootNode = new ColumnTreeNode({

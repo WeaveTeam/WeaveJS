@@ -28,7 +28,7 @@ package weavejs.data.hierarchy
 	 */
 	public class HierarchyUtils
 	{
-		public static function findParentNode(root:IWeaveTreeNode, dataSource:IDataSource, metadata:Object):IWeaveTreeNode
+		public static function findParentNode/*/<T extends IWeaveTreeNode>/*/(root:/*/T/*/IWeaveTreeNode, dataSource:IDataSource, metadata:Object):/*/T/*/IWeaveTreeNode
 		{
 			var leaf:IWeaveTreeNode = dataSource.findHierarchyNode(metadata);
 			var path:Array = findPathToNode(root, leaf);
@@ -55,7 +55,7 @@ package weavejs.data.hierarchy
 		 *         Returns null if the descendant is unreachable from this node.
 		 * @see weave.api.data.IWeaveTreeNode#equals()
 		 */
-		public static function findPathToNode(root:IWeaveTreeNode, descendant:IWeaveTreeNode):Array/*/<IWeaveTreeNode>/*/
+		public static function findPathToNode/*/<T extends IWeaveTreeNode>/*/(root:/*/T/*/IWeaveTreeNode, descendant:/*/T/*/IWeaveTreeNode):Array/*/<T>/*/
 		{
 			if (!root || !descendant)
 				return null;
@@ -88,7 +88,7 @@ package weavejs.data.hierarchy
 		{
 			return getAllColumnReferences(source.getHierarchyRoot(), []);
 		}
-		private static function getAllColumnReferences(node:IWeaveTreeNode, output:Array):Array
+		private static function getAllColumnReferences(node:/*/IWeaveTreeNode & IColumnReference/*/IWeaveTreeNode, output:Array/*/<IColumnReference>/*/):Array/*/<IColumnReference>/*/
 		{
 			var ref:IColumnReference = node as IColumnReference;
 			if (ref && ref.getColumnMetadata())

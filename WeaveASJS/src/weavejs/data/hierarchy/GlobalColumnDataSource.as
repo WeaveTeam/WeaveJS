@@ -108,7 +108,7 @@ package weavejs.data.hierarchy
 			return Weave.getCallbacks(this);
 		}
 		
-		public function getHierarchyRoot():IWeaveTreeNode
+		public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
 		{
 			return _rootNode;
 		}

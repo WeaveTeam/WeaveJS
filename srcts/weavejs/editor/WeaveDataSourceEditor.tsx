@@ -19,6 +19,7 @@ namespace weavejs.editor
 	import PopupWindow = weavejs.dialog.PopupWindow;
 	import WeaveAdminService = weavejs.net.WeaveAdminService;
 	import WeaveDataServlet = weavejs.net.WeaveDataServlet;
+	import IColumnReference = weavejs.api.data.IColumnReference;
 
 
 	const SQL:string = "SQL";
@@ -34,7 +35,8 @@ namespace weavejs.editor
 			(props.dataSource as WeaveDataSource).rootId.addGroupedCallback(this, this.setHierarchySelection, false);
 		}
 
-		onHierarchySelected=(selectedItems:Array<IWeaveTreeNode>):void=>{
+		onHierarchySelected=(selectedItems:(IWeaveTreeNode & IColumnReference)[]):void=>
+		{
 			let item = selectedItems[0] as EntityNode;
 			if (this.props.dataSource && item instanceof EntityNode)
 			{
@@ -46,21 +48,22 @@ namespace weavejs.editor
 			}
 		};
 
-		setHierarchySelection():void {
+		setHierarchySelection():void
+		{/*
 			if (this.tree && this.props.dataSource)
 			{
 				let id:number = (this.props.dataSource as WeaveDataSource).rootId.state as number;
 				let node = this.props.dataSource.findHierarchyNode(id) as EntityNode;
 				if (node != null && node.id > -1)
 				{
-					//this.tree.setSelected([node]);	
+					//this.tree.setSelected([node]);
 				}
 				else
 				{
 					//this.tree.setSelected([]);
 				}
 			}
-		}
+		*/}
 
 		get service()
 		{

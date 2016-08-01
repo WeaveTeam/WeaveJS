@@ -9,6 +9,7 @@ namespace weavejs.dialog
 	import SmartComponent = weavejs.ui.SmartComponent;
 	import prefixer = weavejs.css.prefixer;
 	import Button = weavejs.ui.Button;
+	import ContextMenu = weavejs.ui.menu.ContextMenu;
 
 	export interface PopupWindowProps extends React.Props<PopupWindow>
 	{
@@ -170,7 +171,7 @@ namespace weavejs.dialog
 				height: this.props.height,
 				minWidth: this.minWidth,
 				minHeight: this.minHeight
-			}
+			};
 
 			var popupWindow = (
 				<DraggableDiv
@@ -220,7 +221,7 @@ namespace weavejs.dialog
 			);
 
 			return (
-				<div ref={ReactUtils.registerComponentRef(this)}>
+				<div ref={ReactUtils.registerComponentRef(this)} onContextMenu={ContextMenu.open}>
 					{this.props.modal ? this.renderOverlay(this.props.modal) : null}
 					{popupWindow}
 				</div>

@@ -157,7 +157,7 @@ package weavejs.data.source
 		/**
 		 * Gets the root node of the attribute hierarchy.
 		 */
-		override public function getHierarchyRoot():IWeaveTreeNode
+		override public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
 		{
 			if (!(_rootNode is DBFColumnNode))
 				_rootNode = new DBFColumnNode(this);

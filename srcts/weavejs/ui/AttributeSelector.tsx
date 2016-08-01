@@ -32,7 +32,7 @@ namespace weavejs.ui
 
 	export class AttributeSelector extends SmartComponent<IAttributeSelectorProps, IAttributeSelectorState>
 	{
-		private rootNode:IWeaveTreeNode;
+		private rootNode:IWeaveTreeNode & IColumnReference;
 
 		constructor(props:IAttributeSelectorProps)
 		{
@@ -138,7 +138,8 @@ namespace weavejs.ui
 		{
 			if (this.hierarchyExplorer.selectedFolder)
 			{
-				this.hierarchyExplorer.selectedItems = this.hierarchyExplorer.selectedFolder.getChildren().filter((node) => !node.isBranch());
+				var children = this.hierarchyExplorer.selectedFolder.getChildren() as (IWeaveTreeNode & IColumnReference)[];
+				this.hierarchyExplorer.selectedItems = children.filter((node) => !node.isBranch());
 			}
 		};
 
@@ -168,7 +169,7 @@ namespace weavejs.ui
 			}
 		};
 
-		getSelectedTreeNodes():IWeaveTreeNode[]
+		getSelectedTreeNodes():(IWeaveTreeNode & IColumnReference)[]
 		{
 			let selectedAttribute = this.props.attributes.get(this.state.selectedAttributeName);
 			let columns:IAttributeColumn[] = [];

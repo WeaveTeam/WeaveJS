@@ -101,7 +101,7 @@ package weavejs.data.source
 		 * This function should set _rootNode if it is null, which may happen from calling refreshHierarchy().
 		 * @inheritDoc
 		 */
-		/* abstract */ public function getHierarchyRoot():IWeaveTreeNode
+		/* abstract */ public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
 		{
 			return _rootNode;
 		}

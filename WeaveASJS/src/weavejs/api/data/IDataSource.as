@@ -46,7 +46,7 @@ package weavejs.api.data
 		/**
 		 * Gets the root node of the attribute hierarchy, which should have descendant nodes that implement IColumnReference.
 		 */
-		function getHierarchyRoot():IWeaveTreeNode;
+		function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode;
 		
 		/**
 		 * Finds the hierarchy node that corresponds to a set of metadata, or null if there is no such node.

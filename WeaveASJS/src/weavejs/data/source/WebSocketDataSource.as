@@ -173,7 +173,7 @@ package weavejs.data.source
 		private var records:Array = [];
 		private var propertyNames:Object = new JS.global.Set();
 		
-		override public function getHierarchyRoot():IWeaveTreeNode
+		override public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
 		{
 			if (!_rootNode)
 				_rootNode = new ColumnTreeNode({

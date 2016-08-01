@@ -4,86 +4,104 @@ namespace weavejs.ui
 	import VBox = weavejs.ui.flexbox.VBox;
 	import DOMUtils = weavejs.util.DOMUtils;
 
-	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
-
-	export interface IWeaveTreeState
+	export interface IWeaveTreeState<TreeNode>
 	{
-		selectedItems?: Array<IWeaveTreeNode>;
-		openItems?: Array<IWeaveTreeNode>;
+		selectedItems?: TreeNode[];
+		openItems?: TreeNode[];
 		columnWidth?: number;
 	}
 
-	export interface IWeaveTreeProps
+	export interface IWeaveTreeProps<TreeNode>
 	{
-		root:IWeaveTreeNode
+		root?:TreeNode;
+		treeDescriptor?:ITreeDescriptor<TreeNode>;
 		style?: any;
 		hideRoot?: boolean;
 		hideLeaves? : boolean;
 		hideBranches? : boolean;
-		filterFunc?: (node: IWeaveTreeNode) => boolean;
+		labelFunction?: (item: TreeNode) => string;
+		filterFunc?: (node: TreeNode) => boolean;
 		multipleSelection?: boolean;
-		onSelect?: (selectedItems: Array<IWeaveTreeNode>) => void;
-		onExpand?: (openItems: Array<IWeaveTreeNode>) => void;
-		initialOpenItems?: Array<IWeaveTreeNode>;
-		initialSelectedItems?: Array<IWeaveTreeNode>;
-		onDoubleClick?: (item: IWeaveTreeNode) => void;
+		onSelect?: (selectedItems: TreeNode[]) => void;
+		onExpand?: (openItems: TreeNode[]) => void;
+		initialOpenItems?: TreeNode[];
+		initialSelectedItems?: TreeNode[];
+		onDoubleClick?: (item: TreeNode) => void;
 	};
 
-	export class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTreeState>
+	let defaultTreeDescriptor:ITreeDescriptor<any>;
+
+	export class WeaveTree<TreeNode> extends React.Component<IWeaveTreeProps<TreeNode>, IWeaveTreeState<TreeNode>>
 	{
-		constructor(props: IWeaveTreeProps)
+		public static defaultProps:IWeaveTreeProps<any> = {
+			get treeDescriptor() {
+				return defaultTreeDescriptor || (defaultTreeDescriptor = new BasicTreeDescriptor());
+			}
+		};
+
+		constructor(props: IWeaveTreeProps<TreeNode>)
 		{
 			super(props);
 
-			this.state = { selectedItems: props.initialSelectedItems || [], openItems: props.initialOpenItems || [] };
+			this.state = {
+				selectedItems: props.initialSelectedItems || [],
+				openItems: props.initialOpenItems || []
+			};
 		}
 
-		state: IWeaveTreeState = {
+		state: IWeaveTreeState<TreeNode> = {
 			selectedItems: [],
 			openItems: [],
 			columnWidth: 0
 		};
 
-		componentWillReceiveProps(nextProps: IWeaveTreeProps)
+		componentWillReceiveProps(nextProps: IWeaveTreeProps<TreeNode>)
 		{
-			if (!this.props.root != !nextProps.root || (nextProps.root && !nextProps.root.equals(this.props.root)))
-			{
+			let shouldResetBoth = (
+				this.props.treeDescriptor != nextProps.treeDescriptor
+				|| !this.props.root != !nextProps.root
+				|| (
+					nextProps.root
+					&& !nextProps.treeDescriptor.isEqual(nextProps.root, this.props.root)
+				)
+			);
+			if (shouldResetBoth)
 				this.setState({ selectedItems: nextProps.initialSelectedItems || [], openItems: nextProps.initialOpenItems || [] });
-			}
-			if (!_.isEqual(nextProps.initialSelectedItems, this.props.initialSelectedItems))//TODO does not work with _.IsEqual
+			else if (this.nodeArraysChanged(nextProps.initialSelectedItems, this.props.initialSelectedItems))
 				this.setState({ selectedItems: nextProps.initialSelectedItems || [] });
-			if (!_.isEqual(nextProps.initialOpenItems, this.props.initialOpenItems))
+			else if (this.nodeArraysChanged(nextProps.initialOpenItems, this.props.initialOpenItems))
 				this.setState({ openItems: nextProps.initialOpenItems || [] });
 		}
 
-		getOpen(node: IWeaveTreeNode): boolean
+		isOpen(node:TreeNode): boolean
 		{
 			if (node === this.props.root && this.props.hideRoot)
 				return true;
 			else
-				return node && !!this.state.openItems.find((otherNode) => otherNode.equals(node));
+				return node && !!this.state.openItems.find((otherNode) => this.props.treeDescriptor.isEqual(otherNode, node));
 		}
 
-		static arrayChanged<T>(arrayA: Array<T>, arrayB: Array<T>, itemEqFunc: (a: T, b: T) => boolean): boolean
+		private nodeArraysChanged(arrayA:TreeNode[], arrayB:TreeNode[]):boolean
 		{
-			return (arrayA.length != arrayB.length) || !arrayA.every((d, i, a) => itemEqFunc(d, arrayB[i]));
+			return arrayA.length != arrayB.length
+				|| arrayA.some((d, i, a) => !this.areNodesEqual(d, arrayB[i]));
 		}
 
-		componentDidUpdate(prevProps: IWeaveTreeProps, prevState: IWeaveTreeState)
+		private areNodesEqual = (a:TreeNode, b:TreeNode) =>
 		{
-			let nodeComp = (a: IWeaveTreeNode, b: IWeaveTreeNode) => {
-				if (a && b)
-					return a.equals(b);
-				else
-					return (a === b);
-			};
-			if (this.props.onSelect && WeaveTree.arrayChanged(prevState.selectedItems, this.state.selectedItems, nodeComp)) {
+			if (a && b)
+				return this.props.treeDescriptor.isEqual(a, b);
+			else
+				return (a === b);
+		};
+
+		componentDidUpdate(prevProps: IWeaveTreeProps<TreeNode>, prevState: IWeaveTreeState<TreeNode>)
+		{
+			if (this.props.onSelect && this.nodeArraysChanged(prevState.selectedItems, this.state.selectedItems))
 				this.props.onSelect(this.state.selectedItems);
-			}
 
-			if (this.props.onExpand && WeaveTree.arrayChanged(prevState.openItems, this.state.openItems, nodeComp)) {
+			if (this.props.onExpand && this.nodeArraysChanged(prevState.openItems, this.state.openItems))
 				this.props.onExpand(this.state.openItems);
-			}
 
 			if (this.longestRowJSX)
 			{
@@ -93,8 +111,6 @@ namespace weavejs.ui
 					this.setState({columnWidth: newColumnWidth});
 				}
 			}
-
-			return;
 		}
 
 		componentDidMount():void
@@ -109,11 +125,11 @@ namespace weavejs.ui
 			}
 		}
 
-		private internalSetOpen(node: IWeaveTreeNode, value: boolean)
+		private internalSetOpen(node:TreeNode, value: boolean)
 		{
 			if (!node)
 				return;
-			let isOpen = this.getOpen(node);
+			let isOpen = this.isOpen(node);
 			if (value == isOpen)
 				return;
 
@@ -121,7 +137,7 @@ namespace weavejs.ui
 			if (!isOpen)
 				openItems = openItems.concat([node]);
 			else if (isOpen)
-				openItems = openItems.filter((other) => !node.equals(other));
+				openItems = openItems.filter((other) => !this.props.treeDescriptor.isEqual(node, other));
 
 			this.setState({ openItems });
 		}
@@ -136,7 +152,7 @@ namespace weavejs.ui
 		static EXPANDER_OPEN_CLASS_NAME = "weave-tree-view-icon-expander fa fa-play fa-fw fa-rotate-90";
 		static EXPANDER_HIDDEN_CLASS_NAME = "weave-tree-view-icon-expander fa fa-fw hidden-expander";
 
-		private renderItem = (node: IWeaveTreeNode, index: number, depth: number): JSX.Element =>
+		private renderItem = (node:TreeNode, index:number, depth:number):JSX.Element =>
 		{
 			let className = WeaveTree.CLASSNAME;
 			let iconClassName = WeaveTree.LEAF_ICON_CLASSNAME;
@@ -144,24 +160,27 @@ namespace weavejs.ui
 			let doubleClickFunc: React.MouseEventHandler;
 			let expanderClassName: string = WeaveTree.EXPANDER_HIDDEN_CLASS_NAME;
 
-			let isOpen = this.getOpen(node);
+			let isOpen = this.isOpen(node);
 
 			/* If we are a branch, we still might not be expandable due to hiding leaves and not having any children who are also branches. */
-			let isExpandable = node.isBranch() && (!this.props.hideLeaves || node.hasChildBranches());
+			let isBranch = this.props.treeDescriptor.isBranch(node);
+			let isExpandable = isBranch && (!this.props.hideLeaves || this.props.treeDescriptor.hasChildBranches(node));
 
-			if (node.isBranch())
+			if (isBranch)
 			{
 				iconClassName = isOpen ? WeaveTree.OPEN_BRANCH_ICON_CLASSNAME : WeaveTree.BRANCH_ICON_CLASSNAME;
 			}
 
-			if (isExpandable) {
+			if (isExpandable)
+			{
 				iconClickFunc = (e: React.MouseEvent): void => {
-					this.internalSetOpen(node, !this.getOpen(node)); e.stopPropagation();
+					this.internalSetOpen(node, !this.isOpen(node));
+					e.stopPropagation();
 				};
 
 				expanderClassName = isOpen ? WeaveTree.EXPANDER_OPEN_CLASS_NAME : WeaveTree.EXPANDER_CLOSED_CLASS_NAME;
 			}
-			else if (!node.isBranch() && this.props.onDoubleClick)
+			else if (!this.props.treeDescriptor.isBranch(node) && this.props.onDoubleClick)
 			{
 				doubleClickFunc = (e: React.MouseEvent): void => {
 					this.props.onDoubleClick && this.props.onDoubleClick(node);
@@ -187,12 +206,12 @@ namespace weavejs.ui
 							className={iconClassName}
 						/>
 					</span>
-					{ " " + node.getLabel() }
+					{ " " + this.props.treeDescriptor.getLabel(node) }
 				</HBox>
 			</HBox>;
 		};
 
-		enumerateItems = (node: IWeaveTreeNode, result: Array<[number, IWeaveTreeNode]> = [], depth: number = 0): Array<[number, IWeaveTreeNode]> =>
+		enumerateItems=(node:TreeNode, result: Array<[number, TreeNode]> = [], depth: number = 0): Array<[number, TreeNode]> =>
 		{
 			if (!node)
 				return result;
@@ -202,15 +221,19 @@ namespace weavejs.ui
 				return result;
 			}
 
-			if (node !== this.props.root || !this.props.hideRoot) {
-				if (node.isBranch() || node == this.props.root || !this.props.hideLeaves) {
+			if (node !== this.props.root || !this.props.hideRoot)
+			{
+				if (this.props.treeDescriptor.isBranch(node) || node == this.props.root || !this.props.hideLeaves)
+				{
 					result.push([depth, node]);
 					depth++;
 				}
 			}
 
-			if (node.isBranch() && this.getOpen(node)) {
-				for (let child of node.getChildren()) {
+			if (this.props.treeDescriptor.isBranch(node) && this.isOpen(node))
+			{
+				for (let child of this.props.treeDescriptor.getChildren(node))
+				{
 					this.enumerateItems(child, result, depth);
 				}
 			}
@@ -219,7 +242,7 @@ namespace weavejs.ui
 		};
 
 		rowHeight: number;
-		private lastEnumeration: [number, IWeaveTreeNode][];
+		private lastEnumeration: [number, TreeNode][];
 
 		onSelect=(indices:string[])=>
 		{
@@ -254,11 +277,10 @@ namespace weavejs.ui
 				Weave.getCallbacks(this.props.root).addGroupedCallback(this, this.forceUpdate);
 			}
 			this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22) + 5;
-			let rootChildren = this.props.root && this.props.root.getChildren() || [];
-
+			let rootChildren:TreeNode[] = this.props.treeDescriptor.getChildren(this.props.root) || [];
 
 			this.lastEnumeration = this.props.hideBranches ?
-				rootChildren.filter((n) => !n.isBranch()).map((n):[number, IWeaveTreeNode]=>[0, n]) :
+				rootChildren.filter((n) => !this.props.treeDescriptor.isBranch(n)).map((n):[number, TreeNode] => [0, n]) :
 				this.enumerateItems(this.props.root);
 
 			let selectedIndices:string[] = [];
@@ -268,9 +290,11 @@ namespace weavejs.ui
 			let rows = this.lastEnumeration.map(
 				(row, index): { [columnId: string]: React.ReactChild } => {
 					let [depth, item] = row;
-					if (this.state.selectedItems.filter(_.identity).some(node => node.equals(item))) selectedIndices.push(index.toString());
+					if (this.state.selectedItems.filter(_.identity).some(node => this.props.treeDescriptor.isEqual(node, item)))
+						selectedIndices.push(index.toString());
 					/* keep a running maximum node length */
-					let rowLengthHeuristic = item.getLabel().length + depth;
+					let label = this.props.treeDescriptor.getLabel(item);
+					let rowLengthHeuristic = label.length + depth;
 					if (rowLengthHeuristic > maxRowLength)
 					{
 						maxRowLength = rowLengthHeuristic;
@@ -296,5 +320,85 @@ namespace weavejs.ui
 				allowClear={false}
 			/>;
 		}
+	}
+
+	export interface ITreeDescriptor<T>
+	{
+		getLabel(node:T):string;
+		isEqual(node1:T, node2:T):boolean;
+		getChildren:(node:T)=>T[];
+		hasChildBranches:(node:T)=>boolean;
+		isBranch:(node:T)=>boolean;
+		addChildAt?:(parent:T, newChild:T, index:int)=>boolean;
+		removeChildAt?:(parent:T, child:T, index:int)=>boolean;
+	}
+
+	export interface IBasicTreeNode
+	{
+		label?:string;
+		children?:IBasicTreeNode[];
+	}
+
+	export class BasicTreeDescriptor implements ITreeDescriptor<IBasicTreeNode>
+	{
+		getLabel(node:IBasicTreeNode):string
+		{
+			return node ? node.label : '';
+		}
+
+		isEqual(node1:IBasicTreeNode, node2:IBasicTreeNode):boolean
+		{
+			return node1 == node2;
+		}
+
+		getChildren(node:IBasicTreeNode):IBasicTreeNode[]
+		{
+			return node ? node.children : null;
+		}
+
+		isBranch(node:IBasicTreeNode):boolean
+		{
+			return !!(node && node.children);
+		}
+
+		hasChildBranches(node:IBasicTreeNode):boolean
+		{
+			if (node && node.children)
+				for (let child of node.children)
+					if (child.children)
+						return true;
+			return false;
+		}
+
+		addChildAt(parent:IBasicTreeNode, newChild:IBasicTreeNode, index:int):boolean
+		{
+			var index = parent.children ? parent.children.indexOf(newChild) : -1;
+			if (index >= 0)
+			{
+				var newChildren = parent.children ? parent.children.concat() : [];
+				newChildren.push(newChild);
+				parent.children = newChildren;
+				return true;
+			}
+			return false;
+		}
+
+		removeChildAt(parent:IBasicTreeNode, child:IBasicTreeNode, index:int):boolean
+		{
+			var index = parent.children ? parent.children.indexOf(child) : -1;
+			if (index >= 0)
+			{
+				var newChildren = parent.children ? parent.children.concat() : [];
+				newChildren.splice(index, 1);
+				parent.children = newChildren;
+				return true;
+			}
+			return false;
+		}
+	}
+
+	export namespace WeaveTree
+	{
+		export class BasicWeaveTree extends WeaveTree<IBasicTreeNode> { }
 	}
 }

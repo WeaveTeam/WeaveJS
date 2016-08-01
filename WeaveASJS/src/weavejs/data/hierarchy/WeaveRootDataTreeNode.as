@@ -17,10 +17,11 @@ package weavejs.data.hierarchy
 {
     import weavejs.api.core.ILinkableHashMap;
     import weavejs.api.core.ILinkableObject;
-    import weavejs.api.data.IDataSource;
+	import weavejs.api.data.IColumnReference;
+	import weavejs.api.data.IDataSource;
     import weavejs.api.data.IWeaveTreeNode;
 
-    public class WeaveRootDataTreeNode extends WeaveTreeDescriptorNode implements ILinkableObject
+    public class WeaveRootDataTreeNode extends WeaveTreeDescriptorNode implements ILinkableObject, IColumnReference
     {
 		public function WeaveRootDataTreeNode(root:ILinkableHashMap)
 		{
@@ -49,6 +50,16 @@ package weavejs.data.hierarchy
 					return nodes;
 				}
 			});
+		}
+
+		public function getDataSource():IDataSource
+		{
+			return null;
+		}
+
+		public function getColumnMetadata():/*/{[name:string]:string}/*/Object
+		{
+			return null;
 		}
 		
 		private var globalColumnDataSource:IDataSource;

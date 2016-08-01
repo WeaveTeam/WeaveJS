@@ -154,7 +154,7 @@ package weavejs.data.source
 		/**
 		 * Gets the root node of the attribute hierarchy.
 		 */
-		override public function getHierarchyRoot():IWeaveTreeNode
+		override public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
 		{
 			var id:Object = rootId.getSessionState();
 			if (typeof id == 'string')

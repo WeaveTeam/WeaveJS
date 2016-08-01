@@ -55,7 +55,7 @@ package weavejs.data.source
 			super.initialize(true);
 		}
 
-		override public function getHierarchyRoot():IWeaveTreeNode
+		override public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
 		{
 			if (!_rootNode)
 			{

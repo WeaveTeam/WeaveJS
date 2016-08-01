@@ -143,7 +143,7 @@ package weavejs.data.source
 			return ctn;
 		}
 		
-        override public function getHierarchyRoot():IWeaveTreeNode
+        override public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
         {
             if (!_rootNode)
                 _rootNode = createDataSetNode();
