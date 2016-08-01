@@ -3,37 +3,20 @@
 	<head>
 		<META CHARSET="UTF-8">
 		<title>Weave</title>
-		<link href="c3.css" rel="stylesheet" type="text/css">
-		<link href="codemirror.css" rel="stylesheet" type="text/css">
-		<link href="eclipse.css" rel="stylesheet" type="text/css">
-		<link href="ol.css" rel="stylesheet" type="text/css">
-		<link href="ol-custom.css" rel="stylesheet" type="text/css">
-		<link href="css/font-awesome.css" rel="stylesheet" type="text/css">
-        <link href="rcslider.css" rel="stylesheet">
-		<link href="fixed-data-table.css" rel="stylesheet">
-<!-- 		<link href='https://fonts.googleapis.com/css?family=Roboto:400,700,700italic,400italic' rel='stylesheet' type='text/css'> -->
-		<link rel="stylesheet" type="text/css" href="semantic/semantic.min.css">
-		<link href="weave.css" rel="stylesheet" type="text/css">
-		<style>
-		body {
-			margin: 0;
-			color: #333;
-			overflow: hidden;
-			line-height: normal;
-		}
-		</style>
+		<link href="css/weave.css" rel="stylesheet" type="text/css">
+		<link href="css/weave-app.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
-		<script src="core/WeaveJS.js"></script>
-		<script src="libs.js"></script>
+		<script type="text/javascript" src="core/WeaveJS.js"></script>
+		<script type="text/javascript" src="libs.js"></script>
 		<script type="text/javascript">
 			new WeaveJS().start();
 			$(function () {
 				weavejs.util.EmbedUtils.embed({element: "weaveElt", mode: "file"});
 			});
 		</script>
-		<script src="weavejs.js"></script>
-        <script src="semantic/semantic.min.js"></script>
+		<script type="text/javascript" src="weavejs.js"></script>
+		<script type="text/javascript" src="semantic.min.js"></script>
 		<div id="weaveElt" style="width: 100%; height: 100%;"></div>
 	</body>
 </html>
