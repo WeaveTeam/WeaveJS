@@ -88,7 +88,7 @@ module.exports = function()
 		{
 			let fileNoExt = path.join(path.dirname(file), match[1]);
 			let dep = FileUtils.findFileWithExtension(fileNoExt, ['.tsx', '.ts']);
-			if (dep)
+			if (dep && dep != file)
 			{
 				if (debug)
 					console.log(file, 'extends', path.basename(dep));
@@ -141,18 +141,18 @@ module.exports = function()
 	// get direct dependencies
 	filePaths.sort().forEach(initDeps);
 
-	// topological sort
-	let ordered = graph.sort().reverse() as string[];
-	filePaths = Array.from(new Set(ordered.concat(filePaths)));
-	filePaths = filePaths.slice(ordered.length).concat(ordered);
-
-	// check for circular dependencies
+	// report circular dependencies
 	filePaths.forEach(f =>
 	{
 		var chain = checkDependency(f, f);
 		if (chain)
 			console.error(`Found circular dependency: ${formatDepChain(chain)}`);
 	});
+
+	// topological sort
+	let ordered = graph.sort().reverse() as string[];
+	filePaths = Array.from(new Set(ordered.concat(filePaths)));
+	filePaths = filePaths.slice(ordered.length).concat(ordered);
 
 	// generate output file
 	let stream = fs.createWriteStream(importFileName, {flags: 'w'});
