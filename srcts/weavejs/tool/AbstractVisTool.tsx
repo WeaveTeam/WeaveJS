@@ -169,7 +169,7 @@ namespace weavejs.tool
 
 		static getMenuItems(target:VisToolGroup):MenuItemProps[]
 		{
-			let menuItems:Array<any> = [];
+			let menuItems:MenuItemProps[] = [];
 			let selectionKeySet = target.selectionFilter.target as KeySet;
 			let probeKeySet = target.probeFilter.target as KeySet;
 			let subset = target.filteredKeySet.keyFilter.getInternalKeyFilter() as KeyFilter;
@@ -200,19 +200,19 @@ namespace weavejs.tool
 			else
 			{
 				menuItems.push({
-					enabled: usingSelection && subset,
+					enabled: usingSelection && !!subset,
 					label: Weave.lang("Create subset from selected record(s)"),
 					click: this.createFromSetToSubset.bind(null, selectionKeySet, subset)
 				});
 				menuItems.push({
-					enabled: usingSelection && subset,
+					enabled: usingSelection && !!subset,
 					label: Weave.lang("Remove selected record(s) from subset"),
 					click: this.removeFromSetToSubset.bind(null, selectionKeySet, subset)
 				});
 			}
 
 			menuItems.push({
-				enabled: usingSubset && subset,
+				enabled: usingSubset && !!subset,
 				label: Weave.lang("Show all records"),
 				click: this.clearSubset.bind(null, subset)
 			});
