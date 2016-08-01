@@ -599,4 +599,13 @@ namespace weavejs.ui
 			);
 		}
 	}
+
+	export namespace DataTable
+	{
+		export interface IRow {
+			[columnKey: string]: React.ReactChild;
+		}
+
+		export class ObjectDataTable extends DataTable<IRow> { }
+	}
 }

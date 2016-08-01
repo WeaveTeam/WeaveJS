@@ -4,15 +4,15 @@ namespace weavejs.dialog
 	import HBox = weavejs.ui.flexbox.HBox;
 	import VBox = weavejs.ui.flexbox.VBox;
 	import Label = weavejs.ui.flexbox.Label;
-	import IRow = weavejs.ui.IRow;
 	import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
 	import SmartComponent = weavejs.ui.SmartComponent;
 	import ListOption = weavejs.ui.ListOption;
 	import CenteredIcon = weavejs.ui.CenteredIcon;
-	import ObjectDataTable = weavejs.ui.ObjectDataTable;
 	import Button = weavejs.ui.Button;
 	import FileInfoView = weavejs.ui.FileInfoView;
 	import Admin = weavejs.net.Admin;
+	import IRow = weavejs.ui.DataTable.IRow;
+	import ObjectDataTable = weavejs.ui.DataTable.ObjectDataTable;
 
 	export class WeaveServerFileOpenComponent extends SmartComponent<IOpenFileProps, IOpenFileState>
 	{

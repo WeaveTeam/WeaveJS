@@ -6,11 +6,11 @@ namespace weavejs.editor
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 	import EditableTextCell = weavejs.ui.EditableTextCell;
 	import ComboBox = weavejs.ui.ComboBox;
-	import ObjectDataTable = weavejs.ui.ObjectDataTable;
+	import ObjectDataTable = weavejs.ui.DataTable.ObjectDataTable;
 	import VBox = weavejs.ui.flexbox.VBox;
 	import HBox = weavejs.ui.flexbox.HBox;
 	import ComboBoxOption = weavejs.ui.ComboBoxOption;
-	import IRow = weavejs.ui.IRow;
+	import IRow = weavejs.ui.DataTable.IRow;
 	import EntityMetadata = weavejs.api.net.beans.EntityMetadata;
 
 	export type MetadataEntry = {[key:string]:any};

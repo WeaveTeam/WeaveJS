@@ -1,7 +1,7 @@
 namespace weavejs.ui
 {
-	import ObjectDataTable = weavejs.ui.ObjectDataTable;
-	import IRow = weavejs.ui.IRow;
+	import ObjectDataTable = weavejs.ui.DataTable.ObjectDataTable;
+	import IRow = weavejs.ui.DataTable.IRow;
 	import HBox = weavejs.ui.flexbox.HBox;
 	import VBox = weavejs.ui.flexbox.VBox;
 	import Label = weavejs.ui.flexbox.Label;

@@ -1,7 +1,8 @@
 namespace weavejs.ui
 {
-	import ObjectDataTable = weavejs.ui.ObjectDataTable;
+	import ObjectDataTable = weavejs.ui.DataTable.ObjectDataTable;
 	import AbstractBinningDefinition = weavejs.data.bin.AbstractBinningDefinition;
+	import IRow = weavejs.ui.DataTable.IRow;
 
 	export interface BinNamesListProps {
 		binningDefinition:AbstractBinningDefinition;

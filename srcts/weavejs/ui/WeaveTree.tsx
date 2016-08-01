@@ -3,6 +3,7 @@ namespace weavejs.ui
 	import HBox = weavejs.ui.flexbox.HBox;
 	import VBox = weavejs.ui.flexbox.VBox;
 	import DOMUtils = weavejs.util.DOMUtils;
+	import ObjectDataTable = weavejs.ui.DataTable.ObjectDataTable;
 
 	export interface IWeaveTreeState<TreeNode>
 	{
