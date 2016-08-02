@@ -184,7 +184,15 @@ namespace weavejs.editor
 			];
 		}
 
-		private showInputDialog(title:string, message:string, defaultInput:string = "", inputValidator:Function = null, inputHandler:Function = null)
+		/**
+		 * Displays a modal dialog and requests user input with OK/Cancel buttons
+		 * @param title dialog window title text
+		 * @param message dialog content text
+		 * @param defaultInput default value for text input box
+		 * @param inputValidator checked every time user modifies input and boolean result determines if the OK button should be enabled
+		 * @param inputHandler Called when user clicks OK button
+		 */
+		private showInputDialog(title:string, message:string, defaultInput:string = "", inputValidator:(input:string)=>boolean = null, inputHandler:(input:string)=>void = null)
 		{
 			this.reportError("TODO - implement SessionStateEditor.prototype.showInputDialog()");
 		}
