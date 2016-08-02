@@ -18,7 +18,7 @@ namespace weavejs.editor
 				_.merge(
 					{
 						title: WeaveAPI.ClassRegistry.getDisplayName(ComponentType),
-						width: 800,
+						width: 900,
 						height: 600
 					},
 					popupProps,

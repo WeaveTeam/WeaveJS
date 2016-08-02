@@ -143,8 +143,6 @@ namespace weavejs.ui
 		}
 
 		static CLASSNAME = "weave-tree-view";
-		static CONTAINER_CLASSNAME = "weave-tree-view-container";
-
 		static BRANCH_ICON_CLASSNAME = "weave-tree-view-icon fa fa-folder fa-fw";
 		static LEAF_ICON_CLASSNAME = "weave-tree-view-icon fa fa-file-text-o fa-fw";
 		static OPEN_BRANCH_ICON_CLASSNAME = "weave-tree-view-icon fa fa-folder-open fa-fw";
@@ -322,15 +320,15 @@ namespace weavejs.ui
 		}
 	}
 
-	export interface ITreeDescriptor<T>
+	export interface ITreeDescriptor<Node>
 	{
-		getLabel(node:T):string;
-		isEqual(node1:T, node2:T):boolean;
-		getChildren:(node:T)=>T[];
-		hasChildBranches:(node:T)=>boolean;
-		isBranch:(node:T)=>boolean;
-		addChildAt?:(parent:T, newChild:T, index:int)=>boolean;
-		removeChildAt?:(parent:T, child:T, index:int)=>boolean;
+		getLabel(node:Node):string;
+		isEqual(node1:Node, node2:Node):boolean;
+		getChildren:(node:Node)=>Node[];
+		hasChildBranches:(node:Node)=>boolean;
+		isBranch:(node:Node)=>boolean;
+		addChildAt?:(parent:Node, newChild:Node, index:int)=>boolean;
+		removeChildAt?:(parent:Node, child:Node, index:int)=>boolean;
 	}
 
 	export interface IBasicTreeNode
@@ -339,29 +337,29 @@ namespace weavejs.ui
 		children?:IBasicTreeNode[];
 	}
 
-	export class BasicTreeDescriptor implements ITreeDescriptor<IBasicTreeNode>
+	export class BasicTreeDescriptor<Node extends IBasicTreeNode> implements ITreeDescriptor<Node>
 	{
-		getLabel(node:IBasicTreeNode):string
+		getLabel(node:Node):string
 		{
 			return node ? node.label : '';
 		}
 
-		isEqual(node1:IBasicTreeNode, node2:IBasicTreeNode):boolean
+		isEqual(node1:Node, node2:Node):boolean
 		{
 			return node1 == node2;
 		}
 
-		getChildren(node:IBasicTreeNode):IBasicTreeNode[]
+		getChildren(node:Node):Node[]
 		{
-			return node ? node.children : null;
+			return node ? node.children as Node[] : null;
 		}
 
-		isBranch(node:IBasicTreeNode):boolean
+		isBranch(node:Node):boolean
 		{
 			return !!(node && node.children);
 		}
 
-		hasChildBranches(node:IBasicTreeNode):boolean
+		hasChildBranches(node:Node):boolean
 		{
 			if (node && node.children)
 				for (let child of node.children)
@@ -370,7 +368,7 @@ namespace weavejs.ui
 			return false;
 		}
 
-		addChildAt(parent:IBasicTreeNode, newChild:IBasicTreeNode, index:int):boolean
+		addChildAt(parent:Node, newChild:Node, index:int):boolean
 		{
 			var index = parent.children ? parent.children.indexOf(newChild) : -1;
 			if (index >= 0)
@@ -383,7 +381,7 @@ namespace weavejs.ui
 			return false;
 		}
 
-		removeChildAt(parent:IBasicTreeNode, child:IBasicTreeNode, index:int):boolean
+		removeChildAt(parent:Node, child:Node, index:int):boolean
 		{
 			var index = parent.children ? parent.children.indexOf(child) : -1;
 			if (index >= 0)

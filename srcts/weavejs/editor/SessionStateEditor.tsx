@@ -20,6 +20,12 @@ namespace weavejs.editor
 	import IGetMenuItems = weavejs.ui.menu.IGetMenuItems;
 	import Menu = weavejs.ui.menu.Menu;
 	import BasicWeaveTree = weavejs.ui.WeaveTree.BasicWeaveTree;
+	import IBasicTreeNode = weavejs.ui.IBasicTreeNode;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
+	import StandardLib = weavejs.util.StandardLib;
+	import BasicTreeDescriptor = weavejs.ui.BasicTreeDescriptor;
 
 	export interface ISessionStateEditorProps extends React.Props<SessionStateEditor>
 	{
@@ -48,7 +54,10 @@ namespace weavejs.editor
 			return ControlPanel.openInstance<ISessionStateEditorProps>(
 				weave,
 				SessionStateEditor,
-				{context, title: Weave.lang('Session State Editor')},
+				{
+					context,
+					title: Weave.lang('Session State Editor')
+				},
 				{
 					rootObject: weave.root,
 					initialSelectedObject: selectedObject
@@ -271,11 +280,12 @@ namespace weavejs.editor
 			WeaveProperties.notify(Weave.getWeave(this.props.rootObject), "error", message);
 		}
 
+		private treeDescriptor = new WeaveSessionTreeDescriptor();
+
 		render():JSX.Element
 		{
 			var rootNode = SessionStateEditor.getTreeNode(this.props.rootObject);
 			var initialSelectedNode = SessionStateEditor.getTreeNode(this.props.initialSelectedObject);
-			var targetNode = this.state.selectedNode || initialSelectedNode || rootNode;
 			var initialOpenItems = [rootNode, initialSelectedNode].filter(n => !!n);
 			return (
 				<HDividedBox
@@ -285,8 +295,9 @@ namespace weavejs.editor
 				>
 					<VBox>
 						<DynamicComponent dependencies={[this.props.rootObject]} render={() =>
-							<BasicWeaveTree
+							<WeaveSessionTree
 								root={rootNode}
+								treeDescriptor={this.treeDescriptor}
 								initialOpenItems={initialOpenItems}
 								initialSelectedItems={[initialSelectedNode]}
 								multipleSelection={false}
@@ -302,4 +313,35 @@ namespace weavejs.editor
 			);
 		}
 	}
+
+	class WeaveSessionTreeDescriptor extends BasicTreeDescriptor<WeaveTreeItem>
+	{
+		getLabel(node:WeaveTreeItem):string
+		{
+			// append class name to the label.
+			var label:string = Weave.className(node.data).split(".").pop();
+			if (node.label)
+				label += ' ' + JSON.stringify(node.label);
+
+			// get editor label
+			var editorLabel:String = WeaveAPI.EditorManager.getLabel(node.data as ILinkableObject);
+			// get description
+			var description:String = null;
+			var iowd:IObjectWithDescription = Weave.AS(node.data, IObjectWithDescription);
+			if (iowd)
+				description = iowd.getDescription();
+			else if (Weave.IS(node.data, IAttributeColumn))
+				description = (node.data as IAttributeColumn).getMetadata(ColumnMetadata.TITLE);
+
+			var inParens:String = editorLabel || description;
+			if (editorLabel && description)
+				inParens = editorLabel + ': ' + description;
+			if (inParens)
+				label += ` (${inParens})`;
+
+			return label;
+		}
+	}
+
+	class WeaveSessionTree extends WeaveTree<WeaveTreeItem> { }
 }
