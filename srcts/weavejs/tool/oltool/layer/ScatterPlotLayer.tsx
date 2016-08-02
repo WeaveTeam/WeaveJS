@@ -133,6 +133,8 @@ namespace weavejs.tool.oltool.layer
 
 		updateStyleData()
 		{
+			var recordIds = _.intersection.apply(null, this.requiredAttributes.map((attr) => attr.keys));
+
 			let fillEnabled = this.fill.enable.value;
 			let strokeEnabled = this.line.enable.value;
 			var styleRecords:any[] = ColumnUtils.getRecords(
@@ -142,7 +144,7 @@ namespace weavejs.tool.oltool.layer
 					stroke: this.line.recordFormat,
 					radius: this.radius
 				},
-				this.dataX.keys,
+				recordIds,
 				{
 					fill: this.fill.recordType,
 					stroke: this.line.recordType,
