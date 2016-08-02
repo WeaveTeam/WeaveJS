@@ -20,7 +20,6 @@ namespace weavejs.ui
 		hideRoot?: boolean;
 		hideLeaves? : boolean;
 		hideBranches? : boolean;
-		labelFunction?: (item: TreeNode) => string;
 		filterFunc?: (node: TreeNode) => boolean;
 		multipleSelection?: boolean;
 		onSelect?: (selectedItems: TreeNode[]) => void;
