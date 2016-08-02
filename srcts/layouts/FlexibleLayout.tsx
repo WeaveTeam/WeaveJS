@@ -29,6 +29,7 @@ const OUTER_PANEL_ID:WeavePathArray = []; // special value to indicate dragging 
 var structure_LayoutState:any = {
 	id: MiscUtils.nullableStructure(["string"]),
 	children: null,
+	spacing: "number",
 	flex: "number",
 	direction: "string",
 	maximized: "boolean"
@@ -36,11 +37,11 @@ var structure_LayoutState:any = {
 structure_LayoutState.children = MiscUtils.nullableStructure([structure_LayoutState]);
 var structure_FlexibleLayoutState:any = _.merge({title: "string"}, structure_LayoutState);
 
-export type FlexibleLayoutState = {title?: string} & LayoutState;
+export type FlexibleLayoutState = {title?: string, spacing?: number} & LayoutState;
 
 export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 {
-	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, this.simplifyState({flex: 1, title: ""})), this.forceUpdate, true);
+	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, this.simplifyState({flex: 1, title: "", spacing: 8})), this.forceUpdate, true);
 	private nextState:Object;
 	private rootLayout:Layout;
 	private layoutRect:ClientRect;
@@ -596,7 +597,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	render():JSX.Element
 	{
 		var weave:Weave = Weave.getWeave(this);
-		var newState:LayoutState = this.getSessionState();
+		var newState:FlexibleLayoutState = this.getSessionState();
 		var components:JSX.Element[] = null;
 		if (this.rootLayout)
 		{
@@ -638,6 +639,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 					this.repositionPanels();
 			},
 			state: newState,
+			spacing: newState.spacing,
 			onStateChange: this.setSessionState
 		});
 

@@ -53,7 +53,7 @@ export default class DataInfoTool extends React.Component<IVisToolProps, IVisToo
 	showRecordValue = Weave.linkableChild(this, new LinkableBoolean(true));
 	colorRamp = Weave.linkableChild(this, new ColorRamp(["0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"]));
 	panelTitle = Weave.linkableChild(this, LinkableString);
-
+	showTitle = Weave.linkableChild(this, new LinkableBoolean(true));
 	columnNames:string[] = null;
 	keys:IQualifiedKey[] = null;
 
@@ -148,10 +148,10 @@ export default class DataInfoTool extends React.Component<IVisToolProps, IVisToo
 	{
 		let columnObjects = this.columns && this.columns.getObjects();
 
-
 		let columnUI:JSX.Element[] = columnObjects && columnObjects.map( (col:IAttributeColumn,index:number) =>
 			{
 				let colName = weavejs.data.ColumnUtils.getTitle(col);
+				let imageUrl = this.columns.getName(col);
 				let metaDataPropNames:LinkableVariable = this.columnMetaDataProperties.getObject(colName) as LinkableVariable;
 
 				let metaDataProps:string[] = null;
@@ -185,6 +185,7 @@ export default class DataInfoTool extends React.Component<IVisToolProps, IVisToo
 				                    colorRamp={this.colorRamp}
 				                    layout={this.layout.value}
 				                    column={col}
+									imageUrl={imageUrl}
 				                    recordKeys={this.keys}
 				                    style={colStatsStyle}
 				                    showRecordBar={this.showRecordBar.value}
@@ -200,7 +201,7 @@ export default class DataInfoTool extends React.Component<IVisToolProps, IVisToo
 		}
 		else
 		{
-			return (<HBox padded={true} style={{flex: 1, overflow:"hidden"}}>
+			return (<HBox style={{flex: 1, overflow:"hidden"}}>
 						{columnUI}
 					</HBox>);
 		}
@@ -214,6 +215,7 @@ interface ColumnStatsProps extends React.HTMLProps<ColumnStats>
 	showRecordValue:boolean;
 	columnMetaDataProperties:any;
 	column:IAttributeColumn;
+	imageUrl:string;
 	recordKeys:IQualifiedKey[];
 	colorRamp:ColorRamp;
 }
@@ -236,7 +238,7 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 		let colName = weavejs.data.ColumnUtils.getTitle(this.props.column);
 
 		let columnTitleUI:JSX.Element = null;
-
+		let imageUrl = this.props.imageUrl.indexOf(".") >= 0 ? this.props.imageUrl : null;
 		if(colName)
 		{
 			if (weavejs.WeaveAPI.Locale.reverseLayout)
@@ -244,9 +246,25 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 				colName = Weave.lang(colName);
 			}
 
-			columnTitleUI = <div style={ {whiteSpace: "nowrap",overflow: "hidden",textOverflow: "ellipsis",padding:"2px"} }>
-								{colName}
-							</div>
+			columnTitleUI = (
+				<VBox style={ {
+					justifyContent: "center",
+					fontSize: 11,
+					whiteSpace: "nowrap",
+					overflow: "hidden",
+					textOverflow: "ellipsis",
+					padding: "2px",
+					textAlign: "center",
+					color: imageUrl ? "#d5a480" : "#145784"
+				} }>
+					{
+						imageUrl ?
+						<img src={imageUrl} style={{width: 50, height: 50}}/>
+						: null
+					}
+					{colName}
+				</VBox>
+			);
 		}
 
 		let recordValueUI:JSX.Element = null;
@@ -265,36 +283,23 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 				});
 
 				color = maxValue ? this.props.colorRamp.getHexColor(maxValue as any, 0, 100) : null;
-				let valueBoxStyle:React.CSSProperties = {
-					display:"flex",
-					alignItems:"center",
-					justifyContent:"center",
-					background:color,
-					width:"40px",
-					height:"40px",
-					color:"white",
-					margin:"2px",
-					textShadow:"0px 0px 2px black",
-					borderRadius:"4px",
-					border:"1px solid lightgrey"
-				};
-				let statNameUI:JSX.Element = null;
-				if(this.props.recordKeys.length > 1)
+				let statsName = "Max";
+				let maxValueStr = String(maxValue);
+				if (weavejs.WeaveAPI.Locale.reverseLayout)
 				{
-					let textShadowValue:string = "1px 1px 1px " + color;
-					let statsName:string = "Max";
-					if(weavejs.WeaveAPI.Locale.reverseLayout)
-					{
-						statsName = Weave.lang(statsName);
-					}
-					statNameUI = <div style={ {textAlign:"center",color:"grey",textShadow:textShadowValue} }>{statsName}</div>
+					statsName = Weave.lang(statsName);
+					maxValueStr = Weave.lang(maxValueStr);
 				}
-				recordValueUI =  <div>
-									{statNameUI}
-									<div style={ valueBoxStyle }>
-										{ Weave.lang(String(maxValue)) }
-									</div>
-								</div>;
+				recordValueUI =  (
+					<VBox padded style={{justifyContent: "center", overflow: "visible"}}>
+						<VBox style={{width: 50, height: 50, color: "white", fontWeight: "bold", textAlign: "center", margin: 2, borderRadius: 4, backgroundColor: color}}>
+							<span style={{ fontSize: 8 }}> { statsName } </span>
+							<span style={{ fontSize: 18 }}>
+								{ maxValueStr }
+							</span>
+						</VBox>
+					</VBox>
+				);
 			}
 		}
 
@@ -325,13 +330,15 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 					colMetaDataPropertyNames = this.props.column.getMetadataPropertyNames();
 				}
 					
-				let infoStyle:React.CSSProperties = {
-					borderBottom:"1px solid lightgrey",
-					paddingBottom:"2px",marginTop:"2px",
-					fontSize:"12px"
-				};
-				
-				infoUIs = colMetaDataPropertyNames.map((metaDataPropertyName:string , index:number)=>{
+				infoUIs = colMetaDataPropertyNames.map((metaDataPropertyName:string , index:number) => {
+
+					let infoStyle:React.CSSProperties = {
+						paddingBottom: 2,
+						marginTop: 2,
+						borderBottom: "1px solid lightgrey",
+						fontSize: 10
+					};
+
 					let metadata = this.props.column.getMetadata(metaDataPropertyName);
 					if(metadata)
 					{
@@ -341,50 +348,63 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 							propertyName = Weave.lang(propertyName);
 							metadata = Weave.lang(metadata);
 						}
-						return  ( <HBox key={index} style={ infoStyle }>
-									<div style={ {flex:"1 0"} }>{propertyName}</div>
-									<div>{metadata}</div>
-								</HBox>);
+						// hack to remove last border
+						if(index == colMetaDataPropertyNames.length - 1)
+						{
+							infoStyle["borderBottom"] = "0 px";
+						}
+
+						return  (
+							<HBox key={index} style={ infoStyle }>
+								<div style={ {flex:"1 0"} }>{propertyName}</div>
+								<div>{metadata}</div>
+							</HBox>
+						);
 					}
 					else
 						return null;
 				});
 			}
 
-			columnInfoUI = <VBox style={ {flex:"1 0"} } >{infoUIs}</VBox>
+			columnInfoUI = <VBox>{infoUIs}</VBox>
 		}
 
-		let containerStyle:React.CSSProperties = _.merge({},this.props.style,{
-			flex:"1",
-			padding:"4px"
-		});
+		let verticalLayoutUIStyle = {
+			justifyContent: "space-around",
+			borderBottom: "1px solid lightgrey",
+		};
 
-		let layoutUI:JSX.Element = null;
+		let horizontalLayoutUIStyle = {
+			borderLeft: "8px solid #e0e0e0",
+			borderRight: "8px solid #e0e0e0",
+			borderTop: "16px solid #e0e0e0",
+			borderBottom: "16px solid #e0e0e0",
+		};
+
 		if(this.props.layout == "vertical")
 		{
-			layoutUI = <HBox padded={true} style={ {flex:"1",alignItems:"center"} }>
-							{columnTitleUI}
-							{columnInfoUI}
-							{recordValueUI}
-						</HBox>;
+			return (
+				<HBox style={verticalLayoutUIStyle}>
+					{columnTitleUI}
+					{columnInfoUI}
+					{recordValueUI}
+				</HBox>
+			);
 		}
 		else
 		{
-			layoutUI = <HBox padded={true} style={ {flex:"1",alignItems:"center"} }>
-							{columnInfoUI}
-							{recordValueUI}
-						</HBox>
+			return (
+				<VBox style={horizontalLayoutUIStyle}>
+					<HBox style={{ paddingBottom: 15 }}>
+						{columnTitleUI}
+						{recordValueUI}
+					</HBox>
+					{recordBarUI}
+				</VBox>
+			)
 
 
 		}
-
-
-
-		return  <VBox  style={ containerStyle }>
-					{this.props.layout == "horizontal" ? columnTitleUI : null}
-					{layoutUI}
-					{recordBarUI}
-				</VBox>
 	}
 }
 
