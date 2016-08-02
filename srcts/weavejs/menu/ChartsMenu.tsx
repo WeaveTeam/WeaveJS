@@ -18,6 +18,7 @@ namespace weavejs.menu
 	import BinnedColumn = weavejs.data.column.BinnedColumn;
 	import FilteredColumn = weavejs.data.column.FilteredColumn;
 	import C3Gauge = weavejs.tool.c3tool.C3Gauge;
+	import DataMessageTool = weavejs.tool.DataMessageTool;
 
 	export class ChartsMenu implements MenuBarItemProps
 	{
@@ -48,6 +49,7 @@ namespace weavejs.menu
 				C3ColorHistogram,
 				C3Histogram,
 				C3LineChart,
+				DataMessageTool,
 				OpenLayersMapTool,
 				C3PieChart,
 				C3ScatterPlot,
@@ -74,7 +76,7 @@ namespace weavejs.menu
 		
 		static isBeta(impl:Class):boolean
 		{
-			return impl == C3Gauge;
+			return impl == C3Gauge || impl == DataMessageTool;
 		}
 	}
 }
