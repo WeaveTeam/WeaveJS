@@ -118,13 +118,12 @@ namespace weavejs.ui
 				return;
 
 			let openItems = this.state.openItems;
-			let selectedItems = this.state.selectedItems;
 			if (!isOpen)
 				openItems = openItems.concat([node]);
 			else if (isOpen)
 				openItems = openItems.filter((other) => !node.equals(other));
 
-			this.setState({ openItems, selectedItems });
+			this.setState({ openItems });
 		}
 
 		static CLASSNAME = "weave-tree-view";
