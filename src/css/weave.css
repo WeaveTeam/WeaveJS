@@ -139,7 +139,7 @@
 }
 
 .weave-vslider .rc-slider-vertical {
-    width: 2px;
+	width: 2px;
 	z-index: 0;
 }
 
@@ -165,8 +165,8 @@
 }
 
 .weave-vslider .rc-slider-vertical .rc-slider-dot {
-    left: 1px;
-    margin-bottom: -1px;
+	left: 1px;
+	margin-bottom: -1px;
 }
 
 .weave-vslider .rc-slider-vertical .rc-slider-track {
@@ -382,11 +382,11 @@ div.table-row-selected>div>div>div>div>div {
 	padding: 1rem;
 }
 .weave-section > *:nth-child(1) {
-    border-bottom: 1px solid rgba(34,36,38,.15);
-    padding-bottom: 0.25rem;
-    font-size: 1.28rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
+	border-bottom: 1px solid rgba(34,36,38,.15);
+	padding-bottom: 0.25rem;
+	font-size: 1.28rem;
+	font-weight: bold;
+	margin-bottom: 1rem;
 }
 
 .weave-label {
@@ -455,34 +455,34 @@ div.table-row-selected>div>div>div>div>div {
 
 .weave-tab-label {
 	padding: 5px 8px 5px 8px;
-    cursor: default;
-    background: #F8F8F8;
-    border-right: 1px solid #ddd;
+	cursor: default;
+	background: #F8F8F8;
+	border-right: 1px solid #ddd;
 }
 
 .weave-tab-label:nth-child(1) {
-    border-left: 1px solid #ddd;
+	border-left: 1px solid #ddd;
 }
 
 .weave-tab-label.top {
-    border-top: 1px solid #ddd;
+	border-top: 1px solid #ddd;
 }
 
 .weave-tab-label.bottom {
-    border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
 }
 
 .weave-tab-label.active {
-    background: none;
+	background: none;
 }
 .weave-tab-label.active.top {
-    margin-bottom: -1px; /* to cover the label container border*/
-    border-bottom: 1px solid white; /* todo: border bottom white is not right way has to match backgroundcolor */
+	margin-bottom: -1px; /* to cover the label container border*/
+	border-bottom: 1px solid white; /* todo: border bottom white is not right way has to match backgroundcolor */
 }
 
 .weave-tab-label.active.bottom {
-    margin-top: -1px; /* to cover the label container border*/
-    border-top: 1px solid white; /* todo: border bottom white is not right way has to match backgroundcolor */
+	margin-top: -1px; /* to cover the label container border*/
+	border-top: 1px solid white; /* todo: border bottom white is not right way has to match backgroundcolor */
 }
 
 .weave-tab-content {
@@ -1079,18 +1079,18 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 
 /******* Breadcrumb *******/
 
-.ui.breadcrumb {
-    line-height: normal;
+.weave-app .ui.breadcrumb {
+	line-height: normal;
 }
 
 /******* Menu *******/
 
-.ui.dropdown .menu>.item {
-    line-height: normal;
+.weave-app .ui.dropdown .menu>.item {
+	line-height: normal;
 }
 
 /******* Button *******/
-.ui.button {
+.weave-app .ui.button {
 	border:1px solid lightgrey;
 	background-color:#ECECEC;
 	color:black;
@@ -1098,50 +1098,50 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	margin:0;/* important to override semantic ui default margin-right value. for special cases use inline style to set */
 }
 
-.ui.button:hover {
+.weave-app .ui.button:hover {
 	background-color: lightgrey;
 }
 
-.ui.button:focus {
+.weave-app .ui.button:focus {
 	background-color: #ECECEC;
 	border-color: #85B7D9;
 }
 
-.ui.secondary.button, .ui.secondary.buttons .button {
+.weave-app .ui.secondary.button, .weave-app .ui.secondary.buttons .button {
 	background: rgba(60,64,63,0.9);
 }
 
 /******* Dropdown *****/
 
-.ui.multiple.dropdown>.label {
+.weave-app .ui.multiple.dropdown>.label {
 	display: inline-flex;
 	align-items: center;
 	background: none;
 }
 
-.ui.multiple.dropdown>.label:hover {
+.weave-app .ui.multiple.dropdown>.label:hover {
 	background: lightgrey;
 }
 
-.ui.selection.dropdown .menu {
+.weave-app .ui.selection.dropdown .menu {
 	border-top-style: dashed;
 	border-bottom-style: solid;
 	border-top-width: 1px!important;
 }
 
-.ui.upward.selection.dropdown .menu {
+.weave-app .ui.upward.selection.dropdown .menu {
 	border-top-style: solid;
 	border-bottom-style: dashed;
 	border-bottom-width: 1px!important;
 }
 
-.ui.dropdown .menu>.header {
+.weave-app .ui.dropdown .menu>.header {
 	padding-left: 4px;
 }
 
 /******* grid *********/
 
-.ui.grid {
+.weave-app .ui.grid {
 	display: -webkit-box;
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -1162,17 +1162,17 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	margin: 0;
 }
 
-.ui.grid>* {
+.weave-app .ui.grid>* {
 	padding-left: 0;
 	padding-right: 8px;
 }
 
-.ui.grid>.column:not(.row) {
+.weave-app .ui.grid>.column:not(.row) {
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
 
-.ui.grid>.column:not(.row), .ui.grid>.row>.column {
+.weave-app .ui.grid>.column:not(.row), .weave-app .ui.grid>.row>.column {
 	position: relative;
 	display: inline-block;
 	padding-left: 0;
@@ -1180,7 +1180,7 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	vertical-align: middle;
 }
 
-.ui.grid>.column:not(.row), .ui.grid>.row>.column {
+.weave-app .ui.grid>.column:not(.row), .weave-app .ui.grid>.row>.column {
 	position: relative;
 	display: inline-block;
 	padding-left: 0;
@@ -1189,41 +1189,41 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 }
 
 /****** Accordion *******/
-.ui.styled.accordion {
+.weave-app .ui.styled.accordion {
 	border-radius: 2px;
 	background: none;
 	width:100%;
 	box-shadow:none;
 }
 
-.ui.styled.accordion .title {
+.weave-app .ui.styled.accordion .title {
 	padding: 1em 0 0 0;
 }
 
-.ui.styled.accordion .content {
+.weave-app .ui.styled.accordion .content {
 	padding: .5em 0 1em 1em;
 }
 
 /****** Dimmer ********/
-.ui.dimmer {
+.weave-app .ui.dimmer {
 	background-color: rgba(204,204,204,0.5);
 }
 
 /****** Modal *********/
-.ui.modal>.close {
+.weave-app .ui.modal>.close {
 	top: 1.0535rem;
 	right: 1rem;
 	color: rgba(0,0,0,.87);
 }
 
 /****** Inverted Segment *******/
-.ui.inverted,.ui.inverted.segment {
+.weave-app .ui.inverted,.weave-app .ui.inverted.segment {
 	background: rgba(60,64,63,0.9);
 	color: rgba(161,164,163,1.0);
 }
 
 /****** Warning ******/
-.ui.input.warning input {
+.weave-app .ui.input.warning input {
 	background-color: #FFFAF3;
 	border-color: #C9BA9B;
 	color: #794B02;
@@ -1231,12 +1231,12 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 }
 
 /****** Modal *******/
-.ui.mini.modal {
+.weave-app .ui.mini.modal {
 	width: 400px;
 	margin: 0 0 0 -200px;
 }
 
-.ui.mini.modal>.close {
+.weave-app .ui.mini.modal>.close {
 	top: 1.0535rem;
 	right: 1rem;
 	color: rgba(0,0,0,.87);
