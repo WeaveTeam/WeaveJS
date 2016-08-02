@@ -13,6 +13,7 @@ namespace weavejs.tool.oltool.layer
 	import ColumnUtils = weavejs.data.ColumnUtils;
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import CircleCache = weavejs.tool.oltool.layer.CircleCache;
 
 	export class ScatterPlotLayer extends AbstractGlyphLayer
 	{
@@ -81,7 +82,7 @@ namespace weavejs.tool.oltool.layer
 		{
 			return (strokeEnabled || fillEnabled) && [
 					new ol.style.Style({
-						image: new ol.style.Circle({
+						image: CircleCache.getCircle({
 							stroke: olSelectionStyle[0].getStroke(),
 							radius: record.radius
 						}),
@@ -94,14 +95,14 @@ namespace weavejs.tool.oltool.layer
 		{
 			return (strokeEnabled || fillEnabled) && [
 					new ol.style.Style({
-						image: new ol.style.Circle({
+						image: CircleCache.getCircle({
 							stroke: olProbedStyle[0].getStroke(),
 							radius: record.radius
 						}),
 						zIndex: olProbedStyle[0].getZIndex()
 					}),
 					new ol.style.Style({
-						image: new ol.style.Circle({
+						image: CircleCache.getCircle({
 							stroke: olProbedStyle[1].getStroke(),
 							radius: record.radius
 						}),
@@ -113,7 +114,7 @@ namespace weavejs.tool.oltool.layer
 		static getNormalStyle(record:any, strokeEnabled:boolean, fillEnabled:boolean, olStroke:ol.style.Stroke, olFill:ol.style.Fill):Array<ol.style.Style>
 		{
 			return [new ol.style.Style({
-				image: new ol.style.Circle({
+				image: CircleCache.getCircle({
 					fill: fillEnabled ? olFill : undefined, stroke: strokeEnabled ? olStroke : undefined,
 					radius: record.radius,
 				})
@@ -123,7 +124,7 @@ namespace weavejs.tool.oltool.layer
 		static getUnselectedStyle(record:any, strokeEnabled:boolean, fillEnabled:boolean, olStrokeFaded:ol.style.Stroke, olFillFaded:ol.style.Fill):Array<ol.style.Style>
 		{
 			return [new ol.style.Style({
-				image: new ol.style.Circle({
+				image: CircleCache.getCircle({
 					fill: fillEnabled ? olFillFaded : undefined,
 					stroke: strokeEnabled ? olStrokeFaded : undefined,
 					radius: record.radius

@@ -2380,25 +2380,13 @@ declare module ol {
          * Return the color as an array. This function maintains a cache of calculated arrays which means the result should not be modified.
          * @param color Color.
          */
-        function asArray(color: ol.Color): ol.Color;
-
-        /**
-         * Return the color as an array. This function maintains a cache of calculated arrays which means the result should not be modified.
-         * @param color Color.
-         */
-        function asArray(color: string): ol.Color;
+        function asArray(color: ol.Color|string): ol.Color;
 
         /**
          * Return the color as an rgba string.
          * @param color Color.
          */
-        function asString(color: ol.Color): string;
-
-        /**
-         * Return the color as an rgba string.
-         * @param color Color.
-         */
-        function asString(color: string): string;
+        function asString(color: ol.Color|string): string;
     }
 
     module control {
@@ -4267,6 +4255,8 @@ declare module ol {
 
         class Stroke {
             constructor(opt_options: olx.style.StrokeOptions);
+            getColor(): ol.Color | string;
+            getWidth(): number;
         }
 
         /**
