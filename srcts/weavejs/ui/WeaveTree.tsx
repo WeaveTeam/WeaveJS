@@ -189,11 +189,13 @@ namespace weavejs.ui
 				}
 			}
 
-			return <HBox key={index}
-				className={className}
-				onDoubleClick={ iconClickFunc || doubleClickFunc }
-				style={{ alignItems: "center", width: "100%" }}>
-				<HBox style={{ marginLeft: (depth || 0) * 16 + 5, whiteSpace: "nowrap" }}>
+			return (
+				<HBox
+					key={index}
+					className={className}
+					onDoubleClick={ iconClickFunc || doubleClickFunc }
+					style={{ alignItems: "center", width: "100%", paddingLeft: (depth || 0) * 16 + 5, whiteSpace: "nowrap" }}
+				>
 					<span style={{ alignSelf: "stretch", display: "flex" }}>
 						<i
 							onMouseDown={ iconClickFunc }
@@ -210,7 +212,7 @@ namespace weavejs.ui
 					</span>
 					{ " " + this.props.treeDescriptor.getLabel(node) }
 				</HBox>
-			</HBox>;
+			);
 		};
 
 		enumerateItems=(node:TreeNode, result: Array<[number, TreeNode]> = [], depth: number = 0): Array<[number, TreeNode]> =>

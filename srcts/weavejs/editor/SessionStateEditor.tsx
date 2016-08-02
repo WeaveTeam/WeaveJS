@@ -341,6 +341,11 @@ namespace weavejs.editor
 
 			return label;
 		}
+
+		isEqual(node1:WeaveTreeItem, node2:WeaveTreeItem):boolean
+		{
+			return node1.data == node2.data;
+		}
 	}
 
 	class WeaveSessionTree extends WeaveTree<WeaveTreeItem> { }
