@@ -528,7 +528,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 			let max = ! isNaN(this.props.tableMax) ? this.props.tableMax : 100
 			// todo : automate min max value form all columns
 			// give editor config for user to set that manually too (as 0 to 1 or 1 to 100 are usually expected for heatmap)
-			cellStyle["background"] =  this.props.colorRamp.getHexColor(value as any,min, max)
+			cellStyle["color"] =  this.props.colorRamp.getHexColor(value as any,min, max)
 		}
 
 		let cellValue:number | string = typeof value == 'number' ? value as number : value as string;

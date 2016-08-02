@@ -45,16 +45,14 @@
     "tsd": "^0.6.5",
     "typescript": "^1.8.7"
   },
-  "peerDependencies": {
-    "react": "0.14.7",
-    "react-dom": "0.14.7"
-  },
   "dependencies": {
     "as2dts": "^0.2.3",
     "babel": "^6.1.18",
     "babel-cli": "^6.4.5",
     "browserify-incremental": "^3.1.1",
     "c3": "https://github.com/WeaveTeam/c3.git",
+    "react": "0.14.7",
+    "react-dom": "0.14.7",
     "classnames": "^2.2.3",
     "clipboard": "^1.5.10",
     "d3": "^3.5.9",
