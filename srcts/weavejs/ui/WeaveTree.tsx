@@ -83,8 +83,12 @@ namespace weavejs.ui
 
 		private nodeArraysChanged(arrayA:TreeNode[], arrayB:TreeNode[]):boolean
 		{
-			return arrayA.length != arrayB.length
-				|| arrayA.some((d, i, a) => !this.areNodesEqual(d, arrayB[i]));
+			return (
+				arrayA && arrayB
+				?	arrayA.length != arrayB.length
+					|| arrayA.some((d, i, a) => !this.areNodesEqual(d, arrayB[i]))
+				:	arrayA != arrayB
+			);
 		}
 
 		private areNodesEqual = (a:TreeNode, b:TreeNode) =>
