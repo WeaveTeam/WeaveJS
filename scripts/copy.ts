@@ -5,15 +5,14 @@ module.exports = function()
 	let targets:{[name:string]:TargetEntry} = {
 		index_html: {flatten: true, cwd: 'src/', src: 'index.html', dest: 'dist/'},
 		weave_html: {flatten: true, cwd: 'src/', src: 'weave.html', dest: 'dist/'},
-		css: {flatten: true, cwd: 'src/', src: 'css/*.css', dest: 'dist/css/'},
+		css: {flatten: true, cwd: 'src/', src: 'css/*.css', dest: 'dist/'},
 		img: {flatten: true, cwd: 'src/', src: 'img/*.*', dest: 'dist/img'},
 		fonts: {flatten: true, cwd: 'src/', src: 'css/fonts/*.ttf', dest: 'dist/fonts'},
-		olcss: {flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/css/'},
+		olcss: {flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/'},
 		fontawesomecss: {flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'dist/css/'},
 		fontawesomefont: {flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
-		semantic: {cwd: 'src/semantic', src: 'semantic.min.css', dest: 'dist/css/'},
-		semanticjs: {cwd: 'src/semantic', src: 'semantic.min.js', dest: 'dist/'},
-		weavesessions: {flatten: true, cwd: 'weave_sessions', src: "*.weave", dest: "dist/"},
+		semantic: {cwd: 'src/semantic', src: '**', dest: 'dist/semantic/'},
+		weavesessions: {flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"},
 		projdb: {flatten: true, cwd: 'src/', src: 'ProjDatabase.zip', dest: "dist/"},
 		core: {cwd: "WeaveASJS/bin/js-release/", src: "*.*", dest: "dist/core"}
 	};

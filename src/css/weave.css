@@ -1,13 +1,3 @@
-@import 'c3.css';
-@import 'codemirror.css';
-@import 'eclipse.css';
-@import 'ol.css';
-@import 'ol-custom.css';
-@import 'font-awesome.css';
-@import 'rcslide.css';
-@import 'fixed-data-table.css';
-@import 'semantic.min.css';
-
 weave-vbox * {
 	font-family: sans-serif;
 }
