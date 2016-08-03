@@ -40,12 +40,14 @@ namespace weavejs.editor
 
 	export class SessionStateEditor extends SmartComponent<ISessionStateEditorProps, ISessionStateEditorState> implements IGetMenuItems
 	{
-		static getTreeNode(rootObject:ILinkableObject)
+		static getTreeNode(object:ILinkableObject)
 		{
-			var name:string = null;
-			if (rootObject == Weave.getRoot(rootObject))
-				name = "Weave";
-			return (WeaveAPI.SessionManager as SessionManager).getSessionStateTree(rootObject, name);
+			let root = Weave.getRoot(object);
+			let path = Weave.findPath(root, object);
+			let name:string = WeaveAPI.ClassRegistry.getDisplayName(object.constructor as Class);
+			if (path)
+				name = path.length ? path.pop() : "Weave";
+			return (WeaveAPI.SessionManager as SessionManager).getSessionStateTree(object, name);
 		}
 
 		static openInstance(context:React.ReactInstance, selectedObject:ILinkableObject):ControlPanel
