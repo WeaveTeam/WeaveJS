@@ -7,12 +7,12 @@ namespace weavejs.ui
 	{
 		static popupSet = new Set<Popup>();
 
-		static open(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false, onClose?:(popup:Popup)=>void):Popup
+		static open(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false, onClose?:(popup:Popup)=>void, attachToSibling:boolean = true):Popup
 		{
-			var popup = ReactUtils.openPopup(context, <Popup style={{zIndex: 0}}>{jsx}</Popup>, closeOnMouseDown, (popup:React.ReactInstance) => {
+			var popup = ReactUtils.openPopup(context, <Popup>{jsx}</Popup>, closeOnMouseDown, (popup:React.ReactInstance) => {
 				Popup.close(popup as Popup);
 				if (onClose) onClose(popup as Popup);
-			}) as Popup;
+			},attachToSibling) as Popup;
 			Popup.popupSet.add(popup);
 			Popup.alignPopups();
 			return popup;
@@ -57,8 +57,7 @@ namespace weavejs.ui
 						left: 0,
 						width: "100%",
 						height: "100%",
-						pointerEvents: "none",
-						zIndex: index
+						pointerEvents: "none"
 					}
 				});
 				index++;

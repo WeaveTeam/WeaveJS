@@ -274,7 +274,7 @@ namespace weavejs.ui.menu
 			// this logic should be generic to the menu.
 			// if the menu overflows to the right or bottom
 			// render it the other way
-			if (this.element)
+			if (this.element && !this.opener)
 			{
 				var menuRect = this.element.getBoundingClientRect();
 				if (menuRect.left + menuRect.width > this.window.innerWidth)
