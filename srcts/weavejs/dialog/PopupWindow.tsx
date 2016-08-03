@@ -176,7 +176,7 @@ namespace weavejs.dialog
 			var popupWindow = (
 				<DraggableDiv
 					style={windowStyle}
-					className="weave-window"
+					className="weave-app weave-window"
 					draggable={false}
 					resizable={this.props.resizable}
 					onMouseDown={() => {
@@ -221,7 +221,7 @@ namespace weavejs.dialog
 			);
 
 			return (
-				<div className="weave" ref={ReactUtils.registerComponentRef(this)} onContextMenu={ContextMenu.open}>
+				<div ref={ReactUtils.registerComponentRef(this)} onContextMenu={ContextMenu.open}>
 					{this.props.modal ? this.renderOverlay(this.props.modal) : null}
 					{popupWindow}
 				</div>

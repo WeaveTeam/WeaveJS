@@ -630,7 +630,7 @@ namespace weavejs.app
 			let NotificationSystem_System = NotificationSystem.System;
 			return (
 				<VBox
-					className="weave"
+					className="weave-app"
 					{...this.props as React.HTMLAttributes}
 					style={_.merge({flex: 1}, this.props.style)}
 					onContextMenu={ContextMenu.open}>

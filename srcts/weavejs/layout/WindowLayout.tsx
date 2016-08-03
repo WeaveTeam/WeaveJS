@@ -281,7 +281,6 @@ namespace weavejs.layout
 							overflow: "hidden"
 						})
 					}
-					className={classNames(this.props.className, "weave")}
 				>
 					{
 						state.panels.map(state => {
@@ -307,7 +306,7 @@ namespace weavejs.layout
 									movable={!state.maximized}
 									resizable={!state.maximized}
 									getExternalOverlay={() => this.overlay}
-									className="weave-window"
+									className={classNames("weave-app", "weave-window")}
 									style={style}
 									onMouseDown={(event) => this.bringPanelForward(state.id)}
 									draggable={!this.props.panelRenderer}

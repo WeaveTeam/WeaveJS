@@ -1,34 +1,34 @@
-.weave * {
+.weave-app * {
 	font-family: sans-serif;
 }
 
-.weave p {
+.weave-app p {
 	line-height: normal;
 }
 
-.weave input[type=number]::-webkit-inner-spin-button,
-.weave input[type=number]::-webkit-outer-spin-button {
+.weave-app input[type=number]::-webkit-inner-spin-button,
+.weave-app input[type=number]::-webkit-outer-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
 }
 
 /* disable numerical spinners in Mozilla Firefox */
-.weave input[type=number] {
+.weave-app input[type=number] {
 	-moz-appearance:textfield;
 }
 
 /****** Altering the default behavior of Input Placeholder on Focus******/
 /* WebKit browsers */
-.weave input:focus::-webkit-input-placeholder { opacity:0; }
+.weave-app input:focus::-webkit-input-placeholder { opacity:0; }
 
 /* Mozilla Firefox 4 to 18 */
-.weave input:focus:-moz-placeholder { opacity:0; }
+.weave-app input:focus:-moz-placeholder { opacity:0; }
 
 /* Mozilla Firefox 19+ */
-.weave input:focus::-moz-placeholder { opacity:0;}
+.weave-app input:focus::-moz-placeholder { opacity:0;}
 
 /* Internet Explorer 10+ */
-.weave input:focus:-ms-input-placeholder { opacity:0; }
+.weave-app input:focus:-ms-input-placeholder { opacity:0; }
 
 /* Dowloaded Fonts*/
 @font-face {
@@ -217,7 +217,7 @@ div.table-row-selected>div>div>div>div>div {
 
 
 /* weave custom css */
-.weave {
+.weave-app {
 	user-select: none;
 	-webkit-user-select: none;
 	-moz-user-select: none;
