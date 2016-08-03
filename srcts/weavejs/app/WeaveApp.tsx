@@ -48,6 +48,7 @@ namespace weavejs.app
 		renderPath?:WeavePathArray;
 		readUrlParams?:boolean;
 		showFileDialog?:boolean;
+		forceMenuBar?:boolean;
 		initializeTabs?:boolean;
 		enableTour?:boolean;
 		onClose?:()=>void;
@@ -612,7 +613,15 @@ namespace weavejs.app
 					} as TabLayoutProps }
 				/>);
 
-			menuBarUI = !this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
+			let menuBarEnabled = !this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable);
+
+			/* Only override the menubar configuration in the session or URL params if forceMenuBar is set to *exactly* true or false */
+			if (this.props.forceMenuBar === true || this.props.forceMenuBar === false)
+			{
+				menuBarEnabled = this.props.forceMenuBar;
+			}
+
+			menuBarUI = menuBarEnabled
 				?	<WeaveMenuBar
 						style={prefixer({opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
 						weave={weave}

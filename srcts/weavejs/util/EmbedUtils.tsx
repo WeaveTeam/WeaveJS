@@ -89,7 +89,8 @@ namespace weavejs.util
 					jsxElement = <WeaveApp weave={weave} renderPath={options.path}/>;
 					break;
 				case "tool":
-					jsxElement = <WeaveComponentRenderer weave={weave} path={options.path}/>;
+					/* Hack: In order to ensure right-click and tooltip work, instantiate a whole WeaveApp. */
+					jsxElement = <WeaveApp forceMenuBar={false} weave={weave} renderPath={options.path}/>;
 					break;
 			}
 
