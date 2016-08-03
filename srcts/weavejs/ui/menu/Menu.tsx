@@ -4,6 +4,7 @@ namespace weavejs.ui.menu
 	import VBox = weavejs.ui.flexbox.VBox;
 	import ReactUtils = weavejs.util.ReactUtils;
 	import KeyboardUtils = weavejs.util.KeyboardUtils;
+	import DOMUtils = weavejs.util.DOMUtils;
 
 	// TODO make these static inside Menu
 	export interface MenuItemProps
@@ -33,7 +34,9 @@ namespace weavejs.ui.menu
 
 	export interface MenuState
 	{
-		activeIndex: number;
+		activeIndex?: number;
+		top?: number;
+		left?: number
 	}
 
 	const REACT_COMPONENT = "reactComponent";
@@ -58,11 +61,14 @@ namespace weavejs.ui.menu
 		opener:HTMLElement;
 		window:Window;
 		menuItemList:HTMLDivElement[];
+		lastOverflow = {left: false, top: false, right: false, bottom: false};
 		constructor(props:MenuProps)
 		{
 			super(props);
 			this.state = {
 				activeIndex: -1,
+				top: props.style ? props.style.top : null,
+				left: props.style ? props.style.left : null
 			};
 			this.menuItemList = [];
 		}
@@ -116,11 +122,72 @@ namespace weavejs.ui.menu
 			// we could get these elements in the ref function
 			// but it's safer here
 			this.element = ReactDOM.findDOMNode(this) as HTMLElement;
-			this.window = ReactUtils.getWindow(this);
 			this.opener = this.props.opener ? ReactDOM.findDOMNode(this.props.opener) as HTMLElement : null;
 			ReactUtils.getDocument(this).addEventListener("keydown", this.handleKeyPress);
+			// if (this.element && WeaveAPI.Locale.reverseLayout)
+			// {
+			// 	// TODO fix this logic
+			// 	// var menuRect = this.element.getBoundingClientRect();
+			// 	// menuStyle.left = 0 - this.element.clientWidth;
+			// 	// if (menuRect.left - menuStyle.left < 0)
+			// 	// 	menuStyle.left = 0;
+			// }
+			if (this.opener)
+			{
+				this.setState({
+					top: this.opener.offsetTop + this.opener.offsetHeight,
+					left: this.opener.offsetLeft
+				});
+			}
+			else
+			{
+				this.forceUpdate();
+			}
+		}
 
-			this.forceUpdate();
+		componentDidUpdate()
+		{
+			this.handleOverflow();
+		}
+
+		handleOverflow()
+		{
+			var overflow = DOMUtils.detectOverflow(this.element);
+			var menuRect = this.element.getBoundingClientRect();
+			var newState = _.clone(this.state);
+
+			if (overflow.bottom && !overflow.top && !this.lastOverflow.top)
+			{
+				newState.top -= menuRect.height;
+				if (this.opener)
+					newState.top -= this.opener.clientHeight;
+			}
+
+			if (overflow.right && !overflow.left && !this.lastOverflow.left)
+			{
+				newState.left -= menuRect.width;
+				if (this.opener)
+					newState.left -= this.opener.clientWidth;
+			}
+
+			// if there is a top overflow as a result of a flip due to bottom overflow
+			// put the menu back to the bottom
+			if (overflow.top && this.lastOverflow.bottom)
+			{
+				newState.top += menuRect.height;
+				if (this.opener)
+					newState.top += this.opener.clientHeight;
+			}
+
+			if (overflow.left && this.lastOverflow.right)
+			{
+				newState.left += menuRect.width;
+				if (this.opener)
+					newState.left += this.opener.clientWidth;
+			}
+
+			this.lastOverflow = overflow;
+			ReactUtils.updateState(this, newState);
 		}
 
 		componentWillUnmount()
@@ -259,46 +326,8 @@ namespace weavejs.ui.menu
 		render():JSX.Element
 		{
 			var menuStyle:React.CSSProperties = { position: "absolute" };
-			// if there is an opener, position the menu at the bottom of it
-			// by default
-			if (this.opener)
-			{
-				var openerRect = this.opener.getBoundingClientRect();
-				menuStyle.top = openerRect.bottom;
-				menuStyle.left = openerRect.left
-			}
-
 			// get positions and other styles
-			menuStyle = _.merge(menuStyle, this.props.style);
-
-			// this logic should be generic to the menu.
-			// if the menu overflows to the right or bottom
-			// render it the other way
-			if (this.element && !this.opener)
-			{
-				var menuRect = this.element.getBoundingClientRect();
-				if (menuRect.left + menuRect.width > this.window.innerWidth)
-				{
-					menuStyle.left -= menuRect.width;
-					if (this.opener)
-						menuStyle.left -= this.opener.clientWidth;
-				}
-				if (menuStyle.top + menuRect.height > this.window.innerHeight)
-				{
-					menuStyle.top -= menuRect.height;
-					if (this.opener)
-						menuStyle.top -= this.opener.clientHeight;
-				}
-			}
-
-			if (this.element && WeaveAPI.Locale.reverseLayout)
-			{
-				// TODO fix this logic
-				// var menuRect = this.element.getBoundingClientRect();
-				// menuStyle.left = 0 - this.element.clientWidth;
-				// if (menuRect.left - menuStyle.left < 0)
-				// 	menuStyle.left = 0;
-			}
+			menuStyle = _.merge(menuStyle, this.props.style, { left: this.state.left, top: this.state.top });
 
 			return (
 				<div className="weave-menu" {...this.props as any} style={menuStyle}>
