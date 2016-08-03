@@ -12,7 +12,6 @@ module.exports = function()
 		fontawesomecss: {flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'dist/css/'},
 		fontawesomefont: {flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
 		semantic: {cwd: 'src/semantic', src: 'semantic.min.css', dest: 'dist/css/'},
-		semanticfonts: {cwd: 'src/semantic/themes', src: '*', dest: 'dist/css/themes/'},
 		semanticjs: {cwd: 'src/semantic', src: 'semantic.min.js', dest: 'dist/'},
 		weavesessions: {flatten: true, cwd: 'weave_sessions', src: "*.weave", dest: "dist/"},
 		projdb: {flatten: true, cwd: 'src/', src: 'ProjDatabase.zip', dest: "dist/"},
