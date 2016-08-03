@@ -4,41 +4,41 @@
 @import 'ol.css';
 @import 'ol-custom.css';
 @import 'font-awesome.css';
-@import 'rcslider.css';
+@import 'rcslide.css';
 @import 'fixed-data-table.css';
 @import 'semantic.min.css';
 
-.weave-app * {
+weave-vbox * {
 	font-family: sans-serif;
 }
 
-.weave-app p {
+weave-vbox p {
 	line-height: normal;
 }
 
-.weave-app input[type=number]::-webkit-inner-spin-button,
-.weave-app input[type=number]::-webkit-outer-spin-button {
+weave-vbox input[type=number]::-webkit-inner-spin-button,
+weave-vbox input[type=number]::-webkit-outer-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
 }
 
 /* disable numerical spinners in Mozilla Firefox */
-.weave-app input[type=number] {
+weave-vbox input[type=number] {
 	-moz-appearance:textfield;
 }
 
 /****** Altering the default behavior of Input Placeholder on Focus******/
 /* WebKit browsers */
-.weave-app input:focus::-webkit-input-placeholder { opacity:0; }
+weave-vbox input:focus::-webkit-input-placeholder { opacity:0; }
 
 /* Mozilla Firefox 4 to 18 */
-.weave-app input:focus:-moz-placeholder { opacity:0; }
+weave-vbox input:focus:-moz-placeholder { opacity:0; }
 
 /* Mozilla Firefox 19+ */
-.weave-app input:focus::-moz-placeholder { opacity:0;}
+weave-vbox input:focus::-moz-placeholder { opacity:0;}
 
 /* Internet Explorer 10+ */
-.weave-app input:focus:-ms-input-placeholder { opacity:0; }
+weave-vbox input:focus:-ms-input-placeholder { opacity:0; }
 
 /* Dowloaded Fonts*/
 @font-face {
