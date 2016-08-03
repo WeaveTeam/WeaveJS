@@ -143,7 +143,7 @@ namespace weavejs.ui
 			delete props.requestType;
 			delete props.props;
 
-			return <VBox {...props} className={classNames(props.className, "weave-app")}>{ content }</VBox>;
+			return <VBox {...props} className={classNames(props.className, "weave")}>{ content }</VBox>;
 		}
 	}
 	WeaveAPI.ClassRegistry.registerClass(WeaveComponentRenderer, 'weavejs.ui.WeaveComponentRenderer');
