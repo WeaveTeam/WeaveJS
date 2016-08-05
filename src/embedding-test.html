@@ -3,31 +3,72 @@
 	<head>
 		<META CHARSET="UTF-8">
 		<title>Weave</title>
-		<link href="css/weave.css" rel="stylesheet" type="text/css">
 	</head>
-	<body>
+	<body style="font-family: monospace;">
 		<script type="text/javascript" src="core/WeaveJS.js"></script>
 		<script type="text/javascript" src="libs.js"></script>
 		<script type="text/javascript">
 			new WeaveJS().start();
 			$(function () {
-				weavejs.util.EmbedUtils.embed({element: "vis1", sessionUrl: "test-nba.weave" , path: ["MapTool"]});
-				weavejs.util.EmbedUtils.embed({element: "vis2", path: ["ScatterPlotTool"]});
-				weavejs.util.EmbedUtils.embed({element: "vis3", path: ["Table"]});
+				//weavejs.util.EmbedUtils.embed({element: "vis1", sessionUrl: "test-nba.weave" , path: ["MapTool"]});
+				//weavejs.util.EmbedUtils.embed({element: "vis2", path: ["ScatterPlotTool"]});
+				//weavejs.util.EmbedUtils.embed({element: "vis3", path: ["Table"]});
+				var proto = Object.create(HTMLElement.prototype, {
+					attachedCallback: {
+						value: function() {
+							var topLevel = document.createElement('div');
+							var styleElement = document.createElement('style');
+							var mountPoint = document.createElement('div');
+
+							topLevel.style.height = this.style.height;
+							topLevel.style.width = this.style.width;
+							topLevel.style.display = "flex";
+							mountPoint.style.height = "100%";
+							mountPoint.style.width = "100%";
+							mountPoint.style.display = "flex";
+
+							styleElement.innerText = "@import 'css/weave.css';";
+
+							topLevel.appendChild(styleElement);
+							topLevel.appendChild(mountPoint);
+
+							this.createShadowRoot().appendChild(topLevel);
+							console.log(this.sessionUrl);
+
+							var sessionUrl = this.getAttribute("sessionUrl");
+							var path = this.getAttribute("path");
+							console.log(path, sessionUrl);
+
+							weavejs.util.EmbedUtils.embed({element: mountPoint, sessionUrl: sessionUrl, path: path ? JSON.parse(path) : null});
+						}
+					},
+					detachedCallback: {
+						value: function() {
+
+						}
+					},
+					sessionUrl: {
+						value: null
+					},
+					path: {
+						value: null
+					}
+				});
+				document.registerElement('weave-embed', {prototype: proto});		
 			});
 		</script>
 		<script type="text/javascript" src="weavejs.js"></script>
 		<script type="text/javascript" src="semantic/semantic.min.js"></script>
                 <h1>Nam ante Aristippus, et ille melius.</h1>
 
-                <div id="vis1" style="float:left;width:400px;height:300px"></div><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In omni enim arte vel studio vel quavis scientia vel in ipsa virtute optimum quidque rarissimum est. Non minor, inquit, voluptas percipitur ex vilissimis rebus quam ex pretiosissimis. Atque his de rebus et splendida est eorum et illustris oratio. Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus; Duo Reges: constructio interrete. Neque solum ea communia, verum etiam paria esse dixerunt. Quia, cum a Zenone, inquam, hoc magnifice tamquam ex oraculo editur: Virtus ad beate vivendum se ipsa contenta est, et Quare? Qui enim voluptatem ipsam contemnunt, iis licet dicere se acupenserem maenae non anteponere. </p>
+                <weave-embed id="vis1" style="float:left;width:400px;height:300px" path='["MapTool"]' sessionUrl="test-nba.weave"></weave-embed><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In omni enim arte vel studio vel quavis scientia vel in ipsa virtute optimum quidque rarissimum est. Non minor, inquit, voluptas percipitur ex vilissimis rebus quam ex pretiosissimis. Atque his de rebus et splendida est eorum et illustris oratio. Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus; Duo Reges: constructio interrete. Neque solum ea communia, verum etiam paria esse dixerunt. Quia, cum a Zenone, inquam, hoc magnifice tamquam ex oraculo editur: Virtus ad beate vivendum se ipsa contenta est, et Quare? Qui enim voluptatem ipsam contemnunt, iis licet dicere se acupenserem maenae non anteponere. </p>
 
-                <div id="vis2" style="float:right;width:400px;height:300px"></div><p>Itaque et manendi in vita et migrandi ratio omnis iis rebus, quas supra dixi, metienda. An obliviscimur, quantopere in audiendo in legendoque moveamur, cum pie, cum amice, cum magno animo aliquid factum cognoscimus? Iam in altera philosophiae parte. Praeclare enim Plato: Beatum, cui etiam in senectute contigerit, ut sapientiam verasque opiniones assequi possit. Itaque a sapientia praecipitur se ipsam, si usus sit, sapiens ut relinquat. Familiares nostros, credo,  Sironem dicis et Philodemum, cum optimos viros, tum homines doctissimos. Ergo illi intellegunt quid Epicurus dicat, ego non intellego? Neque solum ea communia, verum etiam paria esse dixerunt. Nec enim, omnes avaritias si aeque avaritias esse dixerimus, sequetur ut etiam aequas esse dicamus. Facit igitur Lucius noster prudenter, qui audire de summo bono potissimum velit; Summum a vobis bonum voluptas dicitur. Atque ego: Scis me, inquam, istud idem sentire, Piso, sed a te opportune facta mentio est. Dolere malum est: in crucem qui agitur, beatus esse non potest. Quid, si etiam iucunda memoria est praeteritorum malorum? Ne vitationem quidem doloris ipsam per se quisquam in rebus expetendis putavit, nisi etiam evitare posset. Nos quidem Virtutes sic natae sumus, ut tibi serviremus, aliud negotii nihil habemus. </p>
+                <weave-embed id="vis2" style="float:right;width:400px;height:300px" path='["ScatterPlotTool"]'></weave-embed><p>Itaque et manendi in vita et migrandi ratio omnis iis rebus, quas supra dixi, metienda. An obliviscimur, quantopere in audiendo in legendoque moveamur, cum pie, cum amice, cum magno animo aliquid factum cognoscimus? Iam in altera philosophiae parte. Praeclare enim Plato: Beatum, cui etiam in senectute contigerit, ut sapientiam verasque opiniones assequi possit. Itaque a sapientia praecipitur se ipsam, si usus sit, sapiens ut relinquat. Familiares nostros, credo,  Sironem dicis et Philodemum, cum optimos viros, tum homines doctissimos. Ergo illi intellegunt quid Epicurus dicat, ego non intellego? Neque solum ea communia, verum etiam paria esse dixerunt. Nec enim, omnes avaritias si aeque avaritias esse dixerimus, sequetur ut etiam aequas esse dicamus. Facit igitur Lucius noster prudenter, qui audire de summo bono potissimum velit; Summum a vobis bonum voluptas dicitur. Atque ego: Scis me, inquam, istud idem sentire, Piso, sed a te opportune facta mentio est. Dolere malum est: in crucem qui agitur, beatus esse non potest. Quid, si etiam iucunda memoria est praeteritorum malorum? Ne vitationem quidem doloris ipsam per se quisquam in rebus expetendis putavit, nisi etiam evitare posset. Nos quidem Virtutes sic natae sumus, ut tibi serviremus, aliud negotii nihil habemus. </p>
 
 
                 <p>Facile pateremur, qui etiam nunc agendi aliquid discendique causa prope contra naturam vígillas suscipere soleamus. Nec tamen ille erat sapiens quis enim hoc aut quando aut ubi aut unde? Et non ex maxima parte de tota iudicabis? Quamquam ego non quaero, quid tibi a me probatum sit, sed huic Ciceroni nostro, quem discipulum cupio a te abducere. Dicuntur ista, Cato, magnifice, inquam, sed videsne verborum gloriam tibi cum Pyrrhone et cum Aristone, qui omnia exaequant, esse communem? Septem autem illi non suo, sed populorum suffragio omnium nominati sunt. Et quidem saepe quaerimus verbum Latinum par Graeco et quod idem valeat; Minime vero probatur huic disciplinae, de qua loquor, aut iustitiam aut amicitiam propter utilitates adscisci aut probari. Hoc est vim afferre, Torquate, sensibus, extorquere ex animis cognitiones verborum, quibus inbuti sumus. Est enim effectrix multarum et magnarum voluptatum. Hic Speusippus, hic Xenocrates, hic eius auditor Polemo, cuius illa ipsa sessio fuit, quam videmus. </p>
 
-                <div id="vis3" style="width:100%;height:400px"></div>
+                <weave-embed id="vis3" style="width:100%;height:400px" path='["Table"]'></weave-embed>
 
                 <p>Simul atque natum animal est, gaudet voluptate et eam appetit ut bonum, aspernatur dolorem ut malum. Est enim effectrix multarum et magnarum voluptatum. <code>Itaque contra est, ac dicitis;</code> Itaque et vivere vitem et mori dicimus arboremque et novellan et vetulam et vigere et senescere. <code>Quod vestri non item.</code> Etsi qui potest intellegi aut cogitari esse aliquod animal, quod se oderit? Quae cum essent dicta, finem fecimus et ambulandi et disputandi. In eo enim positum est id, quod dicimus esse expetendum. Nemo enim est, qui aliter dixerit quin omnium naturarum simile esset id, ad quod omnia referrentur, quod est ultimum rerum appetendarum. In omni enim arte vel studio vel quavis scientia vel in ipsa virtute optimum quidque rarissimum est. Praeclare hoc quidem. Nihil enim desiderabile concupiscunt, plusque in ipsa iniuria detrimenti est quam in iis rebus emolumenti, quae pariuntur iniuria. Huc et illuc, Torquate, vos versetis licet, nihil in hac praeclara epistula scriptum ab Epicuro congruens et conveniens decretis eius reperietis
 	</body>

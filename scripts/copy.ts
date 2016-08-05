@@ -14,6 +14,7 @@ module.exports = function()
 		semantic: {cwd: 'src/semantic', src: 'semantic.min.css', dest: 'dist/css/'},
 		semanticfonts: {cwd: 'src/semantic/themes', src: '*', dest: 'dist/css/themes/'},
 		semanticjs: {cwd: 'src/semantic', src: 'semantic.min.js', dest: 'dist/'},
+		webcomponentsjs: {cwd: 'node_modules/webcomponents.js', src: 'webcomponents.min.js', dest: 'dist/webcomponents.min.js'},
 		weavesessions: {flatten: true, cwd: 'weave_sessions', src: "*.weave", dest: "dist/"},
 		projdb: {flatten: true, cwd: 'src/', src: 'ProjDatabase.zip', dest: "dist/"},
 		core: {cwd: "WeaveASJS/bin/js-release/", src: "*.*", dest: "dist/core"}

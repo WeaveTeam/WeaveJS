@@ -520,8 +520,7 @@ namespace weavejs.tool.oltool
 			this.updateControlPositions();
 		}
 
-
-
+		private retryingUpdateControlPositions:boolean = false;
 		private updateControlPositions():void
 		{
 			let controls = _.sortBy(this.map.getControls().getArray(), item => OpenLayersMapTool.controlIndex.get(item.constructor));
@@ -546,17 +545,33 @@ namespace weavejs.tool.oltool
 
 			if (controlLocation.vertical == "bottom")
 				controls.reverse();
-
+			let retryUpdateControlPositions = false;
 			for (let control of controls)
 			{
 				let height = control.element.scrollHeight;
 				let width = control.element.scrollWidth;
+
+				if (width == mapWidth)
+				{
+					retryUpdateControlPositions = true;
+				}
+
 				let centerOffset = (maxWidth - width) / 2;
 
 				$(control.element).css({top: (verticalDirection * height * verticalOffsetMultiplier) + verticalStart + (padding * verticalDirection)});
 				$(control.element).css({left: (horizontalDirection * width * horizontalOffsetMultiplier) + horizontalStart + ((centerOffset + padding) * horizontalDirection)});
 
 				verticalStart += verticalDirection * (height + padding);
+			}
+
+			if (retryUpdateControlPositions && !this.retryingUpdateControlPositions)
+			{
+				this.retryingUpdateControlPositions = true;
+				WeaveAPI.Scheduler.callLater(this, this.updateControlPositions);
+			}
+			else
+			{
+				this.retryingUpdateControlPositions = false;
 			}
 		}
 
@@ -851,6 +866,10 @@ namespace weavejs.tool.oltool
 
 		render():JSX.Element
 		{
+			if (this.map)
+			{
+				this.updateControlPositions();
+			}
 			return (
 				<ResizingDiv>
 					<div
