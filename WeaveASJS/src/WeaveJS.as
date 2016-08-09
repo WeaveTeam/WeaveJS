@@ -49,8 +49,8 @@ package
 	{
 		public function WeaveJS()
 		{
+
 		}
-		
 		public function start():void
 		{
 			WeaveAPI.ClassRegistry['defaultPackages'].push(
@@ -110,4 +110,5 @@ package
 			WeaveTest;
 		}
 	}
+	new WeaveJS().start();
 }
