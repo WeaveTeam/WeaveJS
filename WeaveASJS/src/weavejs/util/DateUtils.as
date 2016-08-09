@@ -20,7 +20,7 @@ package weavejs.util
 		/**
 		 * This must be set externally.
 		 */
-		public static var moment:Object;
+		private static var moment:Object = JS.global.moment;
 		
 		public static function parse(date:Object, moment_fmt:String, force_utc:Boolean = false, force_local:Boolean = false):Date
 		{

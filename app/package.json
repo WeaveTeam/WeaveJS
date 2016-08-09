@@ -1,0 +1,32 @@
+{
+  "name": "example",
+  "version": "0.0.0",
+  "description": "Collection of visualization tools and UI for the WeaveJS project.",
+  "scripts": {
+    "clean": "rimraf index.js && rimraf index.jsx && rimraf dist/bundle.js && rimraf node_modules/weavejs",
+    "babel": "babel index.jsx --out-file index.js --source-maps inline",
+    "browserify": "mkdir -p dist && browserify index.js -o dist/bundle.js",
+    "copy-typings": "mkdir -p typings/weave && cp ../weave-typings/* typings/weave",
+    "compile": "npm run clean && npm install weavejs && npm run copy-typings && tsc && npm run babel && npm run browserify && node copy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WeaveTeam/WeaveJS.git"
+  },
+  "keywords": [
+    "visualization",
+    "weave"
+  ],
+  "author": "WeaveTeam <devteam@iweave.com>",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "babel-cli": "^6.5.2",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "browserify": "^13.1.0",
+    "rimraf": "^2.5.3",
+    "typescript": "^1.8.10",
+    "weavejs": "../"
+  }
+}

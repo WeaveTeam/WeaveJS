@@ -13,10 +13,10 @@ module.exports = function()
 		fontawesomefont: {flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
 		semantic: {cwd: 'src/semantic', src: 'semantic.min.css', dest: 'dist/css/'},
 		semanticfonts: {cwd: 'src/semantic/themes', src: '*', dest: 'dist/css/themes/'},
-		semanticjs: {cwd: 'src/semantic', src: 'semantic.min.js', dest: 'dist/'},
 		weavesessions: {flatten: true, cwd: 'weave_sessions', src: "*.weave", dest: "dist/"},
 		projdb: {flatten: true, cwd: 'src/', src: 'ProjDatabase.zip', dest: "dist/"},
-		core: {cwd: "WeaveASJS/bin/js-release/", src: "*.*", dest: "dist/core"}
+		weavejs_core_typings: {cwd:'typings/weave/', src:'weavejs-core.d.ts', dest:"weave-typings/"},
+		weavejs_typings: {cwd:'outts/', src:'weavejs.d.ts', dest:"weave-typings/"}
 	};
 
 	let fse = require("fs-extra");

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "preserve",
+    "removeComments": false,
+    "target": "es6",
+    "module": "es6",
+	"outDir": "./",
+    "inlineSources": true,
+    "inlineSourceMap": true,
+	"forceConsistentCasingInFileNames": true,
+	"listFiles": true,
+	"noImplicitReturns": false,
+	"pretty": false,
+	"newLine": "lf"
+  },
+  "compileOnSave": false
+}

@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"outDir": "./outts",
+		"outDir": "outts",
 		"noImplicitAny": true,
 		"removeComments": false,
 		"target": "es6",

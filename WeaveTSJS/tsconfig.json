@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "preserve",
+    "removeComments": false,
+    "target": "es6",
+    "module": "amd",
+    "outFile": "./bin/es6/weavejs.js",
+    "declaration": true,
+    "forceConsistentCasingInFileNames": true,
+    "listFiles": false,
+    "noImplicitReturns": false,
+    "pretty": false,
+    "newLine": "lf",
+    "sourceMap": true
+  },
+  "files": [
+	"./src/_lib-references.ts",
+    "./src/_references.ts"
+  ],
+  "compileOnSave": false
+}

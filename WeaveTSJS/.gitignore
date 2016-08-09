@@ -1,0 +1,6 @@
+# reference files
+bin
+bin/tsd
+WeaveTSJS/src/_lib-references.ts
+WeaveTSJS/src/_references.ts
+*.js.map

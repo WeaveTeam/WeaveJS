@@ -1,0 +1,7 @@
+*.js.map
+index.jsx
+index.js
+node_modules
+dist
+typings/weave
+npm-debug.log

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "react",
+    "removeComments": false,
+    "target": "es6",
+    "outDir": "./bin/es6",
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "noImplicitAny": false,
+    "declaration": false,
+    "forceConsistentCasingInFileNames": true,
+    "listFiles": false,
+    "noImplicitReturns": false,
+    "pretty": false,
+    "newLine": "lf"
+  },
+  "files":[
+    "./src/libs.ts"
+  ],
+  "compileOnSave": false
+}
