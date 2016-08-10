@@ -1,8 +1,10 @@
 const async = require("async");
 const fs = require("fs");
+const path = require("path");
 const version = "2.1.3";
 const browserify = require('browserify');
 const stream = require('stream');
+const Concat = require('concat-with-sourcemaps');
 
 
 function concatenate(paths, callback) {
@@ -17,15 +19,46 @@ function concatenate(paths, callback) {
   });
 }
 
-concatenate(['src/umd-prefix.js', 'lib/libs-node.js', 'dist/core/WeaveJS.js', 'src/initWeaveJS.js', 'src/semantic/semantic.min.js', 'dist/weavejs.js', 'src/umd-suffix.js'], function(err, result) {
-  if (err) throw err;
-  fs.writeFileSync('dist/weavejs-module.js', result);
-  var browserifyInstance = browserify();
-  var s = new stream.Readable();
-  s._read = ()=>{};
-  s.push(result);
-  s.push(null);
-  browserifyInstance.add(s);
-  var outStream = new fs.createWriteStream('dist/weavejs-browser.js');
+filesToConcat = ['src/umd-prefix.js',
+                 'out/libs.js',
+                 'WeaveASJS/bin/js-release/WeaveJS.js',
+                 'src/initWeaveJS.js',
+                 'src/semantic/semantic.min.js',
+                 'out/weavejs-ui.js',
+                 'src/umd-suffix.js'];
+
+
+function build(outputPath, moduleName, browserName)
+{
+  var concat = new Concat(true, moduleName, '\n');
+  for (var filename of filesToConcat)
+  {
+    var sourceMapFilename = filename + ".map";
+    var sourceMapContent = null;
+    var content;
+
+    try
+    {
+      sourceMapContent = fs.readFileSync(sourceMapFilename);
+    }
+    catch (e)
+    {
+      console.log("No sourcemap found for", filename, ", skipping.");
+      sourceMapContent = null; 
+    }
+
+    content = fs.readFileSync(filename);
+
+    concat.add(filename, content, sourceMapContent);
+  }
+
+  fs.writeFileSync(path.join(outputPath, moduleName), concat.content);
+  fs.writeFileSync(path.join(outputPath, moduleName + ".map"), concat.sourceMap);
+
+  var browserifyInstance = browserify({debug: true});
+  browserifyInstance.add(path.join(outputPath, moduleName));
+  var outStream = new fs.createWriteStream(path.join('dist/weavejs-browser.js'));
   browserifyInstance.bundle().pipe(outStream);
-});
+}
+
+build('dist/', 'weavejs-module.js', 'weavejs-browser.js');

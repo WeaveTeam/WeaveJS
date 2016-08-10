@@ -7,16 +7,12 @@
 		<link href="css/weave-app.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
-		<script type="text/javascript" src="core/WeaveJS.js"></script>
-		<script type="text/javascript" src="libs.js"></script>
+		<script type="text/javascript" src="weavejs-browser.js"></script>
 		<script type="text/javascript">
-			new WeaveJS().start();
 			$(function () {
 				weavejs.util.EmbedUtils.embed({element: "weaveElt", mode: "file"});
 			});
 		</script>
-		<script type="text/javascript" src="weavejs.js"></script>
-		<script type="text/javascript" src="semantic.min.js"></script>
 		<div id="weaveElt" style="width: 100%; height: 100%;"></div>
 	</body>
 </html>

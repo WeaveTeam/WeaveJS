@@ -6,14 +6,14 @@
     "target": "es6",
     "module": "amd",
     "outFile": "outts/weavejs.js",
-    "inlineSources": true,
-    "inlineSourceMap": true,
     "declaration": true,
-	"forceConsistentCasingInFileNames": true,
-	"listFiles": false,
-	"noImplicitReturns": false,
-	"pretty": false,
-	"newLine": "lf"
+    "forceConsistentCasingInFileNames": true,
+    "listFiles": false,
+    "noImplicitReturns": false,
+    "pretty": false,
+    "newLine": "lf",
+    "inlineSources": true,
+    "inlineSourceMap": true
   },
   "files": [
   	"srcts/_lib-references.ts",
