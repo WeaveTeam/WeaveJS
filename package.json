@@ -2,7 +2,7 @@
   "name": "weavejs",
   "version": "0.0.0",
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
-  "main": "lib/weavejs.js",
+  "main": "dist/weavejs-module.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "clean": "npm run clean:outts && npm run clean:dist && npm run clean:out",
@@ -11,11 +11,12 @@
     "clean:out": "rimraf out/*.js*",
     "copy": "node run-ts copy",
     "dts": "tsc -p tsconfig-definitions.json",
-    "compile": "npm run compile-as && npm run compile-dts && npm run compile-ts && npm run compile-libs && node scripts/modularize.js && npm run copy",
+    "compile": "npm run compile-as && npm run compile-asdts && npm run compile-ts && npm run compile-libs && node scripts/modularize.js && npm run copy",
     "compile-refs": "node run-ts main-import-tool -d srcts/weavejs -f srcts/_references.ts && npm run compile-librefs",
     "compile-librefs": "node run-ts main-import-tool -d typings/ -f srcts/_lib-references.ts",
     "compile-libs": "npm run compile-librefs && tsc -p tsconfig-libs.json && babel outts/libs.js --out-file out/libs.js -s",
-    "compile-dts": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/ && mv WeaveASJS/typings/*.d.ts ./typings/weave/",
+
+    "compile-asdts": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/ && mv WeaveASJS/typings/*.d.ts ./typings/weave/",
     "compile-ts": "npm run compile-refs && tsc -p tsconfig.json && babel outts/weavejs.js --out-file out/weavejs-ui.js -s",
     "compile-as": "node WeaveASJS/build.js",
     "prepublish": "npm run compile"
