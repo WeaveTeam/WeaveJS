@@ -27,6 +27,7 @@ namespace weavejs.util
 
 	export class ReactUtils
 	{
+		private static map_document_popupContainer = new WeakMap<Document, Element>();
 		private static map_popup_element = new WeakMap<React.ReactInstance, [Element, EventListener]>();
 
 		static openPopout(jsx:JSX.Element, onLoad?:Function, onBeforeUnLoad?:Function, windowOptions?:any):Window
@@ -94,10 +95,18 @@ namespace weavejs.util
 		static openPopup(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false, onClose?:(popup:React.ReactInstance)=>void):React.ReactInstance
 		{
 			var document = ReactUtils.getDocument(context);
-			var element = document.body.appendChild(document.createElement("div")) as Element;
+			var container = ReactUtils.map_document_popupContainer.get(document);
+			if (!container)
+			{
+				container = document.body.appendChild(document.createElement("div")) as HTMLDivElement;
+				container.setAttribute("class", "weave");
+				container.setAttribute("style", "position:fixed; left:0px; top:0px; width:100%; height:100%; pointer-events: none;");
+				ReactUtils.map_document_popupContainer.set(document, container);
+			}
+			var element = container.appendChild(document.createElement("div")) as Element;
 			var popup = ReactDOM.render(jsx as any, element);
 			var handler:EventListener = null;
-			
+
 			if (closeOnMouseDown) 
 			{
 				handler=(event:KeyboardEvent|MouseEvent)=>
@@ -140,7 +149,8 @@ namespace weavejs.util
 				document.removeEventListener("keydown", handler);
 			}
 			ReactDOM.unmountComponentAtNode(element);
-			document.body.removeChild(element);
+			var container = ReactUtils.map_document_popupContainer.get(document);
+			container.removeChild(element);
 		}
 
 

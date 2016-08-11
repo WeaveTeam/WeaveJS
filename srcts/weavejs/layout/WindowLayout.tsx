@@ -281,7 +281,6 @@ namespace weavejs.layout
 							overflow: "hidden"
 						})
 					}
-					className={classNames(this.props.className, "weave")}
 				>
 					{
 						state.panels.map(state => {

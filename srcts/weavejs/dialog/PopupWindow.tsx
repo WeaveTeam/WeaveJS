@@ -221,7 +221,7 @@ namespace weavejs.dialog
 			);
 
 			return (
-				<div className="weave" ref={ReactUtils.registerComponentRef(this)} onContextMenu={ContextMenu.open}>
+				<div ref={ReactUtils.registerComponentRef(this)} onContextMenu={ContextMenu.open}>
 					{this.props.modal ? this.renderOverlay(this.props.modal) : null}
 					{popupWindow}
 				</div>
