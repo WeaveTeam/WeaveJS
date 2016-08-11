@@ -6,19 +6,6 @@ const browserify = require('browserify');
 const stream = require('stream');
 const Concat = require('concat-with-sourcemaps');
 
-
-function concatenate(paths, callback) {
-  async.concatSeries(paths, fs.readFile, function(err, results) {
-    if (err) {
-      var msg = 'Trouble concatenating sources.  ' + err.message;
-      callback(new Error(msg));
-    } else {
-      var src = results.join('\n');
-      callback(null, src);
-    }
-  });
-}
-
 filesToConcat = ['src/umd-prefix.js',
                  'out/libs.js',
                  'WeaveASJS/bin/js-release/WeaveJS.js',
