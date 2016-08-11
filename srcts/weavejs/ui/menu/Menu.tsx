@@ -135,8 +135,8 @@ namespace weavejs.ui.menu
 			if (this.opener)
 			{
 				this.setState({
-					top: this.opener.clientTop + this.opener.clientHeight,
-					left: this.opener.clientLeft
+					top: this.opener.offsetTop + this.opener.offsetHeight,
+					left: this.opener.offsetLeft
 				});
 			}
 			else
