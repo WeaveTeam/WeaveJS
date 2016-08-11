@@ -142,7 +142,7 @@ namespace weavejs.ui
 					ref={this.getMenuRef}
 					menu={this.props.menuGetter()}
 					onMouseUp={this.onMenuMouseUp}
-				/>,false,null,true
+				/>
 			);
 			var document = ReactUtils.getDocument(this);
 			document.addEventListener("mousedown", this.onDocumentMouseDown);

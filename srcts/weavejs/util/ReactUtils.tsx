@@ -27,7 +27,7 @@ namespace weavejs.util
 
 	export class ReactUtils
 	{
-		private static map_popup_element = new WeakMap<React.ReactInstance, [Element, EventListener, boolean]>();
+		private static map_popup_element = new WeakMap<React.ReactInstance, [Element, EventListener]>();
 
 		static openPopout(jsx:JSX.Element, onLoad?:Function, onBeforeUnLoad?:Function, windowOptions?:any):Window
 		{
@@ -91,10 +91,10 @@ namespace weavejs.util
 			return popoutWindow;
 		}
 		
-		static openPopup(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false, onClose?:(popup:React.ReactInstance)=>void, attachToSibling:boolean = true):React.ReactInstance
+		static openPopup(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false, onClose?:(popup:React.ReactInstance)=>void):React.ReactInstance
 		{
 			var document = ReactUtils.getDocument(context);
-			var element = attachToSibling ? ReactDOM.findDOMNode(context).parentNode.appendChild(document.createElement("div")) as Element : document.body.appendChild(document.createElement("div")) as Element;
+			var element = document.body.appendChild(document.createElement("div")) as Element;
 			var popup = ReactDOM.render(jsx as any, element);
 			var handler:EventListener = null;
 			
@@ -120,7 +120,7 @@ namespace weavejs.util
 				document.addEventListener("mousedown", handler);
 				document.addEventListener("keydown", handler);
 			}
-			ReactUtils.map_popup_element.set(popup, [element, handler, attachToSibling]);
+			ReactUtils.map_popup_element.set(popup, [element, handler]);
 			return popup;
 		}
 
@@ -129,7 +129,7 @@ namespace weavejs.util
 			if (!ReactUtils.map_popup_element.has(popup))
 				throw new Error("closePopup() can only be called for popups created by openPopup()");
 			
-			var [element, handler, attachedToSibling] = ReactUtils.map_popup_element.get(popup);
+			var [element, handler] = ReactUtils.map_popup_element.get(popup);
 			if (!element.parentNode)
 				return;
 			
@@ -140,7 +140,7 @@ namespace weavejs.util
 				document.removeEventListener("keydown", handler);
 			}
 			ReactDOM.unmountComponentAtNode(element);
-			attachedToSibling ? element.parentNode.removeChild(element):document.body.removeChild(element);
+			document.body.removeChild(element);
 		}
 
 

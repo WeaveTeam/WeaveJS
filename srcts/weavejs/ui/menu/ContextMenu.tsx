@@ -23,7 +23,7 @@ namespace weavejs.ui.menu
 						left: event.clientX
 					}}
 				/>,
-				true,null,false
+				true
 			);
 			contextMenu.popup = popup;
 		}
