@@ -4,7 +4,7 @@
   } else if (typeof define === "function" && define.amd) {
     define([], factory);
   } else {
-    root.ol = factory();
+    root.weavejs = factory();
   }
 }(this, function () {
   var goog = this.goog = {};
