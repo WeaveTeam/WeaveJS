@@ -3591,7 +3591,7 @@ declare module ol {
         class Modify {
         }
 
-        class MouseWheelZoom {
+        class MouseWheelZoom extends Interaction {
         }
 
         class PinchRotate {

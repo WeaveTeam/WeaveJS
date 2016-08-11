@@ -183,6 +183,8 @@ namespace weavejs.tool.oltool
 		projectionSRS = Weave.linkableChild(this, new LinkableString("EPSG:3857", Projections.projectionVerifier));
 		interactionMode = Weave.linkableChild(this, LinkableString);
 
+		enableMouseWheel = Weave.linkableChild(this, new LinkableBoolean(true));
+
 		layers = Weave.linkableChild(this, new LinkableHashMap(AbstractLayer));
 
 		panelTitle = Weave.linkableChild(this, LinkableString);
@@ -385,7 +387,7 @@ namespace weavejs.tool.oltool
 			Menu.registerMenuSource(this);
 
 			this.map = new ol.Map({
-				interactions: ol.interaction.defaults({ dragPan: false }),
+				interactions: ol.interaction.defaults({ dragPan: false, mouseWheelZoom: false }),
 				controls: [],
 				target: this.element
 			});
@@ -398,7 +400,8 @@ namespace weavejs.tool.oltool
 			let dragSelect = new DragSelection();
 			let probeInteraction = new ProbeInteraction(this);
 			let dragZoom = new CustomDragZoom();
-			
+			let mouseWheelZoom = new ol.interaction.MouseWheelZoom();
+
 			/* 
 			 * !!! Order here matters !!!
 			 * Most recently added interactions will get the first pass of the event;
@@ -409,6 +412,8 @@ namespace weavejs.tool.oltool
 			this.map.addInteraction(probeInteraction);
 			this.map.addInteraction(dragZoom);
 			this.map.addInteraction(new ol.interaction.Interaction({ handleEvent: this.handleGenericEvent }));
+			this.map.addInteraction(mouseWheelZoom);
+
 
 			this.interactionMode.addGroupedCallback(this, () => {
 				let interactionMode = this.interactionMode.value || "select";
@@ -416,6 +421,10 @@ namespace weavejs.tool.oltool
 				dragSelect.setActive(interactionMode === "select");
 				dragZoom.setActive(interactionMode === "zoom");
 				this.updateCursor();
+			}, true);
+
+			this.enableMouseWheel.addGroupedCallback(this, () => {
+				mouseWheelZoom.setActive(this.enableMouseWheel.value);
 			}, true);
 
 			/* Setup custom controls */
@@ -979,6 +988,10 @@ namespace weavejs.tool.oltool
 				[
 					Weave.lang("Zoom and pan behavior"),
 					[
+						[
+							Weave.lang("Enable Mousewheel Zoom"),
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.tool.enableMouseWheel})} label={" "}/>
+						],
 						[
 							Weave.lang("Zoom range"),
 							<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
