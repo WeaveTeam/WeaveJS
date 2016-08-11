@@ -134,9 +134,10 @@ namespace weavejs.ui.menu
 			// }
 			if (this.opener)
 			{
+				var openerRect = this.opener.getBoundingClientRect();
 				this.setState({
-					top: this.opener.offsetTop + this.opener.offsetHeight,
-					left: this.opener.offsetLeft
+					top: openerRect.top + openerRect.height,
+					left: openerRect.left
 				});
 			}
 			else
