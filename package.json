@@ -11,7 +11,7 @@
     "clean:out": "rimraf out/*.js*",
     "copy": "node run-ts copy",
     "dts": "tsc -p tsconfig-definitions.json",
-    "compile": "npm run compile-as && npm run compile-asdts && npm run compile-ts && npm run compile-libs && node scripts/modularize.js && npm run copy",
+    "compile": "npm run compile-as && npm run compile-asdts && npm run compile-ts && npm run compile-libs && node run-ts modularize && npm run copy",
     "compile-refs": "node run-ts main-import-tool -d srcts/weavejs -f srcts/_references.ts && npm run compile-librefs",
     "compile-librefs": "node run-ts main-import-tool -d typings/ -f srcts/_lib-references.ts",
     "compile-libs": "npm run compile-librefs && tsc -p tsconfig-libs.json && babel outts/libs.js --out-file out/libs.js",
