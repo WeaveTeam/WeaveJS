@@ -57,6 +57,11 @@ var sparkline:any = sparkline_;
 var PIXI:any = PIXI_;
 (PIXI as any).utils._saidHello = true;
 
+/* Needed for the core. */
+(window as any).lodash = _;
+(window as any).ol = ol;
+(window as any).moment = moment;
+
 // temporary solution
 /*
 var weavejs:any = weavejs || {};

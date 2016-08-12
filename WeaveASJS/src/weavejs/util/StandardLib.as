@@ -15,14 +15,18 @@
 
 package weavejs.util
 {
+	import weavejs.util.JS;
 	public class StandardLib
 	{
-		/**
-		 * This must be set externally.
-		 */
-		public static var lodash:Object;
-		public static var ol:Object;
-		
+		public static function get ol():Object
+		{
+			return JS.global.ol;
+		}
+		public static function get lodash():Object
+		{
+			return JS.global.lodash;
+		}
+
 		public static function formatNumber(number:Number, precision:int = -1):String
 		{
 			//TODO - use a library
@@ -688,7 +692,7 @@ package weavejs.util
 				array.forEach(function(item:*, index:int):void {_indexMap.set(item, index);})
 			}
 
-			var result:Array = lodash.sortByOrder(array, iteratees, orders);
+			var result:Array = JS.global.lodash.sortByOrder(array, iteratees, orders);
 
 			if (returnIndexedArray)
 			{

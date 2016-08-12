@@ -15,12 +15,16 @@
 
 package weavejs.util
 {
+	import weavejs.util.JS;
 	public class DateUtils
 	{
 		/**
 		 * This must be set externally.
 		 */
-		private static var moment:Object = JS.global.moment;
+		private static function get moment():Object 
+		{
+			return JS.global.moment;
+		}
 		
 		public static function parse(date:Object, moment_fmt:String, force_utc:Boolean = false, force_local:Boolean = false):Date
 		{
