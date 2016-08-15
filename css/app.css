@@ -1,0 +1,79 @@
+button:focus {
+	outline: none;
+}
+
+.weave-menu,
+.weave-menubar,
+.weave-menuitem,
+.weave-menuitem:active,
+.weave-menubar-item.weave-menubar-item-hovered,
+.weave-menubar-item.weave-menubar-item-clicked {
+	background-color: #4a4a4a;
+	color: #a29f9f;
+}
+
+.weave-menubar-item-hovered,
+.weave-menubar-item:hover,
+.weave-menuitem:hover {
+	background-color: #4a4a4a;
+	color: #ffffff
+}
+
+.weave-menubar {
+	height: 50px;
+	border-bottom: 1px solid #616161;
+}
+
+.weave-menubar-item {
+	height: 100%;
+}
+
+.weave-menu {
+	color: white;
+	min-width: 200px;
+	border-radius: 0px 0px 0px 0px;
+}
+
+.weave-menuitem {
+	padding: .4rem 1rem!important;
+}
+
+.nav-logo {
+	margin-left: 50px;
+	color: #FFA500;
+	font-weight: bold;
+	font-size: 2rem;
+}
+
+.main-header {
+	height: 500px;
+	color: white;
+	background-color: #292929;;
+	text-align: left;
+}
+.main-title {
+	color: #efbb68;
+	font-size: 50px;
+}
+
+.app.footer {
+	padding: 50px;
+	background-color: #4a4a4a;
+	color: #a29f9f;
+	border-top: 1px solid black;
+}
+
+.ui.button.get-started-button {
+	border: 2px solid white;
+	background-color: #40715a;
+	color: white;
+	font-weight: bold;
+	font-size: 1.5rem;
+	margin: 0;
+	letter-spacing: 0.05rem;
+	white-space: nowrap;
+}
+
+.highlights {
+	font-size: 1.3em;
+}

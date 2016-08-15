@@ -1,0 +1,7 @@
+c3.d.ts
+jquery.d.ts
+openlayers.d.ts
+rc-slider.d.ts
+react-date-picker.d.ts
+filesaver.d.ts
+clipboard.d.ts

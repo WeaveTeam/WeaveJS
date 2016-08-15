@@ -1,0 +1,1326 @@
+.weave {
+	font-family: 'Lato','Helvetica Neue', sans-serif;
+}
+
+.weave p {
+	line-height: normal;
+}
+
+.weave input[type=number]::-webkit-inner-spin-button,
+.weave input[type=number]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* disable numerical spinners in Mozilla Firefox */
+.weave input[type=number] {
+	-moz-appearance:textfield;
+}
+
+/****** Altering the default behavior of Input Placeholder on Focus******/
+/* WebKit browsers */
+.weave input:focus::-webkit-input-placeholder { opacity:0; }
+
+/* Mozilla Firefox 4 to 18 */
+.weave input:focus:-moz-placeholder { opacity:0; }
+
+/* Mozilla Firefox 19+ */
+.weave input:focus::-moz-placeholder { opacity:0;}
+
+/* Internet Explorer 10+ */
+.weave input:focus:-ms-input-placeholder { opacity:0; }
+
+/* Dowloaded Fonts*/
+@font-face {
+	font-family: 'Michroma';
+	src: url('../fonts/Michroma.ttf');
+}
+
+/* d3 css override */
+.axis path,
+.axis line {
+	fill: none;
+	stroke: #CCCCCC;
+	shape-rendering: crispEdges;
+}
+
+.axis text {
+	font-family: sans-serif;
+	font-size: 11px;
+}
+/********************/
+
+/* c3 css override */
+.c3-tooltip td.value {
+	white-space: nowrap;
+}
+
+.c3-tooltip td.name {
+	white-space: nowrap;
+}
+/********************/
+.weave-rc-slider-container:focus .rc-slider-handle {
+	outline: none;
+	border-color: #57c5f7;
+}
+
+.weave-rc-slider-container
+{
+	outline: none;
+}
+
+.weave-hslider {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+/* rc-slider css override */
+.weave-hslider .rc-slider {
+	position: relative;
+	height: 2px;
+	width: 100%;
+	border-radius: 3px;
+	background-color: #D0D0D0;
+	box-sizing: border-box;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	z-index: 0;
+}
+.weave-hslider .rc-slider-track {
+	position: absolute;
+	left: 0;
+	height: 2px;
+	border-radius: 6px;
+	background-color: #D0D0D0;
+	z-index: 0;
+}
+
+.weave-hslider .rc-slider-dot {
+	position: absolute;
+	top: -3px;
+	margin-left: 0;
+	width: 1px;
+	height: 8px;
+	border: 1px solid #D0D0D0;
+	background-color: #fff;
+	cursor: pointer;
+	/* border-radius: 50%; */
+	vertical-align: middle;
+}
+
+.weave-hslider .rc-slider-dot:first-child {
+	margin-left: -1px
+}
+
+.weave-hslider .rc-slider-dot:last-child {
+	margin-left: -1px;
+}
+
+.weave-hslider .rc-slider-dot-active {
+	border-color: #D0D0D0;
+}
+
+.weave-hslider .rc-slider {
+	background-color: #D0D0D0;
+}
+
+.weave-vslider {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.weave-vslider .rc-slider-vertical {
+	width: 2px;
+	z-index: 0;
+}
+
+.weave-vslider .rc-slider-dot {
+	position: absolute;
+	bottom: -3px;
+	margin-left: -4px;
+	width: 8px;
+	height: 1px;
+	border: 1px solid #D0D0D0;
+	/* background-color: #fff; */
+	cursor: pointer;
+	/* border-radius: 50%; */
+	vertical-align: middle;
+}
+
+.weave-vslider .rc-slider-dot-active {
+	border-color: #D0D0D0;
+}
+
+.weave-vslider .rc-slider {
+	background-color: #D0D0D0;
+}
+
+.weave-vslider .rc-slider-vertical .rc-slider-dot {
+	left: 1px;
+	margin-bottom: -1px;
+}
+
+.weave-vslider .rc-slider-vertical .rc-slider-track {
+	width: 2px;
+}
+
+.weave-vslider .rc-slider-vertical .rc-slider-dot:last-child {
+	margin-bottom: -1px;
+}
+
+.weave-vslider .rc-slider-vertical .rc-slider-dot {
+	margin-bottom: -1px;
+}
+
+.weave-vslider .rc-slider-track {
+	position: absolute;
+	left: 0;
+	height: 2px;
+	border-radius: 6px;
+	background-color: #D0D0D0;
+	z-index: 0;
+}
+
+.weave-vslider .rc-slider-vertical .rc-slider-handle {
+	margin-left: -6px;
+}
+
+/* react fixed data table */
+div.table-row-probed>div>div>div>div>div {
+	background-color: rgba(180, 225, 255, 0.4);
+}
+
+div.table-row-probed-selected>div>div>div>div>div {
+	background-color: rgba(117, 179, 255, 0.6);
+}
+
+div.table-row-selected>div>div>div>div>div {
+	background-color: rgba(109, 163, 228, 0.6);
+}
+
+.public_fixedDataTable_header, .public_fixedDataTable_header .public_fixedDataTableCell_main {
+	background: #F8F8F8 none; /* needed for override of item in fixed data table css */
+}
+
+.public_fixedDataTableCell_cellContent {
+	white-space: nowrap;
+	padding: 4px;
+}
+
+.weave-disableBottomBorder .fixedDataTableLayout_header,
+.weave-disableBottomBorder .fixedDataTableLayout_hasBottomBorder {
+	border-style: none;
+}
+
+.fixedDataTableLayout_hasBottomBorder {
+	border-style: none;
+}
+
+
+/* weave custom css */
+.weave {
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+.weave-resizer-horizontal {
+	background: #e6e6e6;
+	width:4px;
+}
+
+.weave-resizer-vertical {
+	background: #e6e6e6;
+	height:4px;
+}
+
+/* table */
+.weave-table {
+	font-size: inherit;
+	white-space: nowrap;
+}
+
+.weave-table-header {
+	background-color: #eee;
+	color: -webkit-text;
+}
+
+/* tool */
+.weave-tool {
+	background-color: white;
+}
+
+.weave-tool:focus {
+	outline: 4px solid #cecece;
+}
+
+.weave-tool-title-bar {
+	visibility: hidden;
+	font-size: 14px;
+	border-bottom: 1px solid #ffffff;
+	transition: visibility 0s 0.1s, opacity 0.1s linear;
+	-webkit-transition: visibility 0s 0.1s, opacity 0.1s linear;
+}
+
+.weave-tool-title-bar-hovered {
+	visibility: visible;
+	font-size: 14px;
+	background-color: #f8f8f8;
+	border-bottom: 1px solid #e6e6e6;
+	transition: visibility 0s 0.1s, opacity 0.1s linear;
+	-webkit-transition: visibility 0s 0.1s, opacity 0.1s linear;
+}
+
+.weave-tool-title-bar-highlighted {
+	background-color: #e0e0e0;
+}
+
+.weave-tool-title-bar-text {
+	font-family: Roboto, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	font-style: normal;
+	text-decoration: none;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/* icon */
+.weave-transparent-button {
+	-webkit-appearance: none;
+	border: none;
+	background: transparent;
+}
+
+.weave-icon {
+	padding: 5px 5px 5px 5px;
+}
+
+.weave-icon-button {
+	padding: 5px;
+	border-radius:4px;
+	color:grey;
+}
+
+.weave-icon:focus {
+	outline: none;
+	background-color: rgba(0,0,0,.05);
+}
+
+.weave-icon:hover {
+	outline: none;
+	background-color: rgba(0,0,0,.05);
+}
+
+.weave-icon:active {
+	background-color: #CCCCCC;
+}
+
+.weave-icon-button-mouse-over{
+	padding: 5px;
+	border-color: grey;
+	border-radius:4px;
+	color:white;
+	background:grey;
+}
+
+/* containers */
+.weave-container {
+	border:1px solid #ddd;
+	padding: 8px;
+}
+
+.weave-dialog-overlay {
+	background-color: #ccc;
+	opacity: .5;
+}
+
+/**** container - FlexBox *****/
+.weave-padded-vbox > * {
+	flex-shrink: 0;
+	margin-top: 8px;
+}
+
+.weave-padded-vbox > *:nth-child(1) {
+	margin-top: 0;
+}
+
+.weave-padded-hbox > * {
+	flex-shrink: 0;
+	margin-left: 8px;
+}
+.weave-padded-hbox > *:nth-child(1) {
+	margin-left: 0;
+}
+
+.weave-hDividedBox > * {
+	margin: 4px;
+}
+
+.weave-hDividedBox-resizer {
+	width:2px;
+	background-color: #fff;
+	opacity: .1;
+}
+
+.weave-vDividedBox-resizer {
+	height:2px;
+	background-color: #fff;
+	opacity: .1;
+}
+
+.weave-section {
+	padding: 1rem;
+}
+.weave-section > *:nth-child(1) {
+	border-bottom: 1px solid rgba(34,36,38,.15);
+	padding-bottom: 0.25rem;
+	font-size: 1.28rem;
+	font-weight: bold;
+	margin-bottom: 1rem;
+}
+
+.weave-label {
+}
+
+/***** popup window ******/
+
+.weave-window {
+	overflow: hidden;
+	border: 1px solid rgb(171, 167, 167);
+	background-color: #FFFFFF;
+	box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.2);
+	-webkit-box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.2);
+}
+
+.weave-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 4px;
+	cursor: default;
+	font-weight: 300;
+}
+
+/* same weave-menubar but can be customized */
+.weave-header.weave-window-header {
+	/*border-bottom: 1px solid #E6E6E6;
+	background-color: #D5D5D5;
+	padding: 4px 8px 4px 8px;*/
+	background: #EEE;
+	margin: 0;
+	padding: 1.25rem 1.5rem;
+	box-shadow: none;
+	color: rgba(0,0,0,.85);
+	border-bottom: 1px solid rgba(34,36,38,.15);
+	font-size: 1.42857143rem;
+	line-height: normal;
+	font-weight: 700;
+}
+
+.weave-header.weave-window-header>.close {
+	color: rgba(0,0,0,.87);
+}
+
+.weave-header.weave-window-header>.close:hover {
+	opacity: 1;
+	cursor: pointer;
+}
+
+.weave-window-content {
+	padding: 8px;
+}
+
+/* tabs */
+.weave-tab-container {
+}
+
+.weave-tab-icon {
+	outline: none;
+	color: #909090
+}
+.weave-tab-icon:hover {
+	color: #000000
+}
+
+.weave-tab-label {
+	padding: 5px 8px 5px 8px;
+	cursor: default;
+	background: #F8F8F8;
+	border-right: 1px solid #ddd;
+}
+
+.weave-tab-label:nth-child(1) {
+	border-left: 1px solid #ddd;
+}
+
+.weave-tab-label.top {
+	border-top: 1px solid #ddd;
+}
+
+.weave-tab-label.bottom {
+	border-bottom: 1px solid #ddd;
+}
+
+.weave-tab-label.active {
+	background: none;
+}
+.weave-tab-label.active.top {
+	margin-bottom: -1px; /* to cover the label container border*/
+	border-bottom: 1px solid white; /* todo: border bottom white is not right way has to match backgroundcolor */
+}
+
+.weave-tab-label.active.bottom {
+	margin-top: -1px; /* to cover the label container border*/
+	border-top: 1px solid white; /* todo: border bottom white is not right way has to match backgroundcolor */
+}
+
+.weave-tab-content {
+	/*padding: 8px;*/
+	border: 1px solid #ddd;
+}
+
+/* dropdown */
+.weave-dropdown {
+	outline: none;
+}
+
+/* menus */
+.weave-menu {
+	cursor: auto;
+	outline: 0;
+	top: 100%;
+	min-width: -webkit-max-content;
+	min-width: -moz-max-content;
+	min-width: max-content;
+	margin: 0;
+	padding-top: 7px;
+	padding-bottom: 7px;
+	background: #FFF;
+	font-size: 1em;
+	text-shadow: none;
+	text-align: left;
+	box-shadow: 0 2px 3px 0 rgba(34,36,38,.15);
+	border: 1px solid rgba(34,36,38,.15);
+	border-radius: .28571429rem;
+	-webkit-transition: opacity .1s ease;
+	transition: opacity .1s ease;
+	z-index: 11;
+	will-change: transform, opacity;
+}
+
+/* menubar */
+.weave-menubar {
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	cursor: default;
+	background-color: #F8F8F8;
+	/*box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;
+	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;
+	-moz-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;*/
+}
+
+.weave-menubar-item {
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	padding: .5em 1em;
+}
+
+.weave-menubar-item.weave-menubar-item-hovered {
+	background-color: rgba(0,0,0,.05);
+}
+
+.weave-menubar-item.weave-menubar-item-clicked {
+	background-color: #CCCCCC;
+}
+
+.weave-menubar-item-disabled {
+	opacity: 0.5;
+}
+
+.weave-menubar-item-disabled {
+	background-color: rgba(0,0,0,0);
+}
+
+.weave-menubar-item-bold {
+	font-weight: bold;
+}
+
+/* menu */
+.weave-menuitem {
+	/* padding-left: 20px; */
+	/* padding-right: 20px; */
+	outline: none;
+	position: relative;
+	cursor: pointer;
+	display: block;
+	border: none;
+	height: auto;
+	text-align: left;
+	border-top: none;
+	color: rgba(0,0,0,.87);
+	padding: .71428571rem 1.14285714rem!important;
+	font-size: 1rem;
+	text-transform: none;
+	font-weight: 400;
+	box-shadow: none;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+.weave-menuitem.weave-menuitem-focused {
+	background-color: rgba(0,0,0,.05)
+}
+
+.weave-menuitem:active {
+	background-color: #CCCCCC
+}
+
+.disabled.weave-menuitem {
+	cursor: default;
+	color: #C1C1C1;
+}
+
+.disabled.weave-menuitem.weave-menuitem-focused {
+	background-color: #FFFFFF;
+}
+
+.weave-menuitem-label {
+	white-space: nowrap;
+	display: flex;
+	flex:1;
+}
+
+.weave-menuitem-label-padding-left {
+	padding-left: 5px;
+}
+.weave-menuitem-label-padding-right {
+	padding-right: 5px;
+}
+
+.weave-menuitem-nopadding {
+	padding: 0!important;
+}
+
+.weave-menuitem-padding {
+	flex:1;
+	padding: .71428571rem 1.14285714rem!important;
+	cursor: pointer;
+}
+
+.weave-menu-divider {
+	margin: 7px 0 7px 0;
+	height: 1px;
+	border: none;
+	opacity: 1;
+	background-color: rgb(224, 224, 224)
+}
+
+/* help icon */
+.weave-help-icon {
+	color: #808080;
+}
+.weave-help-icon:hover {
+	border-color: rgba(0,0,0,.05)
+}
+
+.weave-help-tooltip {
+	box-shadow: rgba(0, 0, 0, 0.12) 0 1px 6px, rgba(0, 0, 0, 0.12) 0 1px 4px;
+	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0 1px 6px, rgba(0, 0, 0, 0.12) 0 1px 4px;
+	-moz-box-shadow: rgba(0, 0, 0, 0.12) 0 1px 6px, rgba(0, 0, 0, 0.12) 0 1px 4px;
+	border-radius: 2px;
+	padding: 8px;
+	font-size: smaller;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	background-color: #FCF8E3;
+	color: #333;
+}
+
+/* lists */
+.weave-tree-view-icon {
+	color: #808080;
+}
+
+.weave-tree-view-icon-expander {
+	color: #676767;
+	font-size: 60%;
+}
+.weave-tree-view-icon-expander.hidden-expander::before {
+	content: " ";
+}
+
+.weave-tree-view {
+	user-select: none;
+	cursor:pointer;
+	-webkit-user-select: none;
+}
+/*
+.weave-tree-view:hover {
+	background-color: rgba(153, 214, 255, 0.4);
+	cursor:pointer;
+}
+
+.weave-tree-view.selected {
+	background-color: #80CCFF;
+	cursor:pointer;
+}
+
+.weave-tree-view.selected:hover {
+	background-color: #99D6FF;
+	cursor:pointer;
+}
+*/
+
+span.weave-tree-view.open {
+
+}
+/* The pane for the weave-tree-view */
+div.weave-tree-view {
+
+}
+
+.weave-list-item{
+	padding:5px;
+	cursor:pointer;
+	background-color: #FFFFFF;
+}
+.weave-list-item:focus,
+.weave-list-item:active{
+	background-color: rgba(180, 225, 255, 0.4);
+	outline:none;
+}
+.weave-list-item-selected{
+	background-color: rgba(109, 163, 228, 0.6);
+}
+.weave-list-item-selected:focus{
+	background-color: rgba(117, 179, 255, 0.6);
+}
+
+div.ui.inverted.segment .weave-list-item{
+	background-color: inherit;
+	padding: 5px 10px 5px 10px;
+}
+div.ui.inverted.segment .weave-list-item:focus{
+	background-color: rgba(180, 225, 255, 0.4);
+	color: white;
+}
+div.ui.inverted.segment .weave-list-item:active{
+	background-color: rgba(117, 172, 228, 0.5);
+	color: white;
+}
+div.ui.inverted.segment .weave-list-item-selected{
+	background-color: rgba(54, 119, 199, 0.6);
+	color: white;
+}
+
+div.ui.inverted.segment .weave-list-item-selected:focus{
+	background-color: rgba(117, 179, 255, 0.6)
+}
+
+/*
+.weave-file-picker-editor {
+	background: rgba(60,64,63,0.9)!important;
+}
+
+.weave-file-picker-container {
+	background: rgba(54, 119, 199, 0.6);
+}
+*/
+
+.weave-server-file-view {
+	background: white;
+}
+
+/* sidebar */
+.weave-sidebar-dropdown {
+	min-width: 0 !important;
+}
+
+.weave-sidebar-label {
+	text-align: right;
+	display:flex;
+	justify-content: flex-end;
+}
+
+/****** ButtonGroupBar ******/
+
+.weave-buttonGroupBar {
+	border-radius:12px;
+	border:1px solid grey;
+}
+.weave-buttonGroupBar .ui.button { /* inline style will override hover state */
+	background-color:white;
+}
+
+/****** Tool Editor ******/
+
+.weave-ToolEditor {
+	font-size: small;
+}
+
+.weave-ToolEditor .ui.button {
+	font-size: small;
+}
+
+.weave-ToolEditor table {
+	width: 100%;
+	font-size: inherit;
+}
+
+.weave-ToolEditor .weave-left-cell {
+	white-space: nowrap;
+	text-align: right;
+}
+
+.weave-ToolEditor .weave-right-cell {
+	width: 100%;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	padding-left: 8px;
+}
+
+.weave-ToolEditor-Header {
+	align-items: center;
+	border-bottom: 1px solid lightgrey;
+	margin: 0 8px;/* this ensures border bottom will be disconnected seperator */
+}
+
+.weave-ToolEditor-Header .ui.button { /* inline style will override hover state */
+	border-color: transparent;
+	padding: 8px;
+	background-color: transparent;
+}
+
+.weave-ToolEditor-Header .ui.button:hover { /* inline style will override hover state */
+	color: black;
+	background-color: rgba(0, 0, 0, 0.12);
+}
+
+/* Weave Progress Bar */
+.weave-progress-bar-background {
+	background-color: transparent;
+}
+
+.weave-progress-bar {
+	background-color: rgba(109, 163, 228, 0.9);
+	transition-duration: 200ms;
+	height: 4px;
+	-webkit-transition: width .1s linear, visibility .1s ease-in-out;
+	-moz-transition: width .1s linear, visibility .1s ease-in-out;
+	transition: width .1s linear, visibility .1s ease-in-out;
+}
+
+/* Weave GetStart Section */
+.weave-getstarted {
+	padding-left: 20%;
+	padding-right: 20%;
+	font-family: 'Michroma', sans-serif;  /* matched our iweave.com font family theme */
+	-webkit-animation:animateChildren .2s 1 ease;
+	animation:animateChildren .2s 1 ease;
+}
+
+.weave-getstarted:nth-child(1) {
+	-webkit-animation: flexGrow 1.2s ease forwards;
+	animation: flexGrow 1.2ms ease forwards;
+}
+
+
+.weave-getstarted-logo { /* matched our iweave.com theme */
+	color: white;
+	font-size: 64px;
+	font-family: 'Michroma', sans-serif;  /* matched our iweave.com font family theme */
+}
+
+.weave-getstarted-overlay{
+	background-image: linear-gradient( 0deg, rgb(44,48,65) 0%, rgb(70,130,180) 100%);
+	opacity:1;
+}
+
+.weave-getstarted-item {
+	color: white;
+	align-items: center;
+	font-size: 18px;
+	cursor: pointer;
+	margin-bottom:24px; /* required to space between each item , when screen size is reduced*/
+}
+.weave-getstarted-item-icon {
+	border: 4px solid rgb(236, 131, 89);
+	color: rgb(236, 131, 89);
+	width: 164px;
+	height: 164px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	font-size: 40px;
+	margin-bottom:16px;/* required to space between  icon and text */
+}
+
+.weave-getstarted-item-icon:hover {
+	border: 4px solid white;
+}
+
+
+
+.weave-guidance-list {
+	flex:0.0001; /* 0 does not work so we have to use a small number */
+	color:rgb(236, 131, 89);
+	font-size: 16px;
+	-webkit-animation:flexGrow 500ms ease forwards;/* animation will give .5 for flex value */
+	animation:flexGrow 500ms ease forwards;
+}
+
+.weave-guidance-list-item {
+	padding-top: 8px;
+	cursor: pointer;
+}
+
+.weave-guidance-toolTip {
+	padding: 8px;
+	background-color: black;
+	color:white;
+	z-index:1;
+	box-shadow: 0 2px 8px rgba(0,0,0,.4);
+	/*border: 1px solid #FFBE00;*/
+}
+
+.weave-guidance-toolTip-arrow {
+	border: 8px solid black;
+	/*border: 8px solid #FFBE00;*/
+}
+
+
+
+.weave-guidance-pointer-inner{
+	-webkit-animation:pointer-inner 1.2s infinite ease-in-out;
+	animation:pointer-inner 1.2s infinite ease-in-out;
+	background-color: rgba(255, 165, 0, 1);
+	opacity: .7;
+}
+
+.weave-guidance-pointer-outer{
+	-webkit-animation: pointer-outer 1.2s infinite ease-in-out;
+	animation: pointer-outer 1.2s infinite ease-in-out;
+	background-color: rgba(255, 165, 0, 0.2);
+	border: 2px solid #FFA500;
+	opacity: .9;
+}
+/* Pointer Outer circle Animation */
+/* Chrome, Safari, Opera */
+@-webkit-keyframes pointer-outer {
+	0% {
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
+	45% {
+		opacity: .7;
+		-webkit-transform: scale(.75);
+		transform: scale(.75);
+	}
+	100% {
+		opacity: .9;
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
+}
+
+/* Standard syntax */
+@keyframes pointer-outer {
+	0% {
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
+	45% {
+		opacity: .7;
+		-webkit-transform: scale(.75);
+		transform: scale(.75);
+	}
+	100% {
+		opacity: .9;
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
+}
+
+/* Pointer Inner circle Animation */
+/* Chrome, Safari, Opera */
+@-webkit-keyframes pointer-inner {
+	20% {
+		opacity: .9;
+	}
+	90% {
+		opacity: .7;
+	}
+}
+
+/* Standard syntax */
+@keyframes pointer-inner {
+	20% {
+		opacity: .9;
+	}
+	90% {
+		opacity: .7;
+	}
+}
+
+/* Flex Children Addition Animation */
+/* Chrome, Safari, Opera */
+@-webkit-keyframes flexGrow {
+	to {
+		flex: .5;
+	}
+
+}
+/* Standard syntax */
+@keyframes  flexGrow {
+	to {
+		flex: .5;
+	}
+}
+
+
+
+
+/****** Layout - Tab *********/
+.weave-layout-tabs-content {
+	background: #ddd;
+	padding: 4px;
+	border-right: none;
+	border-top: none;
+}
+
+.weave-layout-tabs-bar {
+	padding-bottom: 4px;
+	padding-left: 4px;
+	cursor: default;
+	background: #b0b0b0;
+}
+
+.weave-layout-tabs-label {
+	padding: 5px 8px 5px 8px;
+	border-left: 1px solid #9A9A9A;
+	border-right: 1px solid #9A9A9A;
+	border-bottom: 2px solid #949494;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+.weave-layout-tabs-label.active.bottom {
+	margin-top: 0;
+	background-color: #ddd;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+/********** Dropzone **********/
+.weave-dropzone-file {
+	width: 100%;
+	height: 100%;
+	background: whitesmoke;
+	border: dashed black 1px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.weave-dropzone-file:hover {
+	cursor: pointer;
+	background: #EEE;
+}
+
+.weave-dropzone-file-error {
+	width: 100%;
+	height: 100%;
+	background: #FFF6F6;
+	border: dashed #E0B4B4 1px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.weave-dropzone-file-error:hover {
+	cursor: pointer;
+}
+
+.weave-data-source-manager-sidebar .weave-data-source-item:hover {
+	color: white;
+	cursor: pointer;
+}
+
+.weave-data-source-item span {
+	padding: 0 10px 0 10px;
+}
+
+.weave-data-source-manager-editor {
+	background: white;
+}
+
+.weave-exclamation-triangle {
+	color: #FFDEA2;
+	text-shadow: -1px -1px 0 orange, 1px -1px 0 orange, -1px 1px 0 orange, 1px 1px 0 orange;
+}
+
+/* Override Semantic ui CSS*/
+
+/******* Breadcrumb *******/
+
+.ui.breadcrumb {
+	line-height: normal;
+}
+
+/******* Menu *******/
+
+.ui.dropdown .menu>.item {
+	line-height: normal;
+}
+
+/******* Button *******/
+.ui.button {
+	border:1px solid lightgrey;
+	background-color:#ECECEC;
+	color:black;
+	font-weight: normal;
+	margin:0;/* important to override semantic ui default margin-right value. for special cases use inline style to set */
+}
+
+.ui.button:hover {
+	background-color: lightgrey;
+}
+
+.ui.button:focus {
+	background-color: #ECECEC;
+	border-color: #85B7D9;
+}
+
+.ui.secondary.button, .ui.secondary.buttons .button {
+	background: rgba(60,64,63,0.9);
+}
+
+/******* Dropdown *****/
+
+.ui.multiple.dropdown>.label {
+	display: inline-flex;
+	align-items: center;
+	background: none;
+}
+
+.ui.multiple.dropdown>.label:hover {
+	background: lightgrey;
+}
+
+.ui.selection.dropdown .menu {
+	border-top-style: dashed;
+	border-bottom-style: solid;
+	border-top-width: 1px!important;
+}
+
+.ui.upward.selection.dropdown .menu {
+	border-top-style: solid;
+	border-bottom-style: dashed;
+	border-bottom-width: 1px!important;
+}
+
+.ui.dropdown .menu>.header {
+	padding-left: 4px;
+}
+
+/******* grid *********/
+
+.ui.grid {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: row;
+	-ms-flex-direction: row;
+	flex-direction: row;
+	-webkit-flex-wrap: wrap;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	padding: 0;
+	margin: 0;
+}
+
+.ui.grid>* {
+	padding-left: 0;
+	padding-right: 8px;
+}
+
+.ui.grid>.column:not(.row) {
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.ui.grid>.column:not(.row), .ui.grid>.row>.column {
+	position: relative;
+	display: inline-block;
+	padding-left: 0;
+	padding-right: 8px;
+	vertical-align: middle;
+}
+
+.ui.grid>.column:not(.row), .ui.grid>.row>.column {
+	position: relative;
+	display: inline-block;
+	padding-left: 0;
+	padding-right: 8px;
+	vertical-align: middle;
+}
+
+/****** Accordion *******/
+.ui.styled.accordion {
+	border-radius: 2px;
+	background: none;
+	width:100%;
+	box-shadow:none;
+}
+
+.ui.styled.accordion .title {
+	padding: 1em 0 0 0;
+}
+
+.ui.styled.accordion .content {
+	padding: .5em 0 1em 1em;
+}
+
+/****** Dimmer ********/
+.ui.dimmer {
+	background-color: rgba(204,204,204,0.5);
+}
+
+/****** Modal *********/
+.ui.modal>.close {
+	top: 1.0535rem;
+	right: 1rem;
+	color: rgba(0,0,0,.87);
+}
+
+/****** Inverted Segment *******/
+.ui.inverted,.ui.inverted.segment {
+	background: rgba(60,64,63,0.9);
+	color: rgba(161,164,163,1.0);
+}
+
+/****** Warning ******/
+.ui.input.warning input {
+	background-color: #FFFAF3;
+	border-color: #C9BA9B;
+	color: #794B02;
+	box-shadow: none;
+}
+
+/****** Modal *******/
+.ui.mini.modal {
+	width: 400px;
+	margin: 0 0 0 -200px;
+}
+
+.ui.mini.modal>.close {
+	top: 1.0535rem;
+	right: 1rem;
+	color: rgba(0,0,0,.87);
+}
+
+.weave-dropzone-file {
+	width: 100%;
+	height: 100%;
+	background: whitesmoke;
+	border: dashed black 1px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.weave-dropzone-file-error {
+	width: 100%;
+	height: 100%;
+	background: #FFF6F6;
+	border: dashed #E0B4B4 1px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.weave-data-source-manager-sidebar .weave-data-source-item:hover {
+	color: white;
+	cursor: pointer;
+}
+
+.weave-data-source-item span {
+	padding: 0 10px 0 10px;
+}
+
+.weave-layout-tabs-content {
+	background: #ddd;
+	padding: 2px 4px 4px 4px;
+	border-right: none;
+	border-top: none;
+}
+
+.weave-layout-tabs-bar {
+	padding-bottom: 4px;
+	padding-left: 4px;
+	cursor: default;
+	background: #b0b0b0;
+}
+
+.weave-layout-tabs-label {
+	padding: 5px 8px 5px 8px
+}
+
+.weave-layout-tabs-label.active.bottom {
+	margin-top: 0;
+	background-color: #ddd;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+.weave-exclamation-triangle {
+	color: #FFDEA2;
+	text-shadow: -1px -1px 0 orange, 1px -1px 0 orange, -1px 1px 0 orange, 1px 1px 0 orange;
+}
+
+.weave-caption-border {
+	border-top: 1px solid lightgrey;
+}
+
+.weave-input-div {
+	line-height: 1.2142em;
+	padding: .67861429em 1em;
+	border: 1px solid white;
+}
+
+.weave-input-div.disabled {
+	cursor: default;
+	pointer-events: none;
+	opacity: .45;
+}
+
+.weave-error-border {
+	border: 1px solid indianred;
+}
+
+.weave-normal-border {
+	border: 1px solid lightgrey;
+}
+
+.ReactCodeMirror {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+}
+
+.ReactCodeMirror > .CodeMirror {
+	flex: 1
+}
