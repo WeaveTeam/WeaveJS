@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
   "scripts": {
-    "clean": "rimraf index.js && rimraf index.jsx && rimraf dist/bundle.js && rimraf node_modules/weavejs",
-    "babel": "babel index.jsx --out-file index.js --source-maps inline",
-    "browserify": "mkdir -p dist && browserify index.js -o dist/bundle.js",
+    "clean": "rimraf src/index.js && rimraf src/index.jsx && rimraf dist/bundle.js && rimraf node_modules/weavejs",
+    "babel": "babel src/index.jsx --out-file src/index.js --source-maps inline",
+    "browserify": "mkdir -p dist && browserify src/index.js -o dist/bundle.js",
     "copy-typings": "mkdir -p typings/weave && cp ../weave-typings/* typings/weave",
-    "compile": "npm run clean && npm install weavejs && npm run copy-typings && tsc && npm run babel && npm run browserify && node copy"
+    "compile": "npm run clean && npm install weavejs && npm run copy-typings && tsc && npm run babel && npm run browserify && cd .. && node run-ts copy.ts"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "babel-preset-react": "^6.11.1",
     "browserify": "^13.1.0",
     "rimraf": "^2.5.3",
+    "jquery": "^2.1.4",
     "typescript": "^1.8.10",
     "weavejs": "../"
   }

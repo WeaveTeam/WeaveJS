@@ -3,20 +3,18 @@ module.exports = function()
 	type TargetEntry = {flatten?:boolean, cwd:string, src:string, dest:string};
 
 	let targets:{[name:string]:TargetEntry} = {
-		index_html: {flatten: true, cwd: 'src/', src: 'index.html', dest: 'dist/'},
-		weave_html: {flatten: true, cwd: 'src/', src: 'weave.html', dest: 'dist/'},
-		css: {flatten: true, cwd: 'src/', src: 'css/*.css', dest: 'dist/css/'},
-		img: {flatten: true, cwd: 'src/', src: 'img/*.*', dest: 'dist/img'},
-		fonts: {flatten: true, cwd: 'src/', src: 'css/fonts/*.ttf', dest: 'dist/fonts'},
-		olcss: {flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/css/'},
-		fontawesomecss: {flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'dist/css/'},
-		fontawesomefont: {flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
-		semantic: {cwd: 'src/semantic', src: 'semantic.min.css', dest: 'dist/css/'},
-		semanticfonts: {cwd: 'src/semantic/themes', src: '*', dest: 'dist/css/themes/'},
-		weavesessions: {flatten: true, cwd: 'weave_sessions', src: "*.weave", dest: "dist/"},
-		projdb: {flatten: true, cwd: 'src/', src: 'ProjDatabase.zip', dest: "dist/"},
-		weavejs_core_typings: {cwd:'typings/weave/', src:'weavejs-core.d.ts', dest:"weave-typings/"},
-		weavejs_typings: {cwd:'outts/', src:'weavejs.d.ts', dest:"weave-typings/"}
+		index_html: {flatten: true, cwd: 'app/src/', src: 'index.html', dest: 'app/dist/'},
+		weave_html: {flatten: true, cwd: 'app/src/', src: 'weave.html', dest: 'app/dist/'},
+		css: {flatten: true, cwd: 'app/src/', src: 'css/*.css', dest: 'app/dist/css/'},
+		img: {flatten: true, cwd: 'app/src/', src: 'img/*.*', dest: 'app/dist/img'},
+		fonts: {flatten: true, cwd: 'app/src/', src: 'css/fonts/*.ttf', dest: 'app/dist/fonts'},
+		olcss: {flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'app/dist/css/'},
+		fontawesomecss: {flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'app/dist/css/'},
+		fontawesomefont: {flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'app/dist/fonts/'},
+		semantic: {cwd: 'app/src/semantic', src: 'semantic.min.css', dest: 'app/dist/css/'},
+		semanticfonts: {cwd: 'app/src/semantic/themes', src: '*', dest: 'app/dist/css/themes/'},
+		weavesessions: {flatten: true, cwd: 'weave_sessions', src: "*.weave", dest: "app/dist/"},
+		projdb: {flatten: true, cwd: 'app/src/', src: 'ProjDatabase.zip', dest: "app/dist/"}
 	};
 
 	let fse = require("fs-extra");

@@ -11,7 +11,7 @@ module.exports = function()
 		'WeaveTSJS/bin/js/libs.js',
 		'WeaveASJS/bin/js-release/WeaveJS.js',
 		'WeaveASJS/src/initWeaveJS.js',
-		'app/semantic/semantic.min.js',
+		'app/src/semantic/semantic.min.js',
 		'WeaveTSJS/bin/js/weavejs.js',
 		'scripts/umd-suffix.txt'
 	];

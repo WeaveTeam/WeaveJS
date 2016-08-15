@@ -5,7 +5,7 @@
     "removeComments": false,
     "target": "es6",
     "module": "es6",
-	"outDir": "./",
+	"outDir": "src/",
     "inlineSources": true,
     "inlineSourceMap": true,
 	"forceConsistentCasingInFileNames": true,

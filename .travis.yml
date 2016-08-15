@@ -21,12 +21,19 @@ before_install:
 - mkdir dist
 - yes | npm install
 - npm install
+- pushd app
+- npm install
+- popd
 - pushd node_modules/flexjs/js/bin/
 - chmod a+x *
 - popd
-install: npm run compile-libs && npm run compile
+install:
+- npm run compile
+- pushd app
+- npm run compile
+- popd
 after_success:
-- cd dist/ && tar -zcvf ../$TRAVIS_BRANCH.tgz * && cd ..
+- pushd app/dist/ && tar -zcvf ../../$TRAVIS_BRANCH.tgz * && popd
 - export SSHPASS=$DEPLOY_PASS
 - sshpass -e scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $TRAVIS_BRANCH.tgz
   $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
