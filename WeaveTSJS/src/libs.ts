@@ -57,13 +57,4 @@ var sparkline:any = sparkline_;
 var PIXI:any = PIXI_;
 (PIXI as any).utils._saidHello = true;
 
-// temporary solution
-/*
-var weavejs:any = weavejs || {};
-weavejs.util = weavejs.util || {};
-weavejs.util.DateUtils = weavejs.util.DateUtils || {};
-weavejs.util.StandardLib = weavejs.util.StandardLib || {};
-weavejs.util.DateUtils.moment = (moment as any).default;
-weavejs.util.StandardLib.lodash = _;
-weavejs.util.StandardLib.ol = ol;
-*/
+
