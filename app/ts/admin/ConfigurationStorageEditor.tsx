@@ -52,7 +52,7 @@ namespace weavejs.admin
 		updateCurrentConnection()
 		{
 			this.props.service.getConnectionNames().then(
-				(connectionNames) => { 
+				(connectionNames) => {
 					this.setState({ connectionNames });
 				},
 				this.handleError
@@ -117,7 +117,7 @@ namespace weavejs.admin
 								</div>
 								<div className="twelve wide column">
 									<ComboBox style={{flex:1}} value={this.state.connectionName} options={this.state.connectionNames || []}
-										onChange={(value: string) => {this.setState({connectionName: value})}}/>
+											  onChange={(value: string) => {this.setState({connectionName: value})}}/>
 								</div>
 							</div>
 							<div className="two column row" style={{ paddingBottom: 0 }}>
@@ -143,8 +143,8 @@ namespace weavejs.admin
 							<div className="one column row">
 								<div className="sixteen wide right aligned column">
 									<Checkbox label={Weave.lang("Show advanced options")}
-										value={this.state.showAdvancedOptions}
-										onChange={(value:boolean)=>this.setState({showAdvancedOptions: value})}/>
+											  value={this.state.showAdvancedOptions}
+											  onChange={(value:boolean)=>this.setState({showAdvancedOptions: value})}/>
 								</div>
 							</div>
 							<div className="two column row" style={metadataIdRowStyle}>
