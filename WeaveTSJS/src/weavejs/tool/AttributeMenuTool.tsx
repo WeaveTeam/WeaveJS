@@ -8,6 +8,7 @@ namespace weavejs.tool
 	import VSlider = weavejs.ui.slider.VSlider;
 	import SliderOption = weavejs.ui.slider.SliderOption;
 	import ComboBox = weavejs.ui.ComboBox;
+	import Checkbox = weavejs.ui.Checkbox;
 	import ComboBoxOption = weavejs.ui.ComboBoxOption;
 	import WeaveReactUtils = weavejs.util.WeaveReactUtils
 	import StatefulTextField = weavejs.ui.StatefulTextField;
@@ -17,6 +18,8 @@ namespace weavejs.tool
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import LinkableString = weavejs.core.LinkableString;
+	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import LinkableNumber = weavejs.core.LinkableNumber;
 	import LinkableVariable = weavejs.core.LinkableVariable;
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -41,6 +44,7 @@ namespace weavejs.tool
 
 	export interface IAttributeMenuToolState extends IVisToolState
 	{
+		isPlaying:boolean;
 	}
 
 	export class AttributeMenuTool extends React.Component<IVisToolProps, IAttributeMenuToolState> implements IVisTool
@@ -48,9 +52,11 @@ namespace weavejs.tool
 		constructor (props:IVisToolProps)
 		{
 			super(props);
-			this.state = {};
+			this.state = {isPlaying: false};
 
-			this.targetToolPath.addGroupedCallback(this, this.setToolWatcher)
+			this.targetToolPath.addGroupedCallback(this, this.setToolWatcher);
+			this.selectedAttribute.addGroupedCallback(this, this.onSelectedAttribute);
+			this.playEnabled.addGroupedCallback(this, this.forceUpdate);
 		}
 
 		//session properties
@@ -61,6 +67,8 @@ namespace weavejs.tool
 
 		public targetToolPath = Weave.linkableChild(this, new LinkableVariable(Array));
 		public targetAttribute = Weave.linkableChild(this, LinkableString);
+		public playEnabled = Weave.linkableChild(this, LinkableBoolean);
+		public playbackIntervalSeconds = Weave.linkableChild(this, new LinkableNumber(1));
 		toolWatcher = Weave.privateLinkableChild(this, LinkableWatcher);
 		altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
 
@@ -73,8 +81,8 @@ namespace weavejs.tool
 		setToolWatcher =():void =>
 		{
 			this.toolWatcher.targetPath = this.targetToolPath.state as string[];
-			if (this.selectedAttribute.state)
-				this.handleSelection(this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn);
+			if (this.selectedAttribute.value)
+				this.handleSelection(this.choices.getObject(this.selectedAttribute.value) as IAttributeColumn);
 			this.forceUpdate();
 		};
 
@@ -96,6 +104,46 @@ namespace weavejs.tool
 					value: column
 				};
 			});
+		}
+
+		private playTimeoutHandle:number;
+		private playStep=()=>
+		{
+			if (!this.state.isPlaying)
+				return;
+
+			var currentSelection = this.selectedAttribute.value;
+			var choiceNames = this.choices.getNames() as string[];
+
+			var nextIndex = choiceNames.indexOf(currentSelection) + 1;
+			if (nextIndex >= choiceNames.length)
+			{
+				nextIndex = 0;
+			}
+			this.selectedAttribute.value = choiceNames[nextIndex];
+
+			this.playTimeoutHandle = setTimeout(this.playStep, this.playbackIntervalSeconds.value * 1000);
+		}
+
+		componentDidUpdate(prevProps:IVisToolProps, prevState:IAttributeMenuToolState)
+		{
+			if (this.state.isPlaying == prevState.isPlaying)
+				return;
+
+			if (this.state.isPlaying)
+			{
+				this.playTimeoutHandle = setTimeout(this.playStep, this.playbackIntervalSeconds.value * 1000);
+			}
+			else
+			{
+				clearTimeout(this.playTimeoutHandle);
+				this.playTimeoutHandle = null;
+			}
+		}
+
+		onSelectedAttribute = ():void =>
+		{
+			this.handleSelection(this.choices.getObject(this.selectedAttribute.value) as IAttributeColumn);
 		}
 
 		handleSelection = (selectedValue:any):void =>
@@ -122,7 +170,7 @@ namespace weavejs.tool
 				targetAttributeColumn = hm.getObjects(DynamicColumn)[0];
 			}
 
-			this.selectedAttribute.state = this.choices.getName(selectedColumn);//for the list UI to rerender
+			this.selectedAttribute.value = this.choices.getName(selectedColumn);//for the list UI to rerender
 
 			if (targetAttributeColumn)
 			{
@@ -136,12 +184,19 @@ namespace weavejs.tool
 			return <AttributeMenuTargetEditor attributeMenuTool={ this } pushCrumb={ pushCrumb }/>;
 		}
 
+		togglePlay = ()=>
+		{
+			this.setState({isPlaying: !this.state.isPlaying});
+		}
+
 		render():JSX.Element
 		{
 			let selectedAttribute = this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn;
 			return (
 				<MenuLayoutComponent
 					options={ this.options}
+					playToggle={ this.playEnabled.value ? this.togglePlay : null }
+					isPlaying={ this.state.isPlaying }
 				    displayMode={ this.layoutMode.value }
 				    onChange={ this.handleSelection }
 				    selectedItems={ [selectedAttribute] }
@@ -286,6 +341,19 @@ namespace weavejs.tool
 						className="weave-sidebar-dropdown"
 						ref={ WeaveReactUtils.linkReactStateRef(this, { value: this.props.attributeMenuTool.layoutMode })}
 						options={ menuOptions }
+					/>
+				],
+				[
+					Weave.lang("Show Play Button"),
+					<Checkbox 
+						label=" "
+						ref={WeaveReactUtils.linkReactStateRef(this, {value: this.props.attributeMenuTool.playEnabled})}/>
+				],
+				[
+					Weave.lang("Playback Interval (Seconds)"),
+					<StatefulTextField 
+						className="ui input fluid" 
+						ref={WeaveReactUtils.linkReactStateRef(this, {value:this.props.attributeMenuTool.playbackIntervalSeconds})}
 					/>
 				]
 			];
