@@ -233,7 +233,10 @@ namespace weavejs.editor
 
 			let hasChildren:boolean = false;
 			if (newBranch)
-				hasChildren = newBranch.getChildren().length > 0;
+			{
+				let children = newBranch.getChildren();
+				hasChildren = children && (children.length > 0);
+			}
 			var branch =  hasChildren ? newBranch : root;
 			var leaf = newLeaf;
 		
