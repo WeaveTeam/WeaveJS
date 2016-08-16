@@ -1,8 +1,9 @@
 new WeaveJS().start();
+console.log(weavejs);
 var weavejs = weavejs || {};
 weavejs.util = weavejs.util || {};
 weavejs.util.DateUtils = weavejs.util.DateUtils || {};
 weavejs.util.StandardLib = weavejs.util.StandardLib || {};
-weavejs.util.DateUtils.moment = moment.default;
+weavejs.util.DateUtils.moment = moment;
 weavejs.util.StandardLib.lodash = _;
 weavejs.util.StandardLib.ol = ol;
