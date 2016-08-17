@@ -1,7 +1,7 @@
 namespace weavejs.ui.menu
 {
 	import HBox = weavejs.ui.flexbox.HBox;
-	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	//import InteractiveTour = weavejs.dialog.InteractiveTour;
 	import Dropdown = weavejs.ui.Dropdown;
 	import ReactUtils = weavejs.util.ReactUtils;
 	import KeyboardUtils = weavejs.util.KeyboardUtils;
@@ -222,7 +222,7 @@ namespace weavejs.ui.menu
 					key={index}
 					ref={(c:Dropdown) => {
 						this.dropdownItems[index] = c;
-						InteractiveTour.callComponentRefCallback(props.label, c);
+						//InteractiveTour.callComponentRefCallback(props.label, c);
 					}}
 					onMouseEnter={() => this.onMouseEnter(index)}
 					onFocus={() => this.onFocus(index)}
@@ -230,7 +230,7 @@ namespace weavejs.ui.menu
 					onMouseLeave={() => this.onMouseLeave(index)}
 					onOpen={() => {
 						this.onDropdownOpen(index);
-						InteractiveTour.targetComponentOnClick(props.label)
+						//InteractiveTour.targetComponentOnClick(props.label)
 					}}
 					onClose={this.onDropdownClose}
 					onMouseUp={() => this.onMouseUp(index)}

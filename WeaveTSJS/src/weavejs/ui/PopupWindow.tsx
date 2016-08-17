@@ -1,4 +1,4 @@
-namespace weavejs.dialog
+namespace weavejs.ui
 {
 	import ReactUtils = weavejs.util.ReactUtils;
 	import DraggableDiv = weavejs.ui.DraggableDiv;

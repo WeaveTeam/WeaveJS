@@ -1,7 +1,7 @@
 namespace weavejs.ui
 {
 	import Menu = weavejs.ui.menu.Menu;
-	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	//import InteractiveTour = weavejs.dialog.InteractiveTour;
 	import SmartComponent = weavejs.ui.SmartComponent;
 	import Popup = weavejs.ui.Popup;
 	import ReactUtils = weavejs.util.ReactUtils;
@@ -62,7 +62,7 @@ namespace weavejs.ui
 				?	this.props.children as string + " menu"
 				:	"menu"
 			);
-			InteractiveTour.targetComponentOnClick(menuID);
+			//InteractiveTour.targetComponentOnClick(menuID);
 		
 			// close the menu once an item has been clicked
 			this.closeMenu();
@@ -162,7 +162,7 @@ namespace weavejs.ui
 		getMenuRef=(ele:any)=>
 		{
 			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
-			InteractiveTour.callComponentRefCallback(menuID, ele);
+			//InteractiveTour.callComponentRefCallback(menuID, ele);
 		};
 
 		render()
