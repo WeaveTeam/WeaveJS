@@ -21,7 +21,7 @@ before_install:
 - mkdir dist
 - yes | npm install
 - npm install
-- pushd app
+- pushd WeaveApp
 - npm install
 - popd
 - pushd node_modules/flexjs/js/bin/
@@ -29,11 +29,11 @@ before_install:
 - popd
 install:
 - npm run compile
-- pushd app
+- pushd WeaveApp
 - npm run compile
 - popd
 after_success:
-- pushd app/dist/ && tar -zcvf ../../$TRAVIS_BRANCH.tgz * && popd
+- pushd WeaveApp/dist/ && tar -zcvf ../../$TRAVIS_BRANCH.tgz * && popd
 - export SSHPASS=$DEPLOY_PASS
 - sshpass -e scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $TRAVIS_BRANCH.tgz
   $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
