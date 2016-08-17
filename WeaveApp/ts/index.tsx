@@ -8,126 +8,64 @@ import WeaveArchive = weavejs.core.WeaveArchive;
 import {WeaveAPI} from "weavejs";
 import WeaveApp from "./app/WeaveApp";
 import LandingPage from "./dialog/LandingPage";
+import DOMUtils = weavejs.util.DOMUtils;
 
 // exposing jquery to the global scope
 // so that semantic can plug into it
 (window as any).$ = $;
 (window as any).jQuery = $;
 
-function getElementAndInstance(options:{
-	element:string|Element,
-	weaveInstance?:Weave
-}):{element: Element, weave:Weave}
+var map_session_url_instance = new Map<string, Weave>();
+
+function embed(element:string|Element, weave:Weave, sessionUrl?:string, path?:string[], appMode?:string)
 {
-	let element:Element;
-
-	if (typeof options.element == typeof "")
+	if(typeof element == typeof "")
 	{
-		element = document.getElementById(options.element as string);
+		element = document.getElementById(element as string);
 	}
-	else
-	{
-		element = options.element as Element;
-	}
-
-	(element as HTMLElement).style.display = "flex";
-
-	/* Check if WeaveJS's class registries have been initialized. */
-	if (!((WeaveAPI.ClassRegistry as any)['defaultPackages'] as any).length)
-	{
-		new WeaveJS().start();
-	}
-
-	let weave = options.weaveInstance;
-	if (!weave)
-	{
-		/* Check if window.weave exists and is a weave instance, if so, use that. */
-		if ((window as any).weave instanceof Weave)
-		{
-			weave = (window as any).weave;
-		}
-		else
-		{
-			weave = new Weave();
-			(window as any).weave = weave;
-		}
-	}
-
-	return {element, weave};
-}
-
-function embed(options:{
-	element:string|Element,
-	sessionUrl?: string,
-	path?:string[],
-	mode?:"splash"|"file"|"app"|"tool",
-	weaveInstance?:Weave}):Weave
-{
-	let {element, weave} = getElementAndInstance(options);
 
 	if (typeof Symbol === 'undefined')
-	{
-		ReactDOM.render(<span>Browser not supported</span>, element);
-		return;
-	}
-	let jsxElement:JSX.Element;
+		return ReactDOM.render(<span>Browser not supported</span>, element as Element);
 
-	let mode = ( options.mode && options.mode.toLowerCase() ) || "tool";
-	switch (mode) {
-		case "splash":
-		case "file":
-			jsxElement = <LandingPage
+	if(sessionUrl)
+		WeaveArchive.setSessionFromUrl(weave, sessionUrl);
+
+	if(path)
+		return ReactDOM.render(<WeaveApp weave={weave} renderPath={path}/>, element as Element);
+
+	else if(appMode == "splash" || appMode == "file")
+		return ReactDOM.render(
+			<LandingPage
 				weave={weave}
-				initialView={mode == "splash" ? "splash" : "file"}
-				weaveAppRef={(weaveApp:WeaveApp) => (window as any).weaveApp = weaveApp}
-			/>;
-			break;
-		case "app":
-			jsxElement = <WeaveApp weave={weave} renderPath={options.path}/>;
-			break;
-		case "tool":
-			/* Hack: In order to ensure right-click and tooltip work, instantiate a whole WeaveApp. */
-			jsxElement = <WeaveApp forceMenuBar={false} weave={weave} renderPath={options.path}/>;
-			break;
-	}
+				initialView={appMode as "splash"|"file"}
+				weaveAppRef={(weaveApp:WeaveApp) => {
+					(window as any).weaveApp = weaveApp
+				}}
+			/>,
+			element as Element
+		);
 
-	ReactDOM.render(
-		jsxElement,
-		element
-	);
-
-	if (options.sessionUrl)
-	{
-		WeaveArchive.setSessionFromUrl(weave, options.sessionUrl);
-	}
-
-	return weave;
+	return ReactDOM.render(<WeaveApp weave={weave} readUrlParams={true}/>, element as Element);
 };
 
-
-
-function select(keyType:string, localNames:string[])
+$(function ()
 {
-
-}
-
-function highlight(keyType:string, localNames:string[])
-{
-
-}
-
-var element = $("#weaveElt");
-if(element.length)
-{
-	$(function() {
-		embed({element: "weaveElt", mode: "splash"});
+	var weave_elements = $(".weave");
+	console.log(weave_elements);
+	weave_elements.map((index, weave_element) => {
+		var weave_instance:Weave;
+		var appMode = $(weave_element).data("appmode");
+		var sessionUrl = $(weave_element).data("sessionurl");
+		var path = $(weave_element).data("path");
+		console.log(appMode, sessionUrl, path);
+		weave_instance = map_session_url_instance.get(sessionUrl);
+		if(!weave_instance)
+		{
+			weave_instance = new Weave();
+			map_session_url_instance.set(sessionUrl);
+		}
+		embed(weave_element, weave_instance, sessionUrl, path, appMode);
 	});
-}
-else
-{
-	(window as any).weaveapp = {
-		embed,
-		select,
-		highlight
-	};
-}
+});
+
+(window as any).embed = embed;
