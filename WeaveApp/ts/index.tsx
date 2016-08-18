@@ -117,7 +117,7 @@ function highlight(keyType:string, localNames:string[])
 }
 
 var element = $("#weaveElt");
-if(element.length)
+if(element)
 {
 	$(function() {
 		embed({element: "weaveElt", mode: "splash"});
