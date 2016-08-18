@@ -1,7 +1,0 @@
-*.js.map
-es6
-js
-node_modules
-dist
-typings/weave
-npm-debug.log
