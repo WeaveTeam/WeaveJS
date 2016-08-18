@@ -3,11 +3,16 @@
   "version": "0.0.0",
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
   "scripts": {
-    "clean": "rimraf src/index.js && rimraf src/index.jsx && rimraf dist/bundle.js && rimraf node_modules/weavejs",
-    "babel": "babel src/index.jsx --out-file src/index.js --source-maps inline",
-    "browserify": "mkdirp dist && browserify src/index.js -o dist/bundle.js",
+    "clean": "rimraf bin/* dist/*",
+    "babel": "mkdirp bin/js && babel bin/es6/weave-app.js --out-file bin/js/weave-app.js --source-maps inline",
+    "browserify": "mkdirp dist && browserify ../lib/weave-app.js -o dist/weave-app.bundle.js",
+    "build": "cd .. && node run-ts build weave-app && cd WeaveApp",
+    "copy": "cd .. && node run-ts copy && cd WeaveApp",
+    "compile-libs": "mkdirp bin/js && npm run compile-librefs && tsc -p tsconfig-libs.json && babel bin/es6/libs.js --out-file bin/js/libs.js -s",
+    "compile-refs": "cd .. && node run-ts main-import-tool -d WeaveApp/src/weavejs/ -f WeaveApp/src/_references.ts && cd WeaveApp",
+    "compile-librefs": "cd .. && node run-ts main-import-tool -d WeaveApp/typings/ -f WeaveApp/src/_lib-references.ts && cd WeaveApp",
     "copy-typings": "mkdirp typings/weave && cp ../weave-typings/* typings/weave",
-    "compile": "npm run clean && npm install weavejs && npm run copy-typings && tsc && npm run babel && npm run browserify && cd .. && node run-ts copy.ts"
+    "compile": "npm run clean && npm run copy-typings && npm run compile-librefs && npm run compile-refs && npm run compile-libs && tsc && npm run babel && npm run build && npm run browserify && npm run copy"
   },
   "repository": {
     "type": "git",
@@ -28,7 +33,22 @@
     "rimraf": "^2.5.3",
     "jquery": "^2.1.4",
     "typescript": "^1.8.10",
-    "weavejs": "../"
+    "c3": "https://github.com/WeaveTeam/c3.git",
+    "clipboard": "^1.5.10",
+    "codemirror": "^5.17.0",
+    "d3": "^3.5.9",
+    "filesaver.js": "^0.2.0",
+    "fixed-data-table": "^0.6.0",
+    "classnames": "^2.2.3",
+    "concat-with-sourcemaps": "^1.0.4",
+    "font-awesome": "^4.4.0",
+    "jquery": "^2.1.4",
+    "rc-slider": "^3.6.2",
+    "react-codemirror": "^0.2.6",
+    "react-dropzone": "^3.4.0",
+    "react-notification-system": "^0.2.7",
+    "react-sparklines": "^1.5.2",
+    "react-color": "^2.0.0"
   },
   "devDependencies": {
     "mkdirp": "^0.5.1"

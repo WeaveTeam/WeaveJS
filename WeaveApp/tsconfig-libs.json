@@ -1,22 +1,22 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
-    "jsx": "preserve",
+    "jsx": "react",
     "removeComments": false,
     "target": "es6",
-    "module": "amd",
-    "outFile": "./bin/es6/weave-app.js",
+    "outDir": "./bin/es6/",
     "inlineSources": true,
     "inlineSourceMap": true,
+    "noImplicitAny": false,
+    "declaration": false,
     "forceConsistentCasingInFileNames": true,
     "listFiles": false,
     "noImplicitReturns": false,
     "pretty": false,
     "newLine": "lf"
   },
-  "files": [
-    "./src/_lib-references.ts",
-    "./src/_references.ts"
+  "files":[
+    "./src/libs.ts"
   ],
   "compileOnSave": false
 }

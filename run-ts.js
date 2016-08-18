@@ -36,7 +36,7 @@ function runTypeScript(tsFilePath, args)
 	var outResult = require(outfile);
 	// if the outfile script exports a function, call that function
 	if (typeof outResult == 'function')
-		outResult();
+		outResult(process.argv.slice(2));
 }
 
 function findFile(fileNoExt, extensions)

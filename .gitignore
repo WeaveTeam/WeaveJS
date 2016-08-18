@@ -45,3 +45,5 @@ scripts/outts
 
 lib/
 bin/
+
+weave-typings/

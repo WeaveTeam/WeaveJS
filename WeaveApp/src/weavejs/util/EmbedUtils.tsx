@@ -64,7 +64,7 @@ namespace weavejs.util
 			sessionUrl?: string,
 			path?:string[],
 			mode?:"splash"|"file"|"app"|"tool",
-			weaveInstance?:Weave}):Weave
+			weaveInstance?:Weave})
 		{
 			let {element, weave} = EmbedUtils.getElementAndInstance(options);
 
@@ -94,7 +94,7 @@ namespace weavejs.util
 					break;
 			}
 
-			ReactDOM.render(
+			let appInstance = ReactDOM.render(
 				jsxElement,
 				element
 			);
@@ -104,7 +104,7 @@ namespace weavejs.util
 				WeaveArchive.setSessionFromUrl(weave, options.sessionUrl);
 			}
 
-			return weave;
+			return appInstance;
 		}
 	}
 }

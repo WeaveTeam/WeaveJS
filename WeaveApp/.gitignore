@@ -1,6 +1,6 @@
 *.js.map
-src/index.jsx
-src/index.js
+src/_references.ts
+src/_lib-references.ts
 node_modules
 dist
 typings/weave
