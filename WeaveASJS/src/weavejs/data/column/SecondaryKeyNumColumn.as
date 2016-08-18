@@ -83,8 +83,8 @@ package weavejs.data.column
 		/**
 		 * This object maps keys to data values.
 		 */
-		protected var d2d_qkeyA_keyB_number:Dictionary2D = new Dictionary2D();
-		protected var map_qkeyAB_number:Object = new JS.Map();
+		private var d2d_qkeyA_keyB_number:Dictionary2D = new Dictionary2D();
+		private var map_qkeyAB_number:Object = new JS.Map();
 
 		/**
 		 * Derived from the record data, this is a list of all existing values in the dimension, each appearing once, sorted alphabetically.
@@ -110,7 +110,7 @@ package weavejs.data.column
 		private static var _secondaryKeyFilter:LinkableString;
 		private static var _useGlobalMinMaxValues:LinkableBoolean;
 		
-		protected var _uniqueSecondaryKeys:Array = new Array();
+		private var _uniqueSecondaryKeys:Array = new Array();
 		public function get secondaryKeys():Array
 		{
 			return _uniqueSecondaryKeys;
@@ -119,8 +119,8 @@ package weavejs.data.column
 		/**
 		 * This is a list of unique keys this column defines values for.
 		 */
-		protected var _uniqueKeysA:Array = [];
-		protected var _uniqueKeysAB:Array = [];
+		private var _uniqueKeysA:Array = [];
+		private var _uniqueKeysAB:Array = [];
 		override public function get keys():Array
 		{
 			if (secondaryKeyFilter.value == null || allKeysHack) // when no secondary key specified, use the real unique keys
