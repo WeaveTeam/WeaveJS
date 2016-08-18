@@ -7,7 +7,7 @@ namespace weavejs.ui
 	import WeaveTree = weavejs.ui.WeaveTree;
 	import HBox = weavejs.ui.flexbox.HBox;
 	import VBox = weavejs.ui.flexbox.VBox;
-	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	//import InteractiveTour = weavejs.dialog.InteractiveTour;
 	import Input = weavejs.ui.Input;
 	import Button = weavejs.ui.Button;
 
@@ -99,8 +99,7 @@ namespace weavejs.ui
 						ref={WeaveReactUtils.linkReactStateRef(this, {value: this.props.targetUrl}, 500)}
 					/>
 					<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
-						<Button style={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: 0, whiteSpace: "nowrap", border: "1px solid #E0E1E2"}}
-								ref={InteractiveTour.getPointerRefCallback("Open file")}>
+						<Button style={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: 0, whiteSpace: "nowrap", border: "1px solid #E0E1E2"}}>
 							{Weave.lang("Open file")}
 						</Button>
 					</FileInput>
