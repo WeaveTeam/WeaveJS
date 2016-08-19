@@ -31,7 +31,7 @@ function embed(element:string|Element, weave:Weave, sessionUrl?:string, path?:st
 		WeaveArchive.setSessionFromUrl(weave, sessionUrl);
 
 	if(path)
-		return ReactDOM.render(<WeaveApp weave={weave} renderPath={path}/>, element as Element);
+		return ReactDOM.render(<WeaveApp weave={weave} renderPath={path} forceMenuBar={false}/>, element as Element);
 
 	else if(appMode == "splash" || appMode == "file")
 		return ReactDOM.render(
