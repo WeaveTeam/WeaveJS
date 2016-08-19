@@ -21,7 +21,7 @@ function embed(element:string|Element, weave:Weave, sessionUrl?:string, path?:st
 {
 	if(typeof element == typeof "")
 	{
-		element = document.getElementById(element as string);
+		element = window.document.getElementById(element as string);
 	}
 
 	if (typeof Symbol === 'undefined')
