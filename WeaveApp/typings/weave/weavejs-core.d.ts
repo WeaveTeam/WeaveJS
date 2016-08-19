@@ -3065,6 +3065,10 @@ declare module weavejs.core {
          */
         constructor(preCallback?: Function);
         /**
+         * This is the function that gets called immediately before every callback.
+         */
+        protected _preCallback: Function;
+        /**
          * This is the default value of triggerCounter.
          * The default value is 1 to avoid being equal to a newly initialized uint=0.
          */
@@ -3076,6 +3080,7 @@ declare module weavejs.core {
          * The preCallback function will be called with the specified preCallbackParams arguments.
          * @param preCallbackParams The arguments to pass to the preCallback function given in the constructor.
          */
+        protected _runCallbacksImmediately(...preCallbackParams: any[]): void;
         removeCallback(relevantContext: Object, callback: Function): void;
         triggerCounter: number;
         callbacksAreDelayed: boolean;
@@ -3385,6 +3390,7 @@ declare module weavejs.core {
         getSessionState(): any[];
         setSessionState(newState: any[], removeMissingDynamicObjects: boolean): void;
         target: ILinkableObject;
+        protected internalSetTarget(newTarget: ILinkableObject): void;
         targetPath: Array<string | number>;
         requestLocalObject(objectType: new (..._: any[]) => any, lockObject?: boolean): any;
         requestGlobalObject(name: string, objectType: new (..._: any[]) => any, lockObject?: boolean): any;
@@ -3549,6 +3555,7 @@ declare module weavejs.core {
         value: number;
         getSessionState(): Object;
         setSessionState(value: Object): void;
+        protected sessionStateEquals(otherSessionState: any): boolean;
     }
 }
 declare module weavejs.core {
@@ -3676,6 +3683,39 @@ declare module weavejs.core {
      */
     class LinkableVariable extends CallbackCollection implements ILinkableVariable, ICallbackCollection, IDisposableObject {
         /**
+         * This function is used to prevent the session state from having unwanted values.
+         * Function signature should be  function(value:*):Boolean
+         */
+        protected _verifier: Function;
+        /**
+         * This is true if the session state has been set at least once.
+         */
+        protected _sessionStateWasSet: boolean;
+        /**
+         * This is true if the _sessionStateType is a primitive type.
+         */
+        protected _primitiveType: boolean;
+        /**
+         * Type restriction passed in to the constructor.
+         */
+        protected _sessionStateType: new (..._: any[]) => any;
+        /**
+         * Cannot be modified externally because it is not returned by getSessionState()
+         */
+        protected _sessionStateInternal: any;
+        /**
+         * Available externally via getSessionState()
+         */
+        protected _sessionStateExternal: any;
+        /**
+         * This is set to true when lock() is called.
+         */
+        protected _locked: boolean;
+        /**
+         * If true, session states will be altered to bypass the diff calculation on DynamicState Arrays.
+         */
+        protected _bypassDiff: boolean;
+        /**
          * If a defaultValue is specified, callbacks will be triggered in a later frame unless they have already been triggered before then.
          * This behavior is desirable because it allows the initial value to be handled by the same callbacks that handles new values.
          * @param sessionStateType The type of values accepted for this sessioned property.
@@ -3702,6 +3742,7 @@ declare module weavejs.core {
          * This function is used in setSessionState() to determine if the value has changed or not.
          * Classes that extend this class may override this function.
          */
+        protected sessionStateEquals(otherSessionState: any): boolean;
         /**
          * This function may be called to detect change to a non-primitive session state in case it has been modified externally.
          */
@@ -3739,6 +3780,8 @@ declare module weavejs.core {
          * @see weave.api.core.newDisposableChild()
          */
         constructor(typeRestriction?: new (..._: any[]) => any, immediateCallback?: Function, groupedCallback?: Function);
+        protected _typeRestriction: new (..._: any[]) => any;
+        protected _targetPath: any[];
         /**
          * This is the root object to which targetPath is relative.
          */
@@ -3758,6 +3801,7 @@ declare module weavejs.core {
          * This sets the new target to be watched without resetting targetPath.
          * Callbacks will be triggered immediately if the new target is different from the old one.
          */
+        protected internalSetTarget(newTarget: ILinkableObject): void;
         /**
          * This is the path that is currently being watched for linkable object targets.
          */
@@ -4522,6 +4566,7 @@ declare module weavejs.data {
 }
 declare module weavejs.data.bin {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
+    import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
     import IBinningDefinition = weavejs.api.data.IBinningDefinition;
     import LinkableNumber = weavejs.core.LinkableNumber;
@@ -4534,6 +4579,10 @@ declare module weavejs.data.bin {
      */
     class AbstractBinningDefinition implements IBinningDefinition {
         constructor(allowOverrideBinNames?: boolean, allowOverrideInputRange?: boolean);
+        /**
+         * Implementations that extend this class should use this as an output buffer.
+         */
+        protected output: ILinkableHashMap;
         generateBinClassifiersForColumn(column: IAttributeColumn): void;
         asyncResultCallbacks: ICallbackCollection;
         getBinNames(): any[];
@@ -4541,6 +4590,7 @@ declare module weavejs.data.bin {
         overrideBinNames: LinkableString;
         overrideInputMin: LinkableNumber;
         overrideInputMax: LinkableNumber;
+        protected getOverrideNames(): any[];
     }
 }
 declare module weavejs.data.bin {
@@ -4606,6 +4656,7 @@ declare module weavejs.data.bin {
         getBinClassifiers(): any[];
         getBinNames(): any[];
         binsOverridden: boolean;
+        protected overrideBinsOutput: ILinkableHashMap;
     }
 }
 declare module weavejs.data.bin {
@@ -4658,6 +4709,7 @@ declare module weavejs.data.bin {
         constructor();
         numOfBins: LinkableNumber;
         generateBinClassifiersForColumn(column: IAttributeColumn): void;
+        protected fixMinMaxInclusive(): void;
     }
 }
 declare module weavejs.data.bin {
@@ -4791,6 +4843,7 @@ declare module weavejs.data.column {
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
     import IQualifiedKey = weavejs.api.data.IQualifiedKey;
     import CallbackCollection = weavejs.core.CallbackCollection;
+    import Dictionary2D = weavejs.util.Dictionary2D;
     /**
      * This object contains a mapping from keys to data values.
      *
@@ -4798,6 +4851,7 @@ declare module weavejs.data.column {
      */
     class AbstractAttributeColumn extends CallbackCollection implements IAttributeColumn {
         constructor(metadata?: Object);
+        protected _metadata: Object;
         /**
          * This function should only be called once, before setting the record data.
          * @param metadata Metadata for this column.
@@ -4807,11 +4861,24 @@ declare module weavejs.data.column {
          * Copies key/value pairs from an Object.
          * Converts Array values to Strings using WeaveAPI.CSVParser.createCSVRow().
          */
+        protected static copyValues(object: Object): Object;
         getMetadata(propertyName: string): string;
         getMetadataPropertyNames(): any[];
+        /**
+         * Used by default getValueFromKey() implementation. Must be explicitly initialized.
+         */
+        protected dataTask: ColumnDataTask;
+        /**
+         * Used by default getValueFromKey() implementation. Must be explicitly initialized.
+         */
+        protected dataCache: Dictionary2D<new (..._: any[]) => any, IQualifiedKey, any>;
         keys: any[];
         containsKey(key: IQualifiedKey): boolean;
         getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
+        /**
+         * Used by default getValueFromKey() implementation to cache values.
+         */
+        protected generateValue(key: IQualifiedKey, dataType: new (..._: any[]) => any): Object;
     }
 }
 declare module weavejs.data.column {
@@ -5247,6 +5314,7 @@ declare module weavejs.data.column {
      */
     class GeometryColumn extends AbstractAttributeColumn implements IBaseColumn {
         constructor(metadata?: Object);
+        protected _uniqueKeys: any[];
         /**
          * This is a list of unique keys this column defines values for.
          */
@@ -5293,6 +5361,7 @@ declare module weavejs.data.column {
 declare module weavejs.data.column {
     import IBaseColumn = weavejs.api.data.IBaseColumn;
     import IPrimitiveColumn = weavejs.api.data.IPrimitiveColumn;
+    import IQualifiedKey = weavejs.api.data.IQualifiedKey;
     /**
      * @author adufilie
      */
@@ -5304,6 +5373,7 @@ declare module weavejs.data.column {
          * Get a string value for a given number.
          */
         deriveStringFromNumber(number: number): string;
+        protected generateValue(key: IQualifiedKey, dataType: new (..._: any[]) => any): Object;
         /**
          * Aggregates an Array of Numbers into a single Number.
          * @param numbers An Array of Numbers.
@@ -5570,6 +5640,7 @@ declare module weavejs.data.column {
 declare module weavejs.data.column {
     import IBaseColumn = weavejs.api.data.IBaseColumn;
     import IPrimitiveColumn = weavejs.api.data.IPrimitiveColumn;
+    import IQualifiedKey = weavejs.api.data.IQualifiedKey;
     /**
      * @author adufilie
      */
@@ -5578,6 +5649,7 @@ declare module weavejs.data.column {
         getMetadata(propertyName: string): string;
         setRecords(keys: any[], stringData: any[]): void;
         deriveStringFromNumber(number: number): string;
+        protected generateValue(key: IQualifiedKey, dataType: new (..._: any[]) => any): Object;
         /**
          * Aggregates an Array of Strings into a single String.
          * @param strings An Array of Strings.
@@ -5599,6 +5671,10 @@ declare module weavejs.data.column {
      */
     class StringLookup implements ILinkableObject {
         constructor(column?: IAttributeColumn);
+        /**
+         * This function gets called when the referenced column changes.
+         */
+        protected handleInternalColumnChange(): void;
         /**
          * This is a list of the unique strings of the internal column.
          */
@@ -6260,6 +6336,7 @@ declare module weavejs.data.source {
     import IDataSource = weavejs.api.data.IDataSource;
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import LinkableString = weavejs.core.LinkableString;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
     /**
      * This is a base class to make it easier to develope a new class that implements IDataSource.
      * Classes that extend AbstractDataSource should implement the following methods:
@@ -6275,11 +6352,24 @@ declare module weavejs.data.source {
         label: LinkableString;
         getLabel(): string;
         isLocal: boolean;
+        /**
+         * This variable is set to false when the session state changes and true when initialize() is called.
+         */
+        protected _initializeCalled: boolean;
+        /**
+         * This should be used to keep a pointer to the hierarchy root node.
+         */
+        protected _rootNode: IWeaveTreeNode & weavejs.api.data.IColumnReference;
+        /**
+         * ProxyColumn -> (true if pending, false if not pending)
+         */
+        protected map_proxyColumn_pending: Object;
         hierarchyRefresh: ICallbackCollection;
         /**
          * Sets _rootNode to null and triggers callbacks.
          * @inheritDoc
          */
+        protected refreshHierarchy(): void;
         /**
          * This function must be implemented by classes that extend AbstractDataSource.
          * This function should set _rootNode if it is null, which may happen from calling refreshHierarchy().
@@ -6291,23 +6381,28 @@ declare module weavejs.data.source {
          * This function should make a request to the source to fill in the proxy column.
          * @param proxyColumn Contains metadata for the column request and will be used to store column data when it is ready.
          */
+        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
         /**
          * This function must be implemented by classes that extend AbstractDataSource.
          * @param metadata A set of metadata that may identify a column in this IDataSource.
          * @return A node that contains the metadata.
          */
+        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
         /**
          * Classes that extend AbstractDataSource can define their own replacement for this function.
          * All column requests will be delayed as long as this accessor function returns false.
          * The default behavior is to return false during the time between a change in the session state and when initialize() is called.
          */
+        protected initializationComplete: boolean;
         /**
          * This function is called as an immediate callback and sets initialized to false.
          */
+        protected uninitialize(): void;
         /**
          * This function will be called as a grouped callback the frame after the session state for the data source changes.
          * When overriding this function, super.initialize() should be called.
          */
+        protected initialize(forceRefresh?: boolean): void;
         /**
          * The default implementation of this function calls generateHierarchyNode(metadata) and
          * then traverses the _rootNode to find a matching node.
@@ -6330,12 +6425,15 @@ declare module weavejs.data.source {
          * for the pending column, it is recommended to call super.handlePendingColumnRequest() instead.
          * @param request The request that needs to be handled.
          */
+        protected handlePendingColumnRequest(column: ProxyColumn, forced?: boolean): void;
         /**
          * This function will call handlePendingColumnRequest() on each pending column request.
          */
+        protected handleAllPendingColumnRequests(forced?: boolean): void;
         /**
          * Calls requestColumnFromSource() on all ProxyColumn objects created previously via generateNewAttributeColumn().
          */
+        protected refreshAllProxyColumns(forced?: boolean): void;
         /**
          * This function should be called when the IDataSource is no longer in use.
          * All existing pointers to objects should be set to null so they can be garbage collected.
@@ -6350,6 +6448,7 @@ declare module weavejs.data.source {
     import LinkableBoolean = weavejs.core.LinkableBoolean;
     import LinkableNumber = weavejs.core.LinkableNumber;
     import LinkableString = weavejs.core.LinkableString;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
     class CKANDataSource extends AbstractDataSource implements IDataSource_Service {
         constructor();
         isLocal: boolean;
@@ -6363,13 +6462,17 @@ declare module weavejs.data.source {
         /**
          * This gets called when callbacks are triggered.
          */
+        protected initialize(forceRefresh?: boolean): void;
+        protected refreshHierarchy(): void;
         /**
          * Gets the root node of the attribute hierarchy.
          */
         getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
+        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
         /**
          * @inheritDoc
          */
+        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
         static PARAMS_CKAN_ID: string;
         static PARAMS_CKAN_URL: string;
         static PARAMS_CKAN_FORMAT: string;
@@ -6393,6 +6496,7 @@ declare module weavejs.data.source {
     import LinkableString = weavejs.core.LinkableString;
     import LinkableVariable = weavejs.core.LinkableVariable;
     import DynamicColumn = weavejs.data.column.DynamicColumn;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
     /**
      *
      * @author adufilie
@@ -6408,6 +6512,7 @@ declare module weavejs.data.source {
         metadata: LinkableVariable;
         url: LinkableFile;
         delimiter: LinkableString;
+        protected handleParsedRows(rows: string[][]): void;
         keysAreUnique: boolean;
         /**
          * Convenience function for setting session state of csvData.
@@ -6455,15 +6560,19 @@ declare module weavejs.data.source {
          * @see weave.api.IExternalSessionStateInterface
          */
         putColumn(columnNameOrIndex: Object, dynamicColumn: DynamicColumn): boolean;
+        protected initializationComplete: boolean;
         /**
          * This gets called as a grouped callback.
          */
+        protected initialize(forceRefresh?: boolean): void;
         /**
          * Gets the root node of the attribute hierarchy.
          */
         getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
+        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
         static METADATA_COLUMN_INDEX: string;
         static METADATA_COLUMN_NAME: string;
+        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
         deprecatedStateMapping: Object;
         getColumnByName(name: string): IAttributeColumn;
     }
@@ -6476,6 +6585,7 @@ declare module weavejs.data.source {
         isLocal: boolean;
         type: LinkableString;
         state: LinkableVariable;
+        protected refreshHierarchy(): void;
     }
 }
 declare module weavejs.data.source {
@@ -6503,12 +6613,14 @@ declare module weavejs.data.source {
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import LinkableString = weavejs.core.LinkableString;
     import LinkableVariable = weavejs.core.LinkableVariable;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
     import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
     class CensusDataSource extends AbstractDataSource implements IDataSource_Service {
         static CONCEPT_NAME: string;
         static VARIABLE_NAME: string;
         constructor();
         isLocal: boolean;
+        protected initialize(forceRefresh?: boolean): void;
         keyType: LinkableString;
         apiKey: LinkableString;
         dataSet: LinkableString;
@@ -6517,12 +6629,15 @@ declare module weavejs.data.source {
         getAPI(): CensusApi;
         createDataSetNode(): ColumnTreeNode;
         getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
+        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
+        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
     }
 }
 declare module weavejs.data.source {
     import IDataSource_File = weavejs.api.data.IDataSource_File;
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import LinkableString = weavejs.core.LinkableString;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
     /**
      * @author adufilie
      */
@@ -6533,6 +6648,9 @@ declare module weavejs.data.source {
          */
         isLocal: boolean;
         getLabel(): string;
+        protected initializationComplete: boolean;
+        protected uninitialize(): void;
+        protected initialize(forceRefresh?: boolean): void;
         keyType: LinkableString;
         keyColName: LinkableString;
         dbfUrl: LinkableString;
@@ -6547,6 +6665,7 @@ declare module weavejs.data.source {
          * Gets the root node of the attribute hierarchy.
          */
         getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
+        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
         /**
          * Called when the Shp file is downloaded from the URL
          */
@@ -6559,6 +6678,7 @@ declare module weavejs.data.source {
         /**
          * @inheritDoc
          */
+        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
         getKeyType(): string;
         getColumnNames(): any[];
         getColumnMetadata(columnName: string): Object;
@@ -6569,6 +6689,7 @@ declare module weavejs.data.source {
     import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import DynamicColumn = weavejs.data.column.DynamicColumn;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
     class ForeignDataMappingTransform extends AbstractDataSource implements ISelectableAttributes {
         static DATA_COLUMNNAME_META: string;
         keyColumn: DynamicColumn;
@@ -6576,7 +6697,11 @@ declare module weavejs.data.source {
         constructor();
         isLocal: boolean;
         selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
+        protected initializationComplete: boolean;
+        protected initialize(forceRefresh?: boolean): void;
         getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
+        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
+        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
     }
 }
 declare module weavejs.data.source {
@@ -6584,6 +6709,7 @@ declare module weavejs.data.source {
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import LinkableFile = weavejs.core.LinkableFile;
     import LinkableString = weavejs.core.LinkableString;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
     class GeoJSONDataSource extends AbstractDataSource implements IDataSource_File {
         constructor();
         isLocal: boolean;
@@ -6604,13 +6730,17 @@ declare module weavejs.data.source {
          */
         getPropertyNames(): any[];
         getKeyType(): string;
+        protected initializationComplete: boolean;
         /**
          * This gets called as a grouped callback.
          */
+        protected initialize(forceRefresh?: boolean): void;
         /**
          * Gets the root node of the attribute hierarchy.
          */
         getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
+        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
+        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
     }
 }
 declare module weavejs.data.source {
@@ -6678,11 +6808,14 @@ declare module weavejs.data.source {
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import LinkableString = weavejs.core.LinkableString;
     import DynamicColumn = weavejs.data.column.DynamicColumn;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
     class GroupedDataTransform extends AbstractDataSource implements ISelectableAttributes {
         static DATA_COLUMNNAME_META: string;
         constructor();
         isLocal: boolean;
         selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
+        protected initializationComplete: boolean;
+        protected initialize(forceRefresh?: boolean): void;
         groupByColumn: DynamicColumn;
         groupKeyType: LinkableString;
         dataColumns: ILinkableHashMap;
@@ -6691,22 +6824,8 @@ declare module weavejs.data.source {
          */
         aggregationModes: ILinkableVariable;
         getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
-    }
-}
-declare module weavejs.data.source {
-    import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
-    import LinkableString = weavejs.core.LinkableString;
-    import DynamicColumn = weavejs.data.column.DynamicColumn;
-    class SpatialJoinTransform extends AbstractDataSource implements ISelectableAttributes {
-        geometryColumn: DynamicColumn;
-        xColumn: DynamicColumn;
-        yColumn: DynamicColumn;
-        pointProjection: LinkableString;
-        isLocal: boolean;
-        selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
-        constructor();
-        getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
+        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
+        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
     }
 }
 declare module weavejs.data.source {
@@ -6716,6 +6835,7 @@ declare module weavejs.data.source {
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import LinkableString = weavejs.core.LinkableString;
     import LinkableVariable = weavejs.core.LinkableVariable;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
     import EntityCache = weavejs.net.EntityCache;
     /**
      * WeaveDataSource is an interface for retrieving columns from Weave data servlets.
@@ -6750,10 +6870,12 @@ declare module weavejs.data.source {
          */
         authenticate(user: string, pass: string): void;
         entityCache: EntityCache;
+        protected refreshHierarchy(): void;
         /**
          * Gets the root node of the attribute hierarchy.
          */
         getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
+        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
         /**
          * This function prevents url.value from being null.
          */
@@ -6761,8 +6883,14 @@ declare module weavejs.data.source {
         /**
          * This gets called as a grouped callback when the session state changes.
          */
+        protected initialize(forceRefresh?: boolean): void;
+        protected initializationComplete: boolean;
         generateNewAttributeColumn(metadata: Object): IAttributeColumn;
         static ENTITY_ID: string;
+        /**
+         * @inheritDoc
+         */
+        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
     }
 }
 declare module weavejs.data.source {
@@ -6770,6 +6898,7 @@ declare module weavejs.data.source {
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import LinkableString = weavejs.core.LinkableString;
     import LinkableNumber = weavejs.core.LinkableNumber;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
     class WebSocketDataSource extends AbstractDataSource {
         static DATA_COLUMNNAME_META: string;
         constructor();
@@ -6777,6 +6906,7 @@ declare module weavejs.data.source {
         keyProperty: LinkableString;
         keepLast: LinkableNumber;
         url: LinkableString;
+        protected initialize(forceRefresh?: boolean): void;
         sendMessage(payload: Object): void;
         reconnect(): void;
         getPropertyNames(): Array<string>;
@@ -6785,6 +6915,8 @@ declare module weavejs.data.source {
          */
         aggregationModes: ILinkableVariable;
         getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
+        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
+        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
     }
 }
 declare module weavejs.geom {
@@ -8028,6 +8160,8 @@ declare module weavejs.net {
          */
         begin(): void;
         addToQueue(query: WeavePromise<any>, service: AMF3Servlet): void;
+        protected performQuery(query: WeavePromise<any>): void;
+        protected handleQueryResultOrFault(result: any, query: WeavePromise<any>): void;
     }
 }
 declare module weavejs.net {
@@ -8176,6 +8310,10 @@ declare module weavejs.net {
      */
     class Servlet implements IAsyncService {
         /**
+         * WeavePromise -> [methodName, params, id]
+         */
+        protected map_promise_methodParamsId: Object;
+        /**
          * @param servletURL The URL of the servlet (everything before the question mark in a URL request).
          * @param methodParamName This is the name of the URL parameter that specifies the method to be called on the servlet.
          * @param urlRequestDataFormat This is the format to use when sending parameters to the servlet.
@@ -8187,6 +8325,12 @@ declare module weavejs.net {
          *     http://www.example.com/servlet?param=123
          */
         servletURL: string;
+        protected _servletURL: string;
+        /**
+         * This is the data format of the results from HTTP GET requests.
+         */
+        protected _protocol: string;
+        protected _invokeLater: boolean;
         /**
          * This function makes a remote procedure call.
          * @param methodName The name of the method to call.
@@ -8199,10 +8343,12 @@ declare module weavejs.net {
          * @param methodName The method.
          * @return The servlet url for the method.
          */
+        protected getServletURLForMethod(methodName: string): string;
         /**
          * This will make a url request that was previously delayed.
          * @param promise A WeavePromise generated from a previous call to invokeAsyncMethod().
          */
+        protected invokeNow(promise: WeavePromise<any>): void;
         /**
          * This function reads an object that has been AMF3-serialized into a ByteArray and compressed.
          * @param compressedSerializedObject The ByteArray that contains the compressed AMF3 serialization of an object.
@@ -8367,6 +8513,8 @@ declare module weavejs.net {
     class WeaveDataServlet implements IWeaveEntityService {
         static DEFAULT_URL: string;
         static WEAVE_AUTHENTICATION_EXCEPTION: string;
+        protected servlet: AMF3Servlet;
+        protected _serverInfo: Object;
         constructor(url?: string);
         /**
          * This function will generate a AsyncToken representing a servlet method invocation.
@@ -8531,6 +8679,8 @@ declare module weavejs.path {
          * A pointer to the Weave instance.
          */
         weave: Weave;
+        protected _path: any[];
+        protected _parent: WeavePath;
         /**
          * WeavePath constructor.  WeavePath objects are immutable after they are created.
          * @class WeavePath
@@ -8549,6 +8699,7 @@ declare module weavejs.path {
          *   - If set to 2, it handles arguments like (...LIST, REQUIRED_PARAM) where LIST can be either an Array or multiple arguments.
          * @private
          */
+        protected static _A(args: any[], option?: number): any[];
         /**
          * Creates a new WeavePath relative to the current one.
          * @param relativePath An Array (or multiple parameters) specifying descendant names relative to the current path.
@@ -8738,6 +8889,10 @@ declare module weavejs.path {
          * Provides a human-readable string containing the path.
          */
         toString(): string;
+        protected static _assertParams(methodName: string, args: any[], minLength?: number): boolean;
+        protected static _failPath(methodName: string, path: any[]): any;
+        protected static _failObject(methodName: string, path: any[]): any;
+        protected static _failMessage(methodName: string, message: string, path?: any[]): any;
         static migrate(source: WeavePath, destination: Weave): void;
     }
 }
@@ -8862,6 +9017,7 @@ declare module weavejs.path {
          * @param value The value to which to set the final node.
          * @return The value that was set, or the current value if no value was given.
          */
+        protected static setChain(root: Object, property_chain: any[], value?: any): any;
         /**
          * @private
          * Walk down a property chain of a given object and return the final node.
@@ -8869,6 +9025,7 @@ declare module weavejs.path {
          * @param property_chain An array of property names defining a path.
          * @return The value of the final property in the chain.
          */
+        protected static getChain(root: Object, property_chain: any[]): any;
         /**
          * @private
          * Recursively builds a mapping of property chains to WeavePath objects from a path specification as used in retrieveRecords
@@ -8877,6 +9034,7 @@ declare module weavejs.path {
          * @param output Output object with "chains" and "columns" properties (optional)
          * @return An object like {"chains": [], "columns": []}, where "chains" contains property name chains and "columns" contains IAttributeColumn objects
          */
+        protected listChainsAndColumns(obj: Object, prefix?: any[], output?: Object): Object;
         /**
          * Sets a human-readable label for an ILinkableObject to be used in editors.
          * @param [relativePath] An optional Array (or multiple parameters) specifying child names relative to the current path.
@@ -9943,6 +10101,7 @@ declare module weavejs.util {
          *                 If no resolver is given, setResult() or setError() should be called externally.
          */
         constructor(relevantContext?: Object, resolver?: (resolve: (value?: T) => void, reject: (error?: any) => void) => void);
+        protected relevantContext: Object;
         /**
          * @return This WeavePromise
          */
@@ -9993,6 +10152,7 @@ declare module weavejs.util {
          * @param WeaveTreeItem_implementation The implementation of WeaveTreeItem to use.
          * @param items Item descriptors.
          */
+        protected static _mapItem(WeaveTreeItem_implementation: new (..._: any[]) => any, item: Object): Object;
         /**
          * Constructs a new WeaveTreeItem.
          * @param params An Object containing property values to set on the WeaveTreeItem.
@@ -10000,40 +10160,63 @@ declare module weavejs.util {
          */
         constructor(params?: Object);
         /**
+         * Set this to change the constructor used for initializing child items.
+         * This variable is intentionally uninitialized to avoid overwriting the value set by an extending class in its constructor.
+         */
+        protected childItemClass: new (..._: any[]) => any;
+        protected _recursion: Object;
+        protected _label: any;
+        protected _children: any;
+        protected _dependency: ILinkableObject;
+        /**
+         * Cached values that get invalidated when the source triggers callbacks.
+         */
+        protected _cache: Object;
+        /**
          * Maps a property name to a Boolean which enables or disables caching for that property.
          */
         cacheSettings: Object;
+        /**
+         * Cached values of getCallbackCollection(source).triggerCounter.
+         */
+        protected _counter: Object;
         /**
          * Computes a Boolean value from various structures
          * @param param Either a Boolean, and Object like {not: param}, a Function, an ILinkableVariable, or an Array of those objects.
          * @param recursionName A name used to keep track of recursion.
          * @return A Boolean value derived from the param, or the param itself if called recursively.
          */
+        protected getBoolean(param: any, recursionName: string): any;
         /**
          * Checks if an object has a single specified property.
          */
+        protected isSimpleObject(object: any, singlePropertyName: string): boolean;
         /**
          * Gets a String value from a String or Function.
          * @param param Either a String or a Function.
          * @param recursionName A name used to keep track of recursion.
          * @return A String value derived from the param, or the param itself if called recursively.
          */
+        protected getString(param: any, recursionName: string): any;
         /**
          * Evaluates a function to get an Object or just returns the non-Function Object passed in.
          * @param param Either an Object or a Function.
          * @param recursionName A name used to keep track of recursion.
          * @return An Object derived from the param, or the param itself if called recursively.
          */
+        protected getObject(param: any, recursionName: string): any;
         /**
          * First tries calling a function with no parameters.
          * If an ArgumentError is thrown, the function will called again, passing this WeaveTreeItem as the first parameter.
          */
+        protected evalFunction(func: Function): any;
         /**
          * Checks if cached value is valid.
          * Always returns false if the source property is not set.
          * @param id A string identifying a property.
          * @return true if the property value has been cached.
          */
+        protected isCached(id: string): boolean;
         /**
          * Retrieves or updates a cached value for a property.
          * Does not cache the value if the source property is not set.
@@ -10041,6 +10224,7 @@ declare module weavejs.util {
          * @param newValue Optional new value to cache for the property.
          * @return The new or existing value for the property.
          */
+        protected cache(id: string, newValue?: any): any;
         /**
          * This can be set to either a String or a Function.
          * This property is checked by Flex's default data descriptor.

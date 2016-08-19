@@ -39,7 +39,6 @@ package
 	import weavejs.data.source.ForeignDataMappingTransform;
 	import weavejs.data.source.GeoJSONDataSource;
 	import weavejs.data.source.GroupedDataTransform;
-	import weavejs.data.source.SpatialJoinTransform;
 	import weavejs.data.source.WeaveDataSource;
 	import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
@@ -100,8 +99,7 @@ package
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, CensusDataSource, "Census.gov");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Transform, ForeignDataMappingTransform, "Foreign data mapping");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Transform, GroupedDataTransform, "Grouped data transform");
-			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Transform, SpatialJoinTransform, "Spatial Join transform");
-			
+
 			Weave.registerClass(TempHack_SolidFillStyle, "ExtendedFillStyle");
 			Weave.registerClass(TempHack_SolidLineStyle, "ExtendedLineStyle");
 			

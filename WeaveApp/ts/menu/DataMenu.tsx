@@ -31,7 +31,7 @@ import CKANDataSourceEditor from "../editor/CKANDataSourceEditor";
 import CachedDataSource = weavejs.data.source.CachedDataSource;
 import CachedDataSourceEditor from "../editor/CachedDataSourceEditor";
 
-import SpatialJoinTransform = weavejs.data.source.SpatialJoinTransform;
+import SpatialJoinTransform from "../data/source/SpatialJoinTransform";
 import SpatialJoinTransformEditor from "../editor/SpatialJoinTransformEditor";
 
 import ForeignDataMappingTransform = weavejs.data.source.ForeignDataMappingTransform;

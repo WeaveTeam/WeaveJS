@@ -7,7 +7,7 @@ import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
 import HelpIcon = weavejs.ui.HelpIcon;
 
-import SpatialJoinTransform = weavejs.data.source.SpatialJoinTransform;
+import SpatialJoinTransform from "../data/source/SpatialJoinTransform";
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableHashMap = weavejs.core.LinkableHashMap;

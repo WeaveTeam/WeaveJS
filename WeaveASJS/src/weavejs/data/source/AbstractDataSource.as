@@ -73,7 +73,7 @@ package weavejs.data.source
 		/**
 		 * This should be used to keep a pointer to the hierarchy root node.
 		 */
-		protected var _rootNode:IWeaveTreeNode;
+		protected var _rootNode:/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode;
 		
 		/**
 		 * ProxyColumn -> (true if pending, false if not pending)
