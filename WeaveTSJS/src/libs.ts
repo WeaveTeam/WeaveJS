@@ -8,8 +8,6 @@ import * as reactUpdate_ from "react-addons-update";
 import * as PIXI_ from "pixi.js";
 import * as __ from "lodash";
 import * as moment_ from "moment";
-import * as ol_ from "openlayers";
-import * as proj4_ from "proj4";
 
 var React:any = React_;
 React.addons = (React_ as any).addons || {};
@@ -17,8 +15,6 @@ React.addons.update = (reactUpdate_ as any).default;
 var ReactDOM:any = ReactDOM_;
 var moment:any = (moment_ as any).default;
 var _:any = __;
-var proj4:any = (proj4_ as any).default;
-var ol:any = ol_;
 var lodash:any = __;
 var classNames:any = (classNames_ as any).default;
 var JSZip:any = (JSZip_ as any).default;
