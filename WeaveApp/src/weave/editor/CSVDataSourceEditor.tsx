@@ -23,12 +23,12 @@ import IColumnReference = weavejs.api.data.IColumnReference;
 import ComboBoxOption = weavejs.ui.ComboBoxOption;
 import PopupWindow = weavejs.ui.PopupWindow;
 import Button = weavejs.ui.Button;
-import {MetadataEntry} from "./MetadataGrid";
-import CSVMetadataEditor from "./CSVMetadataEditor";
-import DataSourceEditor, {IDataSourceEditorProps} from "./DataSourceEditor";
-import InteractiveTour from "../dialog/InteractiveTour";
-import KeyTypeInput from "../ui/KeyTypeInput";
-import FileSelector from "../ui/FileSelector";
+import {MetadataEntry} from "weave/editor/MetadataGrid";
+import CSVMetadataEditor from "weave/editor/CSVMetadataEditor";
+import DataSourceEditor, {IDataSourceEditorProps} from "weave/editor/DataSourceEditor";
+import InteractiveTour from "weave/dialog/InteractiveTour";
+import KeyTypeInput from "weave/ui/KeyTypeInput";
+import FileSelector from "weave/ui/FileSelector";
 
 export default class CSVDataSourceEditor extends DataSourceEditor
 {

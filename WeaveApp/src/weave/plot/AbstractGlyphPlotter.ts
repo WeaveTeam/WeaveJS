@@ -18,7 +18,7 @@ import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 import DataType = weavejs.api.data.DataType;
 import IKeySet = weavejs.api.data.IKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
-import {AbstractPlotter} from "./AbstractPlotter";
+import {AbstractPlotter} from "weave/plot/AbstractPlotter";
 import {WeaveAPI} from "weavejs";
 
 /**

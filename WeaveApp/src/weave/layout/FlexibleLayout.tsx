@@ -20,7 +20,7 @@ import LayoutState = weavejs.ui.layout.LayoutState;
 import HORIZONTAL = weavejs.ui.layout.DirectionTypes.HORIZONTAL;
 import VERTICAL = weavejs.ui.layout.DirectionTypes.VERTICAL;
 import ILinkableVariable = weavejs.api.core.ILinkableVariable;
-import {AbstractLayout, LayoutProps, PanelDragEvent, AnyAbstractLayout} from "./AbstractLayout";
+import {AbstractLayout, LayoutProps, PanelDragEvent, AnyAbstractLayout} from "weave/layout/AbstractLayout";
 import {WeaveAPI} from "weavejs";
 
 export enum DropZone {

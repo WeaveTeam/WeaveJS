@@ -5,8 +5,8 @@ import * as _ from "lodash";
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
 import MiscUtils = weavejs.util.MiscUtils;
-import InteractiveTour from "./InteractiveTour";
-import {LandingPageView} from "./LandingPage";
+import InteractiveTour from "weave/dialog/InteractiveTour";
+import {LandingPageView} from "weave/dialog/LandingPage";
 
 export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComponent>
 {

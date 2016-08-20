@@ -12,7 +12,7 @@ import ListOption = weavejs.ui.ListOption;
 import VBox = weavejs.ui.flexbox.VBox;
 import HBox = weavejs.ui.flexbox.HBox;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-import MetadataGrid, {MetadataEntry} from "./MetadataGrid";
+import MetadataGrid, {MetadataEntry} from "weave/editor/MetadataGrid";
 
 export interface CSVMetadataEditorProps extends React.Props<CSVMetadataEditor>
 {

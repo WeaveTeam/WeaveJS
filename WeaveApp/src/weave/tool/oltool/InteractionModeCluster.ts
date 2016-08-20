@@ -2,7 +2,7 @@ import * as ol from "openlayers";
 import * as weavejs from "weavejs";
 
 import LinkableString = weavejs.core.LinkableString;
-import IOpenLayersMapTool from "./IOpenLayersMapTool";
+import IOpenLayersMapTool from "weave/tool/oltool/IOpenLayersMapTool";
 
 export default class InteractionModeCluster extends ol.control.Control
 {

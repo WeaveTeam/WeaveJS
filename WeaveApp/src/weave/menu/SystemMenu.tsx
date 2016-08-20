@@ -6,7 +6,7 @@ import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
 import MenuItemProps = weavejs.ui.menu.MenuItemProps;
 import PopupWindow = weavejs.ui.PopupWindow;
 import Admin = weavejs.net.Admin;
-import IWeaveMenus from "./IWeaveMenus";
+import IWeaveMenus from "weave/menu/IWeaveMenus";
 
 export default class SystemMenu implements MenuBarItemProps
 {

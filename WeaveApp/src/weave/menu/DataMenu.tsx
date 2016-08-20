@@ -11,34 +11,34 @@ import IDataSource_Service = weavejs.api.data.IDataSource_Service;
 
 /* Import editors and their data sources */
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
-import WeaveDataSourceEditor from "../editor/WeaveDataSourceEditor";
+import WeaveDataSourceEditor from "weave/editor/WeaveDataSourceEditor";
 
 import CSVDataSource = weavejs.data.source.CSVDataSource;
-import CSVDataSourceEditor from "../editor/CSVDataSourceEditor";
+import CSVDataSourceEditor from "weave/editor/CSVDataSourceEditor";
 
 import DBFDataSource = weavejs.data.source.DBFDataSource;
-import DBFDataSourceEditor from "../editor/DBFDataSourceEditor";
+import DBFDataSourceEditor from "weave/editor/DBFDataSourceEditor";
 
 import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
-import GeoJSONDataSourceEditor from "../editor/GeoJSONDataSourceEditor";
+import GeoJSONDataSourceEditor from "weave/editor/GeoJSONDataSourceEditor";
 
 import CensusDataSource = weavejs.data.source.CensusDataSource;
-import CensusDataSourceEditor from "../editor/CensusDataSourceEditor";
+import CensusDataSourceEditor from "weave/editor/CensusDataSourceEditor";
 
 import CKANDataSource = weavejs.data.source.CKANDataSource;
-import CKANDataSourceEditor from "../editor/CKANDataSourceEditor";
+import CKANDataSourceEditor from "weave/editor/CKANDataSourceEditor";
 
 import CachedDataSource = weavejs.data.source.CachedDataSource;
-import CachedDataSourceEditor from "../editor/CachedDataSourceEditor";
+import CachedDataSourceEditor from "weave/editor/CachedDataSourceEditor";
 
-import SpatialJoinTransform from "../data/source/SpatialJoinTransform";
-import SpatialJoinTransformEditor from "../editor/SpatialJoinTransformEditor";
+import SpatialJoinTransform from "weave/data/source/SpatialJoinTransform";
+import SpatialJoinTransformEditor from "weave/editor/SpatialJoinTransformEditor";
 
 import ForeignDataMappingTransform = weavejs.data.source.ForeignDataMappingTransform;
-import ForeignDataMappingTransformEditor from "../editor/ForeignDataMappingTransformEditor";
+import ForeignDataMappingTransformEditor from "weave/editor/ForeignDataMappingTransformEditor";
 
 import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
-import GroupedDataTransformEditor from "../editor/GroupedDataTransformEditor";
+import GroupedDataTransformEditor from "weave/editor/GroupedDataTransformEditor";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
@@ -48,8 +48,8 @@ import IKeyFilter = weavejs.api.data.IKeyFilter;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import JS = weavejs.util.JS;
 import ClassRegistryImpl = weavejs.core.ClassRegistryImpl;
-import IWeaveMenus from "./IWeaveMenus";
-import {IDataSourceEditorProps} from "../editor/DataSourceEditor";
+import IWeaveMenus from "weave/menu/IWeaveMenus";
+import {IDataSourceEditorProps} from "weave/editor/DataSourceEditor";
 import {WeaveAPI} from "weavejs";
 
 export default class DataMenu implements MenuBarItemProps

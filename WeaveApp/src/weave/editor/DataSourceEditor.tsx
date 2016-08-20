@@ -29,9 +29,9 @@ import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableString = weavejs.core.LinkableString;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
-import InteractiveTour from "../dialog/InteractiveTour";
-import TableTool from "../tool/TableTool";
-import WeaveDataTree from "../ui/WeaveDataTree";
+import InteractiveTour from "weave/dialog/InteractiveTour";
+import TableTool from "weave/tool/TableTool";
+import WeaveDataTree from "weave/ui/WeaveDataTree";
 
 export const PREVIEW:"preview" = "preview";
 export const METADATA:"metadata" = "metadata";

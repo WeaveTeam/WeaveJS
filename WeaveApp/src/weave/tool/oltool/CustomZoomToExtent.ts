@@ -1,6 +1,6 @@
 import * as ol from "openlayers";
 
-import IOpenLayersMapTool from "./IOpenLayersMapTool";
+import IOpenLayersMapTool from "weave/tool/oltool/IOpenLayersMapTool";
 
 export default class CustomZoomToExtent extends ol.control.Control
 {

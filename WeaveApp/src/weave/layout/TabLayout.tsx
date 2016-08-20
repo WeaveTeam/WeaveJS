@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
-import classNames from "../modules/classnames";
+import classNames from "modules/classnames";
 import * as _ from "lodash";
 import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
 import Tabs = weavejs.ui.Tabs;
@@ -18,8 +18,8 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import ILinkableVariable = weavejs.api.core.ILinkableVariable;
 import StandardLib = weavejs.util.StandardLib;
-import {LayoutProps, AbstractLayout} from "./AbstractLayout";
-import InteractiveTour from "../dialog/InteractiveTour";
+import {LayoutProps, AbstractLayout} from "weave/layout/AbstractLayout";
+import InteractiveTour from "weave/dialog/InteractiveTour";
 
 export interface TabState
 {

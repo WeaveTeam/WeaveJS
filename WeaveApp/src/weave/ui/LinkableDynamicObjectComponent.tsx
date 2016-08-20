@@ -15,7 +15,7 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import SmartComponent = weavejs.ui.SmartComponent;
 import {WeaveAPI} from "weavejs";
 import IconButton = weavejs.ui.IconButton;
-import SessionStateTree from "./SessionStateTree";
+import SessionStateTree from "weave/ui/SessionStateTree";
 
 export interface ILinkableDynamicObjectComponentProps extends React.HTMLProps<LinkableDynamicObjectComponent>
 {

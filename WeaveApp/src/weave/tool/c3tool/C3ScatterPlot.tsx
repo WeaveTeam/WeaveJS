@@ -30,13 +30,13 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-import SolidFillStyle from "../../plot/SolidFillStyle";
-import SolidLineStyle from "../../plot/SolidLineStyle";
-import AbstractC3Tool from "./AbstractC3Tool";
-import FormatUtils from "../../util/FormatUtils";
-import ChartUtils from "../../util/ChartUtils";
-import IVisTool, {IVisToolProps} from "../../api/ui/IVisTool";
-import IAltText from "../../api/ui/IAltText";
+import SolidFillStyle from "weave/plot/SolidFillStyle";
+import SolidLineStyle from "weave/plot/SolidLineStyle";
+import AbstractC3Tool from "weave/tool/c3tool/AbstractC3Tool";
+import FormatUtils from "weave/util/FormatUtils";
+import ChartUtils from "weave/util/ChartUtils";
+import IVisTool, {IVisToolProps} from "weave/api/ui/IVisTool";
+import IAltText from "weave/api/ui/IAltText";
 
 declare type Record = {
 	id: IQualifiedKey,

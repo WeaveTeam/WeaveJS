@@ -34,12 +34,12 @@ import StandardLib = weavejs.util.StandardLib;
 import ArrayUtils = weavejs.util.ArrayUtils;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-import FormatUtils from "../../util/FormatUtils";
-import AbstractC3Tool from "./AbstractC3Tool";
-import ChartUtils from "../../util/ChartUtils";
-import IAltText from "../../api/ui/IAltText";
-import IVisTool from "../../api/ui/IVisTool";
-import {IVisToolProps} from "../../api/ui/IVisTool";
+import FormatUtils from "weave/util/FormatUtils";
+import AbstractC3Tool from "weave/tool/c3tool/AbstractC3Tool";
+import ChartUtils from "weave/util/ChartUtils";
+import IAltText from "weave/api/ui/IAltText";
+import IVisTool from "weave/api/ui/IVisTool";
+import {IVisToolProps} from "weave/api/ui/IVisTool";
 
 declare type Record = {
 	id: IQualifiedKey,

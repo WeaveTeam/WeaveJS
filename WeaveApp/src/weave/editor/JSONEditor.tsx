@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as _ from "lodash";
-import ReactCodeMirror from "../modules/react-codemirror";
+import ReactCodeMirror from "modules/react-codemirror";
 
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";

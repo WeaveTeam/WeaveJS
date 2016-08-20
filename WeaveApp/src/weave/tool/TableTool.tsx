@@ -32,11 +32,11 @@ import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNe
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 import KeyColumn = weavejs.data.column.KeyColumn;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-import AbstractVisTool from "./AbstractVisTool";
+import AbstractVisTool from "weave/tool/AbstractVisTool";
 import {WeaveAPI} from "weavejs";
-import PrintUtils from "../util/PrintUtils";
-import IVisTool, {IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
-import {DataTable, SortTypes, SortDirection} from "../ui/DataTable";
+import PrintUtils from "weave/util/PrintUtils";
+import IVisTool, {IVisToolProps, IVisToolState} from "weave/api/ui/IVisTool";
+import {DataTable, SortTypes, SortDirection} from "weave/ui/DataTable";
 
 export interface IDataTableState extends IVisToolState
 {

@@ -7,10 +7,10 @@ import {WeaveAPI} from "weavejs";
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 import ColumnUtils = weavejs.data.ColumnUtils;
-import C3Histogram from "./C3Histogram";
-import IVisTool from "../../api/ui/IVisTool";
-import {IVisToolProps} from "../../api/ui/IVisTool";
-import IAltText from "../../api/ui/IAltText";
+import C3Histogram from "weave/tool/c3tool/C3Histogram";
+import IVisTool from "weave/api/ui/IVisTool";
+import {IVisToolProps} from "weave/api/ui/IVisTool";
+import IAltText from "weave/api/ui/IAltText";
 
 export default class C3ColorHistogram extends C3Histogram
 {

@@ -12,11 +12,11 @@ import ListOption = weavejs.ui.ListOption;
 import CenteredIcon = weavejs.ui.CenteredIcon;
 import Button = weavejs.ui.Button;
 import Admin = weavejs.net.Admin;
-import DataTable from "../ui/DataTable";
-import {IOpenFileProps, IOpenFileState} from "./FileDialog";
-import ServiceLogin from "../admin/ServiceLogin";
-import FileInfoView from "../ui/FileInfoView";
-import {IRow} from "../ui/DataTable";
+import DataTable from "weave/ui/DataTable";
+import {IOpenFileProps, IOpenFileState} from "weave/dialog/FileDialog";
+import ServiceLogin from "weave/admin/ServiceLogin";
+import FileInfoView from "weave/ui/FileInfoView";
+import {IRow} from "weave/ui/DataTable";
 
 export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFileProps, IOpenFileState>
 {

@@ -16,9 +16,9 @@ import EntityType = weavejs.api.data.EntityType;
 import LinkableFile = weavejs.core.LinkableFile;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import {WeaveAPI} from "weavejs";
-import KeyTypeInput from "../ui/KeyTypeInput";
-import DataSourceEditor from "./DataSourceEditor";
-import FileSelector from "../ui/FileSelector";
+import KeyTypeInput from "weave/ui/KeyTypeInput";
+import DataSourceEditor from "weave/editor/DataSourceEditor";
+import FileSelector from "weave/ui/FileSelector";
 
 export default class DBFDataSourceEditor extends DataSourceEditor
 {

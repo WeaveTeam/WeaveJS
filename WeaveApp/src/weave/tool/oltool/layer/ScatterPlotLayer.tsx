@@ -12,11 +12,11 @@ import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
-import AbstractGlyphLayer from "./AbstractGlyphLayer";
-import SolidFillStyle from "../../../plot/SolidFillStyle";
-import SolidLineStyle from "../../../plot/SolidLineStyle";
-import CircleCache from "./CircleCache";
-import AbstractFeatureLayer from "./AbstractFeatureLayer";
+import AbstractGlyphLayer from "weave/tool/oltool/layer/AbstractGlyphLayer";
+import SolidFillStyle from "weave/plot/SolidFillStyle";
+import SolidLineStyle from "weave/plot/SolidLineStyle";
+import CircleCache from "weave/tool/oltool/layer/CircleCache";
+import AbstractFeatureLayer from "weave/tool/oltool/layer/AbstractFeatureLayer";
 
 export default class ScatterPlotLayer extends AbstractGlyphLayer
 {

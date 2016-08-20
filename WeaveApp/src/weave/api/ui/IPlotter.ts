@@ -5,7 +5,7 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IFilteredKeySet = weavejs.api.data.IFilteredKeySet;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import Bounds2D = weavejs.geom.Bounds2D;
-import {IPlotTask} from "./IPlotTask";
+import {IPlotTask} from "weave/api/ui/IPlotTask";
 
 export default class IPlotter extends ILinkableObject
 {

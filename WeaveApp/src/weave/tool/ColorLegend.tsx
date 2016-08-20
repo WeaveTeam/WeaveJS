@@ -56,12 +56,12 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import Div = weavejs.ui.Div;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-import AbstractVisTool from "./AbstractVisTool";
-import ColorRampComponent from "../ui/ColorRampComponent";
-import {BinningDefinitionSelector} from "../editor/BinningDefinitionEditor";
-import ColorRampEditor from "../editor/ColorRampEditor";
-import PrintUtils from "../util/PrintUtils";
-import IVisTool, {IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
+import AbstractVisTool from "weave/tool/AbstractVisTool";
+import ColorRampComponent from "weave/ui/ColorRampComponent";
+import {BinningDefinitionSelector} from "weave/editor/BinningDefinitionEditor";
+import ColorRampEditor from "weave/editor/ColorRampEditor";
+import PrintUtils from "weave/util/PrintUtils";
+import IVisTool, {IVisToolProps, IVisToolState} from "weave/api/ui/IVisTool";
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";

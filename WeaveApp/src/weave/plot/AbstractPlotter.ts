@@ -14,8 +14,8 @@ import IFilteredKeySet = weavejs.api.data.IFilteredKeySet;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-import {IPlotTask} from "../api/ui/IPlotTask";
-import IPlotter from "../api/ui/IPlotter";
+import {IPlotTask} from "weave/api/ui/IPlotTask";
+import IPlotter from "weave/api/ui/IPlotter";
 
 /**
  * This is a base implementation for an IPlotter.

@@ -16,13 +16,13 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
-import WeaveProperties from "../app/WeaveProperties";
+import WeaveProperties from "weave/app/WeaveProperties";
 import WebSocketDataSource = weavejs.data.source.WebSocketDataSource;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import KeySet = weavejs.data.key.KeySet;
-import IVisTool from "../api/ui/IVisTool";
-import {IVisToolState} from "../api/ui/IVisTool";
-import {IVisToolProps} from "../api/ui/IVisTool";
+import IVisTool from "weave/api/ui/IVisTool";
+import {IVisToolState} from "weave/api/ui/IVisTool";
+import {IVisToolProps} from "weave/api/ui/IVisTool";
 
 export default class DataMessageTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
 {

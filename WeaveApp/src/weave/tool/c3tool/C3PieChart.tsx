@@ -26,11 +26,11 @@ import ArrayUtils = weavejs.util.ArrayUtils;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import ColumnUtils = weavejs.data.ColumnUtils;
-import AbstractC3Tool from "./AbstractC3Tool";
-import SolidFillStyle from "../../plot/SolidFillStyle";
-import SolidLineStyle from "../../plot/SolidLineStyle";
-import IVisTool, {IVisToolProps} from "../../api/ui/IVisTool";
-import IAltText from "../../api/ui/IAltText";
+import AbstractC3Tool from "weave/tool/c3tool/AbstractC3Tool";
+import SolidFillStyle from "weave/plot/SolidFillStyle";
+import SolidLineStyle from "weave/plot/SolidLineStyle";
+import IVisTool, {IVisToolProps} from "weave/api/ui/IVisTool";
+import IAltText from "weave/api/ui/IAltText";
 
 declare type Record = {
 	id: IQualifiedKey,

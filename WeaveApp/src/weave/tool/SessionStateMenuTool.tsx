@@ -30,9 +30,9 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableVariable = weavejs.api.core.ILinkableVariable;
 import {WeaveAPI} from "weavejs";
 import LinkableBoolean = weavejs.core.LinkableBoolean;
-import AbstractVisTool from "./AbstractVisTool";
-import IVisTool, {IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
-import MenuLayoutComponent from "../ui/MenuLayoutComponent";
+import AbstractVisTool from "weave/tool/AbstractVisTool";
+import IVisTool, {IVisToolProps, IVisToolState} from "weave/api/ui/IVisTool";
+import MenuLayoutComponent from "weave/ui/MenuLayoutComponent";
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";

@@ -17,11 +17,11 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import Bounds2D = weavejs.geom.Bounds2D;
 import StandardLib = weavejs.util.StandardLib;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
-import AbstractVisTool from "../AbstractVisTool";
-import FormatUtils from "../../util/FormatUtils";
-import XAxis from "./XAxis";
-import YAxis from "./YAxis";
-import IVisTool, {IVisToolProps, IVisToolState} from "../../api/ui/IVisTool";
+import AbstractVisTool from "weave/tool/AbstractVisTool";
+import FormatUtils from "weave/util/FormatUtils";
+import XAxis from "weave/tool/d3tool/XAxis";
+import YAxis from "weave/tool/d3tool/YAxis";
+import IVisTool, {IVisToolProps, IVisToolState} from "weave/api/ui/IVisTool";
 
 export declare type ScatterPlotRecord = {
 	id: IQualifiedKey,

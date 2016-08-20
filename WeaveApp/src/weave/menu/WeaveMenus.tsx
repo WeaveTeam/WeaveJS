@@ -4,13 +4,13 @@ import {Weave} from "weavejs";
 import * as _ from "lodash";
 import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
 import Admin = weavejs.net.Admin;
-import {IWeaveMenus} from "./IWeaveMenus";
-import ServiceLogin from "../admin/ServiceLogin";
-import SystemMenu from "./SystemMenu";
-import FileMenu from "./FileMenu";
-import ChartsMenu from "./ChartsMenu";
-import DataMenu from "./DataMenu";
-import ControllersMenu from "./ControllersMenu";
+import {IWeaveMenus} from "weave/menu/IWeaveMenus";
+import ServiceLogin from "weave/admin/ServiceLogin";
+import SystemMenu from "weave/menu/SystemMenu";
+import FileMenu from "weave/menu/FileMenu";
+import ChartsMenu from "weave/menu/ChartsMenu";
+import DataMenu from "weave/menu/DataMenu";
+import ControllersMenu from "weave/menu/ControllersMenu";
 
 export type CreateObjectFunction = (type:Class)=>void;
 

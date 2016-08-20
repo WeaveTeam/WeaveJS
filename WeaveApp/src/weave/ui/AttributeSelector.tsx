@@ -18,10 +18,10 @@ import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 import IDataSource = weavejs.api.data.IDataSource;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import SmartComponent = weavejs.ui.SmartComponent;
-import ControlPanel from "../editor/ControlPanel";
-import HierarchyExplorer from "./HierarchyExplorer";
-import ButtonGroupBar from "./ButtonGroupBar";
-import ColumnSelector from "./ColumnSelector";
+import ControlPanel from "weave/editor/ControlPanel";
+import HierarchyExplorer from "weave/ui/HierarchyExplorer";
+import ButtonGroupBar from "weave/ui/ButtonGroupBar";
+import ColumnSelector from "weave/ui/ColumnSelector";
 import Button = weavejs.ui.Button;
 
 export interface IAttributeSelectorProps

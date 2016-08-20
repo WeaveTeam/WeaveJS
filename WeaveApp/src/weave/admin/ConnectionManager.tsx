@@ -16,10 +16,10 @@ import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 import WeaveAdminService = weavejs.net.WeaveAdminService;
-import ConfigurationStorageEditor from "./ConfigurationStorageEditor";
-import ConfirmationDialog from "../dialog/ConfirmationDialog";
-import ServiceLogin from "./ServiceLogin";
-import ConnectionEditor from "./ConnectionEditor";
+import ConfigurationStorageEditor from "weave/admin/ConfigurationStorageEditor";
+import ConfirmationDialog from "weave/dialog/ConfirmationDialog";
+import ServiceLogin from "weave/admin/ServiceLogin";
+import ConnectionEditor from "weave/admin/ConnectionEditor";
 
 export interface IConnectionManagerProps {
 	service: WeaveAdminService;

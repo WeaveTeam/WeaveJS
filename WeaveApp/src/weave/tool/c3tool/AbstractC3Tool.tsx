@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import * as _ from "lodash";
-import $ from "../../modules/jquery";
+import $ from "modules/jquery";
 import * as d3 from "d3";
 import * as c3 from "c3";
 import {Weave} from "weavejs";
@@ -28,10 +28,10 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import JS = weavejs.util.JS;
-import AbstractVisTool from "../AbstractVisTool";
-import C3Chart from "./C3Chart";
-import PrintUtils from "../../util/PrintUtils";
-import {IVisToolProps, IVisToolState} from "../../api/ui/IVisTool";
+import AbstractVisTool from "weave/tool/AbstractVisTool";
+import C3Chart from "weave/tool/c3tool/C3Chart";
+import PrintUtils from "weave/util/PrintUtils";
+import {IVisToolProps, IVisToolState} from "weave/api/ui/IVisTool";
 
 function finiteOrNull(n:number):number { return isFinite(n) ? n : null; }
 

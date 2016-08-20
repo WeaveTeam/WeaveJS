@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
-import SelectableAttributeComponent from "../../ui/SelectableAttributeComponent";
+import SelectableAttributeComponent from "weave/ui/SelectableAttributeComponent";
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import WeavePath = weavejs.path.WeavePath;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;

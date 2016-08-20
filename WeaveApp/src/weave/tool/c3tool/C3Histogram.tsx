@@ -42,17 +42,17 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 import JS = weavejs.util.JS;
-import FormatUtils from "../../util/FormatUtils";
-import BinningDefinitionEditor from "../../editor/BinningDefinitionEditor";
-import ColorRampEditor from "../../editor/ColorRampEditor";
-import SelectableAttributeComponent from "../../ui/SelectableAttributeComponent";
-import AbstractC3Tool from "./AbstractC3Tool";
-import SolidLineStyle from "../../plot/SolidLineStyle";
-import SolidFillStyle from "../../plot/SolidFillStyle";
-import ChartUtils from "../../util/ChartUtils";
-import IVisTool, {IVisToolProps} from "../../api/ui/IVisTool";
-import IAltText from "../../api/ui/IAltText";
-import ColorPicker from "../../ui/ColorPicker";
+import FormatUtils from "weave/util/FormatUtils";
+import BinningDefinitionEditor from "weave/editor/BinningDefinitionEditor";
+import ColorRampEditor from "weave/editor/ColorRampEditor";
+import SelectableAttributeComponent from "weave/ui/SelectableAttributeComponent";
+import AbstractC3Tool from "weave/tool/c3tool/AbstractC3Tool";
+import SolidLineStyle from "weave/plot/SolidLineStyle";
+import SolidFillStyle from "weave/plot/SolidFillStyle";
+import ChartUtils from "weave/util/ChartUtils";
+import IVisTool, {IVisToolProps} from "weave/api/ui/IVisTool";
+import IAltText from "weave/api/ui/IAltText";
+import ColorPicker from "weave/ui/ColorPicker";
 
 declare type Record = {
 	id: IQualifiedKey,

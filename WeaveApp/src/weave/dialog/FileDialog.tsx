@@ -10,10 +10,10 @@ import ListOption = weavejs.ui.ListOption;
 import SmartComponent = weavejs.ui.SmartComponent;
 import CenteredIcon = weavejs.ui.CenteredIcon;
 import List = weavejs.ui.List;
-import ConfirmationDialog from "./ConfirmationDialog";
+import ConfirmationDialog from "weave/dialog/ConfirmationDialog";
 import PopupWindow = weavejs.ui.PopupWindow;
-import LocalFileOpenComponent from "./LocalFileOpenComponent";
-import WeaveServerFileOpenComponent from "./WeaveServerFileOpenComponent";
+import LocalFileOpenComponent from "weave/dialog/LocalFileOpenComponent";
+import WeaveServerFileOpenComponent from "weave/dialog/WeaveServerFileOpenComponent";
 import {WeaveAPI} from "weavejs";
 
 export interface FileListItem {

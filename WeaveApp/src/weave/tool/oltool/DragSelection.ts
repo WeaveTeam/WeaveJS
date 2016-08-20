@@ -2,11 +2,11 @@ import * as ol from "openlayers";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import KeySet = weavejs.data.key.KeySet;
-import IOpenLayersMapTool from "./IOpenLayersMapTool";
-import AbstractFeatureLayer from "./layer/AbstractFeatureLayer";
-import AbstractVisTool from "../AbstractVisTool";
-import AbstractLayer from "./layer/AbstractLayer";
-import ProbeInteraction from "./ProbeInteraction";
+import IOpenLayersMapTool from "weave/tool/oltool/IOpenLayersMapTool";
+import AbstractFeatureLayer from "weave/tool/oltool/layer/AbstractFeatureLayer";
+import AbstractVisTool from "weave/tool/AbstractVisTool";
+import AbstractLayer from "weave/tool/oltool/layer/AbstractLayer";
+import ProbeInteraction from "weave/tool/oltool/ProbeInteraction";
 
 enum DragSelectionMode {
 	SUBTRACT = -1,

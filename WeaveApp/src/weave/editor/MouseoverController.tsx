@@ -10,7 +10,7 @@ import BinnedColumn = weavejs.data.column.BinnedColumn;
 import FilteredColumn = weavejs.data.column.FilteredColumn;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
-import AttributeSelector from "../ui/AttributeSelector";
+import AttributeSelector from "weave/ui/AttributeSelector";
 
 export interface MouseoverControllerProps extends React.Props<MouseoverController>
 {

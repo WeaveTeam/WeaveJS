@@ -17,7 +17,7 @@ import DynamicKeySet = weavejs.data.key.DynamicKeySet;
 import LinkableString = weavejs.core.LinkableString;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
-import IVisTool, {IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
+import IVisTool, {IVisToolProps, IVisToolState} from "weave/api/ui/IVisTool";
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";

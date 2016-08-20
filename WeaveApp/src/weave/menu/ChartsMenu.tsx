@@ -7,21 +7,21 @@ import MenuItemProps = weavejs.ui.menu.MenuItemProps;
 import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
 import FilteredColumn = weavejs.data.column.FilteredColumn;
-import IWeaveMenus from "./IWeaveMenus";
+import IWeaveMenus from "weave/menu/IWeaveMenus";
 import {WeaveAPI} from "weavejs";
-import C3BarChart from "../tool/c3tool/C3BarChart";
-import ColorLegend from "../tool/ColorLegend";
-import C3Gauge from "../tool/c3tool/C3Gauge";
-import C3ColorHistogram from "../tool/c3tool/C3ColorHistogram";
-import C3Histogram from "../tool/c3tool/C3Histogram";
-import C3LineChart from "../tool/c3tool/C3LineChart";
-import DataMessageTool from "../tool/DataMessageTool";
-import C3PieChart from "../tool/c3tool/C3PieChart";
-import C3ScatterPlot from "../tool/c3tool/C3ScatterPlot";
-import Sparkline from "../tool/Sparkline";
-import TableTool from "../tool/TableTool";
-import TextTool from "../tool/TextTool";
-import OpenLayersMapTool from "../tool/oltool/OpenLayersMapTool";
+import C3BarChart from "weave/tool/c3tool/C3BarChart";
+import ColorLegend from "weave/tool/ColorLegend";
+import C3Gauge from "weave/tool/c3tool/C3Gauge";
+import C3ColorHistogram from "weave/tool/c3tool/C3ColorHistogram";
+import C3Histogram from "weave/tool/c3tool/C3Histogram";
+import C3LineChart from "weave/tool/c3tool/C3LineChart";
+import DataMessageTool from "weave/tool/DataMessageTool";
+import C3PieChart from "weave/tool/c3tool/C3PieChart";
+import C3ScatterPlot from "weave/tool/c3tool/C3ScatterPlot";
+import Sparkline from "weave/tool/Sparkline";
+import TableTool from "weave/tool/TableTool";
+import TextTool from "weave/tool/TextTool";
+import OpenLayersMapTool from "weave/tool/oltool/OpenLayersMapTool";
 
 export default class ChartsMenu implements MenuBarItemProps
 {

@@ -14,10 +14,10 @@ import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNe
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import ColumnUtils = weavejs.data.ColumnUtils;
-import AbstractFilterEditor from "./AbstractFilterEditor";
-import {FilterEditorProps} from "./AbstractFilterEditor";
-import HSlider from "../ui/slider/HSlider";
-import VSlider from "../ui/slider/VSlider";
+import AbstractFilterEditor from "weave/editor/AbstractFilterEditor";
+import {FilterEditorProps} from "weave/editor/AbstractFilterEditor";
+import HSlider from "weave/ui/slider/HSlider";
+import VSlider from "weave/ui/slider/VSlider";
 
 export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 {

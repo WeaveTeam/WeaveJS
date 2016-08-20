@@ -5,7 +5,7 @@ import * as _ from "lodash";
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
 import DOMUtils = weavejs.util.DOMUtils;
-import DataTable from "./DataTable";
+import DataTable from "weave/ui/DataTable";
 import {Weave} from "weavejs";
 
 export interface IWeaveTreeState<TreeNode>

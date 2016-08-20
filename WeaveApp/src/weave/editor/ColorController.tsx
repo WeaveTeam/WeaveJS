@@ -12,9 +12,9 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
 import FilteredColumn = weavejs.data.column.FilteredColumn;
-import ColorRampEditor from "./ColorRampEditor";
-import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
-import BinningDefinitionEditor from "./BinningDefinitionEditor";
+import ColorRampEditor from "weave/editor/ColorRampEditor";
+import SelectableAttributeComponent from "weave/ui/SelectableAttributeComponent";
+import BinningDefinitionEditor from "weave/editor/BinningDefinitionEditor";
 
 export interface ColorControllerProps extends React.Props<ColorController>
 {

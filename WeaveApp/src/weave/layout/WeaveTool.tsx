@@ -20,11 +20,11 @@ import DraggableDiv = weavejs.ui.DraggableDiv;
 import LinkableString = weavejs.core.LinkableString;
 
 import KeyboardUtils = weavejs.util.KeyboardUtils;
-import WeaveProperties from "../app/WeaveProperties";
+import WeaveProperties from "weave/app/WeaveProperties";
 import DynamicComponent = weavejs.ui.DynamicComponent;
-import {AbstractLayout, AnyAbstractLayout} from "./AbstractLayout";
-import IVisTool from "../api/ui/IVisTool";
-import IAltText from "../api/ui/IAltText";
+import {AbstractLayout, AnyAbstractLayout} from "weave/layout/AbstractLayout";
+import IVisTool from "weave/api/ui/IVisTool";
+import IAltText from "weave/api/ui/IAltText";
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {

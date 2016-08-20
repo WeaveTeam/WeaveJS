@@ -17,7 +17,7 @@ import WeavePromise = weavejs.util.WeavePromise;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 import Admin = weavejs.net.Admin;
 import WeaveAdminService = weavejs.net.WeaveAdminService;
-import ServiceLogin from "./ServiceLogin";
+import ServiceLogin from "weave/admin/ServiceLogin";
 
 export interface ISqlImportProps extends React.HTMLProps<SqlImport>
 {

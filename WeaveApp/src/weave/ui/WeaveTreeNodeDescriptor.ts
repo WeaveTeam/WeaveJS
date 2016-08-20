@@ -19,7 +19,7 @@ import * as weavejs from "weavejs";
 import ArrayUtils = weavejs.util.ArrayUtils;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import IWeaveTreeNodeWithEditableChildren = weavejs.api.data.IWeaveTreeNodeWithEditableChildren;
-import {ITreeDescriptor} from "./WeaveTree";
+import {ITreeDescriptor} from "weave/ui/WeaveTree";
 
 /**
  * Tells a Tree control how to work with IWeaveTreeNode objects.

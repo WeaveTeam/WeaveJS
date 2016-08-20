@@ -38,11 +38,11 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
-import AbstractVisTool from "./AbstractVisTool";
-import ConfigUtils from "../util/ConfigUtils";
+import AbstractVisTool from "weave/tool/AbstractVisTool";
+import ConfigUtils from "weave/util/ConfigUtils";
 import {WeaveAPI} from "weavejs";
-import SolidFillStyle from "../plot/SolidFillStyle";
-import SolidLineStyle from "../plot/SolidLineStyle";
+import SolidFillStyle from "weave/plot/SolidFillStyle";
+import SolidLineStyle from "weave/plot/SolidLineStyle";
 import {
 	Sparklines,
 	SparklinesLine,
@@ -51,9 +51,9 @@ import {
 	SparklinesNormalBand,
 	SparklinesReferenceLine
 } from "react-sparklines";
-import IVisTool from "../api/ui/IVisTool";
-import {IVisToolProps} from "../api/ui/IVisTool";
-import {IVisToolState} from "../api/ui/IVisTool";
+import IVisTool from "weave/api/ui/IVisTool";
+import {IVisToolProps} from "weave/api/ui/IVisTool";
+import {IVisToolState} from "weave/api/ui/IVisTool";
 
 export declare type Record = {
 	id: IQualifiedKey,

@@ -5,7 +5,7 @@
   "scripts": {
     "clean": "rimraf bin/ && rimraf dist/weave-app.bundle.js",
     "babel": "mkdirp bin/js && babel bin/es6 -d bin/js --source-maps inline",
-    "browserify": "mkdirp dist && browserify bin/js/index.js -o dist/weave-app.bundle.js",
+    "browserify": "mkdirp dist && node scripts/browserify",
     "copy-typings": "mkdirp typings/weave && cp ../weave-typings/* typings/weave",
     "compile": "npm run clean && npm run copy-typings && tsc && npm run babel && npm run browserify && cd .. && node run-ts copy.ts"
   },

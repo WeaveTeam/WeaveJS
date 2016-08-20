@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
-import classNames from "../modules/classnames";
+import classNames from "modules/classnames";
 import {Weave} from "weavejs";
 import {WeaveAPI} from "weavejs";
 import HBox = weavejs.ui.flexbox.HBox;
@@ -10,9 +10,9 @@ import WeaveReactUtils = weavejs.util.WeaveReactUtils;
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
-import SessionStateEditor from "./SessionStateEditor";
-import InteractiveTour from "../dialog/InteractiveTour";
-import {IVisTool} from "../api/ui/IVisTool";
+import SessionStateEditor from "weave/editor/SessionStateEditor";
+import InteractiveTour from "weave/dialog/InteractiveTour";
+import {IVisTool} from "weave/api/ui/IVisTool";
 
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {

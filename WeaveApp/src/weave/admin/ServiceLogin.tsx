@@ -7,7 +7,7 @@ import PopupWindow = weavejs.ui.PopupWindow;
 import Button = weavejs.ui.Button;
 
 import WeaveAdminService = weavejs.net.WeaveAdminService;
-import Login from "./Login";
+import Login from "weave/admin/Login";
 
 export default class ServiceLogin
 {

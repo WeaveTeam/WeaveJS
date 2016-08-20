@@ -20,12 +20,12 @@ import Bounds2D = weavejs.geom.Bounds2D;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
-import WeaveProperties from "../app/WeaveProperties";
+import WeaveProperties from "weave/app/WeaveProperties";
 import {WeaveAPI} from "weavejs";
-import AbstractGlyphPlotter from "./AbstractGlyphPlotter";
-import SolidFillStyle from "./SolidFillStyle";
-import SolidLineStyle from "./SolidLineStyle";
-import IPlotter from "../api/ui/IPlotter";
+import AbstractGlyphPlotter from "weave/plot/AbstractGlyphPlotter";
+import SolidFillStyle from "weave/plot/SolidFillStyle";
+import SolidLineStyle from "weave/plot/SolidLineStyle";
+import IPlotter from "weave/api/ui/IPlotter";
 
 export default class ScatterPlotPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
 {

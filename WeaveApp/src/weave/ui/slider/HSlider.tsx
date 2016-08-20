@@ -2,7 +2,7 @@ import * as React from "react";
 import * as weavejs from "weavejs";
 
 import VBox = weavejs.ui.flexbox.VBox;
-import RCSlider, {SliderOption} from "./RCSlider";
+import RCSlider, {SliderOption} from "weave/ui/slider/RCSlider";
 export interface HSliderProps
 {
 	min?:number;

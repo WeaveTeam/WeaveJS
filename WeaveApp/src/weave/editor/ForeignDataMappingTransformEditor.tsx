@@ -16,8 +16,8 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
-import DataSourceEditor from "./DataSourceEditor";
-import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+import DataSourceEditor from "weave/editor/DataSourceEditor";
+import SelectableAttributeComponent from "weave/ui/SelectableAttributeComponent";
 
 export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 {

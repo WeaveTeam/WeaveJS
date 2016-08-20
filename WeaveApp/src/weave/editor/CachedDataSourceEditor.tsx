@@ -7,7 +7,7 @@ import VBox = weavejs.ui.flexbox.VBox;
 import Button = weavejs.ui.Button;
 
 import CachedDataSource = weavejs.data.source.CachedDataSource;
-import DataSourceEditor from "./DataSourceEditor";
+import DataSourceEditor from "weave/editor/DataSourceEditor";
 
 export default class CachedDataSourceEditor extends DataSourceEditor
 {

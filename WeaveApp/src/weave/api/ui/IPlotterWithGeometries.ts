@@ -18,7 +18,7 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import Bounds2D = weavejs.geom.Bounds2D;
 import ISimpleGeometry = weavejs.api.data.ISimpleGeometry;
 import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
-import IPlotter from "./IPlotter";
+import IPlotter from "weave/api/ui/IPlotter";
 
 /**
  * This interface defines a plotter whose records are geometric objects with

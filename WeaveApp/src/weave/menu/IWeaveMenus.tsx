@@ -3,8 +3,8 @@ import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
 
 import MenuItemProps = weavejs.ui.menu.MenuItemProps;
-import {CreateObjectFunction} from "./WeaveMenus";
-import ServiceLogin from "../admin/ServiceLogin";
+import {CreateObjectFunction} from "weave/menu/WeaveMenus";
+import ServiceLogin from "weave/admin/ServiceLogin";
 
 export interface IWeaveMenus
 {

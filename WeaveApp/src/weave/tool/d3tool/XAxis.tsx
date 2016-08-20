@@ -3,7 +3,7 @@ import * as weavejs from "weavejs";
 import * as d3 from "d3";
 import {WeaveAPI} from "weavejs";
 
-import AbstractAxis, {AxisProps} from "./AbstractAxis";
+import AbstractAxis, {AxisProps} from "weave/tool/d3tool/AbstractAxis";
 
 export default class XAxis extends AbstractAxis
 {

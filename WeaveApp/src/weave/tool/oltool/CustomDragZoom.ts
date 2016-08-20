@@ -1,5 +1,5 @@
 import * as ol from "openlayers";
-import ProbeInteraction from "./ProbeInteraction";
+import ProbeInteraction from "weave/tool/oltool/ProbeInteraction";
 
 export default class CustomDragZoom extends ol.interaction.DragBox
 {

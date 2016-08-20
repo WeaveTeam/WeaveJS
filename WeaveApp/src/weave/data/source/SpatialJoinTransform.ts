@@ -1,6 +1,5 @@
 import * as weavejs from "weavejs";
 import * as ol from "openlayers";
-import proj4 from "../../modules/proj4";
 import * as _ from "lodash";
 import {WeaveAPI} from "weavejs";
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;

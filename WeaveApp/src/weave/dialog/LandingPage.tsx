@@ -4,8 +4,8 @@ import {Weave} from "weavejs";
 
 import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
 import MiscUtils = weavejs.util.MiscUtils;
-import WeaveApp from "../app/WeaveApp";
-import GetStartedComponent from "./GetStartedComponent";
+import WeaveApp from "weave/app/WeaveApp";
+import GetStartedComponent from "weave/dialog/GetStartedComponent";
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 

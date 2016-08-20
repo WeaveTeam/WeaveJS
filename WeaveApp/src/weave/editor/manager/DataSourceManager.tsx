@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import * as _ from "lodash";
-import Dropzone from "../../modules/react-dropzone";
+import Dropzone from "modules/react-dropzone";
 import {Weave} from "weavejs";
 
 import HBox = weavejs.ui.flexbox.HBox;
@@ -15,9 +15,9 @@ import LogComponent = weavejs.ui.LogComponent;
 import IDataSource = weavejs.api.data.IDataSource;
 
 import ListOption = weavejs.ui.ListOption;
-import InteractiveTour from "../../dialog/InteractiveTour";
-import DataMenu from "../../menu/DataMenu";
-import FileMenu from "../../menu/FileMenu";
+import InteractiveTour from "weave/dialog/InteractiveTour";
+import DataMenu from "weave/menu/DataMenu";
+import FileMenu from "weave/menu/FileMenu";
 
 export interface IDataSourceManagerProps
 {

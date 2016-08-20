@@ -22,7 +22,7 @@ import WeaveAdminService = weavejs.net.WeaveAdminService;
 import WeavePromise = weavejs.util.WeavePromise;
 import StandardLib = weavejs.util.StandardLib;
 
-import {LinkedInput} from "./ConnectionEditor";
+import {LinkedInput} from "weave/admin/ConnectionEditor";
 
 export interface IConfigurationStorageEditorProps
 {

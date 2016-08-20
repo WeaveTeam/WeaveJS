@@ -25,10 +25,10 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import {WeaveAPI} from "weavejs";
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import CallbackCollection = weavejs.core.CallbackCollection;
-import AbstractFilterEditor from "../editor/AbstractFilterEditor";
-import DiscreteValuesDataFilterEditor from "../editor/DiscreteValuesDataFilterEditor";
-import NumericRangeDataFilterEditor from "../editor/NumericRangeDataFilterEditor";
-import IVisTool, {IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
+import AbstractFilterEditor from "weave/editor/AbstractFilterEditor";
+import DiscreteValuesDataFilterEditor from "weave/editor/DiscreteValuesDataFilterEditor";
+import NumericRangeDataFilterEditor from "weave/editor/NumericRangeDataFilterEditor";
+import IVisTool, {IVisToolProps, IVisToolState} from "weave/api/ui/IVisTool";
 
 export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {

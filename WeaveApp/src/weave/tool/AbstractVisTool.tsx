@@ -30,9 +30,9 @@ import StatefulTextArea = weavejs.ui.StatefulTextArea;
 import Checkbox = weavejs.ui.Checkbox;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import JS = weavejs.util.JS;
-import IVisTool, {IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
-import IAltText from "../api/ui/IAltText";
-import {IAltTextConfig} from "../api/ui/IAltText";
+import IVisTool, {IVisToolProps, IVisToolState} from "weave/api/ui/IVisTool";
+import IAltText from "weave/api/ui/IAltText";
+import {IAltTextConfig} from "weave/api/ui/IAltText";
 
 export class Margin
 {

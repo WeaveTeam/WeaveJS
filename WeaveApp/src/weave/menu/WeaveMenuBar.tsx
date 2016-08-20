@@ -2,10 +2,10 @@ import * as React from "react";
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
 import MenuBar = weavejs.ui.menu.MenuBar;
-import WeaveProperties from "../app/WeaveProperties";
-import WeaveMenus from "./WeaveMenus";
+import WeaveProperties from "weave/app/WeaveProperties";
+import WeaveMenus from "weave/menu/WeaveMenus";
 import DynamicComponent = weavejs.ui.DynamicComponent;
-import SessionHistorySlider from "../editor/SessionHistorySlider";
+import SessionHistorySlider from "weave/editor/SessionHistorySlider";
 
 export interface WeaveMenuBarProps extends React.HTMLProps<WeaveMenuBar>
 {

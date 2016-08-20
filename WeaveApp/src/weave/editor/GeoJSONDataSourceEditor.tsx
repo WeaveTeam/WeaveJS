@@ -17,9 +17,9 @@ import EntityType = weavejs.api.data.EntityType;
 import LinkableFile = weavejs.core.LinkableFile;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import {WeaveAPI} from "weavejs";
-import DataSourceEditor from "./DataSourceEditor";
-import KeyTypeInput from "../ui/KeyTypeInput";
-import FileSelector from "../ui/FileSelector";
+import DataSourceEditor from "weave/editor/DataSourceEditor";
+import KeyTypeInput from "weave/ui/KeyTypeInput";
+import FileSelector from "weave/ui/FileSelector";
 
 export default class GeoJSONDataSourceEditor extends DataSourceEditor
 {

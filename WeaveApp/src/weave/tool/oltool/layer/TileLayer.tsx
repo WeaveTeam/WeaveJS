@@ -14,8 +14,8 @@ import VBox = weavejs.ui.flexbox.VBox;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
-import AbstractLayer from "./AbstractLayer";
-import Projections from "../Projections";
+import AbstractLayer from "weave/tool/oltool/layer/AbstractLayer";
+import Projections from "weave/tool/oltool/Projections";
 
 interface ITileLayerEditorProps
 {

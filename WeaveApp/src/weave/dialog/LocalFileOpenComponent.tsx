@@ -1,11 +1,11 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
-import Dropzone from "../modules/react-dropzone";
+import Dropzone from "modules/react-dropzone";
 import {Weave} from "weavejs";
 
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
-import {IOpenFileProps, IOpenFileState} from "./FileDialog";
+import {IOpenFileProps, IOpenFileState} from "weave/dialog/FileDialog";
 
 export default class LocalFileOpenComponent extends React.Component<IOpenFileProps, IOpenFileState> {
 

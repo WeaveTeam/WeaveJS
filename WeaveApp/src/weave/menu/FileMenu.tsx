@@ -24,10 +24,10 @@ import {WeaveAPI} from "weavejs";
 import CSVDataSource = weavejs.data.source.CSVDataSource;
 import IDataSource = weavejs.api.data.IDataSource;
 import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
-import WeaveProperties from "../app/WeaveProperties";
+import WeaveProperties from "weave/app/WeaveProperties";
 import Admin = weavejs.net.Admin;
-import FileDialog from "../dialog/FileDialog";
-import IWeaveMenus from "./IWeaveMenus";
+import FileDialog from "weave/dialog/FileDialog";
+import IWeaveMenus from "weave/menu/IWeaveMenus";
 
 var ProgressIndicator = WeaveAPI.ProgressIndicator;
 

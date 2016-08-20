@@ -1,9 +1,9 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
-import DataTable from "./DataTable";
+import DataTable from "weave/ui/DataTable";
 import AbstractBinningDefinition = weavejs.data.bin.AbstractBinningDefinition;
-import {IRow} from "./DataTable";
+import {IRow} from "weave/ui/DataTable";
 
 export interface BinNamesListProps {
 	binningDefinition:AbstractBinningDefinition;

@@ -9,8 +9,8 @@ import LinkableString = weavejs.core.LinkableString;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 import ColumnUtils = weavejs.data.ColumnUtils;
-import AbstractFeatureLayer from "./AbstractFeatureLayer";
-import Projections from "../Projections";
+import AbstractFeatureLayer from "weave/tool/oltool/layer/AbstractFeatureLayer";
+import Projections from "weave/tool/oltool/Projections";
 
 interface LocationRecord
 {

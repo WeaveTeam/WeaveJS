@@ -10,8 +10,8 @@ import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import KeySet = weavejs.data.key.KeySet;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
-import {AbstractFeatureLayer} from "./layer/AbstractFeatureLayer";
-import OpenLayersMapTool from "./OpenLayersMapTool";
+import {AbstractFeatureLayer} from "weave/tool/oltool/layer/AbstractFeatureLayer";
+import OpenLayersMapTool from "weave/tool/oltool/OpenLayersMapTool";
 
 export default class ProbeInteraction extends ol.interaction.Pointer
 {

@@ -13,7 +13,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 import {Weave} from "weavejs";
-import IPlotter from "./IPlotter";
+import IPlotter from "weave/api/ui/IPlotter";
 
 /**
  * A class implementing this interface is an IPlotter that renders text graphics.

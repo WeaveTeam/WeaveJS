@@ -28,9 +28,9 @@ export type EditableField = [
 ] | LinkableVariable | IFilteredKeySet;
 
 import Bounds2D = weavejs.geom.Bounds2D;
-import IOpenLayersMapTool from "../IOpenLayersMapTool";
-import Projections from "../Projections";
-import IVisTool from "../../../api/ui/IVisTool";
+import IOpenLayersMapTool from "weave/tool/oltool/IOpenLayersMapTool";
+import Projections from "weave/tool/oltool/Projections";
+import IVisTool from "weave/api/ui/IVisTool";
 
 export default class AbstractLayer implements ILinkableObject
 {

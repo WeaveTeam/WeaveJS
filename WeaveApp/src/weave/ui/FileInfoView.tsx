@@ -2,14 +2,14 @@ import * as React from "react";
 import * as ReactDOM from "react-dom"
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
-import Clipboard from "../modules/clipboard";
-import $ from "../modules/jquery";
+import Clipboard from "modules/clipboard";
+import $ from "modules/jquery";
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
 import ReactUtils = weavejs.util.ReactUtils;
 import Button = weavejs.ui.Button;
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
-import FormatUtils from "../util/FormatUtils";
+import FormatUtils from "weave/util/FormatUtils";
 
 export interface IFileInfoViewProps extends React.Props<FileInfoView>
 {

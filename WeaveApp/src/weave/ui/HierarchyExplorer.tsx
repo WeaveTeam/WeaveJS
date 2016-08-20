@@ -20,8 +20,8 @@ import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import SmartComponent = weavejs.ui.SmartComponent;
 import DynamicComponent = weavejs.ui.DynamicComponent;
 import Button = weavejs.ui.Button;
-import WeaveDataTree from "./WeaveDataTree";
-import {WeaveTree} from "./WeaveTree";
+import WeaveDataTree from "weave/ui/WeaveDataTree";
+import {WeaveTree} from "weave/ui/WeaveTree";
 
 export interface IHierarchyExplorerProps
 {

@@ -11,14 +11,14 @@ import BinnedColumn = weavejs.data.column.BinnedColumn;
 import FilteredColumn = weavejs.data.column.FilteredColumn;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
-import IWeaveMenus from "./IWeaveMenus";
-import ColorController from "../editor/ColorController";
-import MouseoverController from "../editor/MouseoverController";
+import IWeaveMenus from "weave/menu/IWeaveMenus";
+import ColorController from "weave/editor/ColorController";
+import MouseoverController from "weave/editor/MouseoverController";
 import {WeaveAPI} from "weavejs";
-import AttributeMenuTool from "../tool/AttributeMenuTool";
-import DataFilterTool from "../tool/DataFilterTool";
-import SessionStateMenuTool from "../tool/SessionStateMenuTool";
-import IVisTool from "../api/ui/IVisTool";
+import AttributeMenuTool from "weave/tool/AttributeMenuTool";
+import DataFilterTool from "weave/tool/DataFilterTool";
+import SessionStateMenuTool from "weave/tool/SessionStateMenuTool";
+import IVisTool from "weave/api/ui/IVisTool";
 
 export default class ControllersMenu implements MenuBarItemProps
 {

@@ -32,9 +32,9 @@ import CategoryBinningDefinition = weavejs.data.bin.CategoryBinningDefinition;
 import NaturalJenksBinningDefinition = weavejs.data.bin.NaturalJenksBinningDefinition;
 import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
-import ColumnSelector from "../ui/ColumnSelector";
-import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
-import BinNamesList from "../ui/BinNamesList";
+import ColumnSelector from "weave/ui/ColumnSelector";
+import SelectableAttributeComponent from "weave/ui/SelectableAttributeComponent";
+import BinNamesList from "weave/ui/BinNamesList";
 
 // temporary hack
 function Weave_linkState(a:any, b:any) { if (a != b) Weave.linkState(a, b); }

@@ -17,9 +17,9 @@ import PopupWindow = weavejs.ui.PopupWindow;
 import WeaveAdminService = weavejs.net.WeaveAdminService;
 import WeaveDataServlet = weavejs.net.WeaveDataServlet;
 import IColumnReference = weavejs.api.data.IColumnReference;
-import DataSourceEditor, {IDataSourceEditorProps} from "./DataSourceEditor";
-import ConnectionManager from "../admin/ConnectionManager";
-import SqlImport from "../admin/SqlImport";
+import DataSourceEditor, {IDataSourceEditorProps} from "weave/editor/DataSourceEditor";
+import ConnectionManager from "weave/admin/ConnectionManager";
+import SqlImport from "weave/admin/SqlImport";
 
 
 const SQL:string = "SQL";

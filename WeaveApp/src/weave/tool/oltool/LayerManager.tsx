@@ -9,12 +9,12 @@ import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
-import AbstractLayer from "./layer/AbstractLayer";
-import TileLayer from "./layer/TileLayer";
-import GeometryLayer from "./layer/GeometryLayer";
-import LabelLayer from "./layer/LabelLayer";
-import ScatterPlotLayer from "./layer/ScatterPlotLayer";
-import ImageGlyphLayer from "./layer/ImageGlyphLayer";
+import AbstractLayer from "weave/tool/oltool/layer/AbstractLayer";
+import TileLayer from "weave/tool/oltool/layer/TileLayer";
+import GeometryLayer from "weave/tool/oltool/layer/GeometryLayer";
+import LabelLayer from "weave/tool/oltool/layer/LabelLayer";
+import ScatterPlotLayer from "weave/tool/oltool/layer/ScatterPlotLayer";
+import ImageGlyphLayer from "weave/tool/oltool/layer/ImageGlyphLayer";
 import {WeaveAPI} from "weavejs";
 
 export interface ILayerManagerState

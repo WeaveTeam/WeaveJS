@@ -11,7 +11,7 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import ExtendedDynamicColumn = weavejs.data.column.ExtendedDynamicColumn;
 import IKeySet = weavejs.api.data.IKeySet;
-import AbstractLayer from "./AbstractLayer";
+import AbstractLayer from "weave/tool/oltool/layer/AbstractLayer";
 
 export abstract class AbstractFeatureLayer extends AbstractLayer
 {

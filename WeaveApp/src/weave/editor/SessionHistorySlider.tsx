@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
-import classNames from "../modules/classnames";
+import classNames from "modules/classnames";
 
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
@@ -11,9 +11,9 @@ import SessionStateLog = weavejs.core.SessionStateLog;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import LogEntry = weavejs.core.LogEntry;
 import KeyboardUtils = weavejs.util.KeyboardUtils;
-import HSlider from "../ui/slider/HSlider";
-import RCSlider from "../ui/slider/RCSlider";
-import {SliderOption} from "../ui/slider/RCSlider";
+import HSlider from "weave/ui/slider/HSlider";
+import RCSlider from "weave/ui/slider/RCSlider";
+import {SliderOption} from "weave/ui/slider/RCSlider";
 
 export interface SessionHistorySliderProps extends React.Props<SessionHistorySlider>
 {

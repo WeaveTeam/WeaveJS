@@ -16,10 +16,10 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DataType = weavejs.api.data.DataType;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import ColumnUtils = weavejs.data.ColumnUtils;
-import AbstractFilterEditor from "./AbstractFilterEditor";
-import {FilterEditorProps} from "./AbstractFilterEditor";
-import {FilterOption} from "./AbstractFilterEditor";
-import MenuLayoutComponent from "../ui/MenuLayoutComponent";
+import AbstractFilterEditor from "weave/editor/AbstractFilterEditor";
+import {FilterEditorProps} from "weave/editor/AbstractFilterEditor";
+import {FilterOption} from "weave/editor/AbstractFilterEditor";
+import MenuLayoutComponent from "weave/ui/MenuLayoutComponent";
 
 export const LAYOUT_LIST:string = "List";
 export const LAYOUT_COMBO:string = "ComboBox";

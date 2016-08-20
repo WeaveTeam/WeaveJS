@@ -15,7 +15,7 @@ import WeavePath = weavejs.path.WeavePath;
 import MouseUtils = weavejs.util.MouseUtils;
 import MiscUtils = weavejs.util.MiscUtils;
 import ILinkableVariable = weavejs.api.core.ILinkableVariable;
-import {AbstractLayout, PanelDragEvent, LayoutProps} from "./AbstractLayout";
+import {AbstractLayout, PanelDragEvent, LayoutProps} from "weave/layout/AbstractLayout";
 
 export interface PanelState
 {

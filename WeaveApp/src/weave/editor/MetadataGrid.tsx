@@ -13,7 +13,7 @@ import VBox = weavejs.ui.flexbox.VBox;
 import HBox = weavejs.ui.flexbox.HBox;
 import ComboBoxOption = weavejs.ui.ComboBoxOption;
 import EntityMetadata = weavejs.api.net.beans.EntityMetadata;
-import {IRow} from "../ui/DataTable";
+import {IRow} from "weave/ui/DataTable";
 
 export type MetadataEntry = {[key:string]:any};
 

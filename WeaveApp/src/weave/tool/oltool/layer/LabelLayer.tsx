@@ -11,9 +11,9 @@ import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
-import AbstractGlyphLayer from "./AbstractGlyphLayer";
+import AbstractGlyphLayer from "weave/tool/oltool/layer/AbstractGlyphLayer";
 import {WeaveAPI} from "weavejs";
-import AbstractFeatureLayer from "./AbstractFeatureLayer";
+import AbstractFeatureLayer from "weave/tool/oltool/layer/AbstractFeatureLayer";
 
 interface LabelRecord
 {

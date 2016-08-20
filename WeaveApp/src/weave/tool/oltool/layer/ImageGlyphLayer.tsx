@@ -1,7 +1,7 @@
 import * as weavejs from "weavejs";
 import * as _ from "lodash";
 import * as ol from "openlayers";
-import $ from "../../../modules/jquery";
+import $ from "modules/jquery";
 import {Weave} from "weavejs";
 
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -11,9 +11,9 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-import AbstractGlyphLayer from "./AbstractGlyphLayer";
-import ImageGlyphCache from "./ImageGlyphCache";
-import AbstractFeatureLayer from "./AbstractFeatureLayer";
+import AbstractGlyphLayer from "weave/tool/oltool/layer/AbstractGlyphLayer";
+import ImageGlyphCache from "weave/tool/oltool/layer/ImageGlyphCache";
+import AbstractFeatureLayer from "weave/tool/oltool/layer/AbstractFeatureLayer";
 
 export default class ImageGlyphLayer extends AbstractGlyphLayer
 {

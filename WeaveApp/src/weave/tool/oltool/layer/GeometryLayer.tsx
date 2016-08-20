@@ -16,11 +16,11 @@ import NormalizedColumn = weavejs.data.column.NormalizedColumn;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-import {AbstractFeatureLayer} from "./AbstractFeatureLayer";
-import SolidFillStyle from "../../../plot/SolidFillStyle";
-import SolidLineStyle from "../../../plot/SolidLineStyle";
-import Projections from "../Projections";
-import ScatterPlotLayer from "./ScatterPlotLayer";
+import {AbstractFeatureLayer} from "weave/tool/oltool/layer/AbstractFeatureLayer";
+import SolidFillStyle from "weave/plot/SolidFillStyle";
+import SolidLineStyle from "weave/plot/SolidLineStyle";
+import Projections from "weave/tool/oltool/Projections";
+import ScatterPlotLayer from "weave/tool/oltool/layer/ScatterPlotLayer";
 
 export default class GeometryLayer extends AbstractFeatureLayer
 {

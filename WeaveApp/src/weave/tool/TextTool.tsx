@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
-import $ from "../modules/jquery";
+import $ from "modules/jquery";
 import {Weave} from "weavejs";
 
 import MouseEvent = React.MouseEvent;
@@ -19,9 +19,9 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
-import IVisTool from "../api/ui/IVisTool";
-import {IVisToolProps} from "../api/ui/IVisTool";
-import {IVisToolState} from "../api/ui/IVisTool";
+import IVisTool from "weave/api/ui/IVisTool";
+import {IVisToolProps} from "weave/api/ui/IVisTool";
+import {IVisToolState} from "weave/api/ui/IVisTool";
 
 export default class TextTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
 {

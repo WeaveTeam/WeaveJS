@@ -8,9 +8,9 @@ import DynamicComponent = weavejs.ui.DynamicComponent;
 import DOMUtils = weavejs.util.DOMUtils;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-import AbstractVisTool from "./AbstractVisTool";
-import ScatterPlotPlotter from "../plot/ScatterPlotPlotter";
-import IVisTool, {IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
+import AbstractVisTool from "weave/tool/AbstractVisTool";
+import ScatterPlotPlotter from "weave/plot/ScatterPlotPlotter";
+import IVisTool, {IVisToolProps, IVisToolState} from "weave/api/ui/IVisTool";
 
 export interface PIXIScatterPlotProps extends IVisToolProps
 {

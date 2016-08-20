@@ -17,9 +17,9 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import DynamicComponent = weavejs.ui.DynamicComponent;
 import Checkbox = weavejs.ui.Checkbox;
-import DataSourceEditor from "./DataSourceEditor";
-import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
-import KeyTypeInput from "../ui/KeyTypeInput";
+import DataSourceEditor from "weave/editor/DataSourceEditor";
+import SelectableAttributeComponent from "weave/ui/SelectableAttributeComponent";
+import KeyTypeInput from "weave/ui/KeyTypeInput";
 
 export default class GroupedDataTransformEditor extends DataSourceEditor
 {

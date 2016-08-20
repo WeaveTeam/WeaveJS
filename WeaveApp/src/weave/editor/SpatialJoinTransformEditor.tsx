@@ -7,13 +7,13 @@ import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
 import HelpIcon = weavejs.ui.HelpIcon;
 
-import SpatialJoinTransform from "../data/source/SpatialJoinTransform";
+import SpatialJoinTransform from "weave/data/source/SpatialJoinTransform";
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
-import DataSourceEditor from "./DataSourceEditor";
-import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+import DataSourceEditor from "weave/editor/DataSourceEditor";
+import SelectableAttributeComponent from "weave/ui/SelectableAttributeComponent";
 
 export default class SpatialJoinTransformEditor extends DataSourceEditor
 {

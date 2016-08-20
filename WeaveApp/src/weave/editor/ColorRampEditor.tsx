@@ -16,9 +16,9 @@ import Button = weavejs.ui.Button;
 import ComboBox = weavejs.ui.ComboBox;
 import CenteredIcon = weavejs.ui.CenteredIcon;
 import List = weavejs.ui.List;
-import ColorRampComponent from "../ui/ColorRampComponent";
-import ColorRampList from "../ui/ColorRampList";
-import ColorPicker from "../ui/ColorPicker";
+import ColorRampComponent from "weave/ui/ColorRampComponent";
+import ColorRampList from "weave/ui/ColorRampList";
+import ColorPicker from "weave/ui/ColorPicker";
 
 export interface ColorRampEditorProps extends React.Props<ColorRampEditor>
 {

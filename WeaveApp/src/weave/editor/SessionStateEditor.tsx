@@ -17,17 +17,17 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import DebugUtils = weavejs.util.DebugUtils;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
-import WeaveProperties from "../app/WeaveProperties";
+import WeaveProperties from "weave/app/WeaveProperties";
 import IGetMenuItems = weavejs.ui.menu.IGetMenuItems;
 import Menu = weavejs.ui.menu.Menu;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
 import StandardLib = weavejs.util.StandardLib;
-import ControlPanel from "./ControlPanel";
-import JSONEditor from "./JSONEditor";
-import AttributeSelector from "../ui/AttributeSelector";
-import {WeaveTree, BasicTreeDescriptor} from "../ui/WeaveTree";
+import ControlPanel from "weave/editor/ControlPanel";
+import JSONEditor from "weave/editor/JSONEditor";
+import AttributeSelector from "weave/ui/AttributeSelector";
+import {WeaveTree, BasicTreeDescriptor} from "weave/ui/WeaveTree";
 
 export interface ISessionStateEditorProps extends React.Props<SessionStateEditor>
 {

@@ -3,13 +3,13 @@ import * as weavejs from "weavejs";
 import * as _ from "lodash";
 import {Weave} from "weavejs";
 
-import DataTable from "./DataTable";
+import DataTable from "weave/ui/DataTable";
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
 import Label = weavejs.ui.flexbox.Label;
 import StandardLib = weavejs.util.StandardLib;
-import ColorRampComponent from "./ColorRampComponent";
-import {IRow} from "./DataTable";
+import ColorRampComponent from "weave/ui/ColorRampComponent";
+import {IRow} from "weave/ui/DataTable";
 
 export interface ColorRampListProps extends React.Props<ColorRampList>
 {
