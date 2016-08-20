@@ -43,9 +43,9 @@
     "as2dts": "^0.2.3",
     "babel-cli": "^6.4.5",
     "classnames": "^2.2.3",
+    "concat-with-sourcemaps": "^1.0.4",
     "filesaver.js": "^0.2.0",
     "fixed-data-table": "^0.6.0",
-    "concat-with-sourcemaps": "^1.0.4",
     "font-awesome": "^4.4.0",
     "jquery": "^2.1.4",
     "jszip": "^3.0.0",
@@ -56,6 +56,6 @@
     "react-addons-update": "0.14.7",
     "react-dom": "0.14.7",
     "rimraf": "^2.5.3",
-    "typescript": "^1.8.7"
+    "typescript": "^2.1.0-dev.20160820"
   }
 }

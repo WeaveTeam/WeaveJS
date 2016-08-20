@@ -12,7 +12,8 @@
 	"listFiles": false,
 	"noImplicitReturns": false,
 	"pretty": false,
-	"newLine": "lf"
+	"newLine": "lf",
+	"baseUrl": "./ts"
   },
   "compileOnSave": false
 }

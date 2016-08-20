@@ -301,7 +301,8 @@ namespace weavejs.ui
 		{
 			var n = 5;
 			var nnnn = n * 4;
-			var items:[Handle, string, React.CSSProperties][] = [
+			//TODO fix type
+			var items:[Handle, string, any][] = [
 				// sides
 				[Handle.LEFT,   'ew-resize', {  left: 0,  width: n,  top: nnnn, bottom: nnnn}],
 				[Handle.RIGHT,  'ew-resize', { right: 0,  width: n,  top: nnnn, bottom: nnnn}],
