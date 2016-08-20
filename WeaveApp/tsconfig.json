@@ -5,7 +5,7 @@
     "removeComments": false,
     "target": "es6",
     "module": "es6",
-	"outDir": "es6/",
+	"outDir": "./bin/es6/",
     "inlineSources": true,
     "inlineSourceMap": true,
 	"forceConsistentCasingInFileNames": true,
@@ -13,7 +13,7 @@
 	"noImplicitReturns": false,
 	"pretty": false,
 	"newLine": "lf",
-	"baseUrl": "./ts"
+	"baseUrl": "./src"
   },
   "compileOnSave": false
 }

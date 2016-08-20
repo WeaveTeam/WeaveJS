@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
   "scripts": {
-    "clean": "rimraf es6/ && rimraf js/ && rimraf dist/bundle.js",
-    "babel": "babel es6 -d js --source-maps inline",
-    "browserify": "mkdirp dist && browserify js/index.js -o dist/bundle.js",
+    "clean": "rimraf bin/ && rimraf dist/weave-app.bundle.js",
+    "babel": "mkdirp bin/js && babel bin/es6 -d bin/js --source-maps inline",
+    "browserify": "mkdirp dist && browserify bin/js/index.js -o dist/weave-app.bundle.js",
     "copy-typings": "mkdirp typings/weave && cp ../weave-typings/* typings/weave",
     "compile": "npm run clean && npm run copy-typings && tsc && npm run babel && npm run browserify && cd .. && node run-ts copy.ts"
   },
