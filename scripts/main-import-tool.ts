@@ -38,7 +38,7 @@ module.exports = function()
 	}
 
 	let rootPath = path.dirname(importFileName);
-	let filePaths:string[] = FileUtils.listFiles(sourceDir, excludedFiles, extensions, []);
+	let filePaths:string[] = FileUtils.listFiles(sourceDir, excludedFiles, extensions, []).sort();
 	let graph = tsort();
 
 	function getOrInit<K,V>(map:Map<K,V>, key:K, type:new(..._:any[])=>V):V
@@ -106,6 +106,8 @@ module.exports = function()
 
 	function checkDependency(file:string, dep:string, chain:string[] = null):string[]
 	{
+		if (!map2d_file_dep_chain.has(file))
+			initDeps(file);
 		var map_dep_chain = map2d_file_dep_chain.get(file);
 		var hasChain = map_dep_chain.get(dep);
 		if (hasChain !== undefined)
@@ -138,13 +140,10 @@ module.exports = function()
 		return hasChain;
 	}
 
-	// get direct dependencies
-	filePaths.sort().forEach(initDeps);
-
-	// report circular dependencies
+	// compute dependencies and report circular dependencies
 	filePaths.forEach(f =>
 	{
-		var chain = checkDependency(f, f);
+		var chain = checkDependency(f, f); // this will initialize direct dependencies if not done already
 		if (chain)
 			console.error(`Found circular dependency: ${formatDepChain(chain)}`);
 	});
