@@ -1,4 +1,4 @@
-module.exports = function(args:string[])
+module.exports = function()
 {
 	const async = require("async");
 	const fs = require("fs");
@@ -8,18 +8,13 @@ module.exports = function(args:string[])
 
 	let globalOutput:string[];
 	let moduleOutput:string[];
-	let target = args[0];
 	globalOutput = [
 		'WeaveASJS/bin/js-release/WeaveJS.js',
 		'WeaveASJS/src/initWeaveJS.js',
 		'WeaveTSJS/bin/js/weavejs.js'
 	];
+	moduleOutput = ['scripts/umd-prefix.txt', 'WeaveTSJS/bin/js/libs.js'].concat(globalOutput).concat(['scripts/umd-suffix.txt']);
 
-	if(target == "module")
-	{
-		moduleOutput = ['scripts/umd-prefix.txt', 'WeaveTSJS/bin/js/libs.js'].concat(globalOutput).concat(['scripts/umd-suffix.txt']);
-	}
-	
 	function build(filesToConcat:string[], outputPath:string, moduleName:string)
 	{
 		var concat = new Concat(true, moduleName, '\n');
