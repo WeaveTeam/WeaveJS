@@ -14,9 +14,9 @@
     "compile": "npm run compile-as && npm run compile-dts && npm run compile-ts && npm run copy",
     "compile-refs": "node run-ts main-import-tool -d srcts/weavejs -f srcts/_references.ts && npm run compile-librefs",
     "compile-librefs": "node run-ts main-import-tool -d typings/ -f srcts/_lib-references.ts",
-    "compile-libs": "npm run compile-librefs && tsc -p tsconfig-libs.json && babel outts/libs.js --out-file lib/libs.js && browserifyinc --cachefile  browserifycache.json lib/libs.js > dist/libs.js",
+    "compile-libs": "npm run compile-librefs && tsc -p tsconfig-libs.json && babel outts/libs.js --out-file lib/libs.js && browserifyinc --cachefile browserifycache.json lib/libs.js > dist/libs.js",
     "compile-module": "tsc -p tsconfig-module.json && babel outts/module.js --out-file lib/module.js",
-    "compile-dts": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/ && mv WeaveASJS/typings/*.d.ts ./typings/weave/",
+    "compile-dts": "as2dts --defs-only --out-name weavejs-core ./WeaveASJS/src ./WeaveASJS/typings && mv WeaveASJS/typings/*.d.ts ./typings/weave/",
     "compile-ts": "npm run compile-refs && tsc -p tsconfig.json && babel outts/weavejs.js --out-file dist/weavejs.js",
     "compile-as": "node WeaveASJS/build.js",
     "postinstall": "cd lib || ( npm run compile && npm run compile-module && npm run dts )"
@@ -45,7 +45,7 @@
     "tsort": "^0.0.1"
   },
   "dependencies": {
-    "as2dts": "^0.2.3",
+    "as2dts": "^0.3.0",
     "babel": "^6.1.18",
     "babel-cli": "^6.4.5",
     "browserify-incremental": "^3.1.1",
