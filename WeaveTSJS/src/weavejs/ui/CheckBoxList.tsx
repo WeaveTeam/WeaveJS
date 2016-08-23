@@ -111,20 +111,19 @@ namespace weavejs.ui
 			var labelPosition:string = this.props.labelPosition || "right";
 
 			return (
-				<div style={{flex: 1, alignItems: "center", overflow: "auto"}}>
+				<div style={{flex: 1, alignItems: "center", overflow: "auto"}} className="weave-checkbox-list">
 					{
 						this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
 							var label = this.labels[index];
 							var checkbox = (
 								<Checkbox
-									key={"checkbox"}
 									value={checkBoxState}
 									onChange={(value:boolean) => this.handleChange(value, index)}
 									label={labelPosition == "right" ? label : " "}
 								/>
 							);
 							return (
-								<HBox key={index} style={{height: 30, paddingLeft: 10}}>
+								<HBox key={index} style={{height: 30, paddingLeft: 10}} className="weave-checkbox-list-item">
 									{ labelPosition == "right" ? checkbox : [label, checkbox] }
 								</HBox>
 							);
