@@ -33,6 +33,7 @@
     "d3": "^3.5.9",
     "filesaver.js": "^0.2.0",
     "fixed-data-table": "^0.6.3",
+    "font-awesome": "^4.6.3",
     "jquery": "^2.1.4",
     "lodash": "^3.10.1",
     "openlayers": "3.13.0",
