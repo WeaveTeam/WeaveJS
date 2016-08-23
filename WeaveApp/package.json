@@ -1,15 +1,16 @@
 {
-  "name": "example",
-  "version": "0.0.0",
+  "name": "weave",
+  "version": "2.1.0",
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
   "scripts": {
     "clean": "rimraf bin/ && rimraf dist/weave-app.bundle.js",
     "babel": "mkdirp bin/js && babel bin/es6 -d bin/js --source-maps inline",
     "browserify": "mkdirp dist && node scripts/browserify",
     "copy-typings": "mkdirp typings/weave && cp ../weave-typings/* typings/weave",
+    "compile-global": "tsc -p tsconfig-global.json",
     "compile": "npm run clean && npm run copy-typings && tsc && npm run babel && npm run browserify && cd .. && node run-ts copy.ts"
   },
-  "main": "js/app/WeaveApp.js",
+  "main": "bin/js/app/WeaveApp.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/WeaveTeam/WeaveJS.git"

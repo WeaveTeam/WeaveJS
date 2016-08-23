@@ -26,7 +26,7 @@ import ComboBox = weavejs.ui.ComboBox;
 import Button = weavejs.ui.Button;
 import StandardLib = weavejs.util.StandardLib;
 import DynamicComponent = weavejs.ui.DynamicComponent;
-import {IColumnSelectorProps, default as ColumnSelector} from "weave/ui/ColumnSelector";
+import ColumnSelector, {IColumnSelectorProps} from "weave/ui/ColumnSelector";
 import AttributeSelector from "weave/ui/AttributeSelector";
 import ControlPanel from "weave/editor/ControlPanel";
 import ColorPicker from "weave/ui/ColorPicker";

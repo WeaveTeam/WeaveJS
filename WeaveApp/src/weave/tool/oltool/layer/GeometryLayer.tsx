@@ -17,6 +17,7 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 import {AbstractFeatureLayer} from "weave/tool/oltool/layer/AbstractFeatureLayer";
+import {EditableField} from "weave/tool/oltool/layer/AbstractLayer";
 import SolidFillStyle from "weave/plot/SolidFillStyle";
 import SolidLineStyle from "weave/plot/SolidLineStyle";
 import Projections from "weave/tool/oltool/Projections";

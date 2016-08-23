@@ -12,6 +12,7 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import AbstractGlyphLayer from "weave/tool/oltool/layer/AbstractGlyphLayer";
+import {EditableField} from "weave/tool/oltool/layer/AbstractLayer";
 import {WeaveAPI} from "weavejs";
 import AbstractFeatureLayer from "weave/tool/oltool/layer/AbstractFeatureLayer";
 

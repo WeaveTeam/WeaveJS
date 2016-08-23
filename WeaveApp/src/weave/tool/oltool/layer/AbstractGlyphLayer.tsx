@@ -10,6 +10,7 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import AbstractFeatureLayer from "weave/tool/oltool/layer/AbstractFeatureLayer";
+import {EditableField} from "weave/tool/oltool/layer/AbstractLayer";
 import Projections from "weave/tool/oltool/Projections";
 
 interface LocationRecord

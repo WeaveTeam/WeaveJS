@@ -19,7 +19,7 @@ import StandardLib = weavejs.util.StandardLib;
 
 import CensusDataSource = weavejs.data.source.CensusDataSource;
 import CensusApi = weavejs.data.source.CensusApi;
-import {IDataSourceEditorState, default as DataSourceEditor, IDataSourceEditorProps} from "weave/editor/DataSourceEditor";
+import DataSourceEditor, {IDataSourceEditorState, IDataSourceEditorProps} from "weave/editor/DataSourceEditor";
 import {CensusGeographyFilter} from "weave/editor/CensusGeographyFilter";
 import KeyTypeInput from "weave/ui/KeyTypeInput";
 

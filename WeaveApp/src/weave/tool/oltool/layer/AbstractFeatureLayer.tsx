@@ -12,6 +12,7 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import ExtendedDynamicColumn = weavejs.data.column.ExtendedDynamicColumn;
 import IKeySet = weavejs.api.data.IKeySet;
 import AbstractLayer from "weave/tool/oltool/layer/AbstractLayer";
+import {EditableField} from "weave/tool/oltool/layer/AbstractLayer";
 
 export abstract class AbstractFeatureLayer extends AbstractLayer
 {

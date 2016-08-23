@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+	"noImplicitAny": true,
+	"jsx": "preserve",
+	"removeComments": false,
+	"target": "es6",
+	"module": "amd",
+	"outFile": "./bin/weave-app.jsx",
+	"declaration": true,
+	"forceConsistentCasingInFileNames": true,
+	"listFiles": false,
+	"noImplicitReturns": false,
+	"pretty": false,
+	"newLine": "lf",
+	"baseUrl": "./src"
+  },
+  "exclude": ["node_modules", "bin"],
+  "compileOnSave": false
+}
