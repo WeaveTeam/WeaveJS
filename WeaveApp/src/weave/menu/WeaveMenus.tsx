@@ -11,6 +11,8 @@ import FileMenu from "weave/menu/FileMenu";
 import ChartsMenu from "weave/menu/ChartsMenu";
 import DataMenu from "weave/menu/DataMenu";
 import ControllersMenu from "weave/menu/ControllersMenu";
+import ExternalToolMenu from "weave/menu/ExternalToolMenu";
+import {AbstractVisToolImpl} from "weave/tool/AbstractVisTool";
 
 export type CreateObjectFunction = (type:Class)=>void;
 
@@ -29,8 +31,9 @@ export default class WeaveMenus implements IWeaveMenus
 	chartsMenu:ChartsMenu;
 	dataMenu:DataMenu;
 	controllersMenu:ControllersMenu;
+	externalToolMenu:ExternalToolMenu;
 
-	constructor(context:React.ReactInstance, weave:Weave, createObject:CreateObjectFunction, onFileLoaded:()=>void, openDataManager:()=>void, enableDataManagerItem:()=>boolean)
+	constructor(context:React.ReactInstance, weave:Weave, createObject:CreateObjectFunction, onFileLoaded:()=>void, openDataManager:()=>void, enableDataManagerItem:()=>boolean, externalTools?:AbstractVisToolImpl[])
 	{
 		this.context = context;
 		this.weave = weave;
@@ -49,23 +52,22 @@ export default class WeaveMenus implements IWeaveMenus
 		this.chartsMenu = new ChartsMenu(this);
 		this.dataMenu = new DataMenu(this);
 		this.controllersMenu = new ControllersMenu(this);
+		this.externalToolMenu = _.isArray(externalTools) && externalTools.length ? new ExternalToolMenu(this, externalTools) : null;
 	}
 
 	getMenuList():MenuBarItemProps[]
 	{
-		if (this.showFileMenu)
-			return [
-				this.systemMenu,
-				this.fileMenu,
-				this.chartsMenu,
-				this.controllersMenu
-			];
+		var menuList:MenuBarItemProps[] = [this.systemMenu];
 
-		return [
-			this.systemMenu,
-			this.dataMenu,
-			this.chartsMenu,
-			this.controllersMenu
-		];
+		if(this.showFileMenu)
+			menuList.push(this.fileMenu);
+		else
+			menuList.push(this.dataMenu);
+
+		menuList.push(this.chartsMenu, this.controllersMenu);
+		if(this.externalToolMenu)
+			menuList.push(this.externalToolMenu);
+
+		return menuList;
 	}
 }

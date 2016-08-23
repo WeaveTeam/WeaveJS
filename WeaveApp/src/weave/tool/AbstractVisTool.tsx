@@ -34,6 +34,7 @@ import IVisTool, {IVisToolProps, IVisToolState} from "weave/api/ui/IVisTool";
 import IAltText from "weave/api/ui/IAltText";
 import {IAltTextConfig} from "weave/api/ui/IAltText";
 
+export type AbstractVisToolImpl = typeof AbstractVisTool;
 export class Margin
 {
 	top = Weave.linkableChild(this, new LinkableNumber(20));

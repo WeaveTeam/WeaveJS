@@ -42,6 +42,7 @@ import InteractiveTour from "weave/dialog/InteractiveTour";
 import DataSourceManager from "weave/editor/manager/DataSourceManager";
 import WeaveMenuBar from "weave/menu/WeaveMenuBar";
 import NotificationSystem from "modules/NotifcationSystem";
+import {AbstractVisToolImpl} from "weave/tool/AbstractVisTool";
 
 export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
@@ -53,6 +54,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 	forceMenuBar?:boolean;
 	initializeTabs?:boolean;
 	enableTour?:boolean;
+	externalTools?:AbstractVisToolImpl[]
 	onClose?:()=>void;
 }
 
@@ -98,7 +100,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		{
 			this.urlParams = MiscUtils.getUrlParams();
 		}
-		this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded, this.openDataManager, this.enableDataManagerItem);
+		this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded, this.openDataManager, this.enableDataManagerItem, this.props.externalTools);
 		this.menus.showFileMenu = this.urlParams.hasOwnProperty('fileMenu');
 	}
 
@@ -279,6 +281,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				rootApp={this}
 				weave={this.props.weave}
 				renderPath={newTabLayoutPath}
+				externalTools={this.props.externalTools}
 				initializeTabs={false}
 				style={{width: "100%", height: "100%"}}
 			/>
