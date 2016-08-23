@@ -73,7 +73,7 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 				);
 			case LAYOUT_CHECKBOXLIST:
 				return (
-					<VBox style={{flex: 1, padding: 10}}>
+					<VBox style={{flex: 1}}>
 						{button}
 						<CheckBoxList options={this.props.options} selectedValues={this.props.selectedItems} onChange={this.props.onChange}/>
 					</VBox>
