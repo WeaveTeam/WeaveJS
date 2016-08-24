@@ -1,4 +1,5 @@
 import * as ol from "openlayers";
+import $ from "modules/jquery";
 
 import IOpenLayersMapTool from "weave/tool/oltool/IOpenLayersMapTool";
 

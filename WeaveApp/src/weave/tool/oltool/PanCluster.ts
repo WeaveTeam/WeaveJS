@@ -1,4 +1,6 @@
 import * as ol from "openlayers";
+import $ from "modules/jquery";
+
 export default class PanCluster extends ol.control.Control
 {
 	constructor(optOptions?:any)
