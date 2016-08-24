@@ -136,7 +136,7 @@ namespace weavejs.ui
 			var currentIndexClicked:number = selectedValues.indexOf(value);
 
 			// ctrl selection
-			if (event.ctrlKey || event.metaKey)
+			if ((event.ctrlKey || event.metaKey) && this.props.multiple)
 			{
 				if (currentIndexClicked > -1)
 				{
