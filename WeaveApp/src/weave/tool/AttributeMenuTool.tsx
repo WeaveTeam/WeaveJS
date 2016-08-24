@@ -36,12 +36,10 @@ import HSlider from "weave/ui/slider/HSlider";
 import VSlider from "weave/ui/slider/VSlider";
 import {SliderOption} from "weave/ui/slider/RCSlider";
 import Checkbox = weavejs.ui.Checkbox;
-const LAYOUT_LIST:string = "List";
-const LAYOUT_COMBO:string = "ComboBox";
-const LAYOUT_VSLIDER:string = "VSlider";
-const LAYOUT_HSLIDER:string = "HSlider";
+import {LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_VSLIDER, LAYOUT_HSLIDER, LAYOUT_CHECKBOXLIST} from "weave/ui/MenuLayoutComponent";
 
-const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];
+const LAYOUT_OPTIONS_SINGLE:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];
+const LAYOUT_OPTIONS_MULTIPLE:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER, LAYOUT_CHECKBOXLIST];
 
 export interface IAttributeMenuToolState extends IVisToolState
 {
@@ -75,7 +73,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 	verifyLayoutMode(value:string):boolean
 	{
-		return menuOptions.indexOf(value) >= 0;
+		return LAYOUT_OPTIONS_MULTIPLE.indexOf(value) >= 0;
 	}
 
 	//callback for targetToolPath
@@ -153,18 +151,17 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		).filter(column=>!!column);		
 	}
 
+	getTargetAttribute():IColumnWrapper|ILinkableHashMap
+	{
+		let tool = this.toolWatcher.target as IVisTool;
+
+		return tool && tool.selectableAttributes && tool.selectableAttributes.get(this.targetAttribute.value);
+	}
+
 	onSelectedAttribute = ():void =>
 	{
 		let selectedColumns:IAttributeColumn[] = this.selectedAttributes;
-
-		let tool = this.toolWatcher.target as IVisTool;
-		if (!tool || !tool.selectableAttributes)
-			return;
-
-		let targetAttribute = tool.selectableAttributes.get(this.targetAttribute.value);
-		let targetAttributeColumn:DynamicColumn;
-
-		let columnsToSet:DynamicColumn[];
+		let targetAttribute = this.getTargetAttribute();
 
 		if (Weave.IS(targetAttribute, IColumnWrapper))
 		{
@@ -222,7 +219,8 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	{
 		return (
 			<MenuLayoutComponent
-				options={ this.options}
+				multiple={ Weave.IS(this.getTargetAttribute(), LinkableHashMap) }
+				options={ this.options }
 				playToggle={ this.playEnabled.value ? this.togglePlay : null }
 				isPlaying={ this.state.isPlaying }
 				displayMode={ this.layoutMode.value }
@@ -368,7 +366,9 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					ref={ WeaveReactUtils.linkReactStateRef(this, { value: this.props.attributeMenuTool.layoutMode })}
-					options={ menuOptions }
+					options={ Weave.IS(this.props.attributeMenuTool.getTargetAttribute(), LinkableHashMap) ? 
+						LAYOUT_OPTIONS_MULTIPLE : LAYOUT_OPTIONS_SINGLE
+					}
 				/>
 			],
 			[

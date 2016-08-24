@@ -19,21 +19,22 @@ export interface IMenuLayoutComponentProps
 {
 	selectedItems:any;//TODO find out right typing
 	options:{label:string,value:any}[];
+	multiple?: boolean;
 	displayMode:string;
 	onChange : (selectedValue:any[]) => void;
 	playToggle?: ()=>void; /* If playToggle is not given, don't display play/pause button */
 	isPlaying?: boolean;
 }
 
-const LAYOUT_LIST:string = "List";
-const LAYOUT_COMBO:string = "ComboBox";
-const LAYOUT_VSLIDER:string = "VSlider";
-const LAYOUT_HSLIDER:string = "HSlider";
-const LAYOUT_CHECKBOXLIST:string = "CheckBoxList";
+export const LAYOUT_LIST:string = "List";
+export const LAYOUT_COMBO:string = "ComboBox";
+export const LAYOUT_VSLIDER:string = "VSlider";
+export const LAYOUT_HSLIDER:string = "HSlider";
+export const LAYOUT_CHECKBOXLIST:string = "CheckBoxList";
 
 export interface IMenuLayoutComponentState
 {
-
+	
 }
 
 export default class MenuLayoutComponent extends React.Component<IMenuLayoutComponentProps, IMenuLayoutComponentState>
@@ -54,7 +55,7 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 				return (
 					<VBox>
 						{button}
-						<List options={ this.props.options } multiple={true} onChange={ this.props.onChange } selectedValues={ this.props.selectedItems }/>
+						<List options={ this.props.options } multiple={this.props.multiple} onChange={ this.props.onChange } selectedValues={ this.props.selectedItems }/>
 					</VBox>
 				);
 			case LAYOUT_HSLIDER:
