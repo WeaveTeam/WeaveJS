@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
+import * as _ from "lodash";
 
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
@@ -63,7 +64,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	public panelTitle = Weave.linkableChild(this, LinkableString);
 	public choices = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), this.forceUpdate, true );
 	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
-	public selectedAttribute = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
+	public selectedAttribute = Weave.linkableChild(this, LinkableVariable, this.forceUpdate, true);
 
 	public targetToolPath = Weave.linkableChild(this, new LinkableVariable(Array));
 	public targetAttribute = Weave.linkableChild(this, LinkableString);
@@ -81,8 +82,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	setToolWatcher =():void =>
 	{
 		this.toolWatcher.targetPath = this.targetToolPath.state as string[];
-		if (this.selectedAttribute.value)
-			this.handleSelection(this.choices.getObject(this.selectedAttribute.value) as IAttributeColumn);
+		this.onSelectedAttribute();
 		this.forceUpdate();
 	};
 
@@ -112,15 +112,18 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		if (!this.state.isPlaying)
 			return;
 
-		var currentSelection = this.selectedAttribute.value;
+		var state = this.selectedAttribute.state;
+		var currentSelections:string[] = Array.isArray(state) ? state : [state];
 		var choiceNames = this.choices.getNames() as string[];
 
-		var nextIndex = choiceNames.indexOf(currentSelection) + 1;
-		if (nextIndex >= choiceNames.length)
-		{
-			nextIndex = 0;
-		}
-		this.selectedAttribute.value = choiceNames[nextIndex];
+		let currentIndex = _.min(currentSelections.map(
+			name=>choiceNames.indexOf(name)
+		));
+
+		/* Even if currentIndex is -1 because there was an invalid selection, this will still be valid. */
+		var nextIndex = (currentIndex + 1) % choiceNames.length;
+
+		this.selectedAttribute.state = [choiceNames[nextIndex]];
 
 		this.playTimeoutHandle = setTimeout(this.playStep, this.playbackIntervalSeconds.value * 1000);
 	}
@@ -141,42 +144,68 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		}
 	}
 
-	onSelectedAttribute = ():void =>
-	{
-		this.handleSelection(this.choices.getObject(this.selectedAttribute.value) as IAttributeColumn);
+	private get selectedAttributes():IAttributeColumn[] {
+		let state = this.selectedAttribute.state;
+		let selectedNames:string[] = Array.isArray(state) ? state : [state];
+		
+		return selectedNames.map(
+			(name)=>(this.choices.getObject(name) as IAttributeColumn)
+		).filter(column=>!!column);		
 	}
 
-	handleSelection = (selectedValue:any):void =>
+	onSelectedAttribute = ():void =>
+	{
+		let selectedColumns:IAttributeColumn[] = this.selectedAttributes;
+
+		let tool = this.toolWatcher.target as IVisTool;
+		if (!tool || !tool.selectableAttributes)
+			return;
+
+		let targetAttribute = tool.selectableAttributes.get(this.targetAttribute.value);
+		let targetAttributeColumn:DynamicColumn;
+
+		let columnsToSet:DynamicColumn[];
+
+		if (Weave.IS(targetAttribute, IColumnWrapper))
+		{
+			let columnToSet = ColumnUtils.hack_findInternalDynamicColumn(targetAttribute as IColumnWrapper);
+			if (selectedColumns.length > 0)
+			{
+				let selectedColumn = selectedColumns[0];
+				columnToSet.requestLocalObjectCopy(selectedColumn);
+			}
+			else
+			{
+				columnToSet.removeObject();
+			}
+		}
+		else if (Weave.IS(targetAttribute, LinkableHashMap))
+		{
+			let hm = targetAttribute as LinkableHashMap;
+			hm.delayCallbacks();
+			hm.removeAllObjects();
+			for (let selectedColumn of selectedColumns)
+			{
+				let newColumn = hm.requestObject(null, DynamicColumn, false);
+				newColumn.requestLocalObjectCopy(selectedColumn);
+			}
+			hm.resumeCallbacks();
+		}
+		this.forceUpdate();
+	}
+
+	handleSelection = (selectedValue:IColumnWrapper[]|IColumnWrapper):void =>
 	{
 		if (!selectedValue)
 			return;
 
-		var tool = this.toolWatcher.target as IVisTool;
-		if (!tool || !tool.selectableAttributes)
-			return;
-		var targetAttribute = tool.selectableAttributes.get(this.targetAttribute.value);
+		let selectedColumns:IColumnWrapper[] = Array.isArray(selectedValue) ? selectedValue : [selectedValue];
 
-		var targetAttributeColumn:DynamicColumn;//attribute which will be set
-		var selectedColumn:IColumnWrapper = Array.isArray(selectedValue) ? selectedValue[0] as IColumnWrapper : selectedValue as IColumnWrapper;
+		let selectedNames = selectedColumns.map(
+			column => this.choices.getName(column)
+		);
 
-		if (Weave.IS(targetAttribute, IColumnWrapper))
-		{
-			targetAttributeColumn = ColumnUtils.hack_findInternalDynamicColumn(targetAttribute as IColumnWrapper);
-		}
-		else if (Weave.IS(targetAttribute, ILinkableHashMap))
-		{
-			var hm = targetAttribute as ILinkableHashMap;
-			ColumnUtils.forceFirstColumnDynamic(hm);
-			targetAttributeColumn = hm.getObjects(DynamicColumn)[0];
-		}
-
-		this.selectedAttribute.value = this.choices.getName(selectedColumn);//for the list UI to rerender
-
-		if (targetAttributeColumn)
-		{
-			if (selectedColumn)
-				targetAttributeColumn.requestLocalObjectCopy(selectedColumn);
-		}
+		this.selectedAttribute.state = selectedNames;
 	};
 
 	renderEditor =(pushCrumb :(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void = null):JSX.Element=>
@@ -191,7 +220,6 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 	render():JSX.Element
 	{
-		let selectedAttribute = this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn;
 		return (
 			<MenuLayoutComponent
 				options={ this.options}
@@ -199,7 +227,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 				isPlaying={ this.state.isPlaying }
 				displayMode={ this.layoutMode.value }
 				onChange={ this.handleSelection }
-				selectedItems={ [selectedAttribute] }
+				selectedItems={ this.selectedAttributes }
 			/>
 		);
 	}
