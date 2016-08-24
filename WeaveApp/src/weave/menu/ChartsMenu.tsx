@@ -15,6 +15,7 @@ import C3Gauge from "weave/tool/c3tool/C3Gauge";
 import C3ColorHistogram from "weave/tool/c3tool/C3ColorHistogram";
 import C3Histogram from "weave/tool/c3tool/C3Histogram";
 import C3LineChart from "weave/tool/c3tool/C3LineChart";
+import C3XYLineChart from "weave/tool/c3tool/C3XYLineChart";
 import DataMessageTool from "weave/tool/DataMessageTool";
 import C3PieChart from "weave/tool/c3tool/C3PieChart";
 import C3ScatterPlot from "weave/tool/c3tool/C3ScatterPlot";
@@ -52,6 +53,7 @@ export default class ChartsMenu implements MenuBarItemProps
 			C3ColorHistogram,
 			C3Histogram,
 			C3LineChart,
+			C3XYLineChart,
 			DataMessageTool,
 			OpenLayersMapTool,
 			C3PieChart,
@@ -79,6 +81,6 @@ export default class ChartsMenu implements MenuBarItemProps
 
 	static isBeta(impl:Class):boolean
 	{
-		return impl == C3Gauge || impl == DataMessageTool;
+		return impl == C3Gauge || impl == DataMessageTool || impl == C3XYLineChart;
 	}
 }
