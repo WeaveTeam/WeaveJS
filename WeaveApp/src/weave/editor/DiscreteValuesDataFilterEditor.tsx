@@ -20,12 +20,7 @@ import AbstractFilterEditor from "weave/editor/AbstractFilterEditor";
 import {FilterEditorProps} from "weave/editor/AbstractFilterEditor";
 import {FilterOption} from "weave/editor/AbstractFilterEditor";
 import MenuLayoutComponent from "weave/ui/MenuLayoutComponent";
-
-export const LAYOUT_LIST:string = "List";
-export const LAYOUT_COMBO:string = "ComboBox";
-export const LAYOUT_VSLIDER:string = "VSlider";
-export const LAYOUT_HSLIDER:string = "HSlider";
-export const LAYOUT_CHECKBOXLIST:string = "CheckBoxList";
+import {LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_VSLIDER, LAYOUT_HSLIDER, LAYOUT_CHECKBOXLIST} from "weave/ui/MenuLayoutComponent";
 
 export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 {
@@ -80,6 +75,7 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 		let values:any = this.filter ? this.filter.values.state : [];
 
 		return(<MenuLayoutComponent options={ this.options }
+									multiple={ true }
 									displayMode={ this.layoutMode.value }
 									onChange={ this.onChange.bind(this) }
 									selectedItems={ values }
