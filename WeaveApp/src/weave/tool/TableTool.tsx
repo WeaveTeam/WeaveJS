@@ -299,7 +299,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		else
 		{
 			let column = this.columns.getObject(columnKey) as IAttributeColumn;
-			return column && column.getMetadata(ColumnMetadata.TITLE);
+			return column && Weave.lang(column.getMetadata(ColumnMetadata.TITLE));
 		}
 	}
 

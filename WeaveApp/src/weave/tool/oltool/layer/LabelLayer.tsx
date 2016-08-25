@@ -173,7 +173,7 @@ export default class LabelLayer extends AbstractGlyphLayer
 			}
 
 
-			let text = record.text;
+			let text = Weave.lang(record.text);
 			let color = record.color;
 			let font = record.font;
 			let feature = record.feature;
