@@ -335,6 +335,13 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 /**** container - FlexBox *****/
+.weave-auto-overflow {
+	overflow: auto;
+}
+
+.weave-box-padding {
+
+}
 .weave-padded-vbox > * {
 	flex-shrink: 0;
 	margin-top: 8px;
@@ -1323,4 +1330,9 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 
 .ReactCodeMirror > .CodeMirror {
 	flex: 1
+}
+
+.weave-checkbox-list-item {
+	padding:5px;
+	padding-left: 10px;
 }

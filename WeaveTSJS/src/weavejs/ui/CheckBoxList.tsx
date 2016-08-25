@@ -123,7 +123,7 @@ namespace weavejs.ui
 								/>
 							);
 							return (
-								<HBox key={index} style={{height: 30, paddingLeft: 10}} className="weave-checkbox-list-item">
+								<HBox key={index} className="weave-checkbox-list-item">
 									{ labelPosition == "right" ? checkbox : [label, checkbox] }
 								</HBox>
 							);
