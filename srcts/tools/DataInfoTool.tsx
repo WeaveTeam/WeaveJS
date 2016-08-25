@@ -366,15 +366,17 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 				});
 			}
 
-			columnInfoUI = <VBox>{infoUIs}</VBox>
+			columnInfoUI = <VBox style={{justifyContent: "space-around"}}>{infoUIs}</VBox>
 		}
 
 		let verticalLayoutUIStyle = {
+			flex: 1,
 			justifyContent: "space-around",
 			borderBottom: "1px solid lightgrey",
 		};
 
 		let horizontalLayoutUIStyle = {
+			flex: 1,
 			borderLeft: "8px solid #e0e0e0",
 			borderRight: "8px solid #e0e0e0",
 			borderTop: "16px solid #e0e0e0",
