@@ -138,10 +138,15 @@ export default class C3XYLineChart extends AbstractC3Tool
 							max: null
 						},
 						format: (num:number):string => {
-							var index = Math.round(num);
-							var key = this.indexToKey[index];
-							if(this.xColumn.getInternalColumn() && this.dataXType != "number" && key)
+							//var index = Math.round(num);
+							var key = this.indexToKey[num];
+							if(this.xColumn.getInternalColumn() && this.dataXType != "number")
+							{
+								if(key)
 									return Weave.lang(this.xColumn.getValueFromKey(key));
+								else
+									return "";
+							}
 							return String(FormatUtils.defaultNumberFormatting(num));
 						},
 						rotate: this.xAxisLabelAngle.value,
