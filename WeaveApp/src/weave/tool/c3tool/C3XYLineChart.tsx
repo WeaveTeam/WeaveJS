@@ -53,7 +53,7 @@ export default class C3XYLineChart extends AbstractC3Tool
 	curveType = Weave.linkableChild(this, LinkableString);
 	ramp = Weave.linkableChild(this, ColorRamp);
 	xAxisLabelAngle = Weave.linkableChild(this, new LinkableNumber(-45));
-
+	dataXType:string;
 	data:any[] = [];
 
 	private indexToKey:{[index:number]: IQualifiedKey};
@@ -137,8 +137,16 @@ export default class C3XYLineChart extends AbstractC3Tool
 						culling: {
 							max: null
 						},
+						format: (num:number):string => {
+							var index = Math.round(num);
+							var key = this.indexToKey[index];
+							if(this.xColumn.getInternalColumn() && this.dataXType != "number" && key)
+									return Weave.lang(this.xColumn.getValueFromKey(key));
+							return String(FormatUtils.defaultNumberFormatting(num));
+						},
+						rotate: this.xAxisLabelAngle.value,
+						fit: false,
 						multiline: false,
-						rotate: this.xAxisLabelAngle.value
 					}
 				}
 			},
@@ -191,6 +199,7 @@ export default class C3XYLineChart extends AbstractC3Tool
 			this.columnLabels = [];
 			this.indexToKey = {};
 			var colors:{[title:string]: string} = {};
+			this.dataXType = this.xColumn.getMetadata('dataType');
 
 			var columns = this.yColumns.getObjects(IAttributeColumn) as IAttributeColumn[];
 
@@ -206,7 +215,7 @@ export default class C3XYLineChart extends AbstractC3Tool
 			this.filteredKeySet.setColumnKeySources(columns);
 
 
-			this.data = ColumnUtils.joinColumns(columns,Number,false,this.filteredKeySet.keyFilter);
+			this.data = ColumnUtils.joinColumns(columns,Number,false,this.filteredKeySet.keys);
 			var keysArray:IQualifiedKey[] = this.data.shift();
 			keysArray.forEach( (key:IQualifiedKey,index:number) => {
 				this.indexToKey[index] = key;
