@@ -1333,5 +1333,7 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 }
 
 .weave-checkbox-list-item {
+	padding:5px;
 	padding-left: 10px;
+	padding-right: 10px;
 }

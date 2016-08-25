@@ -115,18 +115,32 @@ namespace weavejs.ui
 					{
 						this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
 							var label = this.labels[index];
-							var checkbox = (
-								<Checkbox
-									value={checkBoxState}
-									onChange={(value:boolean) => this.handleChange(value, index)}
-									label={labelPosition == "right" ? label : " "}
-								/>
-							);
-							return (
-								<HBox key={index} className="weave-checkbox-list-item">
-									{ labelPosition == "right" ? checkbox : [label, checkbox] }
-								</HBox>
-							);
+							if(labelPosition == "right")
+							{
+								return (
+									<HBox key={index} className="weave-checkbox-list-item">
+										<Checkbox
+											value={checkBoxState}
+											onChange={(value:boolean) => this.handleChange(value, index)}
+											label={" "}
+										/>
+										{label}
+									</HBox>
+								)
+							}
+							else
+							{
+								return (
+									<HBox key={index} className="weave-checkbox-list-item">
+										{label}
+										<Checkbox
+											value={checkBoxState}
+											onChange={(value:boolean) => this.handleChange(value, index)}
+											label={" "}
+										/>
+									</HBox>
+								)
+							}
 						})
 					}
 				</div>
