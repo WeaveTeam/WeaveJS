@@ -46,6 +46,12 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 
 	render():JSX.Element
 	{
+		var options = this.props.options.map((option) => {
+			return {
+				label: _.isString(option.label) ? Weave.lang(option.label) : option.label,
+				value: option.value
+			};
+		});
 		let button = this.props.playToggle ?
 			<CenteredIcon onClick={this.props.playToggle} iconProps={{className: this.props.isPlaying ? "fa fa-pause fa-fw" : "fa fa-play fa-fw"}}/>
 			: null;
@@ -55,28 +61,28 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 				return (
 					<VBox>
 						{button}
-						<List options={ this.props.options } multiple={this.props.multiple} onChange={ this.props.onChange } selectedValues={ this.props.selectedItems }/>
+						<List options={ options } multiple={this.props.multiple} onChange={ this.props.onChange } selectedValues={ this.props.selectedItems }/>
 					</VBox>
 				);
 			case LAYOUT_HSLIDER:
 				return (
 					<HBox style={{ flex: 1, paddingLeft: 25, paddingRight: 25, overflow: "hidden" }}>
 						{button}
-						<HSlider options={ this.props.options } onChange={ this.props.onChange} selectedValues={ this.props.selectedItems } type="categorical"/>
+						<HSlider options={ options } onChange={ this.props.onChange} selectedValues={ this.props.selectedItems } type="categorical"/>
 					</HBox>
 				);
 			case LAYOUT_VSLIDER:
 				return (
 					<VBox style={{ flex: 1, paddingTop: 25, paddingBottom: 25, overflow: "hidden" }}>
 						{button}
-						<VSlider options={ this.props.options } onChange={ this.props.onChange } selectedValues={ this.props.selectedItems } type="categorical"/>
+						<VSlider options={ options } onChange={ this.props.onChange } selectedValues={ this.props.selectedItems } type="categorical"/>
 					</VBox>
 				);
 			case LAYOUT_CHECKBOXLIST:
 				return (
 					<VBox style={{flex: 1}}>
 						{button}
-						<CheckBoxList options={this.props.options} selectedValues={this.props.selectedItems} onChange={this.props.onChange}/>
+						<CheckBoxList options={options} selectedValues={this.props.selectedItems} onChange={this.props.onChange}/>
 					</VBox>
 				);
 			case LAYOUT_COMBO:
@@ -85,7 +91,7 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 						<FloatingDiv useContentHeight style={{flex: 1}}>
 							<ComboBox
 								placeholder={(Weave.lang("Select a column"))}
-								options={ this.props.options as ComboBoxOption[] }
+								options={ options as ComboBoxOption[] }
 								onChange={ this.props.onChange }
 								value={ _.head(this.props.selectedItems as any[]) }
 							/>
