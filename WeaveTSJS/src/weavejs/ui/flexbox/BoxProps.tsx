@@ -14,7 +14,6 @@ namespace weavejs.ui.flexbox
 			var style:React.CSSProperties = _.merge(
 				{
 					display: "flex",
-					overflow: props.overflow ? "visible" : "auto"
 				},
 				props.style,
 				{
@@ -23,6 +22,7 @@ namespace weavejs.ui.flexbox
 			);
 			var className:string = classNames(
 				props.padded ? options.paddedClassName : options.unpaddedClassName,
+				{"weave-auto-overflow": props.overflow},
 				props.className
 			);
 			return <div {...attributes} style={style} className={className}/>;
