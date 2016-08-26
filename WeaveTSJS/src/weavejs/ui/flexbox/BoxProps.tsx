@@ -22,7 +22,7 @@ namespace weavejs.ui.flexbox
 			);
 			var className:string = classNames(
 				props.padded ? options.paddedClassName : options.unpaddedClassName,
-				{"weave-auto-overflow": props.overflow},
+				{"weave-auto-overflow": !props.overflow},
 				props.className
 			);
 			return <div {...attributes} style={style} className={className}/>;
