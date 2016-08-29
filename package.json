@@ -13,7 +13,7 @@
     "compile-librefs": "node run-ts main-import-tool -d WeaveTSJS/typings/ -f WeaveTSJS/src/_lib-references.ts",
     "compile-libs": "npm run compile-librefs && tsc -p ./WeaveTSJS/tsconfig-libs.json && babel WeaveTSJS/bin/es6/libs.js --out-file WeaveTSJS/bin/js/libs.js -s",
     "compile-ts": "npm run compile-refs && tsc -p ./WeaveTSJS/tsconfig.json && mkdirp ./WeaveTSJS/bin/js && babel ./WeaveTSJS/bin/es6/weavejs.js --out-file ./WeaveTSJS/bin/js/weavejs.js -s && cp ./WeaveTSJS/bin/es6/weavejs.d.ts ./weave-typings/",
-    "compile-astypings": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/ && mv WeaveASJS/typings/*.d.ts ./WeaveTSJS/typings/weave",
+    "compile-astypings": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/ && cp WeaveASJS/typings/weavejs-core.d.ts ./weave-typings && mv WeaveASJS/typings/*.d.ts ./WeaveTSJS/typings/weave",
     "compile-as": "node WeaveASJS/build.js",
     "prepublish": "cd lib || npm run compile"
   },
@@ -47,6 +47,7 @@
     "jszip": "^3.0.0",
     "lodash": "^3.10.1",
     "moment": "^2.11.2",
+    "pixi.js": "^4.0.0",
     "react": "0.14.7",
     "react-addons-update": "0.14.7",
     "react-dom": "0.14.7",
