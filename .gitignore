@@ -45,3 +45,7 @@ scripts/outts
 
 lib/
 bin/
+
+# auto generated typings
+weave-typings/weavejs.d.ts
+weave-typings/weavejs-core.d.ts
