@@ -2,4 +2,6 @@ bin
 bin-debug
 bin-release
 definitions
+weave-typings/weavejs.d.ts
+weave-typings/weavejs-core.d.ts
 .settings
