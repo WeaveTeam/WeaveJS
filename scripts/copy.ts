@@ -6,6 +6,7 @@ module.exports = function()
 		index_html: {flatten: true, cwd: 'WeaveApp/resources/', src: 'index.html', dest: 'WeaveApp/dist/'},
 		weave_html: {flatten: true, cwd: 'WeaveApp/resources/', src: 'weave.html', dest: 'WeaveApp/dist/'},
 		css: {flatten: true, cwd: 'WeaveApp/resources/', src: 'css/*.css', dest: 'WeaveApp/dist/css/'},
+		weaveuicss: {flatten: true, cwd: 'WeaveTSJS/css/', src: 'weave-ui.css', dest: 'WeaveApp/dist/css/'},
 		img: {flatten: true, cwd: 'WeaveApp/resources/', src: 'img/*.*', dest: 'WeaveApp/dist/img'},
 		fonts: {flatten: true, cwd: 'WeaveApp/resources/', src: 'css/fonts/*.ttf', dest: 'WeaveApp/dist/fonts'},
 		olcss: {flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'WeaveApp/dist/css/'},

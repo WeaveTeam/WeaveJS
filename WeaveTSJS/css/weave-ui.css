@@ -754,60 +754,6 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	justify-content: flex-end;
 }
 
-/****** ButtonGroupBar ******/
-
-.weave-buttonGroupBar {
-	border-radius:12px;
-	border:1px solid grey;
-}
-.weave-buttonGroupBar .ui.button { /* inline style will override hover state */
-	background-color:white;
-}
-
-/****** Tool Editor ******/
-
-.weave-ToolEditor {
-	font-size: small;
-}
-
-.weave-ToolEditor .ui.button {
-	font-size: small;
-}
-
-.weave-ToolEditor table {
-	width: 100%;
-	font-size: inherit;
-}
-
-.weave-ToolEditor .weave-left-cell {
-	white-space: nowrap;
-	text-align: right;
-}
-
-.weave-ToolEditor .weave-right-cell {
-	width: 100%;
-	padding-top: 4px;
-	padding-bottom: 4px;
-	padding-left: 8px;
-}
-
-.weave-ToolEditor-Header {
-	align-items: center;
-	border-bottom: 1px solid lightgrey;
-	margin: 0 8px;/* this ensures border bottom will be disconnected seperator */
-}
-
-.weave-ToolEditor-Header .ui.button { /* inline style will override hover state */
-	border-color: transparent;
-	padding: 8px;
-	background-color: transparent;
-}
-
-.weave-ToolEditor-Header .ui.button:hover { /* inline style will override hover state */
-	color: black;
-	background-color: rgba(0, 0, 0, 0.12);
-}
-
 /* Weave Progress Bar */
 .weave-progress-bar-background {
 	background-color: transparent;
@@ -1237,6 +1183,60 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	top: 1.0535rem;
 	right: 1rem;
 	color: rgba(0,0,0,.87);
+}
+
+/****** ButtonGroupBar ******/
+
+.weave-buttonGroupBar {
+	border-radius:12px;
+	border:1px solid grey;
+}
+.weave-buttonGroupBar .ui.button { /* inline style will override hover state */
+	background-color:white;
+}
+
+/****** Tool Editor ******/
+
+.weave-ToolEditor {
+	font-size: small;
+}
+
+.weave-ToolEditor .ui.button {
+	font-size: small;
+}
+
+.weave-ToolEditor table {
+	width: 100%;
+	font-size: inherit;
+}
+
+.weave-ToolEditor .weave-left-cell {
+	white-space: nowrap;
+	text-align: right;
+}
+
+.weave-ToolEditor .weave-right-cell {
+	width: 100%;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	padding-left: 8px;
+}
+
+.weave-ToolEditor-Header {
+	align-items: center;
+	border-bottom: 1px solid lightgrey;
+	margin: 0 8px;/* this ensures border bottom will be disconnected seperator */
+}
+
+.weave-ToolEditor-Header .ui.button { /* inline style will override hover state */
+	border-color: transparent;
+	padding: 8px;
+	background-color: transparent;
+}
+
+.weave-ToolEditor-Header .ui.button:hover { /* inline style will override hover state */
+	color: black;
+	background-color: rgba(0, 0, 0, 0.12);
 }
 
 .weave-dropzone-file {

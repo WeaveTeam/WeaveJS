@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
+import {Weave} from "weavejs";
 import * as _ from "lodash";
 import ReactUtils = weavejs.util.ReactUtils;
 import WeaveReactUtils = weavejs.util.WeaveReactUtils;
@@ -127,7 +128,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 					</Button>
 				</HBox>;
 		return (
-			<VBox overflow padded>
+			<VBox overflow padded style={{flex: 1}}>
 				{mainSelector}
 				{(!isColorColumn && defaultSelector) ? <HBox padded><div style={{alignSelf: "center"}}>{Weave.lang("Default value")}</div>{defaultSelector}</HBox> : null}
 			</VBox>
