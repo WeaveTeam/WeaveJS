@@ -35,7 +35,7 @@ namespace weavejs.data
 	import JS = weavejs.util.JS;
 	import WeavePromise = weavejs.util.WeavePromise;
 
-	export declare type Cache = any;
+	export declare type CachedColumnData = [string, string, {[property:string]:string}, string[], any[]][];
 	export class AttributeColumnCache implements IAttributeColumnCache
 	{
 		public getColumn(dataSource:IDataSource, metadata:{[key:string]:string}):IAttributeColumn
@@ -70,13 +70,13 @@ namespace weavejs.data
 		private d2d_dataSource_metadataHash_column = new Dictionary2D<IDataSource, string, IAttributeColumn>();
 
 		// TEMPORARY SOLUTION for WeaveArchive to access this cache data
-		public /* readonly */ map_root_saveCache:WeakMap<ILinkableHashMap, Cache> = new WeakMap();
+		public /* readonly */ map_root_saveCache:WeakMap<ILinkableHashMap, CachedColumnData> = new WeakMap();
 
 		/**
 		 * Creates a cache dump and modifies the session state so data sources are non-functional.
 		 * @return A WeavePromise that returns a cache dump that can later be passed to restoreCache();
 		 */
-		public convertToCachedDataSources(root:ILinkableHashMap)
+		public convertToCachedDataSources(root:ILinkableHashMap):WeavePromise<CachedColumnData>
 		{
 			var promise = new WeavePromise(root).setResult(root);
 			var dispose = () => promise.dispose();
@@ -100,10 +100,10 @@ namespace weavejs.data
 			return promiseThen;
 		}
 
-		private _convertToCachedDataSources(root:ILinkableHashMap):IDataSource[]
+		private _convertToCachedDataSources(root:ILinkableHashMap):CachedColumnData
 		{
 			//cache data from AttributeColumnCache
-			var output:Cache = [];
+			var output:CachedColumnData = [];
 			var dataSource:IDataSource;
 			var dataSources:IDataSource[] = this.d2d_dataSource_metadataHash_column.primaryKeys();
 			for (var dataSource of dataSources)
@@ -124,7 +124,7 @@ namespace weavejs.data
 					var column:IAttributeColumn = this.d2d_dataSource_metadataHash_column.get(dataSource, metadataHash);
 					if (!column || Weave.wasDisposed(column))
 						continue;
-					var metadata:Object = ColumnMetadata.getAllMetadata(column);
+					var metadata:{[property:string]:string} = ColumnMetadata.getAllMetadata(column);
 					var dataType:string = column.getMetadata(ColumnMetadata.DATA_TYPE);
 					var keys:string[] = [];
 					var data:any[] = [];
@@ -183,11 +183,11 @@ namespace weavejs.data
 		 * Restores the cache from a dump created by convertToLocalDataSources().
 		 * @param cacheData The cache dump.
 		 */
-		public restoreCache(root:ILinkableHashMap, cacheData:Cache):void
+		public restoreCache(root:ILinkableHashMap, cacheData:CachedColumnData):void
 		{
 			this.map_root_saveCache.set(root, cacheData);
-			for (var args of cacheData as any)
-				this.addToColumnCache.apply(this, [root].concat(args));
+			for (var [dataSourceName, metadataHash, metadata, keyStrings, data] of cacheData)
+				this.addToColumnCache(root, dataSourceName, metadataHash, metadata, keyStrings, data);
 		}
 
 		private addToColumnCache(root:ILinkableHashMap, dataSourceName:string, metadataHash:string, metadata:{[key:string]:string}, keyStrings:string[], data:any[]):void

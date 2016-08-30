@@ -7,6 +7,7 @@ namespace weavejs.core
 	import BackwardsCompatibility = weavejs.util.BackwardsCompatibility;
 	import JSByteArray = weavejs.util.JSByteArray;
 	import WeavePromise = weavejs.util.WeavePromise;
+	import CachedColumnData = weavejs.data.CachedColumnData;
 
 	export type UpdateCallback = (meta: { percent: number, currentFile: string }) => void;
 
@@ -139,7 +140,7 @@ namespace weavejs.core
 			else
 				throw new Error("No session history found.");
 
-			let columnCache: Object = this.objects.get(WeaveArchive.ARCHIVE_COLUMN_CACHE_AMF) || this.objects.get(WeaveArchive.ARCHIVE_COLUMN_CACHE_JSON);
+			let columnCache:CachedColumnData = (this.objects.get(WeaveArchive.ARCHIVE_COLUMN_CACHE_AMF) || this.objects.get(WeaveArchive.ARCHIVE_COLUMN_CACHE_JSON)) as CachedColumnData;
 			(WeaveAPI.AttributeColumnCache as AttributeColumnCache).restoreCache(weave.root, columnCache);
 
 			for (let [name, content] of this.files)
