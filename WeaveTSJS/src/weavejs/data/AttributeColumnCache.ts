@@ -184,10 +184,8 @@ namespace weavejs.data
 		 */
 		public restoreCache(root:ILinkableHashMap, cacheData:CachedColumnData):void
 		{
-			if(!cacheData)
-				return;
 			this.map_root_saveCache.set(root, cacheData);
-			for (var [dataSourceName, metadataHash, metadata, keyStrings, data] of cacheData)
+			for (var [dataSourceName, metadataHash, metadata, keyStrings, data] of cacheData || [])
 				this.addToColumnCache(root, dataSourceName, metadataHash, metadata, keyStrings, data);
 		}
 
