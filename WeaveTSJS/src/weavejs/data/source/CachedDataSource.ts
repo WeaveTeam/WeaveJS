@@ -42,5 +42,5 @@ namespace weavejs.data.source
 			root.setNameOrder(names);
 		}
 	}
-	Weave.registerClass(CachedDataSource, "weavejs.data.source.CachedDataSource", null, "Cached Data Source");
+	Weave.registerClass(CachedDataSource, "weavejs.data.source.CachedDataSource", [IDataSource], "Cached Data Source");
 }
