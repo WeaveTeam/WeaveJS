@@ -56,7 +56,7 @@ $(function ()
 		if(!weave_instance)
 		{
 			weave_instance = new Weave();
-			map_session_url_instance.set(sessionUrl);
+			map_session_url_instance.set(sessionUrl, weave_instance);
 		}
 		embed(weave_element, weave_instance, sessionUrl, path, appMode);
 	});

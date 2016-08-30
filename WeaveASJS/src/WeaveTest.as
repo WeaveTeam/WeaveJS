@@ -11,10 +11,12 @@ package
 	import weavejs.api.data.IPrimitiveColumn;
 	import weavejs.api.data.IQualifiedKey;
 	import weavejs.api.data.IWeaveTreeNodeWithPathFinding;
+	import weavejs.api.data.IDataSource;
 	import weavejs.core.EventCallbackCollection;
 	import weavejs.core.LinkableBoolean;
 	import weavejs.core.LinkableCallbackScript;
 	import weavejs.core.LinkableDynamicObject;
+	import weavejs.core.LinkableFile;
 	import weavejs.core.LinkableFunction;
 	import weavejs.core.LinkableHashMap;
 	import weavejs.core.LinkableNumber;
@@ -71,7 +73,7 @@ import weavejs.data.column.StringColumn;
 	import weavejs.data.key.KeySetCallbackInterface;
 	import weavejs.data.key.KeySetUnion;
 	import weavejs.data.key.SortedKeySet;
-	import weavejs.data.source.GeoJSONDataSource;
+	import weavejs.data.source.AbstractDataSource;
 	import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.geom.Range;
@@ -154,7 +156,6 @@ import weavejs.path.ExternalTool;
 			SortedIndexColumn,
 			StringColumn,
 			StringLookup,
-			GeoJSONDataSource,
 			KeyColumn,
 			ExternalTool,
 			WeaveMenuItem,
@@ -187,6 +188,9 @@ import weavejs.path.ExternalTool;
 			AMF3Servlet,
 			AsyncInvocationQueue,
 			StreamedGeometryColumn,
+			LinkableFile,
+			AbstractDataSource,
+			LinkableFile,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];
