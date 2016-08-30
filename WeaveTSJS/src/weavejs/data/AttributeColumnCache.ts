@@ -10,50 +10,51 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/.
- * 
+ *
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data
+namespace weavejs.data
 {
-	import weavejs.WeaveAPI;
-	import weavejs.api.core.ILinkableHashMap;
-	import weavejs.api.data.ColumnMetadata;
-	import weavejs.api.data.DataType;
-	import weavejs.api.data.IAttributeColumn;
-	import weavejs.api.data.IAttributeColumnCache;
-	import weavejs.api.data.IBaseColumn;
-	import weavejs.api.data.IDataSource;
-	import weavejs.api.data.IQualifiedKey;
-	import weavejs.data.column.DateColumn;
-	import weavejs.data.column.GeometryColumn;
-	import weavejs.data.column.NumberColumn;
-	import weavejs.data.column.StringColumn;
-	import weavejs.data.key.QKeyManager;
-	import weavejs.data.source.CachedDataSource;
-	import weavejs.geom.GeneralizedGeometry;
-	import weavejs.util.Dictionary2D;
-	import weavejs.util.JS;
-	import weavejs.util.WeavePromise;
-	
-	public class AttributeColumnCache implements IAttributeColumnCache
+	import WeaveAPI = weavejs.WeaveAPI;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import DataType = weavejs.api.data.DataType;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IAttributeColumnCache = weavejs.api.data.IAttributeColumnCache;
+	import IBaseColumn = weavejs.api.data.IBaseColumn;
+	import IDataSource = weavejs.api.data.IDataSource;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import DateColumn = weavejs.data.column.DateColumn;
+	import GeometryColumn = weavejs.data.column.GeometryColumn;
+	import NumberColumn = weavejs.data.column.NumberColumn;
+	import StringColumn = weavejs.data.column.StringColumn;
+	import QKeyManager = weavejs.data.key.QKeyManager;
+	import CachedDataSource = weavejs.data.source.CachedDataSource;
+	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
+	import Dictionary2D = weavejs.util.Dictionary2D;
+	import JS = weavejs.util.JS;
+	import WeavePromise = weavejs.util.WeavePromise;
+
+	export declare type Cache = any;
+	export class AttributeColumnCache implements IAttributeColumnCache
 	{
-		public function getColumn(dataSource:IDataSource, metadata:Object):IAttributeColumn
+		public getColumn(dataSource:IDataSource, metadata:{[key:string]:string}):IAttributeColumn
 		{
 			// null means no column
 			if (dataSource == null || metadata == null)
 				return null;
 
 			// Get the column pointer associated with the hash value.
-			var hashCode:String = Weave.stringify(metadata);
-			var column:IAttributeColumn = d2d_dataSource_metadataHash_column.get(dataSource, hashCode);
+			var hashCode = Weave.stringify(metadata);
+			var column = this.d2d_dataSource_metadataHash_column.get(dataSource, hashCode);
 			if (!column)
 			{
 				// if this is the first time we've seen this data source, add dispose callback
-				if (!d2d_dataSource_metadataHash_column.map.has(dataSource))
+				if (!this.d2d_dataSource_metadataHash_column.map.has(dataSource))
 					Weave.getCallbacks(dataSource).addDisposeCallback(this, function():void {
 						this.d2d_dataSource_metadataHash_column.map['delete'](dataSource);
 					});
-				
+
 				// If no column is associated with this hash value, request the
 				// column from its data source and save the column pointer.
 				column = dataSource.generateNewAttributeColumn(metadata);
@@ -61,30 +62,30 @@ package weavejs.data
 					column.addDisposeCallback(this, function():void {
 						this.d2d_dataSource_metadataHash_column.remove(dataSource, hashCode);
 					});
-				d2d_dataSource_metadataHash_column.set(dataSource, hashCode, column);
+				this.d2d_dataSource_metadataHash_column.set(dataSource, hashCode, column);
 			}
 			return column;
 		}
-		
-		private var d2d_dataSource_metadataHash_column:Dictionary2D = new Dictionary2D();
-		
+
+		private d2d_dataSource_metadataHash_column = new Dictionary2D<IDataSource, string, IAttributeColumn>();
+
 		// TEMPORARY SOLUTION for WeaveArchive to access this cache data
-		public const map_root_saveCache:Object = new JS.WeakMap();
-		
+		public /* readonly */ map_root_saveCache:WeakMap<ILinkableHashMap, Cache> = new WeakMap();
+
 		/**
 		 * Creates a cache dump and modifies the session state so data sources are non-functional.
 		 * @return A WeavePromise that returns a cache dump that can later be passed to restoreCache();
 		 */
-		public function convertToCachedDataSources(root:ILinkableHashMap):WeavePromise/*/<any>/*/
+		public convertToCachedDataSources(root:ILinkableHashMap)
 		{
-			var promise:WeavePromise = new WeavePromise(root).setResult(root);
-			var dispose:Function = function(_:*):void { promise.dispose(); };
-			var promiseThen:WeavePromise = promise
+			var promise = new WeavePromise(root).setResult(root);
+			var dispose = () => promise.dispose();
+			var promiseThen = promise
 				.then(function(root:ILinkableHashMap):ILinkableHashMap {
 					// request data from every column
 					var column:IAttributeColumn;
-					var columns:Array = Weave.getDescendants(root, IAttributeColumn);
-					for each (column in columns)
+					var columns = Weave.getDescendants(root, IAttributeColumn);
+					for (column of columns)
 					{
 						// simply requesting the keys will cause the data to be requested
 						if (column.keys.length)
@@ -94,46 +95,46 @@ package weavejs.data
 					}
 					return root;
 				})
-				.then(_convertToCachedDataSources);
+				.then(this._convertToCachedDataSources);
 			promiseThen.then(dispose, dispose);
 			return promiseThen;
 		}
-		
-		private function _convertToCachedDataSources(root:ILinkableHashMap):Array
+
+		private _convertToCachedDataSources(root:ILinkableHashMap):IDataSource[]
 		{
 			//cache data from AttributeColumnCache
-			var output:Array = [];
+			var output:Cache = [];
 			var dataSource:IDataSource;
-			var dataSources:Array = d2d_dataSource_metadataHash_column.primaryKeys();
-			for each (dataSource in dataSources)
+			var dataSources:IDataSource[] = this.d2d_dataSource_metadataHash_column.primaryKeys();
+			for (var dataSource of dataSources)
 			{
 				// skip local data sources
 				if (dataSource.isLocal)
 					continue;
-				
-				var dataSourceName:String = root.getName(dataSource);
-				
+
+				var dataSourceName:string = root.getName(dataSource);
+
 				// skip disposed data sources and global columns (EquationColumn, CSVColumn)
 				if (!dataSourceName)
 					continue;
-				
-				var metadataHashes:Array = d2d_dataSource_metadataHash_column.secondaryKeys(dataSource);
-				for each (var metadataHash:String in metadataHashes)
+
+				var metadataHashes:string[] = this.d2d_dataSource_metadataHash_column.secondaryKeys(dataSource);
+				for (var metadataHash of metadataHashes)
 				{
-					var column:IAttributeColumn = d2d_dataSource_metadataHash_column.get(dataSource, metadataHash);
+					var column:IAttributeColumn = this.d2d_dataSource_metadataHash_column.get(dataSource, metadataHash);
 					if (!column || Weave.wasDisposed(column))
 						continue;
 					var metadata:Object = ColumnMetadata.getAllMetadata(column);
-					var dataType:String = column.getMetadata(ColumnMetadata.DATA_TYPE);
-					var keys:Array = [];
-					var data:Array = [];
-					for each (var key:IQualifiedKey in column.keys)
+					var dataType:string = column.getMetadata(ColumnMetadata.DATA_TYPE);
+					var keys:string[] = [];
+					var data:any[] = [];
+					for (var key of column.keys)
 					{
-						var values:* = column.getValueFromKey(key, Array);
+						var values:any[] = column.getValueFromKey(key, Array);
 						// special case if column misbehaves and does not actually return an array when one is requested (not sure if this occurs)
-						if (values != null && !(values is Array))
-							values = [values];
-						for each (var value:* in values)
+						if (values != null && !(Array.isArray(values)))
+						values = [values];
+						for (var value of values)
 						{
 							if (dataType == DataType.GEOMETRY)
 							{
@@ -147,63 +148,63 @@ package weavejs.data
 							}
 						}
 					}
-					
+
 					// output a set of arguments to addToColumnCache()
 					output.push([dataSourceName, metadataHash, metadata, keys, data]);
 				}
 			}
-			
+
 			// stub out data sources
 			dataSources = root.getObjects(IDataSource);
-			for each (dataSource in dataSources)
+			for (var dataSource of dataSources)
 			{
 				// skip local data sources
 				if (dataSource.isLocal)
 					continue;
-				
-				var type:String = Weave.className(dataSource);
+
+				var type:string = Weave.className(dataSource);
 				var state:Object = Weave.getState(dataSource);
 				var cds:CachedDataSource = root.requestObject(root.getName(dataSource), CachedDataSource, false);
 				cds.label.value = Weave.lang('{0} (Cached)', dataSource.getLabel());
 				cds.type.value = type;
 				cds.state.state = state;
 			}
-			
+
 			// repopulate cache for newly created data sources
-			restoreCache(root, output);
-			
+			this.restoreCache(root, output);
+
 			// TEMPORARY SOLUTION
-			map_root_saveCache.set(root, output);
-			
+			this.map_root_saveCache.set(root, output);
+
 			return output;
 		}
-		
+
 		/**
 		 * Restores the cache from a dump created by convertToLocalDataSources().
 		 * @param cacheData The cache dump.
 		 */
-		public function restoreCache(root:ILinkableHashMap, cacheData:Object):void
+		public restoreCache(root:ILinkableHashMap, cacheData:Cache):void
 		{
-			map_root_saveCache.set(root, cacheData);
-			for each (var args:Array in cacheData)
-				addToColumnCache.apply(this, [root].concat(args));
+			this.map_root_saveCache.set(root, cacheData);
+			for (var args of cacheData as any)
+				this.addToColumnCache.apply(this, [root].concat(args));
 		}
-		
-		private function addToColumnCache(root:ILinkableHashMap, dataSourceName:String, metadataHash:String, metadata:Object, keyStrings:Array, data:Array):void
+
+		private addToColumnCache(root:ILinkableHashMap, dataSourceName:string, metadataHash:string, metadata:{[key:string]:string}, keyStrings:string[], data:any[]):void
 		{
 			// create the column object
-			var dataSource:IDataSource = root.getObject(dataSourceName) as IDataSource;
+			var dataSource:IDataSource = Weave.AS(root.getObject(dataSourceName), IDataSource);
 			if (!dataSource)
 			{
 				if (dataSourceName)
 					JS.error("Data source not found: " + dataSourceName);
 				return;
 			}
-			
+
 			var column:IBaseColumn;
-			var keyType:String = metadata[ColumnMetadata.KEY_TYPE];
-			var dataType:String = metadata[ColumnMetadata.DATA_TYPE];
-			
+			var keyType:string = metadata[ColumnMetadata.KEY_TYPE];
+			var dataType:string = metadata[ColumnMetadata.DATA_TYPE];
+
 			if (dataType == DataType.GEOMETRY)
 				column = Weave.disposableChild(dataSource, column = new GeometryColumn(metadata));
 			else if (dataType == DataType.DATE)
@@ -212,18 +213,18 @@ package weavejs.data
 				column = Weave.disposableChild(dataSource, column = new NumberColumn(metadata));
 			else // string
 				column = Weave.disposableChild(dataSource, column = new StringColumn(metadata));
-			
+
 			(WeaveAPI.QKeyManager as QKeyManager)
 				.getQKeysPromise(column, keyType, keyStrings)
-				.then(function(keys:Array):void {
-					if (column is GeometryColumn)
+				.then(function(keys:IQualifiedKey[]):void {
+					if (Weave.IS(column, GeometryColumn))
 					{
-						var geomKeys:Array = [];
-						var geoms:Array = [];
+						var geomKeys:IQualifiedKey[] = [];
+						var geoms:GeneralizedGeometry[] = [];
 						for (var i:int = 0; i < data.length; i++)
 						{
-							var geomsFromGeoJson:Array = GeneralizedGeometry.fromGeoJson(data[i]);
-							for each (var geom:GeneralizedGeometry in geomsFromGeoJson)
+							var geomsFromGeoJson:GeneralizedGeometry[] = GeneralizedGeometry.fromGeoJson(data[i]);
+							for (var geom of geomsFromGeoJson)
 							{
 								geomKeys.push(keys[i]);
 								geoms.push(geom);
@@ -234,21 +235,23 @@ package weavejs.data
 					}
 					column.setRecords(keys, data);
 				});
-			
+
 			// insert into cache
-			d2d_dataSource_metadataHash_column.set(dataSource, metadataHash, column);
+			this.d2d_dataSource_metadataHash_column.set(dataSource, metadataHash, column);
 		}
-		
+
 		/**
 		 * Restores a session state to what it was before calling convertToCachedDataSources().
 		 */
-		public function restoreFromCachedDataSources(root:ILinkableHashMap):void
+		public restoreFromCachedDataSources(root:ILinkableHashMap):void
 		{
-			for each (var cds:CachedDataSource in root.getObjects(CachedDataSource))
+			for (var cds of root.getObjects(CachedDataSource))
 			{
-				d2d_dataSource_metadataHash_column.removeAllPrimary(cds);
+				this.d2d_dataSource_metadataHash_column.removeAllPrimary(cds);
 				cds.hierarchyRefresh.triggerCallbacks();
 			}
 		}
 	}
+	Weave.registerClass(AttributeColumnCache, "weavejs.data.AttributeColumnCache");
+	WeaveAPI.ClassRegistry.registerSingletonImplementation(IAttributeColumnCache, AttributeColumnCache);
 }

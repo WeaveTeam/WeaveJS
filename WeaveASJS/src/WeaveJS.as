@@ -13,7 +13,6 @@ package
 	import weavejs.api.core.IProgressIndicator;
 	import weavejs.api.core.IScheduler;
 	import weavejs.api.core.ISessionManager;
-	import weavejs.api.data.IAttributeColumnCache;
 	import weavejs.api.data.ICSVParser;
 	import weavejs.api.data.IDataSource;
 	import weavejs.api.data.IDataSource_Transform;
@@ -28,7 +27,6 @@ package
 	import weavejs.core.ProgressIndicator;
 	import weavejs.core.Scheduler;
 	import weavejs.core.SessionManager;
-	import weavejs.data.AttributeColumnCache;
 	import weavejs.data.CSVParser;
 	import weavejs.data.StatisticsCache;
 	import weavejs.data.key.QKeyManager;
@@ -73,7 +71,6 @@ package
 			);
 			
 			WeaveAPI.ClassRegistry.registerSingletonImplementation(IURLRequestUtils, URLRequestUtils);
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(IAttributeColumnCache, AttributeColumnCache);
 			WeaveAPI.ClassRegistry.registerSingletonImplementation(ISessionManager, SessionManager);
 			WeaveAPI.ClassRegistry.registerSingletonImplementation(IQualifiedKeyManager, QKeyManager);
 			WeaveAPI.ClassRegistry.registerSingletonImplementation(IScheduler, Scheduler);
