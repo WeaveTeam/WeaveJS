@@ -25,7 +25,7 @@ module.exports = function()
 
 			try
 			{
-				sourceMapContent = fs.readFileSync(filename);
+				sourceMapContent = fs.readFileSync(filename+".map", {encoding: "utf-8"});
 			}
 			catch (e)
 			{
