@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as weavejs from "weavejs";
-import $ from "modules/jquery";
 import Weave = weavejs.Weave;
 import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
 import WeaveArchive = weavejs.core.WeaveArchive;
@@ -9,11 +8,6 @@ import {WeaveAPI} from "weavejs";
 import WeaveApp from "weave/app/WeaveApp";
 import LandingPage from "weave/dialog/LandingPage";
 import DOMUtils = weavejs.util.DOMUtils;
-
-// exposing jquery to the global scope
-// so that semantic can plug into it
-(window as any).$ = $;
-(window as any).jQuery = $;
 
 var map_session_url_instance = new Map<string, Weave>();
 

@@ -43,7 +43,11 @@ import DataSourceManager from "weave/editor/manager/DataSourceManager";
 import WeaveMenuBar from "weave/menu/WeaveMenuBar";
 import NotificationSystem from "modules/NotifcationSystem";
 import {AbstractVisToolImpl} from "weave/tool/AbstractVisTool";
-
+import $ from "modules/jquery";
+// exposing jquery to the global scope
+// so that semantic can plug into it
+(window as any).$ = $;
+(window as any).jQuery = $;
 export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
 	rootApp?:WeaveApp;
