@@ -13,129 +13,122 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data.source
+namespace weavejs.data.source
 {
-	import weavejs.WeaveAPI;
-	import weavejs.api.core.ILinkableHashMap;
-	import weavejs.api.core.ILinkableVariable;
-	import weavejs.api.data.Aggregation;
-	import weavejs.api.data.ColumnMetadata;
-	import weavejs.api.data.DataType;
-	import weavejs.api.data.IAttributeColumn;
-	import weavejs.api.data.IDataSource;
-	import weavejs.api.data.IQualifiedKey;
-	import weavejs.api.data.ISelectableAttributes;
-	import weavejs.api.data.IWeaveTreeNode;
-	import weavejs.core.LinkableHashMap;
-	import weavejs.core.LinkableString;
-	import weavejs.core.LinkableVariable;
-	import weavejs.data.column.DynamicColumn;
-	import weavejs.data.column.ProxyColumn;
-	import weavejs.data.hierarchy.ColumnTreeNode;
-	import weavejs.data.ColumnUtils;
-	import weavejs.data.DataSourceUtils;
-	import weavejs.util.JS;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import ILinkableVariable = weavejs.api.core.ILinkableVariable;
+	import Aggregation = weavejs.api.data.Aggregation;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import DataType = weavejs.api.data.DataType;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IDataSource = weavejs.api.data.IDataSource;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+	import LinkableHashMap = weavejs.core.LinkableHashMap;
+	import LinkableString = weavejs.core.LinkableString;
+	import LinkableVariable = weavejs.core.LinkableVariable;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import ProxyColumn = weavejs.data.column.ProxyColumn;
+	import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
+	import ColumnUtils = weavejs.data.ColumnUtils;
+	import DataSourceUtils = weavejs.data.DataSourceUtils;
+	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import IColumnReference = weavejs.api.data.IColumnReference;
 
-	public class GroupedDataTransform extends AbstractDataSource implements ISelectableAttributes
+	export class GroupedDataTransform extends AbstractDataSource implements ISelectableAttributes
 	{
-		WeaveAPI.ClassRegistry.registerImplementation(IDataSource, GroupedDataTransform, "Grouped data transform");
+		public static /* readonly */ DATA_COLUMNNAME_META:string = "__GroupedDataColumnName__";
 
-		public static const DATA_COLUMNNAME_META:String = "__GroupedDataColumnName__";
-
-
-		public function GroupedDataTransform()
-		{
-		}
-		
-		override public function get isLocal():Boolean 
+		/* override */ public get isLocal():boolean
 		{
 			return !DataSourceUtils.hasRemoteColumnDependencies(this);
 		}
 
-		public function get selectableAttributes():/*/Map<string, (weavejs.api.data.IColumnWrapper|weavejs.api.core.ILinkableHashMap)>/*/Object
+		public get selectableAttributes()
 		{
-			return new JS.Map()
-				.set("Group by", groupByColumn)
-				.set("Data to transform", dataColumns);
+			return new Map<string, IColumnWrapper|ILinkableHashMap>()
+				.set("Group by", this.groupByColumn)
+				.set("Data to transform", this.dataColumns);
 		}
 		
-		override protected function get initializationComplete():Boolean
+		/* override */protected get initializationComplete():boolean
 		{
 			return super.initializationComplete
-				&& !Weave.isBusy(groupByColumn)
-				&& !Weave.isBusy(dataColumns);
+				&& !Weave.isBusy(this.groupByColumn)
+				&& !Weave.isBusy(this.dataColumns);
 		}
 
-		override protected function initialize(forceRefresh:Boolean = false):void
+		/* override */protected initialize(forceRefresh:boolean = false):void
 		{
 			super.initialize(true);
 		}
 
-		public const groupByColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-		public const groupKeyType:LinkableString = Weave.linkableChild(this, LinkableString);
-		public const dataColumns:ILinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+		public /* readonly */groupByColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+		public /* readonly */groupKeyType:LinkableString = Weave.linkableChild(this, LinkableString);
+		public /* readonly */dataColumns:ILinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 
 		/**
 		 * The session state maps a column name in dataColumns hash map to a value for its "aggregation" metadata.
 		 */
-		public const aggregationModes:ILinkableVariable = Weave.linkableChild(this, new LinkableVariable(null, typeofIsObject));
-		private function typeofIsObject(value:Object):Boolean
+		public /* readonly */aggregationModes:ILinkableVariable = Weave.linkableChild(this, new LinkableVariable(null, this.typeofIsObject));
+		private typeofIsObject(value:Object):boolean
 		{
 			return typeof value == 'object';
 		}
 		
-		override public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
+		/* override */public getHierarchyRoot():IWeaveTreeNode&IColumnReference
 		{
-			if (!_rootNode)
-				_rootNode = new ColumnTreeNode({
+			if (!this._rootNode)
+				this._rootNode = new ColumnTreeNode({
 					cacheSettings: {"label": false},
 					dataSource: this,
-					dependency: dataColumns.childListCallbacks,
+					dependency: this.dataColumns.childListCallbacks,
 					data: this,
-					"label": getLabel,
+					"label": this.getLabel,
 					hasChildBranches: false,
-					children: function():Array {
-						return dataColumns.getNames().map(
-							function (columnName:String, ..._):* {
-								var meta:Object = {};
-								meta[DATA_COLUMNNAME_META] = columnName;
-								return generateHierarchyNode(meta);
+					children: function() {
+						return this.dataColumns.getNames().map(
+							function (columnName:string) {
+								var meta:{[key:string]:string} = {};
+								meta[GroupedDataTransform.DATA_COLUMNNAME_META] = columnName;
+								return this.generateHierarchyNode(meta);
 							}
 						);
 					}
 				});
-			return _rootNode;
+			return this._rootNode;
 		}
 
-		override protected function generateHierarchyNode(metadata:Object):IWeaveTreeNode
+		/* override */protected generateHierarchyNode(metadata:{[key:string]:string}):IWeaveTreeNode
 		{
 			if (!metadata)
 				return null;
 
-			metadata = getColumnMetadata(metadata[DATA_COLUMNNAME_META]);
+			metadata = this.getColumnMetadata(metadata[GroupedDataTransform.DATA_COLUMNNAME_META]);
 
 			if (!metadata)
 				return null;
 
 			return new ColumnTreeNode({
 				dataSource: this,
-				idFields: [DATA_COLUMNNAME_META],
+				idFields: [GroupedDataTransform.DATA_COLUMNNAME_META],
 				data: metadata
 			});
 		}
 		
-		private function getColumnMetadata(dataColumnName:String):Object
+		private getColumnMetadata(dataColumnName:string):{[key:string]:string}
 		{
-			var column:IAttributeColumn = dataColumns.getObject(dataColumnName) as IAttributeColumn;
+			var column:IAttributeColumn = this.dataColumns.getObject(dataColumnName) as IAttributeColumn;
 			if (!column)
 				return null;
 
-			var metadata:Object = ColumnMetadata.getAllMetadata(column);
-			metadata[ColumnMetadata.KEY_TYPE] = groupKeyType.value || groupByColumn.getMetadata(ColumnMetadata.DATA_TYPE);
-			metadata[DATA_COLUMNNAME_META] = dataColumnName;
-			
-			var aggState:Object = aggregationModes.getSessionState();
-			var aggregation:String = aggState ? aggState[dataColumnName] : null;
+			var metadata:{[key:string]:string} = ColumnMetadata.getAllMetadata(column);
+			metadata[ColumnMetadata.KEY_TYPE] = this.groupKeyType.value || this.groupByColumn.getMetadata(ColumnMetadata.DATA_TYPE);
+			metadata[GroupedDataTransform.DATA_COLUMNNAME_META] = dataColumnName;
+
+			var aggState = this.aggregationModes.getSessionState() as any;
+			var aggregation:string = aggState ? aggState[dataColumnName] : null;
 			aggregation = aggregation || Aggregation.DEFAULT;
 			metadata[ColumnMetadata.AGGREGATION] = aggregation;
 			
@@ -145,10 +138,10 @@ package weavejs.data.source
 			return metadata;
 		}
 		
-		override protected function requestColumnFromSource(proxyColumn:ProxyColumn):void
+		/* override */protected requestColumnFromSource(proxyColumn:ProxyColumn):void
 		{
-			var columnName:String = proxyColumn.getMetadata(DATA_COLUMNNAME_META);
-			var metadata:Object = getColumnMetadata(columnName);
+			var columnName:string = proxyColumn.getMetadata(GroupedDataTransform.DATA_COLUMNNAME_META);
+			var metadata:{[key:string]:string} = this.getColumnMetadata(columnName);
 			if (!metadata)
 			{
 				proxyColumn.dataUnavailable();
@@ -156,142 +149,144 @@ package weavejs.data.source
 			}
 			proxyColumn.setMetadata(metadata);
 			
-			var dataColumn:IAttributeColumn = dataColumns.getObject(columnName) as IAttributeColumn;
-			var aggregateColumn:AggregateColumn = proxyColumn.getInternalColumn() as AggregateColumn || new AggregateColumn(this);
-			aggregateColumn.setup(metadata, dataColumn, getGroupKeys());
+			var dataColumn:IAttributeColumn = Weave.AS(this.dataColumns.getObject(columnName), IAttributeColumn);
+			var aggregateColumn:AggregateColumn = Weave.AS(proxyColumn.getInternalColumn(), AggregateColumn) || new AggregateColumn(this);
+			aggregateColumn.setup(metadata, dataColumn, this.getGroupKeys());
 
 			proxyColumn.setInternalColumn(aggregateColumn);
 		}
 
-		private var _groupKeys:Array;
-		private function getGroupKeys():Array
+		private _groupKeys:IQualifiedKey[];
+		private getGroupKeys():IQualifiedKey[]
 		{
-			if (Weave.detectChange(getGroupKeys, groupByColumn, groupKeyType))
+			if (Weave.detectChange(this.getGroupKeys, this.groupByColumn, this.groupKeyType))
 			{
-				_groupKeys = [];
-				var stringLookup:Object = {};
-				var keyType:String = groupKeyType.value || groupByColumn.getMetadata(ColumnMetadata.DATA_TYPE);
-				for each (var key:IQualifiedKey in groupByColumn.keys)
+				this._groupKeys = [];
+				var stringLookup:{[key:string]:boolean} = {};
+				var keyType:string = this.groupKeyType.value || this.groupByColumn.getMetadata(ColumnMetadata.DATA_TYPE);
+				for(var key of this.groupByColumn.keys)
 				{
-					var localName:String;
+					var localName:string;
 					// if the foreign key column is numeric, avoid using the formatted strings as keys
-					if (groupByColumn.getMetadata(ColumnMetadata.DATA_TYPE) == DataType.NUMBER)
-						localName = groupByColumn.getValueFromKey(key, Number);
+					if (this.groupByColumn.getMetadata(ColumnMetadata.DATA_TYPE) == DataType.NUMBER)
+						localName = this.groupByColumn.getValueFromKey(key, Number);
 					else
-						localName = groupByColumn.getValueFromKey(key, String);
+						localName = this.groupByColumn.getValueFromKey(key, String);
 					
 					if (!stringLookup[localName])
 					{
 						stringLookup[localName] = true;
 						var groupKey:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(keyType, localName);
-						_groupKeys.push(groupKey);
+						this._groupKeys.push(groupKey);
 					}
 				}
 			}
-			return _groupKeys;
+			return this._groupKeys;
 		}
 	}
+	Weave.registerClass(GroupedDataTransform, "weavejs.data.source.GroupedDataTransform", [IDataSource], "Grouped data transform");
 }
 
-import weavejs.WeaveAPI;
-import weavejs.api.data.Aggregation;
-import weavejs.api.data.ColumnMetadata;
-import weavejs.api.data.DataType;
-import weavejs.api.data.IAttributeColumn;
-import weavejs.api.data.IPrimitiveColumn;
-import weavejs.api.data.IQualifiedKey;
-import weavejs.core.SessionManager;
-import weavejs.data.ColumnUtils;
-import weavejs.data.EquationColumnLib;
-import weavejs.data.column.AbstractAttributeColumn;
-import weavejs.data.column.NumberColumn;
-import weavejs.data.column.StringColumn;
-import weavejs.data.source.GroupedDataTransform;
-import weavejs.util.ArrayUtils;
-import weavejs.util.Dictionary2D;
-import weavejs.util.StandardLib;
+import WeaveAPI = weavejs.WeaveAPI;
+import Aggregation = weavejs.api.data.Aggregation;
+import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+import DataType = weavejs.api.data.DataType;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import IPrimitiveColumn = weavejs.api.data.IPrimitiveColumn;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import SessionManager = weavejs.core.SessionManager;
+import ColumnUtils = weavejs.data.ColumnUtils;
+import EquationColumnLib = weavejs.data.EquationColumnLib;
+import AbstractAttributeColumn = weavejs.data.column.AbstractAttributeColumn;
+import NumberColumn = weavejs.data.column.NumberColumn;
+import StringColumn = weavejs.data.column.StringColumn;
+import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
+import ArrayUtils = weavejs.util.ArrayUtils;
+import Dictionary2D = weavejs.util.Dictionary2D;
+import StandardLib = weavejs.util.StandardLib;
 
-internal class AggregateColumn extends AbstractAttributeColumn implements IPrimitiveColumn
+class AggregateColumn extends AbstractAttributeColumn implements IPrimitiveColumn
 {
-	public function AggregateColumn(source:GroupedDataTransform)
+	constructor(source:GroupedDataTransform)
 	{
+		super();
 		Weave.linkableChild(this, source);
-		_groupByColumn = source.groupByColumn;
+		this._groupByColumn = source.groupByColumn;
 	}
 	
-	private var _groupByColumn:IAttributeColumn;
-	private var _dataColumn:IAttributeColumn;
-	private var _keys:Array;
-	private var _cacheTriggerCounter:uint = 0;
+	private _groupByColumn:IAttributeColumn;
+	private _dataColumn:IAttributeColumn;
+	private _keys:IQualifiedKey[];
+	private _cacheTriggerCounter:uint = 0;
 	
-	public function setup(metadata:Object, dataColumn:IAttributeColumn, keys:Array):void
+	public setup(metadata:{[key:string]:string}, dataColumn:IAttributeColumn, keys:IQualifiedKey[]):void
 	{
-		if (_dataColumn && _dataColumn != dataColumn)
-			(WeaveAPI.SessionManager as SessionManager).unregisterLinkableChild(this, _dataColumn);
+		if (this._dataColumn && this._dataColumn != dataColumn)
+			(WeaveAPI.SessionManager as SessionManager).unregisterLinkableChild(this, this._dataColumn);
 		
-		_metadata = copyValues(metadata);
-		_dataColumn = dataColumn && Weave.linkableChild(this, dataColumn);
-		_keys = keys;
-		_cacheTriggerCounter = 0;
-		triggerCallbacks();
+		this._metadata = AggregateColumn.copyValues(metadata);
+		this._dataColumn = dataColumn && Weave.linkableChild(this, dataColumn);
+		this._keys = keys;
+		this._cacheTriggerCounter = 0;
+		this.triggerCallbacks();
 	}
 	
-	override public function getMetadata(propertyName:String):String
+	/* override */public getMetadata(propertyName:string):string
 	{
 		return super.getMetadata(propertyName)
-			|| (_dataColumn ? _dataColumn.getMetadata(propertyName) : null);
+			|| (this._dataColumn ? this._dataColumn.getMetadata(propertyName) : null);
 	}
 	
-	override public function getMetadataPropertyNames():Array
+	/* override */public getMetadataPropertyNames():string[]
 	{
-		if (_dataColumn)
-			return ArrayUtils.union(super.getMetadataPropertyNames(), _dataColumn.getMetadataPropertyNames());
+		if (this._dataColumn)
+			return ArrayUtils.union(super.getMetadataPropertyNames(), this._dataColumn.getMetadataPropertyNames());
 		return super.getMetadataPropertyNames();
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	override public function get keys():Array
+	/* override */public get keys()
 	{
-		return _keys;
+		return this._keys;
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
-	override public function containsKey(key:IQualifiedKey):Boolean
+	/* override */public containsKey(key:IQualifiedKey):boolean
 	{
-		return _dataColumn && _dataColumn.containsKey(key);
+		return this._dataColumn && this._dataColumn.containsKey(key);
 	}
 	
-	public function deriveStringFromNumber(value:Number):String
+	public deriveStringFromNumber(value:number):string
 	{
-		return ColumnUtils.deriveStringFromNumber(_dataColumn, value);
+		return ColumnUtils.deriveStringFromNumber(this._dataColumn, value);
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
-	override public function getValueFromKey(groupKey:IQualifiedKey, dataType:Class = null):*
+	/* override */public getValueFromKey(groupKey:IQualifiedKey, dataType:Class = null):any
 	{
-		if (triggerCounter != _cacheTriggerCounter)
+		if (this.triggerCounter != this._cacheTriggerCounter)
 		{
-			_cacheTriggerCounter = triggerCounter;
-			dataCache = new Dictionary2D();
+			this._cacheTriggerCounter = this.triggerCounter;
+			this.dataCache = new Dictionary2D<Class, IQualifiedKey, any>();
 		}
 		
 		if (!dataType)
 			dataType = Array;
 
-		var value:* = dataCache.get(dataType, groupKey);
+		var value:any = this.dataCache.get(dataType, groupKey);
 
 		if (value === undefined)
 		{
-			value = getAggregateValue(groupKey, dataType);
-			dataCache.set(dataType, groupKey, value === undefined ? UNDEFINED : value);
+			value = this.getAggregateValue(groupKey, dataType);
+			this.dataCache.set(dataType, groupKey, value === undefined ? AggregateColumn.UNDEFINED : value);
 		}
-		else if (value === UNDEFINED)
+		else if (value === AggregateColumn.UNDEFINED)
 		{
 			value = undefined;
 		}
@@ -299,14 +294,14 @@ internal class AggregateColumn extends AbstractAttributeColumn implements IPrimi
 		return value;
 	}
 	
-	private static const UNDEFINED:Object = {}; // used as a placeholder for undefined values in dataCache
+	private static /* readonly */ UNDEFINED:Object = {}; // used as a placeholder for undefined values in dataCache
 	
 	/**
 	 * Computes an aggregated value.
 	 * @param groupKey A key that references a String value and is associated with a set of input keys.
 	 * @param dataType The dataType parameter passed to the EquationColumn.
 	 */
-	public function getAggregateValue(groupKey:IQualifiedKey, dataType:Class):*
+	public getAggregateValue(groupKey:IQualifiedKey, dataType:Class):any
 	{
 		if (groupKey.keyType != this.getMetadata(ColumnMetadata.KEY_TYPE))
 			return undefined;
@@ -315,23 +310,23 @@ internal class AggregateColumn extends AbstractAttributeColumn implements IPrimi
 			dataType = Array;
 		
 		// get input keys from groupKey
-		var tempKeys:Array = EquationColumnLib.getAssociatedKeys(_groupByColumn, groupKey, true);
-		var meta_dataType:String = _dataColumn ? _dataColumn.getMetadata(ColumnMetadata.DATA_TYPE) : null;
+		var tempKeys:IQualifiedKey[] = EquationColumnLib.getAssociatedKeys(this._groupByColumn, groupKey, true);
+		var meta_dataType:string = this._dataColumn ? this._dataColumn.getMetadata(ColumnMetadata.DATA_TYPE) : null;
 		var inputType:Class = DataType.getClass(meta_dataType);
 
 		if (dataType === Array)
 		{
 			// We want a flat Array of values, not a nested Array, so we request the original input type
 			// in case they need to be pre-aggregated.
-			return getValues(_dataColumn, tempKeys, inputType);
+			return AggregateColumn.getValues(this._dataColumn, tempKeys, inputType);
 		}
 		
-		var meta_aggregation:String = this.getMetadata(ColumnMetadata.AGGREGATION) || Aggregation.DEFAULT;
+		var meta_aggregation:string = this.getMetadata(ColumnMetadata.AGGREGATION) || Aggregation.DEFAULT;
 		
 		if (inputType === Number || inputType === Date)
 		{
-			var array:Array = this.getValueFromKey(groupKey, Array) as Array;
-			var number:Number = NumberColumn.aggregate(array, meta_aggregation);
+			var array:any[] = Weave.AS(this.getValueFromKey(groupKey, Array), Array);
+			var number:number = NumberColumn.aggregate(array, meta_aggregation);
 			
 			if (dataType === Number)
 				return number;
@@ -343,7 +338,7 @@ internal class AggregateColumn extends AbstractAttributeColumn implements IPrimi
 			{
 				if (isNaN(number) && array && array.length > 1 && meta_aggregation == Aggregation.SAME)
 					return Aggregation.AMBIGUOUS_DATA;
-				return ColumnUtils.deriveStringFromNumber(_dataColumn, number)
+				return ColumnUtils.deriveStringFromNumber(this._dataColumn, number)
 					|| StandardLib.formatNumber(number);
 			}
 			
@@ -353,9 +348,9 @@ internal class AggregateColumn extends AbstractAttributeColumn implements IPrimi
 		if (inputType === String)
 		{
 			// get a list of values of the requested type, then treat them as Strings and aggregate the Strings
-			var values:Array = getValues(_dataColumn, tempKeys, dataType);
+			var values = AggregateColumn.getValues(this._dataColumn, tempKeys, dataType);
 
-			var string:String = StringColumn.aggregate(values, meta_aggregation);
+			var string:string = StringColumn.aggregate(values, meta_aggregation);
 			
 			if (dataType === Number)
 				return StandardLib.asNumber(string);
@@ -379,17 +374,17 @@ internal class AggregateColumn extends AbstractAttributeColumn implements IPrimi
 	 * Gets an Array of values from a column, excluding missing data.
 	 * Flattens Arrays.
 	 */
-	private static function getValues(column:IAttributeColumn, keys:Array, dataType:Class):Array
+	private static getValues(column:IAttributeColumn, keys:IQualifiedKey[], dataType:Class):any[]
 	{
-		var values:Array = [];
+		var values:any[] = [];
 		if (!column)
 			return values;
-		for each (var key:IQualifiedKey in keys)
+		for (var key of keys)
 		{
 			if (!column.containsKey(key))
 				continue;
-			var value:* = column.getValueFromKey(key, dataType);
-			if (value is Array)
+			var value:any = column.getValueFromKey(key, dataType);
+			if (Array.isArray(value))
 				values.push.apply(values, value);
 			else
 				values.push(value);

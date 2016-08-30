@@ -4120,31 +4120,6 @@ declare module weavejs.core {
     }
 }
 declare module weavejs.data {
-    import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
-    import IAttributeColumn = weavejs.api.data.IAttributeColumn;
-    import IAttributeColumnCache = weavejs.api.data.IAttributeColumnCache;
-    import IDataSource = weavejs.api.data.IDataSource;
-    import WeavePromise = weavejs.util.WeavePromise;
-    class AttributeColumnCache implements IAttributeColumnCache {
-        getColumn(dataSource: IDataSource, metadata: Object): IAttributeColumn;
-        map_root_saveCache: Object;
-        /**
-         * Creates a cache dump and modifies the session state so data sources are non-functional.
-         * @return A WeavePromise that returns a cache dump that can later be passed to restoreCache();
-         */
-        convertToCachedDataSources(root: ILinkableHashMap): WeavePromise<any>;
-        /**
-         * Restores the cache from a dump created by convertToLocalDataSources().
-         * @param cacheData The cache dump.
-         */
-        restoreCache(root: ILinkableHashMap, cacheData: Object): void;
-        /**
-         * Restores a session state to what it was before calling convertToCachedDataSources().
-         */
-        restoreFromCachedDataSources(root: ILinkableHashMap): void;
-    }
-}
-declare module weavejs.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
     import ICSVParser = weavejs.api.data.ICSVParser;
     /**
@@ -6578,17 +6553,6 @@ declare module weavejs.data.source {
     }
 }
 declare module weavejs.data.source {
-    import LinkableString = weavejs.core.LinkableString;
-    import LinkableVariable = weavejs.core.LinkableVariable;
-    class CachedDataSource extends AbstractDataSource {
-        constructor();
-        isLocal: boolean;
-        type: LinkableString;
-        state: LinkableVariable;
-        protected refreshHierarchy(): void;
-    }
-}
-declare module weavejs.data.source {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
     import WeavePromise = weavejs.util.WeavePromise;
     class CensusApi implements ILinkableObject {
@@ -6799,33 +6763,6 @@ declare module weavejs.data.source {
         getColumnMetadata(): {
             [name: string]: string;
         };
-    }
-}
-declare module weavejs.data.source {
-    import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
-    import ILinkableVariable = weavejs.api.core.ILinkableVariable;
-    import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
-    import LinkableString = weavejs.core.LinkableString;
-    import DynamicColumn = weavejs.data.column.DynamicColumn;
-    import ProxyColumn = weavejs.data.column.ProxyColumn;
-    class GroupedDataTransform extends AbstractDataSource implements ISelectableAttributes {
-        static DATA_COLUMNNAME_META: string;
-        constructor();
-        isLocal: boolean;
-        selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
-        protected initializationComplete: boolean;
-        protected initialize(forceRefresh?: boolean): void;
-        groupByColumn: DynamicColumn;
-        groupKeyType: LinkableString;
-        dataColumns: ILinkableHashMap;
-        /**
-         * The session state maps a column name in dataColumns hash map to a value for its "aggregation" metadata.
-         */
-        aggregationModes: ILinkableVariable;
-        getHierarchyRoot(): IWeaveTreeNode & weavejs.api.data.IColumnReference;
-        protected generateHierarchyNode(metadata: Object): IWeaveTreeNode;
-        protected requestColumnFromSource(proxyColumn: ProxyColumn): void;
     }
 }
 declare module weavejs.data.source {

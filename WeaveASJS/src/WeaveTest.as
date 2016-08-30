@@ -74,7 +74,6 @@ package
 	import weavejs.data.source.DBFDataSource;
 	import weavejs.data.source.ForeignDataMappingTransform;
 	import weavejs.data.source.GeoJSONDataSource;
-	import weavejs.data.source.GroupedDataTransform;
 	import weavejs.data.source.WeaveDataSource;
 	import weavejs.data.source.WebSocketDataSource;
 	import weavejs.geom.TempHack_SolidFillStyle;
@@ -147,7 +146,6 @@ package
 			ForeignDataMappingTransform,
 			CensusDataSource,
 			DBFDataSource,
-			GroupedDataTransform,
 			WebSocketDataSource,
 			CKANDataSource,
 			KeyColumn,
