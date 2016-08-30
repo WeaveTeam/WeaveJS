@@ -33,7 +33,7 @@ else
 {
 	browserify({
 		entries: ["./bin/js/index.js"],
-		paths: ["./bin/js"],
+		paths: ["./bin/js", "../lib"],
 		debug: true
 	}).external(libs).bundle().pipe(fs.createWriteStream("./dist/weave-app.bundle.js"));
 }

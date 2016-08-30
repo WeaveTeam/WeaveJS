@@ -29,9 +29,6 @@ before_install:
 - popd
 install:
 - npm run compile
-- pushd WeaveApp
-- npm run compile
-- popd
 after_success:
 - pushd WeaveApp/dist/ && tar -zcvf ../../$TRAVIS_BRANCH.tgz * && popd
 - export SSHPASS=$DEPLOY_PASS

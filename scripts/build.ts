@@ -41,6 +41,6 @@ module.exports = function()
 		fs.writeFileSync(path.join(outputPath, moduleName), concat.content);
 		fs.writeFileSync(path.join(outputPath, moduleName + ".map"), concat.sourceMap);
 	}
-	build(globalOutput, 'lib/', 'weavejs.js');
-	build(moduleOutput, 'lib/', 'weavejs-module.js');
+	build(globalOutput, 'lib/', 'weavejs-global.js');
+	build(moduleOutput, 'lib/', 'weavejs.js');
 }
