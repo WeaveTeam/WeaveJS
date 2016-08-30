@@ -52,6 +52,7 @@
     "typescript": "^2.1.0-dev.20160820"
   },
   "devDependencies": {
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "mold-source-map": "^0.4.0"
   }
 }
