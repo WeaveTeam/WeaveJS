@@ -252,6 +252,6 @@ namespace weavejs.data
 			}
 		}
 	}
-	Weave.registerClass(AttributeColumnCache, "weavejs.data.AttributeColumnCache");
+	Weave.registerClass(AttributeColumnCache, "weavejs.data.AttributeColumnCache", [IAttributeColumnCache]);
 	WeaveAPI.ClassRegistry.registerSingletonImplementation(IAttributeColumnCache, AttributeColumnCache);
 }
