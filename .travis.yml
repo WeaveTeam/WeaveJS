@@ -28,6 +28,9 @@ before_install:
 - chmod a+x *
 - popd
 install:
+- pushd WeaveApp
+- npm run compile-libs
+- popd
 - npm run compile
 after_success:
 - pushd WeaveApp/dist/ && tar -zcvf ../../$TRAVIS_BRANCH.tgz * && popd
