@@ -32,7 +32,6 @@ namespace weavejs.data
 	import CachedDataSource = weavejs.data.source.CachedDataSource;
 	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 	import Dictionary2D = weavejs.util.Dictionary2D;
-	import JS = weavejs.util.JS;
 	import WeavePromise = weavejs.util.WeavePromise;
 
 	export declare type CachedColumnData = [string, string, {[property:string]:string}, string[], any[]][];
@@ -197,7 +196,7 @@ namespace weavejs.data
 			if (!dataSource)
 			{
 				if (dataSourceName)
-					JS.error("Data source not found: " + dataSourceName);
+					console.error("Data source not found: " + dataSourceName);
 				return;
 			}
 
