@@ -2,4 +2,5 @@ bin
 bin-debug
 bin-release
 definitions
+typings
 .settings

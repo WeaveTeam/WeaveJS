@@ -68,7 +68,7 @@ export default class SpatialJoinTransform extends AbstractDataSource implements 
 			this._rootNode = new ColumnTreeNode({
 				dataSource: this,
 				data: this,
-				"label": this.getLabel,
+				"label": () => this.getLabel(),
 				hasChildBranches: false,
 				children: [
 					this.generateHierarchyNode({})
@@ -149,4 +149,9 @@ export default class SpatialJoinTransform extends AbstractDataSource implements 
 }
 //var IDataSource_Service:Class = IDataSource;
 //WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, SpatialJoinTransform, "Spatial Join Transform");
-WeaveAPI.ClassRegistry.registerImplementation(IDataSource, SpatialJoinTransform, "Spatial Join Transform");
+Weave.registerClass(
+	SpatialJoinTransform,
+	"weavejs.data.source.SpatialTransform",
+	[IDataSource, ISelectableAttributes],
+	"Spatial Join Transform"
+);
