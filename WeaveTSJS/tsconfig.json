@@ -12,7 +12,8 @@
     "noImplicitReturns": false,
     "pretty": false,
     "newLine": "lf",
-    "sourceMap": true
+    "sourceMap": true,
+    "inlineSources": true
   },
   "files": [
 	"./src/_lib-references.ts",

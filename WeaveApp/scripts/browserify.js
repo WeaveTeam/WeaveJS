@@ -2,6 +2,7 @@ const fs = require("fs");
 const browserify = require("browserify");
 const path = require("path");
 const mold = require("mold-source-map");
+const exorcist = require("exorcist");
 var libs = [
 	"c3",
 	"clipboard",
@@ -44,5 +45,8 @@ else
 		debug: true
 	})
 	.require("./lib/weavejs.js", {debug: true, expose: "weavejs"})
-	.external(libs).bundle().pipe(mold.transformSourcesRelativeTo(path.join(process.cwd(), ".."))).pipe(fs.createWriteStream("./dist/weave-app.bundle.js"));
+	.external(libs).bundle()
+	.pipe(mold.transformSourcesRelativeTo(path.join(process.cwd(), "..")))
+	.pipe(exorcist('./dist/weave-app.bundle.js.map'))
+	.pipe(fs.createWriteStream("./dist/weave-app.bundle.js"));
 }

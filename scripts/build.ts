@@ -5,6 +5,7 @@ module.exports = function()
 	const path = require("path");
 	const version = "2.1.3";
 	const Concat = require('concat-with-sourcemaps');
+
 	const dataurl = require('dataurl');
 
 	let globalOutput:string[];
@@ -25,12 +26,12 @@ module.exports = function()
 			var sourceMapContent:string = null;
 			var content:string;
 			content = fs.readFileSync(filename, 'utf8');
-
+			var sourceMap:any;
 			try
 			{
 				sourceMapContent = fs.readFileSync(filename+".map", {encoding: "utf-8"});
 
-				var sourceMap = JSON.parse(sourceMapContent);
+				sourceMap = JSON.parse(sourceMapContent);
 				if (sourceMap.file == "") /* The ASJS output does not set a file, uses full paths */
 				{
 					sourceMap.file = "WeaveJS.js";
@@ -45,7 +46,7 @@ module.exports = function()
 
 							return fpath;
 						}
-					)	
+					)
 				}
 				else if (sourceMap.file == "weavejs.js" || "libs.js") /* ASJS output gives a weird relative path */
 				{
@@ -62,14 +63,27 @@ module.exports = function()
 						}
 					)
 				}
-
-				sourceMapContent = JSON.stringify(sourceMap);
 			}
 			catch (e)
 			{
-				console.log("No sourcemap found for", filename, ", skipping.");
-				sourceMapContent = null;
+				console.log("Failed to find sourcemap for", e, "making stub.")
+				sourceMap = {
+					version: 3,
+					file: path.basename(filename),
+					sourceRoot: cwd,
+					sources: [filename],
+					names: [],
+					mappings: ""
+				}
 			}
+
+			sourceMap.sourcesContent = sourceMap.sources.map(
+				(fpath:string):string => {
+					return fs.readFileSync(fpath, 'utf-8');
+				}
+			);
+
+			sourceMapContent = JSON.stringify(sourceMap);
 
 			var contentLines = content.split("\n");
 			/* Remove old sourceMap comments and trailing blanks */
@@ -97,7 +111,7 @@ module.exports = function()
 		sourceContent += "\n//# sourceMappingURL=" + sourceMapUrl;
 
 		fs.writeFileSync(path.join(outputPath, moduleName), sourceContent);
-		if (!inline) fs.writeFileSync(path.join(outputPath, moduleName + ".map"), concat.sourceMap);
+		/*if (!inline)*/ fs.writeFileSync(path.join(outputPath, moduleName + ".map"), concat.sourceMap);
 	}
 	build(globalOutput, 'lib/', 'weavejs-global.js', true);
 	build(moduleOutput, 'lib/', 'weavejs.js', true);
