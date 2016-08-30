@@ -1,7 +1,7 @@
 import * as weavejs from "weavejs";
 import * as ol from "openlayers";
 import * as _ from "lodash";
-import {WeaveAPI} from "weavejs";
+import {Weave} from "weavejs";
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import IDataSource = weavejs.api.data.IDataSource;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -149,4 +149,9 @@ export default class SpatialJoinTransform extends AbstractDataSource implements 
 }
 //var IDataSource_Service:Class = IDataSource;
 //WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, SpatialJoinTransform, "Spatial Join Transform");
-WeaveAPI.ClassRegistry.registerImplementation(IDataSource, SpatialJoinTransform, "Spatial Join Transform");
+Weave.registerClass(
+	SpatialJoinTransform,
+	"weavejs.data.source.SpatialJoinTransform",
+	[IDataSource, ISelectableAttributes],
+	"Spatial Join Transform"
+);
