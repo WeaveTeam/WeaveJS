@@ -94,7 +94,7 @@ namespace weavejs.data
 					}
 					return root;
 				})
-				.then(this._convertToCachedDataSources);
+				.then((root:ILinkableHashMap) => this._convertToCachedDataSources(root));
 			promiseThen.then(dispose, dispose);
 			return promiseThen;
 		}
