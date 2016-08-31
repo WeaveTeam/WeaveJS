@@ -1045,7 +1045,7 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	border-color: #85B7D9;
 }
 
-.weave .ui.secondary.button, .ui.secondary.buttons .button {
+.weave .ui.secondary.button,.weave .ui.secondary.buttons .button {
 	background: rgba(60,64,63,0.9);
 }
 
@@ -1110,7 +1110,7 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	padding-bottom: 4px;
 }
 
-.weave .ui.grid>.column:not(.row), .ui.grid>.row>.column {
+.weave .ui.grid>.column:not(.row),.weave .ui.grid>.row>.column {
 	position: relative;
 	display: inline-block;
 	padding-left: 0;
@@ -1118,7 +1118,7 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	vertical-align: middle;
 }
 
-.weave .ui.grid>.column:not(.row), .ui.grid>.row>.column {
+.weave .ui.grid>.column:not(.row),.weave .ui.grid>.row>.column {
 	position: relative;
 	display: inline-block;
 	padding-left: 0;
@@ -1155,7 +1155,7 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 }
 
 /****** Inverted Segment *******/
-.weave .ui.inverted,.ui.inverted.segment {
+.weave .ui.inverted,.weave .ui.inverted.segment {
 	background: rgba(60,64,63,0.9);
 	color: rgba(161,164,163,1.0);
 }
