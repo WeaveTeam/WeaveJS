@@ -1,6 +1,6 @@
 {
   "name": "weave-app",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Collection of visualization tools and UI from the WeaveJS project.",
   "scripts": {
     "clean": "rimraf bin/ && rimraf dist/weave-app.bundle.js",
@@ -11,8 +11,8 @@
     "compile-module": "npm run clean && npm run copy-typings && tsc && npm run babel",
     "compile-libs": "mkdirp dist && node scripts/browserify libs",
     "compile": "npm run compile && npm run browserify && cd .. && node run-ts copy.ts",
-    "prepublish": "npm run compile-module && npm run compile-global",
-    "publish": "mv ./bin/js/weave/** ./ && mkdirp weaveapp-typings && cp ./bin/weave-app.d.ts ./weaveapp-typings && cp ./bin/weave-app.js ./weave-app.js"
+    "move-files": "mv ./bin/js/weave/** ./ && mkdirp weaveapp-typings && cp ./bin/weave-app.d.ts ./weaveapp-typings && cp ./bin/weave-app.js ./weave-app.js",
+    "prepublish": "npm run compile-module && npm run compile-global && npm run move-files",
   },
   "main": "app/WeaveApp.js",
   "repository": {
