@@ -94,7 +94,7 @@ package weavejs.data.column
 		/**
 		 * Used by default getValueFromKey() implementation. Must be explicitly initialized.
 		 */
-		protected var dataCache:Dictionary2D;
+		protected var dataCache:Dictionary2D/*/<any,IQualifiedKey,any>/*/;
 		
 		public function get keys():Array
 		{

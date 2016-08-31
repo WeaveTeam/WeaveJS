@@ -83,7 +83,7 @@ package weavejs.data.column
 		/**
 		 * This object maps keys to data values.
 		 */
-		protected var d2d_qkeyA_keyB_number:Dictionary2D = new Dictionary2D();
+		protected var d2d_qkeyA_keyB_number:Dictionary2D/*/<IQualifiedKey,IQualifiedKey,number>/*/ = new Dictionary2D();
 		protected var map_qkeyAB_number:Object = new JS.Map();
 
 		/**
