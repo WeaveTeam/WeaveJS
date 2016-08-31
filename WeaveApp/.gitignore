@@ -1,6 +1,5 @@
 *.js.map
-es6
-js
+bin
 node_modules
 dist
 typings/weave

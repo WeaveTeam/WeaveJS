@@ -1,8 +1,8 @@
 {
   "name": "weavejs",
-  "version": "0.0.0",
-  "description": "Collection of visualization tools and UI for the WeaveJS project.",
-  "main": "lib/weavejs-module.js",
+  "version": "0.0.2",
+  "description": "Application architecture library for building modern web applications",
+  "main": "lib/weavejs.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "clean": "npm run clean:as && npm run clean:ts",
@@ -16,8 +16,13 @@
     "compile-ts": "npm run compile-refs && tsc -p ./WeaveTSJS/tsconfig.json && mkdirp ./WeaveTSJS/bin/js && node scripts/babel-with-source-maps.js -i WeaveTSJS/bin/es6/weavejs.js -m WeaveTSJS/bin/es6/weavejs.js.map -o WeaveTSJS/bin/js/weavejs.js && cp ./WeaveTSJS/bin/es6/weavejs.d.ts ./weave-typings/",
     "compile-astypings": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/ && cp WeaveASJS/typings/weavejs-core.d.ts ./weave-typings && mv WeaveASJS/typings/*.d.ts ./WeaveTSJS/typings/weave",
     "compile-as": "node WeaveASJS/build.js",
-    "prepublish": "cd lib || npm run compile-weavejs"
+    "prepublish": "npm run compile-weavejs"
   },
+  "files": [
+    "LICENSE",
+    "lib/",
+    "weave-typings"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/WeaveTeam/WeaveJS.git"
@@ -40,21 +45,21 @@
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "tsd": "^0.6.5",
-    "tsort": "^0.0.1"
-  },
-  "dependencies": {
+    "tsort": "^0.0.1",
     "as2dts": "^0.2.3",
     "babel-cli": "^6.4.5",
-    "classnames": "^2.2.3",
     "concat-with-sourcemaps": "^1.0.4",
+    "rimraf": "^2.5.3",
+    "typescript": "^1.8.10"
+  },
+  "dependencies": {
+    "classnames": "^2.2.3",
     "jszip": "^3.0.0",
     "lodash": "^3.10.1",
     "moment": "^2.11.2",
     "pixi.js": "^4.0.0",
     "react": "0.14.7",
     "react-addons-update": "0.14.7",
-    "react-dom": "0.14.7",
-    "rimraf": "^2.5.3",
-    "typescript": "^1.8.10"
+    "react-dom": "0.14.7"
   }
 }
