@@ -1,5 +1,5 @@
 import * as ol from "openlayers";
-import $ from "modules/jquery";
+import $ from "weave/modules/jquery";
 
 export default class PanCluster extends ol.control.Control
 {

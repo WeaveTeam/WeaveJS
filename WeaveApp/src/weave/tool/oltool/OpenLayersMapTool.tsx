@@ -3,8 +3,8 @@ import * as ReactDOM from "react-dom";
 import * as weavejs from "weavejs";
 import * as ol from "openlayers";
 import * as _ from "lodash";
-import proj4 from "modules/proj4";
-import $ from "modules/jquery";
+import proj4 from "weave/modules/proj4";
+import $ from "weave/modules/jquery";
 
 import MouseUtils = weavejs.util.MouseUtils;
 import Menu = weavejs.ui.menu.Menu;

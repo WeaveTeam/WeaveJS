@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
-import classNames from "modules/classnames";
+import classNames from "weave/modules/classnames";
 
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;

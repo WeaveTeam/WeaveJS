@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from 'react-dom';
 import * as weavejs from "weavejs";
-import $ from "modules/jquery";
+import $ from "weave/modules/jquery";
 import {Weave} from "weavejs";
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;

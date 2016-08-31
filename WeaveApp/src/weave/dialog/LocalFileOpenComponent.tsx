@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
-import Dropzone from "modules/react-dropzone";
+import Dropzone from "weave/modules/react-dropzone";
 import {Weave} from "weavejs";
 
 import HBox = weavejs.ui.flexbox.HBox;

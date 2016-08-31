@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
-import classNames from "modules/classnames";
+import classNames from "weave/modules/classnames";
 import * as _ from "lodash";
 import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
 import Tabs = weavejs.ui.Tabs;

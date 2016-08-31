@@ -2,8 +2,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom"
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
-import Clipboard from "modules/clipboard";
-import $ from "modules/jquery";
+import Clipboard from "weave/modules/clipboard";
+import $ from "weave/modules/jquery";
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
 import ReactUtils = weavejs.util.ReactUtils;

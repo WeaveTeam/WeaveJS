@@ -1,4 +1,4 @@
-import $ from "modules/jquery";
+import $ from "weave/modules/jquery";
 import Dictionary2D = weavejs.util.Dictionary2D;
 import {WeaveAPI} from "weavejs";
 

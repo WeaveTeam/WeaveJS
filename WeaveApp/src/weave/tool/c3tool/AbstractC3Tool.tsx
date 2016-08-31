@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import * as _ from "lodash";
-import $ from "modules/jquery";
+import $ from "weave/modules/jquery";
 import * as d3 from "d3";
 import * as c3 from "c3";
 import {Weave} from "weavejs";

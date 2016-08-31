@@ -1,7 +1,7 @@
 import * as weavejs from "weavejs";
 import * as ol from "openlayers";
-import JSZip from "modules/jszip";
-import proj4 from "modules/proj4";
+import JSZip from "weave/modules/jszip";
+import proj4 from "weave/modules/proj4";
 import WeavePromise = weavejs.util.WeavePromise;
 import URLRequest = weavejs.net.URLRequest;
 import Bounds2D = weavejs.geom.Bounds2D;

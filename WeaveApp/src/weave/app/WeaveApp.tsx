@@ -41,9 +41,9 @@ import WeaveProgressBar from "weave/ui/WeaveProgressBar";
 import InteractiveTour from "weave/dialog/InteractiveTour";
 import DataSourceManager from "weave/editor/manager/DataSourceManager";
 import WeaveMenuBar from "weave/menu/WeaveMenuBar";
-import NotificationSystem from "modules/NotifcationSystem";
+import NotificationSystem from "weave/modules/NotifcationSystem";
 import {AbstractVisToolImpl} from "weave/tool/AbstractVisTool";
-import $ from "modules/jquery";
+import $ from "weave/modules/jquery";
 // exposing jquery to the global scope
 // so that semantic can plug into it
 (window as any).$ = $;

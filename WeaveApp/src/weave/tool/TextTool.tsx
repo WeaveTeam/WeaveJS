@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
-import $ from "modules/jquery";
+import $ from "weave/modules/jquery";
 import {Weave} from "weavejs";
 
 import MouseEvent = React.MouseEvent;

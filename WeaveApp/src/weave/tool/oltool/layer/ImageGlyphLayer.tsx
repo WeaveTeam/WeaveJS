@@ -1,7 +1,7 @@
 import * as weavejs from "weavejs";
 import * as _ from "lodash";
 import * as ol from "openlayers";
-import $ from "modules/jquery";
+import $ from "weave/modules/jquery";
 import {Weave} from "weavejs";
 
 import DynamicColumn = weavejs.data.column.DynamicColumn;
