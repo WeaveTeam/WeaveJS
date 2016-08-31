@@ -747,59 +747,7 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	justify-content: flex-end;
 }
 
-/****** ButtonGroupBar ******/
 
-.weave-buttonGroupBar {
-	border-radius:12px;
-	border:1px solid grey;
-}
-.weave-buttonGroupBar .ui.button { /* inline style will override hover state */
-	background-color:white;
-}
-
-/****** Tool Editor ******/
-
-.weave-ToolEditor {
-	font-size: small;
-}
-
-.weave-ToolEditor .ui.button {
-	font-size: small;
-}
-
-.weave-ToolEditor table {
-	width: 100%;
-	font-size: inherit;
-}
-
-.weave-ToolEditor .weave-left-cell {
-	white-space: nowrap;
-	text-align: right;
-}
-
-.weave-ToolEditor .weave-right-cell {
-	width: 100%;
-	padding-top: 4px;
-	padding-bottom: 4px;
-	padding-left: 8px;
-}
-
-.weave-ToolEditor-Header {
-	align-items: center;
-	border-bottom: 1px solid lightgrey;
-	margin: 0 8px;/* this ensures border bottom will be disconnected seperator */
-}
-
-.weave-ToolEditor-Header .ui.button { /* inline style will override hover state */
-	border-color: transparent;
-	padding: 8px;
-	background-color: transparent;
-}
-
-.weave-ToolEditor-Header .ui.button:hover { /* inline style will override hover state */
-	color: black;
-	background-color: rgba(0, 0, 0, 0.12);
-}
 
 /* Weave Progress Bar */
 .weave-progress-bar-background {
@@ -1069,18 +1017,18 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 
 /******* Breadcrumb *******/
 
-.ui.breadcrumb {
+.weave .ui.breadcrumb {
 	line-height: normal;
 }
 
 /******* Menu *******/
 
-.ui.dropdown .menu>.item {
+.weave .ui.dropdown .menu>.item {
 	line-height: normal;
 }
 
 /******* Button *******/
-.ui.button {
+.weave .ui.button {
 	border:1px solid lightgrey;
 	background-color:#ECECEC;
 	color:black;
@@ -1088,50 +1036,50 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	margin:0;/* important to override semantic ui default margin-right value. for special cases use inline style to set */
 }
 
-.ui.button:hover {
+.weave .ui.button:hover {
 	background-color: lightgrey;
 }
 
-.ui.button:focus {
+.weave .ui.button:focus {
 	background-color: #ECECEC;
 	border-color: #85B7D9;
 }
 
-.ui.secondary.button, .ui.secondary.buttons .button {
+.weave .ui.secondary.button, .ui.secondary.buttons .button {
 	background: rgba(60,64,63,0.9);
 }
 
 /******* Dropdown *****/
 
-.ui.multiple.dropdown>.label {
+.weave .ui.multiple.dropdown>.label {
 	display: inline-flex;
 	align-items: center;
 	background: none;
 }
 
-.ui.multiple.dropdown>.label:hover {
+.weave .ui.multiple.dropdown>.label:hover {
 	background: lightgrey;
 }
 
-.ui.selection.dropdown .menu {
+.weave .ui.selection.dropdown .menu {
 	border-top-style: dashed;
 	border-bottom-style: solid;
 	border-top-width: 1px!important;
 }
 
-.ui.upward.selection.dropdown .menu {
+.weave .ui.upward.selection.dropdown .menu {
 	border-top-style: solid;
 	border-bottom-style: dashed;
 	border-bottom-width: 1px!important;
 }
 
-.ui.dropdown .menu>.header {
+.weave .ui.dropdown .menu>.header {
 	padding-left: 4px;
 }
 
 /******* grid *********/
 
-.ui.grid {
+.weave .ui.grid {
 	display: -webkit-box;
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -1152,17 +1100,17 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	margin: 0;
 }
 
-.ui.grid>* {
+.weave .ui.grid>* {
 	padding-left: 0;
 	padding-right: 8px;
 }
 
-.ui.grid>.column:not(.row) {
+.weave .ui.grid>.column:not(.row) {
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
 
-.ui.grid>.column:not(.row), .ui.grid>.row>.column {
+.weave .ui.grid>.column:not(.row), .ui.grid>.row>.column {
 	position: relative;
 	display: inline-block;
 	padding-left: 0;
@@ -1170,7 +1118,7 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	vertical-align: middle;
 }
 
-.ui.grid>.column:not(.row), .ui.grid>.row>.column {
+.weave .ui.grid>.column:not(.row), .ui.grid>.row>.column {
 	position: relative;
 	display: inline-block;
 	padding-left: 0;
@@ -1179,41 +1127,41 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 }
 
 /****** Accordion *******/
-.ui.styled.accordion {
+.weave .ui.styled.accordion {
 	border-radius: 2px;
 	background: none;
 	width:100%;
 	box-shadow:none;
 }
 
-.ui.styled.accordion .title {
+.weave .ui.styled.accordion .title {
 	padding: 1em 0 0 0;
 }
 
-.ui.styled.accordion .content {
+.weave .ui.styled.accordion .content {
 	padding: .5em 0 1em 1em;
 }
 
 /****** Dimmer ********/
-.ui.dimmer {
+.weave .ui.dimmer {
 	background-color: rgba(204,204,204,0.5);
 }
 
 /****** Modal *********/
-.ui.modal>.close {
+.weave .ui.modal>.close {
 	top: 1.0535rem;
 	right: 1rem;
 	color: rgba(0,0,0,.87);
 }
 
 /****** Inverted Segment *******/
-.ui.inverted,.ui.inverted.segment {
+.weave .ui.inverted,.ui.inverted.segment {
 	background: rgba(60,64,63,0.9);
 	color: rgba(161,164,163,1.0);
 }
 
 /****** Warning ******/
-.ui.input.warning input {
+.weave .ui.input.warning input {
 	background-color: #FFFAF3;
 	border-color: #C9BA9B;
 	color: #794B02;
@@ -1221,15 +1169,69 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 }
 
 /****** Modal *******/
-.ui.mini.modal {
+.weave .ui.mini.modal {
 	width: 400px;
 	margin: 0 0 0 -200px;
 }
 
-.ui.mini.modal>.close {
+.weave .ui.mini.modal>.close {
 	top: 1.0535rem;
 	right: 1rem;
 	color: rgba(0,0,0,.87);
+}
+
+/****** ButtonGroupBar ******/
+
+.weave-buttonGroupBar {
+	border-radius:12px;
+	border:1px solid grey;
+}
+.weave-buttonGroupBar .ui.button { /* inline style will override hover state */
+	background-color:white;
+}
+
+/****** Tool Editor ******/
+
+.weave-ToolEditor {
+	font-size: small;
+}
+
+.weave-ToolEditor .ui.button {
+	font-size: small;
+}
+
+.weave-ToolEditor table {
+	width: 100%;
+	font-size: inherit;
+}
+
+.weave-ToolEditor .weave-left-cell {
+	white-space: nowrap;
+	text-align: right;
+}
+
+.weave-ToolEditor .weave-right-cell {
+	width: 100%;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	padding-left: 8px;
+}
+
+.weave-ToolEditor-Header {
+	align-items: center;
+	border-bottom: 1px solid lightgrey;
+	margin: 0 8px;/* this ensures border bottom will be disconnected seperator */
+}
+
+.weave-ToolEditor-Header .ui.button { /* inline style will override hover state */
+	border-color: transparent;
+	padding: 8px;
+	background-color: transparent;
+}
+
+.weave-ToolEditor-Header .ui.button:hover { /* inline style will override hover state */
+	color: black;
+	background-color: rgba(0, 0, 0, 0.12);
 }
 
 .weave-dropzone-file {
@@ -1315,12 +1317,12 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	border: 1px solid lightgrey;
 }
 
-.ReactCodeMirror {
+.weave .ReactCodeMirror {
 	display: flex;
 	flex: 1;
 	flex-direction: column;
 }
 
-.ReactCodeMirror > .CodeMirror {
+.weave .ReactCodeMirror > .CodeMirror {
 	flex: 1
 }
