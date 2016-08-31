@@ -72,7 +72,7 @@ export default class C3Histogram extends AbstractC3Tool
 	aggregationMethod = Weave.linkableChild(this, new LinkableString("count"));
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
-	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95), this.verifyBarRatio);
+	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95, this.verifyBarRatio));
 	horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
 	showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
 	xAxisLabelAngle = Weave.linkableChild(this, new LinkableNumber(-45));

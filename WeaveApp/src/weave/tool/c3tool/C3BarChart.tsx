@@ -88,7 +88,7 @@ export default class C3BarChart extends AbstractC3Tool
 	showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
 	showXAxisLabel = Weave.linkableChild(this, new LinkableBoolean(false));
 	xAxisLabelAngle = Weave.linkableChild(this, new LinkableNumber(-45));
-	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.8), this.verifyBarRatio);
+	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.8, this.verifyBarRatio));
 
 	private verifyGroupingMode(mode:string):boolean
 	{
