@@ -50,7 +50,7 @@ namespace weavejs.data
 			{
 				// if this is the first time we've seen this data source, add dispose callback
 				if (!this.d2d_dataSource_metadataHash_column.map.has(dataSource))
-					Weave.getCallbacks(dataSource).addDisposeCallback(this, function():void {
+					Weave.getCallbacks(dataSource).addDisposeCallback(this, ():void => {
 						this.d2d_dataSource_metadataHash_column.map['delete'](dataSource);
 					});
 
@@ -58,7 +58,7 @@ namespace weavejs.data
 				// column from its data source and save the column pointer.
 				column = dataSource.generateNewAttributeColumn(metadata);
 				if (column)
-					column.addDisposeCallback(this, function():void {
+					column.addDisposeCallback(this, ():void => {
 						this.d2d_dataSource_metadataHash_column.remove(dataSource, hashCode);
 					});
 				this.d2d_dataSource_metadataHash_column.set(dataSource, hashCode, column);
@@ -80,7 +80,7 @@ namespace weavejs.data
 			var promise = new WeavePromise(root).setResult(root);
 			var dispose = () => promise.dispose();
 			var promiseThen = promise
-				.then(function(root:ILinkableHashMap):ILinkableHashMap {
+				.then((root:ILinkableHashMap):ILinkableHashMap => {
 					// request data from every column
 					var column:IAttributeColumn;
 					var columns = Weave.getDescendants(root, IAttributeColumn);
@@ -215,7 +215,7 @@ namespace weavejs.data
 
 			(WeaveAPI.QKeyManager as QKeyManager)
 				.getQKeysPromise(column, keyType, keyStrings)
-				.then(function(keys:IQualifiedKey[]):void {
+				.then((keys:IQualifiedKey[]) => {
 					if (Weave.IS(column, GeometryColumn))
 					{
 						var geomKeys:IQualifiedKey[] = [];

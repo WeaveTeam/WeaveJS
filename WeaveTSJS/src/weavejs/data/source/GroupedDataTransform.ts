@@ -85,11 +85,11 @@ namespace weavejs.data.source
 					dataSource: this,
 					dependency: this.dataColumns.childListCallbacks,
 					data: this,
-					"label": this.getLabel,
+					"label": () => this.getLabel(),
 					hasChildBranches: false,
-					children: function() {
+					children: () => {
 						return this.dataColumns.getNames().map(
-							function (columnName:string) {
+							(columnName:string) => {
 								var meta:{[key:string]:string} = {};
 								meta[GroupedDataTransform.DATA_COLUMNNAME_META] = columnName;
 								return this.generateHierarchyNode(meta);
