@@ -17,7 +17,7 @@
     "compile-libs": "npm run compile-librefs && tsc -p tsconfig-libs.json && babel outts/libs.js --out-file lib/libs.js && browserifyinc --cachefile  browserifycache.json lib/libs.js > dist/libs.js",
     "compile-module": "tsc -p tsconfig-module.json && babel outts/module.js --out-file lib/module.js",
     "compile-dts": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/ && mv WeaveASJS/typings/*.d.ts ./typings/weave/",
-    "compile-ts": "npm run compile-refs && tsc -p tsconfig.json && babel outts/weavejs.js --out-file dist/weavejs.js",
+    "compile-ts": "mkdirp dist/ && npm run compile-refs && tsc -p tsconfig.json && babel outts/weavejs.js --out-file dist/weavejs.js",
     "compile-as": "node WeaveASJS/build.js",
     "postinstall": "cd lib || ( npm run compile && npm run compile-module && npm run dts )"
   },
@@ -41,6 +41,7 @@
     "glob": "^7.0.5",
     "minifyify": "^7.1.0",
     "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
     "tsd": "^0.6.5",
     "tsort": "^0.0.1"
   },

@@ -18,7 +18,6 @@ addons:
       - g++-4.8
       - sshpass
 before_install:
-- mkdir dist
 - yes | npm install
 - npm install
 - pushd node_modules/flexjs/js/bin/
