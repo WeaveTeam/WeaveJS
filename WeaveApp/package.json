@@ -1,6 +1,6 @@
 {
   "name": "weave-app",
-  "version": "2.2.0",
+  "version": "2.2.2",
   "description": "Collection of visualization tools and UI from the WeaveJS project.",
   "scripts": {
     "clean": "rimraf bin/ && rimraf dist/weave-app.bundle.js",
