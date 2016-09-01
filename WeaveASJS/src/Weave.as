@@ -543,14 +543,53 @@ package
 		 */
 		public static function registerClass(definition:Class, qualifiedName:/*/string|string[]/*/Object, additionalInterfaces:Array/*/<new()=>any>/*/ = null, displayName:String = null):void
 		{
-			var names:Array = qualifiedName as Array || [qualifiedName];
-			for (var index:String in names)
-			{
-				if (index == '0')
-					WeaveAPI.ClassRegistry.registerClass(definition, names[index], [ILinkableObject].concat(additionalInterfaces || []), displayName);
-				else
-					WeaveAPI.ClassRegistry.registerClass(definition, names[index]);
-			}
+			var ids:Array = qualifiedName is String ? [qualifiedName] : qualifiedName as Array || [];
+			if (!ids.length)
+				throw new Error("registerClass() requires at least one name under which to register a class definition");
+
+			definition['WEAVE_INFO'] = classInfo(definition, {
+				"id": ids[0],
+				"label": displayName,
+				"interfaces": additionalInterfaces,
+				"deprecatedIds": ids.slice(1)
+			});
+		}
+
+		/**
+		 * Registers a class.
+		 * @param definition The class definition.
+		 * @param info An object containing the class info.
+		 * @return The same info object passed in as a parameter.
+		 */
+		public static function classInfo(definition:/*/new(..._:any[])=>any/*/Class, info:/*/{
+			id:string,
+			label?:string,
+			interfaces?:Array<new()=>any>,
+			deprecatedIds?:string[],
+			singleton?:boolean,
+			linkable?:boolean
+		}/*/Object):/*/typeof info/*/Object
+		{
+			var ID:String = 'id';
+			var DEPRECATED_IDS:String = 'deprecatedIds';
+			var INTERFACES:String = 'interfaces';
+			var LABEL:String = 'label';
+			var LINKABLE:String = 'linkable';
+			var SINGLETON:String = 'singleton';
+
+			var id:String = info[ID] as String;
+			var label:String = info[LABEL] as String;
+			var linkable:Boolean = info[LINKABLE] === undefined ? true : !!info[LINKABLE];
+			var singleton:Boolean = !!info[SINGLETON];
+			var allInterfaces:Array = linkable ? [ILinkableObject].concat(info[INTERFACES] || []) : info[INTERFACES] as Array;
+			var deprecatedIds:Array = info[DEPRECATED_IDS] is String ? [info[DEPRECATED_IDS]] : info[DEPRECATED_IDS] as Array || [];
+
+			WeaveAPI.ClassRegistry.registerClass(definition, id, allInterfaces, label);
+
+			for each (var deprecatedId:String in deprecatedIds)
+				WeaveAPI.ClassRegistry.registerClass(definition, deprecatedId);
+
+			return definition['WEAVE_INFO'] = info;
 		}
 		
 		/**
