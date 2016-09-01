@@ -66,7 +66,7 @@ module.exports = function()
 			}
 			catch (e)
 			{
-				console.log("Failed to find sourcemap for", e, "making stub.")
+				console.log("Failed to find sourcemap for", filename+",", "making stub.")
 				sourceMap = {
 					version: 3,
 					file: path.basename(filename),
