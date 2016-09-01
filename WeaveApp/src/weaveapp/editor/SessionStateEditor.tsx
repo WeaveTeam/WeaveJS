@@ -17,7 +17,7 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import DebugUtils = weavejs.util.DebugUtils;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
-import WeaveProperties from "weaveapp/app/WeaveProperties";
+import WeaveProperties from "weaveapp/WeaveProperties";
 import IGetMenuItems = weavejs.ui.menu.IGetMenuItems;
 import Menu = weavejs.ui.menu.Menu;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;

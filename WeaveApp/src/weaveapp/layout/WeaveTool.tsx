@@ -20,7 +20,7 @@ import DraggableDiv = weavejs.ui.DraggableDiv;
 import LinkableString = weavejs.core.LinkableString;
 
 import KeyboardUtils = weavejs.util.KeyboardUtils;
-import WeaveProperties from "weaveapp/app/WeaveProperties";
+import WeaveProperties from "weaveapp/WeaveProperties";
 import DynamicComponent = weavejs.ui.DynamicComponent;
 import {AbstractLayout, AnyAbstractLayout} from "weaveapp/layout/AbstractLayout";
 import IVisTool from "weaveapp/api/ui/IVisTool";

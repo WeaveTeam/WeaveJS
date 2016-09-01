@@ -16,7 +16,7 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
-import WeaveProperties from "weaveapp/app/WeaveProperties";
+import WeaveProperties from "weaveapp/WeaveProperties";
 import WebSocketDataSource = weavejs.data.source.WebSocketDataSource;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import KeySet = weavejs.data.key.KeySet;

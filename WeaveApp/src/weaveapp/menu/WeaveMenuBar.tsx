@@ -2,7 +2,7 @@ import * as React from "react";
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
 import MenuBar = weavejs.ui.menu.MenuBar;
-import WeaveProperties from "weaveapp/app/WeaveProperties";
+import WeaveProperties from "weaveapp/WeaveProperties";
 import WeaveMenus from "weaveapp/menu/WeaveMenus";
 import DynamicComponent = weavejs.ui.DynamicComponent;
 import SessionHistorySlider from "weaveapp/editor/SessionHistorySlider";

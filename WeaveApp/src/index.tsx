@@ -5,7 +5,7 @@ import Weave = weavejs.Weave;
 import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
 import WeaveArchive = weavejs.core.WeaveArchive;
 import {WeaveAPI} from "weavejs";
-import WeaveApp from "weaveapp/app/WeaveApp";
+import WeaveApp from "weaveapp/WeaveApp";
 import LandingPage from "weaveapp/dialog/LandingPage";
 import DOMUtils = weavejs.util.DOMUtils;
 

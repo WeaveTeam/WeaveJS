@@ -24,7 +24,7 @@ import {WeaveAPI} from "weavejs";
 import CSVDataSource = weavejs.data.source.CSVDataSource;
 import IDataSource = weavejs.api.data.IDataSource;
 import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
-import WeaveProperties from "weaveapp/app/WeaveProperties";
+import WeaveProperties from "weaveapp/WeaveProperties";
 import Admin = weavejs.net.Admin;
 import FileDialog from "weaveapp/dialog/FileDialog";
 import IWeaveMenus from "weaveapp/menu/IWeaveMenus";

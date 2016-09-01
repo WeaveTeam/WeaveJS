@@ -20,7 +20,7 @@ import Bounds2D = weavejs.geom.Bounds2D;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
-import WeaveProperties from "weaveapp/app/WeaveProperties";
+import WeaveProperties from "weaveapp/WeaveProperties";
 import {WeaveAPI} from "weavejs";
 import AbstractGlyphPlotter from "weaveapp/plot/AbstractGlyphPlotter";
 import SolidFillStyle from "weaveapp/plot/SolidFillStyle";

@@ -25,7 +25,7 @@ import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
 import DynamicState = weavejs.api.core.DynamicState;
-import WeaveProperties from "weaveapp/app/WeaveProperties";
+import WeaveProperties from "weaveapp/WeaveProperties";
 import WeaveMenus from "weaveapp/menu/WeaveMenus";
 import {WeaveAPI} from "weavejs";
 import WeaveToolEditor from "weaveapp/editor/WeaveToolEditor";
