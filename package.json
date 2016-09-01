@@ -45,7 +45,7 @@
     "tsort": "^0.0.1"
   },
   "dependencies": {
-    "as2dts": "^0.3.0",
+    "as2dts": "^0.3.6",
     "babel": "^6.1.18",
     "babel-cli": "^6.4.5",
     "browserify-incremental": "^3.1.1",
