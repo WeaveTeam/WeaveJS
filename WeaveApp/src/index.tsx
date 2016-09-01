@@ -5,8 +5,8 @@ import Weave = weavejs.Weave;
 import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
 import WeaveArchive = weavejs.core.WeaveArchive;
 import {WeaveAPI} from "weavejs";
-import WeaveApp from "weave/app/WeaveApp";
-import LandingPage from "weave/dialog/LandingPage";
+import WeaveApp from "weaveapp/app/WeaveApp";
+import LandingPage from "weaveapp/dialog/LandingPage";
 import DOMUtils = weavejs.util.DOMUtils;
 
 var map_session_url_instance = new Map<string, Weave>();
