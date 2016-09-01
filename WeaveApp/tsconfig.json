@@ -15,6 +15,6 @@
 	"newLine": "lf",
 	"baseUrl": "./src"
   },
-  "exclude": ["node_modules", "bin"],
+  "exclude": ["node_modules", "bin", "weaveapp-typings"],
   "compileOnSave": false
 }
