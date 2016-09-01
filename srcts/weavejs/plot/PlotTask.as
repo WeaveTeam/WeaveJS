@@ -22,6 +22,10 @@ namespace weavejs.plot
 	 */
 	export default  class PlotTask implements IPlotTask, ILinkableObject, IDisposableObject
 	{
+		static WEAVE_INFO = Weave.classInfo(PlotTask, {
+			id: "weavejs.plot.PlotTask"
+		});
+
 		public static debug:boolean = false;
 		// public static debugMouseDownPause:boolean = false;
 		public static debugIgnoreSpatialIndex:boolean = false;
@@ -451,6 +455,4 @@ namespace weavejs.plot
 		public iterationStopTime:number;
 		public asyncState:any = {};
 	}
-
-	Weave.registerClass(PlotTask, "weavejs.plot.PlotTask");
 }

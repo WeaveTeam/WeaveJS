@@ -40,6 +40,18 @@ namespace weavejs.tool.c3tool
 
 	export class C3PieChart extends AbstractC3Tool
 	{
+		static WEAVE_INFO = Weave.classInfo(C3PieChart, {
+			id: "weavejs.tool.c3tool.C3PieChart",
+			label: "Pie Chart",
+			interfaces: [
+				IVisTool,
+				ILinkableObjectWithNewProperties,
+				ISelectableAttributes,
+				IAltText
+			],
+			deprecatedIds: ["weave.visualization.tools::PieChartTool"]
+		}) ;
+
 		data = Weave.linkableChild(this, DynamicColumn);
 		label = Weave.linkableChild(this, DynamicColumn);
 		fill = Weave.linkableChild(this,SolidFillStyle);
@@ -280,16 +292,4 @@ namespace weavejs.tool.c3tool
 			}];
 		}
 	}
-
-	Weave.registerClass(
-		C3PieChart,
-		["weavejs.tool.c3tool.C3PieChart", "weave.visualization.tools::PieChartTool"],
-		[
-			IVisTool,
-			ILinkableObjectWithNewProperties,
-			ISelectableAttributes,
-			IAltText
-		],
-		"Pie Chart"
-	);
 }

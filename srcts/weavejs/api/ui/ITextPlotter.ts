@@ -18,9 +18,15 @@ namespace weavejs.api.ui
 	/**
 	 * A class implementing this interface is an IPlotter that renders text graphics.
 	 */
-	export interface ITextPlotter extends IPlotter { }
-	
-	export class ITextPlotter { }
-	
-	Weave.registerClass(ITextPlotter, "weavejs.api.ui.ITextPlotter", [IPlotter]);
+	export interface ITextPlotter extends IPlotter
+	{
+	}
+
+	export class ITextPlotter
+	{
+		static WEAVE_INFO = Weave.classInfo(ITextPlotter, {
+			id: "weavejs.api.ui.ITextPlotter",
+			interfaces: [IPlotter]
+		});
+	}
 }

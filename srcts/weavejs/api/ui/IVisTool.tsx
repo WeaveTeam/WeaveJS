@@ -24,6 +24,11 @@ namespace weavejs.api.ui
 
 	export class IVisTool
 	{
+		static WEAVE_INFO = Weave.classInfo(IVisTool, {
+			id: 'weavejs.api.ui.IVisTool',
+			interfaces: [ISelectableAttributes]
+		});
+
 		static renderSelectableAttributes(selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>, pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void):React.ReactChild[][]
 		{
 			return JS.mapEntries(selectableAttributes).map(([key, value]) => {
@@ -34,6 +39,4 @@ namespace weavejs.api.ui
 			});
 		}
 	}
-	
-	WeaveAPI.ClassRegistry.registerClass(IVisTool, 'weavejs.api.ui.IVisTool', [ISelectableAttributes]);
 }

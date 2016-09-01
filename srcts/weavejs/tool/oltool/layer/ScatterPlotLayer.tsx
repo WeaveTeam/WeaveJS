@@ -17,6 +17,13 @@ namespace weavejs.tool.oltool.layer
 
 	export class ScatterPlotLayer extends AbstractGlyphLayer
 	{
+		static WEAVE_INFO = Weave.classInfo(ScatterPlotLayer, {
+			id: "weavejs.tool.oltool.layer.ScatterPlotLayer",
+			label: "Bubbles",
+			interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],
+			deprecatedIds: ["weave.visualization.plotters::ScatterPlotPlotter"]
+		});
+
 		get selectableAttributes()
 		{
 			return super.selectableAttributes
@@ -196,11 +203,4 @@ namespace weavejs.tool.oltool.layer
 			}
 		}
 	}
-
-	Weave.registerClass(
-		ScatterPlotLayer,
-		["weavejs.tool.oltool.layer.ScatterPlotLayer", "weave.visualization.plotters::ScatterPlotPlotter"],
-		[ILinkableObjectWithNewProperties, ISelectableAttributes],
-		"Bubbles"
-	);
 }

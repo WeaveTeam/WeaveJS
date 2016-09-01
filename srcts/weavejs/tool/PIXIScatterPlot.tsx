@@ -24,6 +24,16 @@ namespace weavejs.tool
 
 	export class PIXIScatterPlot extends AbstractVisTool<PIXIScatterPlotProps, PIXIScatterPlotState>
 	{
+		static WEAVE_INFO = Weave.classInfo(PIXIScatterPlot, {
+			id: "weavejs.tool.PIXIScatterPlot",
+			label: "Scatter Plot",
+			interfaces: [
+				IVisTool,
+				ILinkableObjectWithNewProperties,
+				ISelectableAttributes,
+			]
+		});
+
 		element:HTMLDivElement;
 		renderer:PIXI.WebGLRenderer | PIXI.CanvasRenderer;
 		graphics:PIXI.Graphics = new PIXI.Graphics();
@@ -79,15 +89,4 @@ namespace weavejs.tool
 			);
 		}
 	}
-
-	Weave.registerClass(
-		PIXIScatterPlot,
-		["weavejs.tool.PIXIScatterPlot"/*, "weave.visualization.tools::ScatterPlotTool"*/],
-		[
-			IVisTool,
-			ILinkableObjectWithNewProperties,
-			ISelectableAttributes,
-		],
-		"Scatter Plot"
-	);
 }

@@ -21,8 +21,7 @@ namespace weavejs.tool.oltool
 
 	export class IOpenLayersMapTool
 	{
+		static WEAVE_INFO = Weave.classInfo(IOpenLayersMapTool, {id: 'weavejs.api.ui.IOpenLayersMapTool', linkable: false});
 		static MAP_TOOL = "IOpenLayersMapTool";
 	}
-	
-	WeaveAPI.ClassRegistry.registerClass(IOpenLayersMapTool, 'weavejs.api.ui.IOpenLayersMapTool');
 }

@@ -33,6 +33,17 @@ namespace weavejs.tool.c3tool
 
 	export class C3Gauge extends AbstractC3Tool
 	{
+		static WEAVE_INFO = Weave.classInfo(C3Gauge, {
+			id: "weavejs.tool.c3tool.C3Gauge",
+			label: "Gauge",
+			interfaces: [
+				IVisTool,
+				ILinkableObjectWithNewProperties,
+				ISelectableAttributes
+			],
+			deprecatedIds: ["weave.visualization.tools::GaugeTool"]
+		});
+
 		meterColumn = Weave.linkableChild(this, DynamicColumn);
 		binningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
 		colorRamp = Weave.linkableChild(this, ColorRamp);
@@ -228,15 +239,4 @@ namespace weavejs.tool.c3tool
 			}];
 		}
 	}
-
-	Weave.registerClass(
-		C3Gauge,
-		["weavejs.tool.c3tool.C3Gauge", "weave.visualization.tools::GaugeTool"],
-		[
-			IVisTool,
-			ILinkableObjectWithNewProperties,
-			ISelectableAttributes
-		],
-		"Gauge"
-	);
 }

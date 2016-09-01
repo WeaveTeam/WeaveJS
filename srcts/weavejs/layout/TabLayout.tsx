@@ -55,6 +55,12 @@ namespace weavejs.layout
 
 	export class TabLayout extends AbstractLayout<TabLayoutProps, {}> implements ILinkableVariable
 	{
+		static WEAVE_INFO = Weave.classInfo(TabLayout, {
+			id: 'weavejs.layout.TabLayout',
+			label: 'Tab Layout',
+			interfaces: [ILinkableVariable]
+		});
+
 		static get DEFAULT_TAB_PREFIX():string
 		{
 			return Weave.lang("Sheet ");
@@ -396,11 +402,4 @@ namespace weavejs.layout
 			);
 		}
 	}
-
-	Weave.registerClass(
-		TabLayout,
-		'weavejs.layout.TabLayout',
-		[ILinkableVariable],
-		'Tab Layout'
-	);
 }

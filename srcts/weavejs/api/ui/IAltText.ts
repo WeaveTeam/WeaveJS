@@ -5,15 +5,20 @@ namespace weavejs.api.ui
 
 	export class IAltTextConfig
 	{
+		static WEAVE_INFO = Weave.classInfo(IAltTextConfig, {
+			id: "weavejs.api.ui.IAltTextConfig",
+		});
+
 		text = Weave.linkableChild(this, LinkableString);
 		showAsCaption = Weave.linkableChild(this, new LinkableBoolean(false));
 	}
-	Weave.registerClass(IAltTextConfig, "weavejs.api.ui.IAltTextConfig");
 
 	export class IAltText
 	{
+		static WEAVE_INFO = Weave.classInfo(IAltTextConfig, {
+			id: "weavejs.api.ui.IAltText",
+		});
 		altText = Weave.linkableChild(this, IAltTextConfig);
 		getAutomaticDescription:()=>string;
 	}
-	Weave.registerClass(IAltText, "weavejs.api.ui.IAltText");
 }

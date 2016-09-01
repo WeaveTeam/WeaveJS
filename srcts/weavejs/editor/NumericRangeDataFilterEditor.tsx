@@ -16,6 +16,11 @@ namespace weavejs.editor
 
 	export class NumericRangeDataFilterEditor extends AbstractFilterEditor
 	{
+		static WEAVE_INFO = Weave.classInfo(NumericRangeDataFilterEditor, {
+			id: "weavejs.editor.NumericRangeDataFilterEditor",
+			interfaces: [ILinkableObjectWithNewProperties]
+		});
+
 		static get OPTIONS():string[]{
 			return ["Force Discrete Values"];
 		}
@@ -70,6 +75,4 @@ namespace weavejs.editor
 			}
 		}
 	}
-
-	Weave.registerClass(NumericRangeDataFilterEditor, "weavejs.editor.NumericRangeDataFilterEditor", [ILinkableObjectWithNewProperties]);
 }

@@ -41,6 +41,13 @@ namespace weavejs.tool
 
 	export class SessionStateMenuTool extends AbstractVisTool<IVisToolProps, IVisToolState>
 	{
+		static WEAVE_INFO = Weave.classInfo(SessionStateMenuTool, {
+			id: "weavejs.tool.SessionStateMenu",
+			label: "Session State Menu Tool",
+			interfaces: [IVisTool],
+			deprecatedIds: ["weave.ui::SessionStateMenuTool"]
+		});
+
 		public selectedChoice = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
 		public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
 		public autoRecord = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
@@ -181,13 +188,6 @@ namespace weavejs.tool
 			);
 		}
 	}
-
-	Weave.registerClass(
-		SessionStateMenuTool,
-		["weavejs.tool.SessionStateMenu", "weave.ui::SessionStateMenuTool"],
-		[IVisTool/*, ILinkableObjectWithNewProperties*/],
-		"Session State Menu Tool"
-	);
 
 
 	//EDITOR for the Session state Menu tool

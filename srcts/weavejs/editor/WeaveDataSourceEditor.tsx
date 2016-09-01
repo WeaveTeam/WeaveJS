@@ -29,6 +29,10 @@ namespace weavejs.editor
 
 	export class WeaveDataSourceEditor extends DataSourceEditor
 	{
+		static WEAVE_INFO = Weave.classInfo(WeaveDataSourceEditor, {
+			id: "weavejs.editor.WeaveDataSourceEditor"
+		});
+
 		componentWillReceiveProps(props:IDataSourceEditorProps)
 		{
 			super.componentWillReceiveProps(props);
@@ -172,6 +176,4 @@ namespace weavejs.editor
 			return super.editorFields.concat(editorFields)
 		}
 	}
-
-	Weave.registerClass(WeaveDataSourceEditor, "weavejs.editor.WeaveDataSourceEditor", []);
 }

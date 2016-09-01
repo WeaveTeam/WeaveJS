@@ -10,15 +10,24 @@ namespace weavejs.app
 	import BinnedColumn = weavejs.data.column.BinnedColumn;
 	import FilteredColumn = weavejs.data.column.FilteredColumn;
 
-	export class AccessibilityProperties {
+	export class AccessibilityProperties
+	{
+		static WEAVE_INFO = Weave.classInfo(AccessibilityProperties, {
+			id: "weavejs.app.AccessibilityProperties",
+		});
+
 		enableAccessibilityFeatures = Weave.linkableChild(this, LinkableBoolean);
 		enableCaptioning = Weave.linkableChild(this, LinkableBoolean);
 	}
 
-	Weave.registerClass(AccessibilityProperties, "weavejs.app.AccessibilityProperties");
-
 	export class WeaveProperties implements ILinkableObject, ILinkableObjectWithNewProperties
 	{
+		static WEAVE_INFO = Weave.classInfo(WeaveProperties, {
+			id: "weavejs.app.WeaveProperties",
+			interfaces: [ILinkableObjectWithNewProperties],
+			deprecatedIds: ["weave::WeaveProperties"]
+		});
+
 		static WEAVE_PROPERTIES = "WeaveProperties";
 
 		static DEFAULT_COLOR_COLUMN = "defaultColorColumn";
@@ -90,6 +99,4 @@ namespace weavejs.app
 			return {};
 		}
 	}
-
-	Weave.registerClass(WeaveProperties, ["weavejs.app.WeaveProperties", "weave::WeaveProperties"], [ILinkableObject, ILinkableObjectWithNewProperties]);
 }

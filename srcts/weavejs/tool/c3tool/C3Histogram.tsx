@@ -63,6 +63,18 @@ namespace weavejs.tool.c3tool
 
 	export class C3Histogram extends AbstractC3Tool
 	{
+		static WEAVE_INFO = Weave.classInfo(C3Histogram, {
+			id: "weavejs.tool.c3tool.C3Histogram",
+			label: "Histogram",
+			interfaces: [
+				IVisTool,
+				ILinkableObjectWithNewProperties,
+				ISelectableAttributes,
+				IAltText
+			],
+			deprecatedIds: ["weave.visualization.tools::HistogramTool"]
+		});
+
 		binnedColumn = Weave.linkableChild(this, BinnedColumn, this.setColorColumn, true);
 		columnToAggregate = Weave.linkableChild(this, DynamicColumn);
 		aggregationMethod = Weave.linkableChild(this, new LinkableString("count"));
@@ -689,16 +701,4 @@ namespace weavejs.tool.c3tool
 			}];
 		}
 	}
-
-	Weave.registerClass(
-		C3Histogram,
-		["weavejs.tool.c3tool.C3Histogram", "weave.visualization.tools::HistogramTool"],
-		[
-			IVisTool,
-			ILinkableObjectWithNewProperties,
-			ISelectableAttributes,
-			IAltText
-		],
-		"Histogram"
-	);
 }

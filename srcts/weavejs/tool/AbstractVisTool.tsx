@@ -36,13 +36,18 @@ namespace weavejs.tool
 
 	export class Margin
 	{
+		static WEAVE_INFO = Weave.classInfo(Margin, {id: "weavejs.tool.Margin"});
+
 		top = Weave.linkableChild(this, new LinkableNumber(20));
 		bottom = Weave.linkableChild(this, new LinkableNumber(100));
 		left = Weave.linkableChild(this, new LinkableNumber(100));
 		right = Weave.linkableChild(this, new LinkableNumber(20));
 	}
+
 	export class OverrideBounds
 	{
+		static WEAVE_INFO = Weave.classInfo(OverrideBounds, {id: "weavejs.tool.OverrideBounds"});
+
 		xMin = Weave.linkableChild(this, LinkableNumber);
 		yMin = Weave.linkableChild(this, LinkableNumber);
 		xMax = Weave.linkableChild(this, LinkableNumber);
@@ -55,11 +60,6 @@ namespace weavejs.tool
 		selectionFilter:DynamicKeyFilter,
 		probeFilter:DynamicKeyFilter
 	}
-
-	Weave.registerClass(Margin, "weavejs.tool.Margin");
-	Weave.registerClass(OverrideBounds, "weavejs.tool.OverrideBounds");
-
-
 
 	export class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems, IInitSelectableAttributes, IAltText
 	{

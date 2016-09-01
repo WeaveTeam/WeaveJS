@@ -213,10 +213,4 @@ namespace weavejs.plot
 			this.prevLineStyle = lineStyleParams;
 		}
 	}
-
-	Weave.registerClass(LineChartPlotter, "Line Chart", [IPlotter]);
 }
-
-
-
-

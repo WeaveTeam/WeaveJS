@@ -26,6 +26,8 @@ namespace weavejs.editor
 
 	export class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState>
 	{
+		static WEAVE_INFO = Weave.classInfo(SessionHistorySlider, {id: "weavejs.editor.SessionHistorySlider"});
+
 		private _stateLogWatcher:LinkableWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog));
 
 		constructor(props:SessionHistorySliderProps)
@@ -177,5 +179,4 @@ namespace weavejs.editor
 			);
 		}
 	}
-	Weave.registerClass(SessionHistorySlider, "weavejs.editor.SessionHistorySlider");
 }

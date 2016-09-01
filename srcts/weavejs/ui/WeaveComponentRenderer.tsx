@@ -25,6 +25,8 @@ namespace weavejs.ui
 
 	export class WeaveComponentRenderer extends SmartComponent<IWeaveComponentRendererProps, IWeaveComponentRendererState>
 	{
+		static WEAVE_INFO = Weave.classInfo(WeaveComponentRenderer, {id: 'weavejs.ui.WeaveComponentRenderer', linkable: false});
+
 		watcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(null, null, this.handleWatcher.bind(this)));
 		generatedComponent:React.Component<any, any> & ILinkableObject;
 		key:number = 0;
@@ -146,5 +148,4 @@ namespace weavejs.ui
 			return <VBox {...props} className={classNames(props.className, "weave")}>{ content }</VBox>;
 		}
 	}
-	WeaveAPI.ClassRegistry.registerClass(WeaveComponentRenderer, 'weavejs.ui.WeaveComponentRenderer');
 }

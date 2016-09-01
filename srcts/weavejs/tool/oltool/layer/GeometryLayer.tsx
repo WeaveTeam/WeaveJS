@@ -21,6 +21,13 @@ namespace weavejs.tool.oltool.layer
 
 	export class GeometryLayer extends AbstractFeatureLayer
 	{
+		static WEAVE_INFO = Weave.classInfo(GeometryLayer, {
+			id: "weavejs.tool.oltool.layer.GeometryLayer",
+			label: "Geometries",
+			interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],
+			deprecatedIds: ["weave.visualization.plotters::GeometryPlotter"]
+		});
+
 		private geoJsonParser:ol.format.GeoJSON;
 
 		fill = Weave.linkableChild(this, SolidFillStyle);
@@ -214,11 +221,4 @@ namespace weavejs.tool.oltool.layer
 			}
 		}
 	}
-
-	Weave.registerClass(
-		GeometryLayer,
-		["weavejs.tool.oltool.layer.GeometryLayer", "weave.visualization.plotters::GeometryPlotter"],
-		[ILinkableObjectWithNewProperties, ISelectableAttributes],
-		"Geometries"
-	);
 }

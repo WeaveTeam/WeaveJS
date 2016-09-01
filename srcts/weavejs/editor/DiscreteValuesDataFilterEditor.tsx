@@ -22,6 +22,11 @@ namespace weavejs.editor
 
 	export class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 	{
+		static WEAVE_INFO = Weave.classInfo(DiscreteValuesDataFilterEditor, {
+			id: "weavejs.editor.DiscreteValuesDataFilterEditor",
+			interfaces: [ILinkableObjectWithNewProperties]
+		});
+
 		static get OPTIONS():string[]{
 			return [LAYOUT_LIST,
 				LAYOUT_COMBO,
@@ -79,6 +84,4 @@ namespace weavejs.editor
 			/>);
 		}
 	}
-
-	Weave.registerClass(DiscreteValuesDataFilterEditor, "weavejs.editor.DiscreteValuesDataFilterEditor", [ILinkableObjectWithNewProperties]);
 }

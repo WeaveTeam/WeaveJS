@@ -26,6 +26,12 @@ namespace weavejs.plot
 
 	export class ScatterPlotPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
 	{
+		static WEAVE_INFO = Weave.classInfo(ScatterPlotPlotter, {
+			id: 'weavejs.plot.ScatterPlotPlotter',
+			label: "Scatterplot",
+			interfaces: [IPlotter, IObjectWithDescription, ISelectableAttributes]
+		});
+
 		public constructor()
 		{
 			super();
@@ -184,8 +190,4 @@ namespace weavejs.plot
 			};
 		}
 	}
-
-	Weave.registerClass(ScatterPlotPlotter, 'weavejs.plot.ScatterPlotPlotter', [IPlotter, IObjectWithDescription, ISelectableAttributes]);
-
-	WeaveAPI.ClassRegistry.registerImplementation(IPlotter, ScatterPlotPlotter, "Scatterplot");
 }

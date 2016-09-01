@@ -37,6 +37,18 @@ namespace weavejs.tool.c3tool
 
 	export class C3LineChart extends AbstractC3Tool
 	{
+		static WEAVE_INFO = Weave.classInfo(C3LineChart, {
+			id: "weavejs.tool.c3tool.C3LineChart",
+			label: "Line Chart",
+			interfaces: [
+				IVisTool,
+				ILinkableObjectWithNewProperties,
+				ISelectableAttributes,
+				IAltText
+			],
+			deprecatedIds: ["weave.visualization.tools::LineChartTool"]
+		}) ;
+
 		columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 		line = Weave.linkableChild(this, SolidLineStyle);
 		curveType = Weave.linkableChild(this, LinkableString);
@@ -432,17 +444,5 @@ namespace weavejs.tool.c3tool
 			}];
 		}
 	}
-
-	Weave.registerClass(
-		C3LineChart,
-		["weavejs.tool.c3tool.C3LineChart", "weave.visualization.tools::LineChartTool"],
-		[
-			IVisTool,
-			ILinkableObjectWithNewProperties,
-			ISelectableAttributes,
-			IAltText
-		],
-		"Line Chart"
-	);
 }
 

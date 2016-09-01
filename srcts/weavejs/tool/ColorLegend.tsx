@@ -76,6 +76,13 @@ namespace weavejs.tool
 
 	export class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements ILinkableObjectWithNewProperties, IVisTool, IInitSelectableAttributes
 	{
+		static WEAVE_INFO = Weave.classInfo(ColorLegend, {
+			id: "weavejs.tool.ColorLegend",
+			label: "Color Legend",
+			interfaces: [IVisTool, ILinkableObjectWithNewProperties, ISelectableAttributes],
+			deprecatedIds: ["weave.visualization.tools::ColorBinLegendTool"]
+		});
+
 		panelTitle = Weave.linkableChild(this, LinkableString);
 		filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 		selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
@@ -535,11 +542,4 @@ namespace weavejs.tool
 			};
 		}
 	}
-
-	Weave.registerClass(
-		ColorLegend,
-		["weavejs.tool.ColorLegend", "weave.visualization.tools::ColorBinLegendTool"],
-		[IVisTool, ILinkableObjectWithNewProperties, ISelectableAttributes],
-		"Color Legend"
-	);
 }

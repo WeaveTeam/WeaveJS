@@ -45,6 +45,13 @@ namespace weavejs.tool
 
 	export class AttributeMenuTool extends React.Component<IVisToolProps, IAttributeMenuToolState> implements IVisTool
 	{
+		static WEAVE_INFO = Weave.classInfo(AttributeMenuTool, {
+			id: "weavejs.tool.AttributeMenu",
+			label: "Attribute Menu Tool",
+			interfaces: [IVisTool, ISelectableAttributes],
+			deprecatedIds: ["weave.ui::AttributeMenuTool"]
+		});
+
 		constructor (props:IVisToolProps)
 		{
 			super(props);
@@ -149,13 +156,6 @@ namespace weavejs.tool
 			);
 		}
 	}
-
-	Weave.registerClass(
-		AttributeMenuTool,
-		["weavejs.tool.AttributeMenu", "weave.ui::AttributeMenuTool"],
-		[IVisTool, ISelectableAttributes],
-		"Attribute Menu Tool"
-	);
 
 	//EDITOR for the Attribute Menu Tool
 

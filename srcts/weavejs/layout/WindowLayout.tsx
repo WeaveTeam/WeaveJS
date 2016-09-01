@@ -44,6 +44,12 @@ namespace weavejs.layout
 
 	export class WindowLayout extends AbstractLayout<LayoutProps, {}> implements ILinkableVariable
 	{
+		static WEAVE_INFO = Weave.classInfo(WindowLayout, {
+			id: 'weavejs.layout.WindowLayout',
+			label: "Window Layout",
+			interfaces: [ILinkableVariable]
+		});
+
 		private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, MiscUtils.normalizeStructure({}, stateStructure)), this.forceUpdate, true);
 		private overlay:Div;
 
@@ -326,11 +332,4 @@ namespace weavejs.layout
 			);
 		}
 	}
-
-	Weave.registerClass(
-		WindowLayout,
-		'weavejs.layout.WindowLayout',
-		[ILinkableVariable],
-		"Window Layout"
-	);
 }

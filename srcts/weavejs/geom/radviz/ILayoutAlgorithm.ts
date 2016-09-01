@@ -20,6 +20,14 @@ namespace weavejs.geom.radviz
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
+	export class ILayoutAlgorithm
+	{
+		static WEAVE_INFO = Weave.classInfo(ILayoutAlgorithm, {
+			id: 'weavejs.geom.radviz.ILayoutAlgorithm',
+			interfaces: [ICallbackCollection]
+		});
+	}
+
 	/**
 	 * An interface for dimensional layout algorithms
 	 */
@@ -41,10 +49,4 @@ namespace weavejs.geom.radviz
 	}
 
 	export type D2D_KeyColumnNumber = Dictionary2D<IQualifiedKey, IAttributeColumn, number>;
-
-	export class ILayoutAlgorithm
-	{
-	}
-
-	Weave.registerClass(ILayoutAlgorithm, 'weavejs.geom.radviz.ILayoutAlgorithm', [ICallbackCollection]);
 }

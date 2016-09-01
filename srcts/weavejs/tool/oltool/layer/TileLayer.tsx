@@ -170,6 +170,13 @@ namespace weavejs.tool.oltool.layer
 
 	export class TileLayer extends AbstractLayer
 	{
+		static WEAVE_INFO = Weave.classInfo(TileLayer, {
+			id: "weavejs.tool.oltool.layer.TileLayer",
+			label: "Base map",
+			interfaces: [ILinkableObjectWithNewProperties],
+			deprecatedIds: ["weave.visualization.plotters::WMSPlotter"]
+		});
+
 		oldProviderName:string;
 
 		provider = Weave.linkableChild(this, new LinkableString("osm"));
@@ -336,11 +343,4 @@ namespace weavejs.tool.oltool.layer
 			this.source = newLayer || null;
 		}
 	}
-
-	Weave.registerClass(
-		TileLayer,
-		["weavejs.tool.oltool.layer.TileLayer", "weave.visualization.plotters::WMSPlotter"],
-		[ILinkableObjectWithNewProperties],
-		"Base map"
-	);
 }

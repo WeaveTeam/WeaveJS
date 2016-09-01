@@ -26,6 +26,11 @@ namespace weavejs.plot
 
 	export class SolidLineStyle implements ILinkableObject
 	{
+		static WEAVE_INFO = Weave.classInfo(SolidLineStyle, {
+			id: "weavejs.plot.SolidLineStyle",
+			deprecatedIds: ["ExtendedLineStyle"]
+		});
+
 		public constructor()
 		{
 			this._callbackCollection = Weave.getCallbacks(this);
@@ -140,7 +145,5 @@ namespace weavejs.plot
 			return params;
 		}
 	}
-
-	Weave.registerClass(SolidLineStyle, ["weavejs.plot.SolidLineStyle", "ExtendedLineStyle"]);
 }
 

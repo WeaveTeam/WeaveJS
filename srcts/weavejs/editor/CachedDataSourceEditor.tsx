@@ -8,6 +8,11 @@ namespace weavejs.editor
 
 	export class CachedDataSourceEditor extends DataSourceEditor
 	{
+		static WEAVE_INFO = Weave.classInfo(CachedDataSourceEditor, {
+			id: "weavejs.editor.CachedDataSourceEditor",
+			linkable: false
+		});
+
 		get editorFields():[React.ReactChild, React.ReactChild][]
 		{
 			let ds = (this.props.dataSource as CachedDataSource);
@@ -21,6 +26,4 @@ namespace weavejs.editor
 			];
 		}
 	}
-
-	Weave.registerClass(CachedDataSourceEditor, "weavejs.editor.CachedDataSourceEditor", []);
 }

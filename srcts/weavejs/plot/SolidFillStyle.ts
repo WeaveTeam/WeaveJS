@@ -23,6 +23,11 @@ namespace weavejs.plot
 	
 	export class SolidFillStyle implements ILinkableObject
 	{
+		static WEAVE_INFO = Weave.classInfo(SolidFillStyle, {
+			id: "weavejs.plot.SolidFillStyle",
+			deprecatedIds: ["ExtendedFillStyle"]
+		});
+
 		/**
 		 * Used to enable or disable fill patterns.
 		 */
@@ -64,6 +69,4 @@ namespace weavejs.plot
 			};
 		}
 	}
-
-	Weave.registerClass(SolidFillStyle, ["weavejs.plot.SolidFillStyle", "ExtendedFillStyle"]);
 }

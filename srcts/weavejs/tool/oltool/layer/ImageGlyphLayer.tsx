@@ -12,6 +12,13 @@ namespace weavejs.tool.oltool.layer
 
 	export class ImageGlyphLayer extends AbstractGlyphLayer
 	{
+		static WEAVE_INFO = Weave.classInfo(ImageGlyphLayer, {
+			id: "weavejs.tool.oltool.layer.ImageGlyphLayer",
+			label: "Icons",
+			interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],
+			deprecatedIds: ["weave.visualization.plotters::ImageGlyphPlotter"]
+		});
+
 		private imageGlyphCache:ImageGlyphCache;
 
 		imageSize = Weave.linkableChild(this, AlwaysDefinedColumn);
@@ -167,11 +174,4 @@ namespace weavejs.tool.oltool.layer
 			});
 		}
 	}
-
-	Weave.registerClass(
-		ImageGlyphLayer,
-		["weavejs.tool.oltool.layer.ImageGlyphLayer", "weave.visualization.plotters::ImageGlyphPlotter"],
-		[ILinkableObjectWithNewProperties, ISelectableAttributes],
-		"Icons"
-	);
 }

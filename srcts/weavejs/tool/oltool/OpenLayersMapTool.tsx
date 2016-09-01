@@ -92,6 +92,19 @@ namespace weavejs.tool.oltool
 
 	export class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> implements IOpenLayersMapTool, IAltText
 	{
+		static WEAVE_INFO = Weave.classInfo(OpenLayersMapTool, {
+			id: "weavejs.tool.oltool.OpenLayersMapTool",
+			label: "Map",
+			interfaces: [
+				IVisTool,
+				IOpenLayersMapTool,
+				ILinkableObjectWithNewProperties,
+				ILinkableObjectWithNewPaths,
+				IAltText
+			],
+			deprecatedIds: ["weavejs.tool.Map", "weave.visualization.tools::MapTool"]
+		});
+
 		static isGeomColumnOrRef(column: (IAttributeColumn | IColumnReference)):boolean
 		{
 			let iac = Weave.AS(column, IAttributeColumn);
@@ -874,21 +887,6 @@ namespace weavejs.tool.oltool
 
 
 	}
-
-
-
-	Weave.registerClass(
-		OpenLayersMapTool,
-		["weavejs.tool.oltool.OpenLayersMapTool", "weavejs.tool.Map", "weave.visualization.tools::MapTool"],
-		[
-			IVisTool,
-			IOpenLayersMapTool,
-			ILinkableObjectWithNewProperties,
-			ILinkableObjectWithNewPaths,
-			IAltText
-		],
-		"Map"
-	);
 
 
 	export interface IOpenLayersMapToolEditorState {
