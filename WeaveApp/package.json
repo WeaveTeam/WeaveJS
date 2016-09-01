@@ -10,9 +10,9 @@
     "compile-global": "tsc -p tsconfig-global.json && babel bin/weave-app.jsx -o bin/weave-app.js",
     "compile-module": "npm run clean && npm run copy-typings && tsc && npm run babel",
     "compile-libs": "mkdirp dist && node scripts/browserify libs",
-    "compile": "npm run compile && npm run browserify && cd .. && node run-ts copy.ts",
+    "compile": "npm run compile-module && npm run browserify && cd .. && node run-ts copy.ts",
     "move-files": "mv ./bin/js/weave/** ./ && mkdirp weaveapp-typings && cp ./bin/weave-app.d.ts ./weaveapp-typings && cp ./bin/weave-app.js ./weave-app.js",
-    "prepublish": "npm run compile-module && npm run compile-global && npm run move-files",
+    "prepublish": "npm run compile-module && npm run compile-global && npm run move-files"
   },
   "main": "app/WeaveApp.js",
   "repository": {

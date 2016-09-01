@@ -39,12 +39,10 @@ if(mode == "libs")
 else
 {
 	browserify({
-		entries: ["./WeaveApp/bin/js/index.js"],
-		basedir: "../",
-		paths: ['./WeaveApp/bin/js','./WeaveApp/node_modules'],
+		entries: ["./bin/js/index.js"],
+		paths: ['./bin/js','./node_modules'],
 		debug: true
 	})
-	.require("./lib/weavejs.js", {debug: true, expose: "weavejs"})
 	.external(libs).bundle()
 	.pipe(mold.transformSourcesRelativeTo(path.join(process.cwd(), "..")))
 	.pipe(exorcist('./dist/weave-app.bundle.js.map'))
