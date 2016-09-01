@@ -1337,3 +1337,16 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 	padding-left: 10px;
 	padding-right: 10px;
 }
+
+.weave-data-filter-checkbox {
+	padding: 5px;
+}
+
+.weave-data-filter-editor {
+
+}
+
+.weave-data-filter-editor.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}

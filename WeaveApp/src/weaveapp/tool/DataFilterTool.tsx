@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as weavejs from "weavejs";
 import {Weave} from "weavejs";
-
+import classNames from "weaveapp/modules/classnames";
 import HBox = weavejs.ui.flexbox.HBox;
 import VBox = weavejs.ui.flexbox.VBox;
 import ReactUtils = weavejs.util.ReactUtils;
@@ -159,6 +159,17 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		return <DataFilterEditor filterEditor={ this.filterEditor }  pushCrumb={pushCrumb} selectableAttributes={ this.selectableAttributes }  />
 	}
 
+	setEnabled=(value:boolean)=>
+	{
+		if(this.getFilter())
+			this.getFilter().enabled.value = value;
+	}
+
+	getEnabled=()=>
+	{
+		return this.getFilter() ? this.getFilter().enabled.value : false
+	}
+
 	render():JSX.Element
 	{
 		var editorClass = LinkablePlaceholder.getClass(this.filterEditor.target) as typeof AbstractFilterEditor;
@@ -177,10 +188,19 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 			);
 
 		return (
-			<VBox style={{flex: 1}}>
-				{
-					editor
-				}
+			<VBox style={{flex: 1}} padded className="weave-data-filter">
+				<div className="weave-data-filter-checkbox">
+					<Checkbox
+						label={Weave.lang("Enabled")}
+						value={this.getEnabled()}
+						onChange={this.setEnabled}
+					/>
+				</div>
+				<VBox style={{flex: 1}} className={classNames("weave-data-filter-editor", {disabled: !this.getEnabled()})}>
+					{
+						editor
+					}
+				</VBox>
 			</VBox>
 		)
 	}
