@@ -20,8 +20,9 @@ import {WeaveAPI} from "weavejs";
 import DataSourceEditor from "weaveapp/editor/DataSourceEditor";
 import KeyTypeInput from "weaveapp/ui/KeyTypeInput";
 import FileSelector from "weaveapp/ui/FileSelector";
+import {IDataSourceEditorState} from "weaveapp/editor/DataSourceEditor";
 
-export default class GeoJSONDataSourceEditor extends DataSourceEditor
+export default class GeoJSONDataSourceEditor extends DataSourceEditor<IDataSourceEditorState>
 {
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{

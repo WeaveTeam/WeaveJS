@@ -51,7 +51,7 @@ export interface IDataSourceEditorState
 	guideToTab?:string;
 };
 
-export default class DataSourceEditor extends SmartComponent<IDataSourceEditorProps, IDataSourceEditorState>
+export default class DataSourceEditor<S extends IDataSourceEditorState> extends SmartComponent<IDataSourceEditorProps, S>
 {
 	dataSourceWatcher = WeaveReactUtils.forceUpdateWatcher(this, IDataSource);
 	protected weaveRoot:ILinkableHashMap;
@@ -60,7 +60,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	{
 		super(props);
 		this.handleProps(props);
-		this.setState({showPreviewView: false});
+		this.setState({showPreviewView: false} as any);
 	}
 
 	handleProps(props:IDataSourceEditorProps)
@@ -264,7 +264,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		this.setState({
 			selectedBranch: branch,
 			selectedLeaf: leaf
-		});
+		} as any);
 	}
 	/* Border and shadow of ui segements in Tab gives contrasting color to its backgrouund */
 	render():JSX.Element

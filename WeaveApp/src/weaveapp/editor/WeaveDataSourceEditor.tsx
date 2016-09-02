@@ -18,6 +18,7 @@ import WeaveAdminService = weavejs.net.WeaveAdminService;
 import WeaveDataServlet = weavejs.net.WeaveDataServlet;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import DataSourceEditor, {IDataSourceEditorProps} from "weaveapp/editor/DataSourceEditor";
+import {IDataSourceEditorState} from "weaveapp/editor/DataSourceEditor";
 import ConnectionManager from "weaveapp/admin/ConnectionManager";
 import SqlImport from "weaveapp/admin/SqlImport";
 
@@ -27,7 +28,7 @@ const CSV:string = "CSV";
 
 const dataImportTypes:string[] = [SQL];
 
-export default class WeaveDataSourceEditor extends DataSourceEditor
+export default class WeaveDataSourceEditor extends DataSourceEditor<IDataSourceEditorState>
 {
 	componentWillReceiveProps(props:IDataSourceEditorProps)
 	{

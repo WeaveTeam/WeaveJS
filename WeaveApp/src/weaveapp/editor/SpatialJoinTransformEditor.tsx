@@ -13,9 +13,10 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import DataSourceEditor from "weaveapp/editor/DataSourceEditor";
+import {IDataSourceEditorState} from "weaveapp/editor/DataSourceEditor";
 import SelectableAttributeComponent from "weaveapp/ui/SelectableAttributeComponent";
 
-export default class SpatialJoinTransformEditor extends DataSourceEditor
+export default class SpatialJoinTransformEditor extends DataSourceEditor<IDataSourceEditorState>
 {
 	get editorFields(): [React.ReactChild, React.ReactChild][] {
 		let ds = (this.props.dataSource as SpatialJoinTransform);

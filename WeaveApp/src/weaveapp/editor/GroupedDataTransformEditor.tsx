@@ -18,10 +18,11 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import DynamicComponent = weavejs.ui.DynamicComponent;
 import Checkbox = weavejs.ui.Checkbox;
 import DataSourceEditor from "weaveapp/editor/DataSourceEditor";
+import {IDataSourceEditorState} from "weaveapp/editor/DataSourceEditor";
 import SelectableAttributeComponent from "weaveapp/ui/SelectableAttributeComponent";
 import KeyTypeInput from "weaveapp/ui/KeyTypeInput";
 
-export default class GroupedDataTransformEditor extends DataSourceEditor
+export default class GroupedDataTransformEditor extends DataSourceEditor<IDataSourceEditorState>
 {
 	private isFiltered=():boolean=>
 	{

@@ -8,8 +8,9 @@ import Button = weavejs.ui.Button;
 
 import CachedDataSource = weavejs.data.source.CachedDataSource;
 import DataSourceEditor from "weaveapp/editor/DataSourceEditor";
+import {IDataSourceEditorState} from "weaveapp/editor/DataSourceEditor";
 
-export default class CachedDataSourceEditor extends DataSourceEditor
+export default class CachedDataSourceEditor extends DataSourceEditor<IDataSourceEditorState>
 {
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{

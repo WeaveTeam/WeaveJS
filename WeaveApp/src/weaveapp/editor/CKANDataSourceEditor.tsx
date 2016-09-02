@@ -16,8 +16,10 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
 import DataSourceEditor from "weaveapp/editor/DataSourceEditor";
 import {IDataSourceEditorProps} from "weaveapp/editor/DataSourceEditor";
+import {IDataSourceEditorState} from "weaveapp/editor/DataSourceEditor";
 
-export default class CKANDataSourceEditor extends DataSourceEditor
+
+export default class CKANDataSourceEditor extends DataSourceEditor<IDataSourceEditorState>
 {
 	private _dataSourceNode:ColumnTreeNode
 	constructor(props:IDataSourceEditorProps)

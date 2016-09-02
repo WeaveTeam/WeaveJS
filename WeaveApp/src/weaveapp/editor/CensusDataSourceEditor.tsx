@@ -23,32 +23,20 @@ import DataSourceEditor, {IDataSourceEditorState, IDataSourceEditorProps} from "
 import {CensusGeographyFilter} from "weaveapp/editor/CensusGeographyFilter";
 import KeyTypeInput from "weaveapp/ui/KeyTypeInput";
 
-export interface CensusRawDataset {
-	c_dataset: string[];
-	c_vintage: number;
-	identifier: string;
-	title: string;
-	c_isAvailable: boolean;
-};
-
-interface CensusRawGeography {
-	name: string,
-	requires: string[],
-	optional: string
-};
+import CensusApiDataSet = weavejs.data.source.CensusApiDataSet;
+import CensusApiGeography = weavejs.data.source.CensusApiGeography;
 
 export interface ICensusDataSourceEditorState extends IDataSourceEditorState
 {
 	dataFamily?: string;
 	dataVintage?: string;
 	geographies?: {value: string, label: string }[];
-	datasets?: CensusRawDataset[];
-
+	datasets?: CensusApiDataSet[];
 	optional?: string; /* Optional geography filter name */
 	requires?: string[]; /* Required geography filter names */
 }
 
-export default class CensusDataSourceEditor extends DataSourceEditor
+export default class CensusDataSourceEditor extends DataSourceEditor<ICensusDataSourceEditorState>
 {
 	constructor(props:IDataSourceEditorProps)
 	{
@@ -56,7 +44,7 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		let ds = (this.props.dataSource as CensusDataSource);
 		this.api = ds.getAPI();
 		this.api.getDatasets().then(
-			(result: { dataset: CensusRawDataset[] }) => { this.state = { datasets: result.dataset } as any; }
+			(result: { dataset: CensusApiDataSet[] }) => { this.state = { datasets: result.dataset } }
 		);
 		ds.dataSet.addGroupedCallback(this, this.getGeographies, true);
 		ds.geographicScope.addGroupedCallback(this, this.updateRequiresAndOptional, true);
@@ -66,12 +54,12 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 	{
 		let ds = (this.props.dataSource as CensusDataSource);
 		this.api.getGeographies(ds.dataSet.value).then(
-			(geographies:({[id:string]: CensusRawGeography}))=>
+			(geographies:({[id:string]: CensusApiGeography}))=>
 			{
 				let geography = geographies[ds.geographicScope.value];
 				if (geography)
 				{
-					this.setState({ optional: geography.optional, requires: geography.requires } as any);
+					this.setState({ optional: geography.optionalWithWCFor, requires: geography.requires });
 				}
 			}
 		)
@@ -81,11 +69,11 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		return family && (family.indexOf("acs") == 0 || family.indexOf("sf") == 0);
 	}
 
-	static isInFamily(family: string, dataset: CensusRawDataset): boolean {
+	static isInFamily(family: string, dataset: CensusApiDataSet): boolean {
 		return family && dataset && ((family == "All") || (dataset.c_dataset.indexOf(family) != -1));
 	}
 
-	static isOfVintage(vintage: string, dataset: CensusRawDataset): boolean {
+	static isOfVintage(vintage: string, dataset: CensusApiDataSet): boolean {
 		return vintage && dataset && ((vintage == "All") || (dataset.c_vintage !== undefined && dataset.c_vintage.toString() == vintage));
 	}
 
@@ -126,8 +114,8 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		if (!raw_datasets || !family || !vintage)
 			return [{ value: ds.dataSet.value, label: ds.dataSet.value}];
 
-		let filterFunc = (dataset: CensusRawDataset) => CensusDataSourceEditor.isInFamily(family, dataset) && CensusDataSourceEditor.isOfVintage(vintage, dataset);
-		let makeEntry = (dataset: CensusRawDataset) => { return { value: dataset.identifier, label: dataset.title }; };
+		let filterFunc = (dataset: CensusApiDataSet) => CensusDataSourceEditor.isInFamily(family, dataset) && CensusDataSourceEditor.isOfVintage(vintage, dataset);
+		let makeEntry = (dataset: CensusApiDataSet) => { return { value: dataset.identifier, label: dataset.title }; };
 
 		return _.sortBy(raw_datasets.filter(filterFunc).map(makeEntry), "label");
 	}
@@ -151,18 +139,18 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 
 				tempGeographies = _.sortBy(tempGeographies, "value");
 				if (!_.isEqual(this.state.geographies, tempGeographies))
-					this.setState({ geographies: tempGeographies } as any);
+					this.setState({ geographies: tempGeographies });
 			});
 	}
 
 	dataFamilyChanged=(selectedItem:any)=>
 	{
-		this.setState({ dataFamily: (selectedItem as string) } as any);
+		this.setState({ dataFamily: (selectedItem as string) });
 	}
 
 	dataVintageChanged=(selectedItem:any)=>
 	{
-		this.setState({ dataVintage: (selectedItem as string)} as any);
+		this.setState({ dataVintage: (selectedItem as string)});
 	}
 
 	get editorFields(): [React.ReactChild, React.ReactChild][] {

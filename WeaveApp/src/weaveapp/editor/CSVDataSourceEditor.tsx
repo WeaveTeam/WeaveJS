@@ -25,12 +25,17 @@ import PopupWindow = weavejs.ui.PopupWindow;
 import Button = weavejs.ui.Button;
 import {MetadataEntry} from "weaveapp/editor/MetadataGrid";
 import CSVMetadataEditor from "weaveapp/editor/CSVMetadataEditor";
-import DataSourceEditor, {IDataSourceEditorProps} from "weaveapp/editor/DataSourceEditor";
+import DataSourceEditor, {IDataSourceEditorProps, IDataSourceEditorState} from "weaveapp/editor/DataSourceEditor";
 import InteractiveTour from "weaveapp/dialog/InteractiveTour";
 import KeyTypeInput from "weaveapp/ui/KeyTypeInput";
 import FileSelector from "weaveapp/ui/FileSelector";
 
-export default class CSVDataSourceEditor extends DataSourceEditor
+interface ICSVDataSourceEditorState extends IDataSourceEditorState
+{
+
+}
+
+export default class CSVDataSourceEditor extends DataSourceEditor<ICSVDataSourceEditorState>
 {
 	private _dataSourceNode:ColumnTreeNode;
 	constructor(props:IDataSourceEditorProps)

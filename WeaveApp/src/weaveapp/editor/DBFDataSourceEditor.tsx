@@ -19,8 +19,9 @@ import {WeaveAPI} from "weavejs";
 import KeyTypeInput from "weaveapp/ui/KeyTypeInput";
 import DataSourceEditor from "weaveapp/editor/DataSourceEditor";
 import FileSelector from "weaveapp/ui/FileSelector";
+import {IDataSourceEditorState} from "weaveapp/editor/DataSourceEditor";
 
-export default class DBFDataSourceEditor extends DataSourceEditor
+export default class DBFDataSourceEditor extends DataSourceEditor<IDataSourceEditorState>
 {
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
