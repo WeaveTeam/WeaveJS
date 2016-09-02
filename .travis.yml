@@ -15,7 +15,7 @@ addons:
     packages:
       - sshpass
 before_install:
-- mkdir dist
+- mkdir -p dist
 - yes | npm install
 - npm install
 - pushd WeaveApp
