@@ -30,7 +30,7 @@ import InteractiveTour from "weaveapp/dialog/InteractiveTour";
 import KeyTypeInput from "weaveapp/ui/KeyTypeInput";
 import FileSelector from "weaveapp/ui/FileSelector";
 
-interface ICSVDataSourceEditorState extends IDataSourceEditorState
+export interface ICSVDataSourceEditorState extends IDataSourceEditorState
 {
 
 }
