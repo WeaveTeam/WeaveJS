@@ -12,47 +12,94 @@
 * 
 * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data.source
+namespace weavejs.data.source
 {
-	import weavejs.WeaveAPI;
-	import weavejs.api.core.ILinkableObject;
-	import weavejs.api.data.ColumnMetadata;
-	import weavejs.net.JsonCache;
-	import weavejs.util.ArrayUtils;
-	import weavejs.util.JS;
-	import weavejs.util.StandardLib;
-	import weavejs.util.WeavePromise;
-	
-	public class CensusApi implements ILinkableObject
+	import WeaveAPI = weavejs.WeaveAPI;
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import JsonCache = weavejs.net.JsonCache;
+	import ArrayUtils = weavejs.util.ArrayUtils;
+	import StandardLib = weavejs.util.StandardLib;
+	import WeavePromise = weavejs.util.WeavePromise;
+
+	export declare type CensusApiVariable = {
+		label:string;
+		title:string;
+		concept:string;
+	};
+
+	export declare type CensusApiGeography = {
+		geoLevelId: string;
+		name: string;
+		requires: string[];
+		optionalWithWCFor: string;
+	}
+
+	export declare type CensusApiParams = {
+		get?:string;
+		for?:string;
+		in?:string;
+		key?:string;
+	}
+
+	export declare type CensusApiVariablesResult = {
+		variables:{[key:string]:CensusApiVariable};
+	}
+
+	export declare type CensusApiGeographiesResult = {
+		fips:CensusApiGeography[];
+	}
+
+	export declare type CensusApiDataSet = {
+		identifier: string;
+		title:string;
+		distribution:{accessURL:string}[];
+		c_dataset: string[];
+		c_vintage: number;
+		c_isAvailable: boolean;
+		c_variablesLink:string;
+		c_geographyLink:string;
+	}
+
+	export declare type CensusApiResult = {
+		dataset:CensusApiDataSet[];
+	}
+
+	export class CensusApi implements ILinkableObject
 	{
-		public static const BASE_URL:String = "http://api.census.gov/";
-		private const jsonCache:JsonCache = Weave.linkableChild(this, JsonCache);
+		public static /* readonly */ BASE_URL:string = "http://api.census.gov/";
+		private /* readonly */ jsonCache:JsonCache = Weave.linkableChild(this, JsonCache);
 		
-		private function getUrl(serviceUrl:String, params:Object):String
+		private getUrl(serviceUrl:string, params:CensusApiParams):string
 		{
-			var paramsStr:String = '';
-			for (var key:String in params)
-				paramsStr += (paramsStr ? '&' : '?') + key + '=' + params[key];
+			var paramsStr:string = '';
+			for (var key in params)
+				paramsStr += (paramsStr ? '&' : '?') + key as string + '=' + (params as any)[key as string];
 			return serviceUrl + paramsStr;
 		}
-		
-		public function getDatasets():WeavePromise/*/<any>/*/
+
+		public getJsonCachePromise(accessUrl:string, params:CensusApiParams)
 		{
-			return jsonCache.getJsonPromise(BASE_URL + "data.json");
+			return this.jsonCache.getJsonPromise(this.getUrl(accessUrl, params));
+		}
+		
+		public getDatasets():WeavePromise<CensusApiResult>
+		{
+			return this.jsonCache.getJsonPromise(CensusApi.BASE_URL + "data.json");
 		}
 		
 		/* TODO: Add memoized promises for preprocessing steps */
 		
-		private function getDatasetPromise(dataSetIdentifier:String):WeavePromise
+		public getDatasetPromise(dataSetIdentifier:string):WeavePromise<CensusApiDataSet>
 		{
-			return getDatasets().then(
-				function (result:Object):Object
+			return this.getDatasets().then(
+				(result):CensusApiDataSet =>
 				{
 					if (!result || !result.dataset)
 					{
 						throw new Error("Malformed response from Census API.");
 					}
-					for each (var tmp_dataset:Object in result.dataset)
+					for (var tmp_dataset of result.dataset)
 					{
 						if (tmp_dataset.identifier == dataSetIdentifier)
 						{
@@ -62,199 +109,73 @@ package weavejs.data.source
 					throw new Error("No such dataset: " + dataSetIdentifier);
 				});
 		}
-		private function getVariablesPromise(dataSetIdentifier:String):WeavePromise
+		private getVariablesPromise(dataSetIdentifier:string)
 		{
-			return getDatasetPromise(dataSetIdentifier).then(
-				function (dataset:Object):WeavePromise
+			return this.getDatasetPromise(dataSetIdentifier).then(
+				(dataset):WeavePromise<CensusApiVariablesResult> =>
 				{
-					return jsonCache.getJsonPromise(dataset.c_variablesLink);
+					return this.jsonCache.getJsonPromise(dataset.c_variablesLink);
 				});
 		}
-		private function getGeographiesPromise(dataSetIdentifier:String):WeavePromise
+		private getGeographiesPromise(dataSetIdentifier:string)
 		{
-			return getDatasetPromise(dataSetIdentifier).then(
-				function (dataset:Object):WeavePromise
+			return this.getDatasetPromise(dataSetIdentifier).then(
+				(dataset):WeavePromise<CensusApiGeographiesResult> =>
 				{
-					return jsonCache.getJsonPromise(dataset.c_geographyLink);
+					return this.jsonCache.getJsonPromise(dataset.c_geographyLink);
 				});
 		}
 
-		private var _variablesInfoCached:Object;
-		private var _variablesInfoProcessed:Object;
+		private _variablesInfoCached:{[key:string]:CensusApiVariable};
+		private _variablesInfoProcessed:{[key:string]:CensusApiVariable};
 
-		
-		public function getVariables(dataSetIdentifier:String):WeavePromise/*/<any>/*/
+		public getVariables(dataSetIdentifier:string)
 		{
-			return getVariablesPromise(dataSetIdentifier).then(
-				function (result:Object):Object
+			return this.getVariablesPromise(dataSetIdentifier).then(
+				(result) =>
 				{
-					if (result.variables === _variablesInfoCached)
-						return _variablesInfoProcessed;
+					if (result.variables === this._variablesInfoCached)
+						return this._variablesInfoProcessed;
 
-					var variablesInfo:Object = JS.copyObject(result.variables);
+					var variablesInfo:{[key:string]:CensusApiVariable} = _.clone(result.variables);
 					delete variablesInfo["for"];
 					delete variablesInfo["in"];
 					
-					for (var key:String in variablesInfo)
+					for (var key in variablesInfo)
 					{
-						var label:String = variablesInfo[key]['label'];
-						var title:String = StandardLib.substitute('{0} ({1})', StandardLib.replace(label, '!!', '\u2014'), key);
-						variablesInfo[key]['title'] = title;
+						var label = variablesInfo[key].label;
+						var title = StandardLib.substitute('{0} ({1})', StandardLib.replace(label, '!!', '\u2014'), key);
+						variablesInfo[key].title = title;
 					}
 
-					_variablesInfoProcessed = variablesInfo;
-					_variablesInfoCached = result.variables;
+					this._variablesInfoProcessed = variablesInfo;
+					this._variablesInfoCached = result.variables;
 					
-					return _variablesInfoProcessed;
+					return this._variablesInfoProcessed;
 				});
 		}
 		
-		public function getGeographies(dataSetIdentifier:String):WeavePromise/*/<any>/*/
+		public getGeographies(dataSetIdentifier:string)
 		{
-			return getGeographiesPromise(dataSetIdentifier).then(
-				function (result:Object):Object
+			return this.getGeographiesPromise(dataSetIdentifier).then((result) =>
 				{
-					var geo:Object = {};
-					for each (var geo_description:Object in result.fips)
+					var geo:{[fips:string]:CensusApiGeography} = {};
+					for (var geo_description of result.fips)
 					{
 						geo[geo_description.geoLevelId] = {
-							id: geo_description.geoLevelId,
+							geoLevelId: geo_description.geoLevelId,
 							name: geo_description.name,
 							requires: geo_description.requires,
-							optional: geo_description.optionalWithWCFor || []
+							optionalWithWCFor: geo_description.optionalWithWCFor
 						};
 					}
-					
 					return geo;
-				});
-		}
-		/**
-		 * 
-		 * @param metadata
-		 * @return An object containing three fields, "keys," "values," and "metadata" 
-		 */				
-		public function getColumn(metadata:Object):WeavePromise/*/<{keys:any, values:any, metadata:any}>/*/
-		{	
-			var dataSource:CensusDataSource = Weave.getOwner(this) as CensusDataSource;
-			var dataset_name:String;
-			var geography_id:String;
-			var geography_filters:Object;
-			var api_key:String;
-			
-			var variable_name:String = metadata[CensusDataSource.VARIABLE_NAME];
-			
-			var params:Object = {};
-			var title:String = null;
-			var access_url:String = null;
-			var filters:Array = [];
-			var requires:Array = null;
-			
-			return new WeavePromise(this)
-			.setResult(this)
-			.depend(dataSource.dataSet)
-			.then(
-				function (context:Object):WeavePromise
-				{
-					dataset_name = dataSource.dataSet.value;
-					return getDatasetPromise(dataset_name);
-				}
-			).then(
-				function (datasetInfo:Object):WeavePromise
-				{
-					if (datasetInfo && 
-						datasetInfo.distribution && 
-						datasetInfo.distribution[0])
-					{
-						access_url = datasetInfo.distribution[0].accessURL;
-					}
-
-					if (!access_url)
-					{
-						throw new Error("Dataset distribution information malformed.");
-					}
-
-					return getVariables(dataset_name);
-				}
-			).then(
-				function (variableInfo:Object):WeavePromise
-				{
-					if (variableInfo && variableInfo[variable_name])
-						title = variableInfo[variable_name].title;
-					return getGeographies(dataset_name);
-				}
-			).depend(dataSource.geographicScope, dataSource.apiKey, dataSource.geographicFilters)
-			.then(
-				function (geographyInfo:Object):WeavePromise
-				{
-					if (geographyInfo == null) return null;
-					geography_id = dataSource.geographicScope.value;
-					geography_filters = dataSource.geographicFilters.getSessionState();
-					api_key = dataSource.apiKey.value;
-					requires = ArrayUtils.copy(geographyInfo[geography_id].requires || []);
-					requires.push(geographyInfo[geography_id].name);
-					filters = [];
-					for (var key:String in geography_filters)
-					{
-						filters.push(key + ":" + geography_filters[key]);
-					}
-
-					params["get"] = variable_name;
-					params["for"] = geographyInfo[geography_id].name + ":*";
-					
-					if (filters.length != 0)
-						params["in"] =  filters.join(",");
-					
-					if (api_key)
-						params['key'] = api_key;
-
-					return jsonCache.getJsonPromise(getUrl(access_url, params));
-				}
-			).then(
-				function (dataResult:Object):Object
-				{
-					if (dataResult == null)
-						return null;
-					var idx:int;
-					var columns:Array = dataResult[0] as Array;
-					var rows:Array = dataResult as Array;
-					var data_column:Array = new Array(rows.length - 1);
-					var key_column:Array = new Array(rows.length - 1);
-					var key_column_indices:Array = new Array(columns.length);
-					var data_column_index:int = columns.indexOf(variable_name);
-					
-					var tmp_key_type:String = WeaveAPI.CSVParser.createCSVRow(requires);
-					
-					
-
-					metadata[ColumnMetadata.KEY_TYPE] = tmp_key_type;
-					metadata[ColumnMetadata.TITLE] = title;
-					for (idx = 0; idx < requires.length; idx++)
-					{
-						key_column_indices[idx] = columns.indexOf(requires[idx]);
-					}
-					for (var row_idx:int = 0; row_idx < data_column.length; row_idx++)
-					{
-						var row:Array = rows[row_idx+1];
-						var key_values:Array = new Array(key_column_indices.length);
-						
-						for (idx = 0; idx < key_column_indices.length; idx++)
-						{
-							key_values[idx] = row[key_column_indices[idx]];
-						}
-						key_column[row_idx] = key_values.join("");
-						data_column[row_idx] = row[data_column_index];
-					}
-					
-					return {
-						keys: key_column,
-						data: data_column,
-						metadata: metadata
-					};
 				}
 			);
 		}
-		
-		private static const state_fips:Object = {
+
+		// TODO replace with json file
+		private static /* readonly */state_fips = {
 			"01": "AL",
 			"02": "AK",
 			"04": "AZ",
@@ -309,7 +230,7 @@ package weavejs.data.source
 			"72": "PR"
 		};
 		
-		private static const county_fips:Object = {
+		private static /* readonly */ county_fips = {
 			"01": {
 				"001": "Autauga County",
 				"003": "Baldwin County",
@@ -3661,4 +3582,5 @@ package weavejs.data.source
 			}
 		};
 	}
+	Weave.registerClass(CensusApi,  "weavejs.data.source.CensusApi");
 }

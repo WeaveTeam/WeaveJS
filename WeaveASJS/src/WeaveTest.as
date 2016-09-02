@@ -70,7 +70,6 @@ package
 	import weavejs.data.key.SortedKeySet;
 	import weavejs.data.source.CKANDataSource;
 	import weavejs.data.source.CSVDataSource;
-	import weavejs.data.source.CensusDataSource;
 	import weavejs.data.source.DBFDataSource;
 	import weavejs.data.source.ForeignDataMappingTransform;
 	import weavejs.data.source.GeoJSONDataSource;
@@ -82,6 +81,7 @@ package
 	import weavejs.geom.ZoomBounds;
 	import weavejs.geom.LinkableBounds2D;
 	import weavejs.net.Admin;
+	import weavejs.net.JsonCache;
 	import weavejs.path.ExternalTool;
 	import weavejs.util.BackwardsCompatibility;
 	import weavejs.util.JS;
@@ -144,13 +144,12 @@ package
 			GeoJSONDataSource,
 			WeaveDataSource,
 			ForeignDataMappingTransform,
-			CensusDataSource,
 			DBFDataSource,
 			WebSocketDataSource,
 			CKANDataSource,
 			KeyColumn,
 			ExternalTool,
-			
+			JsonCache,
 			WeaveMenuItem,
 			ZoomBounds,
 			WeaveRootDataTreeNode,

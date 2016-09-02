@@ -13,40 +13,46 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data.source
+namespace weavejs.data.source
 {
-    import weavejs.WeaveAPI;
-    import weavejs.api.data.ColumnMetadata;
-    import weavejs.api.data.IDataSource;
-    import weavejs.api.data.IDataSource_Service;
-    import weavejs.api.data.IWeaveTreeNode;
-    import weavejs.core.LinkableString;
-    import weavejs.core.LinkableVariable;
-    import weavejs.data.DataSourceUtils;
-    import weavejs.data.column.ProxyColumn;
-    import weavejs.data.hierarchy.ColumnTreeNode;
-    import weavejs.util.JS;
-    import weavejs.util.StandardLib;
+    import WeaveAPI = weavejs.WeaveAPI;
+    import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+    import IDataSource = weavejs.api.data.IDataSource;
+    import IDataSource_Service = weavejs.api.data.IDataSource_Service;
+    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+    import LinkableString = weavejs.core.LinkableString;
+    import LinkableVariable = weavejs.core.LinkableVariable;
+    import DataSourceUtils = weavejs.data.DataSourceUtils;
+    import ProxyColumn = weavejs.data.column.ProxyColumn;
+    import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
+    import StandardLib = weavejs.util.StandardLib;
+	import IColumnReference = weavejs.api.data.IColumnReference;
+	import WeavePromise = weavejs.util.WeavePromise;
 
-    public class CensusDataSource extends AbstractDataSource implements IDataSource_Service
+	export declare type Data = {
+		concept?: string,
+		variableId?: string
+	}
+
+	export declare type ConceptNode = {
+		dataSource: IDataSource;
+		data: Data;
+		label: string;
+		idFields: ("concept"|"variableId")[];
+		hasChildBranches?: boolean;
+		children: ConceptNode[];
+	};
+
+    export class CensusDataSource extends AbstractDataSource implements IDataSource
     {
-        WeaveAPI.ClassRegistry.registerImplementation(IDataSource, CensusDataSource, "Census.gov");
-
-        private static const baseUrl:String = "http://api.census.gov/";
+		private static /* readonly */ baseUrl:string = "http://api.census.gov/";
 		
-		public static const CONCEPT_NAME:String = "__CensusDataSource__concept";
-		public static const VARIABLE_NAME:String = "__CensusDataSource__variable";
-
-        public function CensusDataSource()
-        {
-        }
-
-		override public function get isLocal():Boolean 
+		/* override */ public get isLocal():boolean
 		{
 			return false;
 		}
 		
-		override protected function initialize(forceRefresh:Boolean = false):void
+		/* override */ protected initialize(forceRefresh:boolean = false):void
         {
             // recalculate all columns previously requested
             //forceRefresh = true;
@@ -54,123 +60,128 @@ package weavejs.data.source
             super.initialize(forceRefresh);
         }
 		
-		public const keyType:LinkableString = Weave.linkableChild(this, LinkableString);
-		public const apiKey:LinkableString = Weave.linkableChild(this, new LinkableString(""));
-		public const dataSet:LinkableString = Weave.linkableChild(this, new LinkableString("http://api.census.gov/data/id/ACSSF2014"));
-		public const geographicScope:LinkableString = Weave.linkableChild(this, new LinkableString("040"));
-		public const geographicFilters:LinkableVariable = Weave.linkableChild(this, new LinkableVariable(Object));
-		private const api:CensusApi = Weave.linkableChild(this, CensusApi);
-		
-		public function getAPI():CensusApi {return api;}
+		public /* readonly */ keyType:LinkableString = Weave.linkableChild(this, LinkableString);
+		public /* readonly */ apiKey:LinkableString = Weave.linkableChild(this, new LinkableString(""));
+		public /* readonly */ dataSet:LinkableString = Weave.linkableChild(this, new LinkableString("http://api.census.gov/data/id/ACSSF2014"));
+		public /* readonly */ geographicScope:LinkableString = Weave.linkableChild(this, new LinkableString("040"));
+		public /* readonly */ geographicFilters:LinkableVariable = Weave.linkableChild(this, new LinkableVariable(Object));
+		private /* readonly */ api:CensusApi = Weave.linkableChild(this, CensusApi);
 
-		public function createDataSetNode():ColumnTreeNode
+		public getAPI()
+		{
+			return this.api;
+		}
+
+		public createDataSetNode():ColumnTreeNode
 		{
 			var _ds:IDataSource = this;
-			var name:String = getLabel();
-			var data:Object = {id:0, name: name};
+			var name:string = this.getLabel();
+			var data:Data = {};
 			var ctn:ColumnTreeNode = new ColumnTreeNode({
 				dataSource: this,
 				data: data,
-				"label": function():String { return dataSet.value || name; },
+				label: () => { return this.dataSet.value || name; },
 				hasChildBranches: true,
-				children: function(node:ColumnTreeNode):Array {
-					var children:Array = [];
+				children: (node:ColumnTreeNode) => {
+					var children:ConceptNode[] = [];
 
-					api.getVariables(dataSet.value).then(function (result:Object):void
+					this.api.getVariables(this.dataSet.value).then((result) =>
 					{
-						var concept_nodes:Object = {};
-						var concept_node:Object;
-						for (var variableId:String in result)	
+						var concept_nodes = new Map<string, ConceptNode>();
+						var concept_node:ConceptNode;
+						for (var variableId in result)
 						{							
-							var variableInfo:Object = result[variableId];
-							concept_node = concept_nodes[variableInfo.concept];
-							
+							var variableInfo = result[variableId];
+							concept_node = concept_nodes.get(variableInfo.concept);
 							
 							if (!concept_node)
 							{
-								var concept_label:String = variableInfo.concept;
-								if (!concept_label) concept_label = Weave.lang("No Concept");
+								var concept_label:string = variableInfo.concept;
+
+								if (!concept_label)
+									concept_label = Weave.lang("No Concept");
+
 								concept_node = {
 									dataSource: _ds,
-									data: JS.copyObject(data),
-									"label": concept_label,
-									idFields: [CONCEPT_NAME],
+									data: _.clone(data),
+									label: concept_label,
+									idFields: ["concept"],
 									hasChildBranches: false,
 									children: []
 								};
 								
-								concept_node.data[CONCEPT_NAME] = variableInfo.concept;
+								concept_node.data.concept = variableInfo.concept;
 								
 								children.push(concept_node);
-								concept_nodes[variableInfo.concept] = concept_node;
+								concept_nodes.set(variableInfo.concept, concept_node);
 							}
 							
-							var variable_descriptor:Object = {
+							var variable_descriptor:ConceptNode = {
 								dataSource: _ds,
-								data: JS.copyObject(concept_node.data),
-								"label": variableInfo.title,
-								idFields: [CONCEPT_NAME, VARIABLE_NAME],
+								data: _.clone(concept_node.data),
+								label: variableInfo.title,
+								idFields: ["concept", "variableId"],
 								children: null
 							};
 							
-							variable_descriptor.data[VARIABLE_NAME] = variableId;
+							variable_descriptor.data.variableId = variableId;
 							
 							concept_node.children.push(variable_descriptor);
 						}
-						for each (concept_node in concept_nodes)
+						for (var [key, concept_node] of concept_nodes)
 						{
-							StandardLib.sortOn(concept_node.children, function (obj:Object):String	{return obj.data[VARIABLE_NAME]}); 
+							StandardLib.sortOn(concept_node.children, (obj:ConceptNode) => {return obj.data.variableId});
 						}
-						StandardLib.sortOn(children, function (obj:Object):String {return obj.data[CONCEPT_NAME]});
+						StandardLib.sortOn(children, (obj:ConceptNode) => {return obj.data.concept});
 					});
 					return children;
 				}
 			});
-			api.getDatasets().then(
-				function (datasetsInfo:Object):void
+			this.api.getDatasets().then(
+				(datasetsInfo:CensusApiResult):void =>
 				{
-					for each (var dataset:Object in datasetsInfo.dataSet)
+					for (var dataset of datasetsInfo.dataset)
 					{
-						if (dataset.identifier == dataSet.value)
+						if (dataset.identifier == this.dataSet.value)
 						{
 							ctn.label = dataset.title;
 							return;
 						}
 					}
-					ctn.label = dataSet.value;
+					ctn.label = this.dataSet.value;
 				}
 			);
 			return ctn;
 		}
 		
-        override public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
+        /* override */ public getHierarchyRoot():IWeaveTreeNode&IColumnReference
         {
-            if (!_rootNode)
-                _rootNode = createDataSetNode();
-            return _rootNode;
+            if (!this._rootNode)
+                this._rootNode = this.createDataSetNode();
+            return this._rootNode;
         }
 		
-		override protected function generateHierarchyNode(metadata:Object):IWeaveTreeNode
+		/* override */ protected generateHierarchyNode(metadata:{[key:string]:string}):IWeaveTreeNode
 		{
 			if (!metadata)
 				return null;
-			var idFields:Array = [CONCEPT_NAME, VARIABLE_NAME];
+			var idFields = ["concept", "variableId"];
 
 			var ctn:ColumnTreeNode = new ColumnTreeNode({dataSource: this, idFields: idFields, data: metadata});
 			return ctn; 
 		}
 		
-        override protected function requestColumnFromSource(proxyColumn:ProxyColumn):void
+        /* override */ protected requestColumnFromSource(proxyColumn:ProxyColumn):void
         {
-        	var metadata:Object = ColumnMetadata.getAllMetadata(proxyColumn);
+        	var metadata = ColumnMetadata.getAllMetadata(proxyColumn);
         	
-			api.getColumn(metadata).then(
-				function(columnInfo:Object):void
+			this.getColumn(metadata).then(
+				(columnInfo:{keys: any;	values: any; metadata: any; data:any}):void =>
 				{
 					if (!columnInfo) return;
 
-					if (keyType.value)
-						columnInfo.metadata[ColumnMetadata.KEY_TYPE] = keyType.value;
+					if (this.keyType.value)
+						columnInfo.metadata[ColumnMetadata.KEY_TYPE] = this.keyType.value;
 					
 					proxyColumn.setMetadata(columnInfo.metadata);
 					
@@ -178,5 +189,131 @@ package weavejs.data.source
 				}
 			);
         }
+
+		/**
+		 *
+		 * @param metadata
+		 * @return An object containing three fields, "keys," "data," and "metadata"
+		 */
+		public getColumn(metadata:{[key:string]:string}):WeavePromise<{keys:string[], data:string[], metadata:{[key:string]:string}}>
+		{
+			var dataset_name:string;
+			var geography_id:string;
+			var geography_filters:Object;
+			var api_key:string;
+
+			var variable_name:string = metadata["variableId"];
+
+			var params:CensusApiParams = {};
+			var title:string = null;
+			var access_url:string = null;
+			var filters:string[] = [];
+			var requires:string[] = null;
+
+			return new WeavePromise(this)
+				.setResult(this)
+				.depend(this.dataSet)
+				.then(
+					() =>
+					{
+						dataset_name = this.dataSet.value;
+						return this.api.getDatasetPromise(dataset_name);
+					}
+				).then(
+					(datasetInfo:CensusApiDataSet) =>
+					{
+						if (datasetInfo &&
+							datasetInfo.distribution &&
+							datasetInfo.distribution[0])
+						{
+							access_url = datasetInfo.distribution[0].accessURL;
+						}
+
+						if (!access_url)
+						{
+							throw new Error("Dataset distribution information malformed.");
+						}
+
+						return this.api.getVariables(dataset_name);
+					}
+				).then(
+					(variableInfo) =>
+					{
+						if (variableInfo && variableInfo[variable_name])
+							title = variableInfo[variable_name].title;
+						return this.api.getGeographies(dataset_name);
+					}
+				).depend(this.geographicScope, this.apiKey, this.geographicFilters)
+				.then(
+					(geographyInfo) =>
+					{
+						if (geographyInfo == null) return null;
+						geography_id = this.geographicScope.value;
+						geography_filters = this.geographicFilters.getSessionState();
+						api_key = this.apiKey.value;
+						requires = ArrayUtils.copy(geographyInfo[geography_id].requires || []);
+						requires.push(geographyInfo[geography_id].name);
+						filters = [];
+						for (var key in geography_filters)
+						{
+							filters.push(key + ":" + (geography_filters as any)[key]);
+						}
+
+						params.get = variable_name;
+						params.for = geographyInfo[geography_id].name + ":*";
+
+						if (filters.length != 0)
+							params.in =  filters.join(",");
+
+						if (api_key)
+							params.key = api_key;
+
+						return this.api.getJsonCachePromise(access_url, params);
+					}
+				).then(
+					(dataResult:any):any =>
+					{
+						if (dataResult == null)
+							return null;
+						var idx:int;
+						var columns = Weave.AS(dataResult[0], Array);
+						var rows = Weave.AS(dataResult, Array);
+						var data_column:string[] = new Array(rows.length - 1);
+						var key_column:string[] = new Array(rows.length - 1);
+						var key_column_indices:number[] = new Array(columns.length);
+						var data_column_index:int = columns.indexOf(variable_name);
+
+						var tmp_key_type:string = WeaveAPI.CSVParser.createCSVRow(requires);
+
+
+
+						metadata[ColumnMetadata.KEY_TYPE] = tmp_key_type;
+						metadata[ColumnMetadata.TITLE] = title;
+						for (idx = 0; idx < requires.length; idx++)
+						{
+							key_column_indices[idx] = columns.indexOf(requires[idx]);
+						}
+						for (var row_idx:int = 0; row_idx < data_column.length; row_idx++)
+						{
+							var row = rows[row_idx+1];
+							var key_values = new Array(key_column_indices.length);
+
+							for (idx = 0; idx < key_column_indices.length; idx++)
+							{
+								key_values[idx] = row[key_column_indices[idx]];
+							}
+							key_column[row_idx] = key_values.join("");
+							data_column[row_idx] = row[data_column_index];
+						}
+						return {
+							keys: key_column,
+							data: data_column,
+							metadata: metadata
+						};
+					}
+				);
+		}
     }
+	Weave.registerClass(CensusDataSource, "weavejs.data.source.CensusDataSource", [IDataSource], "Census.gov");
+	// WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, CensusDataSource, "Census.gov");
 }
