@@ -13,18 +13,18 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net
+namespace weavejs.net
 {
-	import weavejs.WeaveAPI;
-	import weavejs.api.core.ILinkableObject;
-	import weavejs.util.WeavePromise;
+	import WeaveAPI = weavejs.WeaveAPI;
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import WeavePromise = weavejs.util.WeavePromise;
 
-	public class JsonCache implements ILinkableObject
+	export class JsonCache implements ILinkableObject
 	{
-		public static function buildURL(base:String, params:Object):String
+		public static buildURL(base:string, params:{[key:string]:string}):string
 		{
-			var paramsStr:String = '';
-			for (var key:String in params)
+			var paramsStr:string = '';
+			for (var key in params)
 				paramsStr += (paramsStr ? '&' : '?') + encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
 			return base + paramsStr;
 		}
@@ -32,20 +32,20 @@ package weavejs.net
 		/**
 		 * @param requestHeaders Optionally set this to an Object mapping header names to values.
 		 */
-		public function JsonCache(requestHeaders:Object = null)
+		public JsonCache(requestHeaders:{[header:string]:string} = null)
 		{
 			this.requestHeaders = requestHeaders;
 		}
 		
-		private var requestHeaders:Object = null;
+		private requestHeaders:{[header:string]:string} = null;
 		
-		private var cache:Object = {};
+		private cache = new Map<string, WeavePromise<any>>();
 		
-		public function clearCache():void
+		public clearCache():void
 		{
-			for each (var promise:WeavePromise in cache)
+			for(var [url, promise] of this.cache)
 				Weave.dispose(promise);
-			cache = {};
+			this.cache.clear();
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
@@ -53,25 +53,26 @@ package weavejs.net
 		 * @param url The URL to get JSON data
 		 * @return The cached Object.
 		 */
-		public function getJsonObject(url:String):Object
+		public getJsonObject(url:string):Object
 		{
-			return getJsonPromise(url).getResult();
+			return this.getJsonPromise(url).getResult();
 		}
 		
-		public function getJsonPromise(url:String):WeavePromise/*/<any>/*/
+		public getJsonPromise(url:string):WeavePromise<any>
 		{
-			var promise:WeavePromise = cache[url];
+			var promise = this.cache.get(url);
 			if (!promise)
 			{
 				var request:URLRequest = new URLRequest(url);
-				request.requestHeaders = requestHeaders;
+				request.requestHeaders = this.requestHeaders;
 				request.responseType = ResponseType.JSON;
 				promise = new WeavePromise(this)
 					.setResult(WeaveAPI.URLRequestUtils.request(this, request))
-					.then(function(result:Object):Object { return result || {}; });
-				cache[url] = promise;
+					.then((result:Object):Object => { return result || {}; });
+				this.cache.set(url, promise);
 			}
 			return promise;
 		}
 	}
+	Weave.registerClass(JsonCache, "weavejs.net.JsonCache");
 }

@@ -81,7 +81,6 @@ package
 	import weavejs.geom.ZoomBounds;
 	import weavejs.geom.LinkableBounds2D;
 	import weavejs.net.Admin;
-	import weavejs.net.JsonCache;
 	import weavejs.path.ExternalTool;
 	import weavejs.util.BackwardsCompatibility;
 	import weavejs.util.JS;
@@ -149,7 +148,6 @@ package
 			CKANDataSource,
 			KeyColumn,
 			ExternalTool,
-			JsonCache,
 			WeaveMenuItem,
 			ZoomBounds,
 			WeaveRootDataTreeNode,
