@@ -24,6 +24,11 @@ import {LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_VSLIDER, LAYOUT_HSLIDER, LAYOUT_CHECKB
 
 export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 {
+	static WEAVE_INFO = Weave.classInfo(DiscreteValuesDataFilterEditor, {
+		id: "weavejs.editor.DiscreteValuesDataFilterEditor",
+		interfaces: [ILinkableObjectWithNewProperties]
+	});
+
 	static get OPTIONS():string[]{
 		return [LAYOUT_LIST,
 			LAYOUT_COMBO,
@@ -82,5 +87,3 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 		/>);
 	}
 }
-
-Weave.registerClass(DiscreteValuesDataFilterEditor, "weavejs.editor.DiscreteValuesDataFilterEditor", [ILinkableObjectWithNewProperties]);

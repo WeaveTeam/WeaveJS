@@ -29,6 +29,13 @@ interface ITileLayerEditorState
 
 class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEditorState>
 {
+	static WEAVE_INFO = Weave.classInfo(TileLayer, {
+		id: "weavejs.tool.oltool.layer.TileLayer",
+		label: "Base map",
+		interfaces: [ILinkableObjectWithNewProperties],
+		deprecatedIds: ["weave.visualization.plotters::WMSPlotter"]
+	});
+
 	constructor(props:ITileLayerEditorProps)
 	{
 		super(props);
@@ -341,10 +348,3 @@ export default class TileLayer extends AbstractLayer
 		this.source = newLayer || null;
 	}
 }
-
-Weave.registerClass(
-	TileLayer,
-	["weavejs.tool.oltool.layer.TileLayer", "weave.visualization.plotters::WMSPlotter"],
-	[ILinkableObjectWithNewProperties],
-	"Base map"
-);

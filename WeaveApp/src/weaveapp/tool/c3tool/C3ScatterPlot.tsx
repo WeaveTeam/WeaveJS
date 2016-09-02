@@ -48,6 +48,18 @@ declare type Record = {
 
 export default class C3ScatterPlot extends AbstractC3Tool
 {
+	static WEAVE_INFO = Weave.classInfo(C3ScatterPlot, {
+		id: "weavejs.tool.c3tool.C3ScatterPlot",
+		label: "Scatter Plot",
+		interfaces: [
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
+			IAltText
+		],
+		deprecatedIds: ["weave.visualization.tools::ScatterPlotTool"]
+	});
+
 	dataX = Weave.linkableChild(this, DynamicColumn);
 	dataY = Weave.linkableChild(this, DynamicColumn);
 	radius = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
@@ -426,15 +438,3 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		}];
 	}
 }
-
-Weave.registerClass(
-	C3ScatterPlot,
-	["weavejs.tool.c3tool.C3ScatterPlot", "weave.visualization.tools::ScatterPlotTool"],
-	[
-		IVisTool,
-		ILinkableObjectWithNewProperties,
-		ISelectableAttributes,
-		IAltText
-	],
-	"Scatter Plot"
-);

@@ -32,10 +32,16 @@ import IVisTool, {IVisToolProps, IVisToolState} from "weaveapp/api/ui/IVisTool";
 
 export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {
+	static WEAVE_INFO = Weave.classInfo(DataFilterTool, {
+		id: "weavejs.tool.DataFilter",
+		label: "Data Filter",
+		interfaces: [IVisTool, ILinkableObjectWithNewProperties],
+		deprecatedIds: ["weave.ui::DataFilterTool"]
+	});
+
 	public filter:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(ColumnDataFilter),this.handleFilterWatcher);
 	public filterEditor:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(AbstractFilterEditor),this.handleEditor,true);
 	altText:LinkableString = Weave.linkableChild(this, LinkableString);
-
 
 	constructor(props:IVisToolProps)
 	{
@@ -205,14 +211,6 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		)
 	}
 }
-
-Weave.registerClass(
-	DataFilterTool,
-	["weavejs.tool.DataFilter", "weave.ui::DataFilterTool"],
-	[IVisTool, ILinkableObjectWithNewProperties],
-	"Data Filter"
-);
-
 
 export interface IDataFilterEditorState {
 

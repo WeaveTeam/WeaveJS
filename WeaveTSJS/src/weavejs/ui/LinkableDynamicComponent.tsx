@@ -5,6 +5,11 @@ namespace weavejs.ui
 
 	export class LinkableDynamicComponent extends React.Component<any, any> implements ILinkableVariable
 	{
+		static WEAVE_INFO = Weave.classInfo(LinkableDynamicComponent, {
+			id: 'weavejs.ui.LinkableDynamicComponent',
+			interfaces: [ILinkableVariable]
+		});
+
 		private linkableState = Weave.linkableChild(this, LinkableVariable, this.forceUpdate, true);
 		
 		getSessionState():any
@@ -50,6 +55,4 @@ namespace weavejs.ui
 			return <ComponentClass ref={this.refHandler} {...props}/>;
 		}
 	}
-
-	Weave.registerClass(LinkableDynamicComponent, 'weavejs.ui.LinkableDynamicComponent', [ILinkableVariable]);
 }

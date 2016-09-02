@@ -21,6 +21,8 @@ namespace weavejs.net
 
 	export class JsonCache implements ILinkableObject
 	{
+		static WEAVE_INFO = Weave.classInfo(JsonCache, {id: "weavejs.net.JsonCache"});
+
 		public static buildURL(base:string, params:{[key:string]:string}):string
 		{
 			var paramsStr:string = '';
@@ -74,5 +76,4 @@ namespace weavejs.net
 			return promise;
 		}
 	}
-	Weave.registerClass(JsonCache, "weavejs.net.JsonCache");
 }

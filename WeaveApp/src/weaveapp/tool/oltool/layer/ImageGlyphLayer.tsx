@@ -17,6 +17,13 @@ import AbstractFeatureLayer from "weaveapp/tool/oltool/layer/AbstractFeatureLaye
 
 export default class ImageGlyphLayer extends AbstractGlyphLayer
 {
+	static WEAVE_INFO = Weave.classInfo(ImageGlyphLayer, {
+		id: "weavejs.tool.oltool.layer.ImageGlyphLayer",
+		label: "Icons",
+		interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],
+		deprecatedIds: ["weave.visualization.plotters::ImageGlyphPlotter"]
+	});
+
 	private imageGlyphCache:ImageGlyphCache;
 
 	imageSize = Weave.linkableChild(this, AlwaysDefinedColumn);
@@ -172,10 +179,3 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 		});
 	}
 }
-
-Weave.registerClass(
-	ImageGlyphLayer,
-	["weavejs.tool.oltool.layer.ImageGlyphLayer", "weave.visualization.plotters::ImageGlyphPlotter"],
-	[ILinkableObjectWithNewProperties, ISelectableAttributes],
-	"Icons"
-);

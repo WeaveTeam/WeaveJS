@@ -93,8 +93,8 @@ package
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, CKANDataSource, "CKAN server");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Transform, ForeignDataMappingTransform, "Foreign data mapping");
 
-			Weave.registerClass(TempHack_SolidFillStyle, "ExtendedFillStyle");
-			Weave.registerClass(TempHack_SolidLineStyle, "ExtendedLineStyle");
+			Weave.classInfo(TempHack_SolidFillStyle, {id: "ExtendedFillStyle"});
+			Weave.classInfo(TempHack_SolidLineStyle, {id: "ExtendedLineStyle"});
 			
 			// TEMPORARY
 			//WeaveTest.test(weave);

@@ -26,6 +26,12 @@ import GeoJSON = ol.format.GeoJSON;
 
 export default class SpatialJoinTransform extends AbstractDataSource implements ISelectableAttributes
 {
+	static WEAVE_INFO = Weave.classInfo(SpatialJoinTransform, {
+		id: "weavejs.data.source.SpatialJoinTransform",
+		label: "Spatial Join Transform",
+		interfaces: [IDataSource, ISelectableAttributes]
+	});
+
 	public geometryColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 	public xColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 	public yColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
@@ -147,11 +153,3 @@ export default class SpatialJoinTransform extends AbstractDataSource implements 
 		proxyColumn.setInternalColumn(column);
 	}
 }
-//var IDataSource_Service:Class = IDataSource;
-//WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, SpatialJoinTransform, "Spatial Join Transform");
-Weave.registerClass(
-	SpatialJoinTransform,
-	"weavejs.data.source.SpatialJoinTransform",
-	[IDataSource, ISelectableAttributes],
-	"Spatial Join Transform"
-);

@@ -9,6 +9,8 @@ import {IPlotTask} from "weaveapp/api/ui/IPlotTask";
 
 export default class IPlotter extends ILinkableObject
 {
+	static WEAVE_INFO = Weave.classInfo(IPlotter, {id: 'weavejs.api.ui.IPlotter'});
+
 	/**
 	 * This is an interface for adding callbacks that get called when any spatial properties of the plotter change.
 	 * Spatial properties are those that affect the data bounds of visual elements.  Whenever these callbacks get
@@ -63,5 +65,3 @@ export default class IPlotter extends ILinkableObject
 	 */
 	drawBackground(dataBounds:Bounds2D, screenBounds:Bounds2D, destination:PIXI.Graphics):void { }
 }
-
-Weave.registerClass(IPlotter, 'weavejs.api.ui.IPlotter');

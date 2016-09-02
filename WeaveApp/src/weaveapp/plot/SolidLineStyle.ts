@@ -27,6 +27,11 @@ import EquationColumnLib = weavejs.data.EquationColumnLib;
 
 export default class SolidLineStyle implements ILinkableObject
 {
+	static WEAVE_INFO = Weave.classInfo(SolidLineStyle, {
+		id: "weavejs.plot.SolidLineStyle",
+		deprecatedIds: ["ExtendedLineStyle"]
+	});
+
 	public constructor()
 	{
 		this._callbackCollection = Weave.getCallbacks(this);
@@ -141,5 +146,3 @@ export default class SolidLineStyle implements ILinkableObject
 		return params;
 	}
 }
-
-Weave.registerClass(SolidLineStyle, ["weavejs.plot.SolidLineStyle", "ExtendedLineStyle"]);

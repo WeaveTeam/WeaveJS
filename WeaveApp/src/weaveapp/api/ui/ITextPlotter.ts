@@ -18,8 +18,16 @@ import IPlotter from "weaveapp/api/ui/IPlotter";
 /**
  * A class implementing this interface is an IPlotter that renders text graphics.
  */
-export interface ITextPlotter extends IPlotter { }
+export interface ITextPlotter extends IPlotter
+{
+}
 
-export class ITextPlotter { }
+export class ITextPlotter
+{
+	static WEAVE_INFO = Weave.classInfo(ITextPlotter, {
+		id: "weavejs.api.ui.ITextPlotter",
+		interfaces: [IPlotter]
+	});
+}
+
 export default ITextPlotter;
-Weave.registerClass(ITextPlotter, "weavejs.api.ui.ITextPlotter", [IPlotter]);

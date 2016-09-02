@@ -20,6 +20,13 @@ import AbstractFeatureLayer from "weaveapp/tool/oltool/layer/AbstractFeatureLaye
 
 export default class ScatterPlotLayer extends AbstractGlyphLayer
 {
+	static WEAVE_INFO = Weave.classInfo(ScatterPlotLayer, {
+		id: "weavejs.tool.oltool.layer.ScatterPlotLayer",
+		label: "Bubbles",
+		interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],
+		deprecatedIds: ["weave.visualization.plotters::ScatterPlotPlotter"]
+	});
+
 	get selectableAttributes()
 	{
 		return super.selectableAttributes
@@ -199,10 +206,3 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 		}
 	}
 }
-
-Weave.registerClass(
-	ScatterPlotLayer,
-	["weavejs.tool.oltool.layer.ScatterPlotLayer", "weave.visualization.plotters::ScatterPlotPlotter"],
-	[ILinkableObjectWithNewProperties, ISelectableAttributes],
-	"Bubbles"
-);

@@ -22,6 +22,12 @@ namespace weavejs.data.source
 
 	export class CachedDataSource extends AbstractDataSource
 	{
+		static WEAVE_INFO = Weave.classInfo(CachedDataSource, {
+			id: "weavejs.data.source.CachedDataSource",
+			label: "Cached Data Source",
+			interfaces: [IDataSource]
+		});
+
 		/* override */ public get isLocal():boolean
 		{
 			return true;
@@ -42,5 +48,4 @@ namespace weavejs.data.source
 			root.setNameOrder(names);
 		}
 	}
-	Weave.registerClass(CachedDataSource, "weavejs.data.source.CachedDataSource", [IDataSource], "Cached Data Source");
 }

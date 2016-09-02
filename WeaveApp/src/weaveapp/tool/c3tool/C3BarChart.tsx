@@ -77,6 +77,18 @@ const LEGEND_POSITIONS:ComboBoxOption[] = [
 
 export default class C3BarChart extends AbstractC3Tool
 {
+	static WEAVE_INFO = Weave.classInfo(C3BarChart, {
+		id: "weavejs.tool.c3tool.C3BarChart",
+		label: "Bar Chart",
+		interfaces: [
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
+			IAltText
+		],
+		deprecatedIds: ["weave.visualization.tools::CompoundBarChartTool"]
+	});
+
 	heightColumns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 	labelColumn = Weave.linkableChild(this, DynamicColumn);
 	sortColumn = Weave.linkableChild(this, DynamicColumn);
@@ -748,15 +760,3 @@ export default class C3BarChart extends AbstractC3Tool
 		}];
 	}
 }
-
-Weave.registerClass(
-	C3BarChart,
-	["weavejs.tool.c3tool.C3BarChart", "weave.visualization.tools::CompoundBarChartTool"],
-	[
-		IVisTool,
-		ILinkableObjectWithNewProperties,
-		ISelectableAttributes,
-		IAltText
-	],
-	"Bar Chart"
-);

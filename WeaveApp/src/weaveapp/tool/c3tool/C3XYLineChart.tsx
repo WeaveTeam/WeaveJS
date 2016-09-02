@@ -46,6 +46,18 @@ declare type Record = {
 
 export default class C3XYLineChart extends AbstractC3Tool
 {
+	static WEAVE_INFO = Weave.classInfo(C3XYLineChart, {
+		id: "weavejs.tool.c3tool.C3XYLineChart",
+		label: "XY Line Chart",
+		interfaces: [
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
+			IAltText
+		],
+		deprecatedIds: ["weave.visualization.tools::XYLineChartTool"]
+	});
+
 	xColumn = Weave.linkableChild(this, new DynamicColumn);
 	sortColumn = Weave.linkableChild(this, new DynamicColumn);
 	yColumns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
@@ -451,15 +463,3 @@ export default class C3XYLineChart extends AbstractC3Tool
 		}];
 	}
 }
-
-Weave.registerClass(
-	C3XYLineChart,
-	["weavejs.tool.c3tool.C3XYLineChart", "weave.visualization.tools::XYLineChartTool"],
-	[
-		IVisTool,
-		ILinkableObjectWithNewProperties,
-		ISelectableAttributes,
-		IAltText
-	],
-	"XY Line Chart"
-);

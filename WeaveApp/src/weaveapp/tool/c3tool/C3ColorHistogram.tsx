@@ -14,6 +14,18 @@ import IAltText from "weaveapp/api/ui/IAltText";
 
 export default class C3ColorHistogram extends C3Histogram
 {
+	static WEAVE_INFO = Weave.classInfo(C3ColorHistogram, {
+		id: "weavejs.tool.c3tool.C3ColorHistogram",
+		label: "Color Histogram",
+		interfaces: [
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
+			IAltText
+		],
+		deprecatedIds: ["weave.visualization.tools::ColormapHistogramTool"]
+	});
+
 	constructor(props:IVisToolProps)
 	{
 		super(props);
@@ -28,15 +40,3 @@ export default class C3ColorHistogram extends C3Histogram
 		return Weave.lang("Color Histogram");
 	}
 }
-
-Weave.registerClass(
-	C3ColorHistogram,
-	["weavejs.tool.c3tool.C3ColorHistogram", "weave.visualization.tools::ColormapHistogramTool"],
-	[
-		IVisTool,
-		ILinkableObjectWithNewProperties,
-		ISelectableAttributes,
-		IAltText
-	],
-	"Color Histogram"
-);

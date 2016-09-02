@@ -45,6 +45,12 @@ namespace weavejs.data.source
 
     export class CensusDataSource extends AbstractDataSource implements IDataSource
     {
+		static WEAVE_INFO = Weave.classInfo(CensusDataSource, {
+			id: "weavejs.data.source.CensusDataSource",
+			label: "Census.gov",
+			interfaces: [IDataSource]
+		});
+
 		private static /* readonly */ baseUrl:string = "http://api.census.gov/";
 		
 		/* override */ public get isLocal():boolean
@@ -314,6 +320,4 @@ namespace weavejs.data.source
 				);
 		}
     }
-	Weave.registerClass(CensusDataSource, "weavejs.data.source.CensusDataSource", [IDataSource], "Census.gov");
-	// WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, CensusDataSource, "Census.gov");
 }

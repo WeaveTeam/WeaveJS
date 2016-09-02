@@ -21,6 +21,11 @@ import VSlider from "weaveapp/ui/slider/VSlider";
 
 export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 {
+	static WEAVE_INFO = Weave.classInfo(NumericRangeDataFilterEditor, {
+		id: "weavejs.editor.NumericRangeDataFilterEditor",
+		interfaces: [ILinkableObjectWithNewProperties]
+	});
+
 	static get OPTIONS():string[]{
 		return ["Force Discrete Values"];
 	}
@@ -75,5 +80,3 @@ export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 		}
 	}
 }
-
-Weave.registerClass(NumericRangeDataFilterEditor, "weavejs.editor.NumericRangeDataFilterEditor", [ILinkableObjectWithNewProperties]);

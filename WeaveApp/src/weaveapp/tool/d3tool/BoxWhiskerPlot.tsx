@@ -59,6 +59,12 @@ export interface BoxWhiskerPlotState extends IVisToolState
 
 export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps, BoxWhiskerPlotState>
 {
+	static WEAVE_INFO = Weave.classInfo(BoxWhiskerPlot, {
+		id: "weavejs.tool.d3tool.BoxWhiskerPlot",
+		label: "Box and Whisker Plot",
+		interfaces: [IVisTool, ILinkableObjectWithNewProperties]
+	});
+
 	boxwhiskerX = Weave.linkableChild(this, DynamicColumn);
 	boxwhiskerY = Weave.linkableChild(this, DynamicColumn);
 
@@ -330,10 +336,3 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		);
 	}
 }
-
-Weave.registerClass(
-	BoxWhiskerPlot,
-	"weavejs.tool.d3tool.BoxWhiskerPlot",
-	[IVisTool, ILinkableObjectWithNewProperties],
-	"Box and Whisker Plot"
-);

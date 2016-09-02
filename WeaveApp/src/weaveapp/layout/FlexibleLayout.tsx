@@ -48,6 +48,12 @@ export type FlexibleLayoutState = {title?: string} & LayoutState;
 
 export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> implements ILinkableVariable
 {
+	static WEAVE_INFO = Weave.classInfo(FlexibleLayout, {
+		id: 'weavejs.layout.FlexibleLayout',
+		label: 'Flexible Layout',
+		interfaces: [ILinkableVariable]
+	});
+
 	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, this.simplifyState({flex: 1, title: ""})), this.forceUpdate, true);
 	private nextState:Object;
 	private rootLayout:Layout;
@@ -674,10 +680,3 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		);
 	}
 }
-
-Weave.registerClass(
-	FlexibleLayout,
-	'weavejs.layout.FlexibleLayout',
-	[ILinkableVariable],
-	'Flexible Layout'
-);

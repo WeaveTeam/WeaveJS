@@ -24,6 +24,11 @@ import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 
 export default class SolidFillStyle implements ILinkableObject
 {
+	static WEAVE_INFO = Weave.classInfo(SolidFillStyle, {
+		id: "weavejs.plot.SolidFillStyle",
+		deprecatedIds: ["ExtendedFillStyle"]
+	});
+
 	/**
 	 * Used to enable or disable fill patterns.
 	 */
@@ -65,5 +70,3 @@ export default class SolidFillStyle implements ILinkableObject
 		};
 	}
 }
-
-Weave.registerClass(SolidFillStyle, ["weavejs.plot.SolidFillStyle", "ExtendedFillStyle"]);

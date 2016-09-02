@@ -25,6 +25,13 @@ const SHAPE_TYPE_LINE:string = "line";
 
 export default class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {
+	static WEAVE_INFO = Weave.classInfo(BarChartLegend, {
+		id: "weavejs.tool.BarChartLegend",
+		label: "Bar Chart Legend",
+		interfaces: [IVisTool, ILinkableObjectWithNewProperties],
+		deprecatedIds: ["weave.visualization.tools::BarChartLegendTool"]
+	});
+
 	chartColors = Weave.linkableChild(this, ColorRamp);
 	columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 	//maxColumns = Weave.linkableChild(this, LinkableNumber);
@@ -188,10 +195,3 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 		};
 	}
 }
-
-Weave.registerClass(
-	BarChartLegend,
-	["weavejs.tool.BarChartLegend", "weave.visualization.tools::BarChartLegendTool"],
-	[IVisTool, ILinkableObjectWithNewProperties],
-	"Bar Chart Legend"
-);

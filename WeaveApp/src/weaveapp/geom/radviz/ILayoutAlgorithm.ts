@@ -44,7 +44,9 @@ namespace weavejs.geom.radviz
 
 	export class ILayoutAlgorithm
 	{
+		static WEAVE_INFO = Weave.classInfo(ILayoutAlgorithm, {
+			id: 'weavejs.geom.radviz.ILayoutAlgorithm',
+			interfaces: [ICallbackCollection]
+		});
 	}
-
-	Weave.registerClass(ILayoutAlgorithm, 'weavejs.geom.radviz.ILayoutAlgorithm', [ICallbackCollection]);
 }

@@ -25,6 +25,13 @@ import {IVisToolState} from "weaveapp/api/ui/IVisTool";
 
 export default class TextTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
 {
+	static WEAVE_INFO = Weave.classInfo(TextTool, {
+		id: "weavejs.tool.Text",
+		label: "Text",
+		interfaces: [IVisTool, ILinkableObjectWithNewProperties],
+		deprecatedIds: ["weave.ui::TextTool"]
+	});
+
 	htmlText = Weave.linkableChild(this, new LinkableString(""));
 	padding = Weave.linkableChild(this, new LinkableNumber(4));
 	panelBackgroundColor = Weave.linkableChild(this, LinkableNumber);
@@ -143,10 +150,3 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 					 className={this.textToolContainerClass}></div>);
 	}
 }
-
-Weave.registerClass(
-	TextTool,
-	["weavejs.tool.Text", "weave.ui::TextTool"],
-	[IVisTool, ILinkableObjectWithNewProperties],
-	"Text"
-);

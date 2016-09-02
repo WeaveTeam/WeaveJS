@@ -28,6 +28,13 @@ interface LabelRecord
 
 export default class LabelLayer extends AbstractGlyphLayer
 {
+	static WEAVE_INFO = Weave.classInfo(LabelLayer, {
+		id: "weavejs.tool.oltool.layer.LabelLayer",
+		label: "Labels",
+		interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],
+		deprecatedIds: ["weave.visualization.plotters::TextGlyphPlotter", "weave.visualization.plotters::GeometryLabelPlotter"]
+	});
+
 	size = Weave.linkableChild(this, AlwaysDefinedColumn);
 	text = Weave.linkableChild(this, DynamicColumn);
 	color = Weave.linkableChild(this, AlwaysDefinedColumn);
@@ -208,10 +215,3 @@ export default class LabelLayer extends AbstractGlyphLayer
 		}
 	}
 }
-
-Weave.registerClass(
-	LabelLayer,
-	["weavejs.tool.oltool.layer.LabelLayer", "weave.visualization.plotters::TextGlyphPlotter", "weave.visualization.plotters::GeometryLabelPlotter"],
-	[ILinkableObjectWithNewProperties, ISelectableAttributes],
-	"Labels"
-);

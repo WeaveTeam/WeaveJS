@@ -35,8 +35,15 @@ namespace weavejs.data
 	import WeavePromise = weavejs.util.WeavePromise;
 
 	export declare type CachedColumnData = [string, string, {[property:string]:string}, string[], any[]][];
+
 	export class AttributeColumnCache implements IAttributeColumnCache
 	{
+		static WEAVE_INFO = Weave.classInfo(AttributeColumnCache, {
+			id: "weavejs.data.AttributeColumnCache",
+			interfaces: [IAttributeColumnCache],
+			singleton: true
+		});
+
 		public getColumn(dataSource:IDataSource, metadata:{[key:string]:string}):IAttributeColumn
 		{
 			// null means no column
@@ -251,6 +258,4 @@ namespace weavejs.data
 			}
 		}
 	}
-	Weave.registerClass(AttributeColumnCache, "weavejs.data.AttributeColumnCache", [IAttributeColumnCache]);
-	WeaveAPI.ClassRegistry.registerSingletonImplementation(IAttributeColumnCache, AttributeColumnCache);
 }

@@ -451,6 +451,4 @@ namespace weavejs.plot
 		public iterationStopTime:number;
 		public asyncState:any = {};
 	}
-
-	Weave.registerClass(PlotTask, "weavejs.plot.PlotTask");
 }

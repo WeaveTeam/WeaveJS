@@ -106,6 +106,13 @@ const REFERENCELINE_MODES:ComboBoxOption[] = [
 
 export default class Sparkline extends SmartComponent<ISparklineProps, ISparklineState> implements IVisTool, IInitSelectableAttributes
 {
+	static WEAVE_INFO = Weave.classInfo(Sparkline, {
+		id: "weavejs.tool.Sparkline",
+		label: "Sparkline",
+		interfaces: [IVisTool, ILinkableObjectWithNewProperties, ISelectableAttributes],
+		deprecatedIds: ["weave.visualization.tools::Sparkline"]
+	});
+
 	columns  = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 	sortColumn = Weave.linkableChild(this, DynamicColumn);
 	labelColumn = Weave.linkableChild(this, DynamicColumn);
@@ -586,10 +593,3 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 		);
 	}
 }
-
-Weave.registerClass(
-	Sparkline,
-	["weavejs.tool.Sparkline", "weave.visualization.tools::Sparkline"],
-	[IVisTool, ILinkableObjectWithNewProperties, ISelectableAttributes],
-	"Sparkline"
-);

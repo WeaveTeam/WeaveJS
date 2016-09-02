@@ -26,6 +26,11 @@ import {IVisToolProps} from "weaveapp/api/ui/IVisTool";
 
 export default class DataMessageTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
 {
+	static WEAVE_INFO = Weave.classInfo(DataMessageTool, {
+		id: "weavejs.tool.DataMessageTool",
+		label: "Data Message Tool",
+		interfaces: [IVisTool]
+	});
 
 	constructor(props:IVisToolProps)
 	{
@@ -87,10 +92,3 @@ export default class DataMessageTool extends React.Component<IVisToolProps, IVis
 		return <Button onClick={this.sendMessage}>{Weave.lang("Send Message")}</Button>;
 	}
 }
-
-Weave.registerClass(
-	DataMessageTool,
-	["weavejs.tool.DataMessageTool"],
-	[IVisTool],
-	"Data Message Tool"
-);

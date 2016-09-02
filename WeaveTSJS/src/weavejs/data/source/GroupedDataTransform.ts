@@ -38,6 +38,12 @@ namespace weavejs.data.source
 
 	export class GroupedDataTransform extends AbstractDataSource implements ISelectableAttributes
 	{
+		static WEAVE_INFO = Weave.classInfo(GroupedDataTransform, {
+			id: "weavejs.data.source.GroupedDataTransform",
+			label: "Grouped data transform",
+			interfaces: [IDataSource]
+		});
+
 		public static /* readonly */ DATA_COLUMNNAME_META:string = "__GroupedDataColumnName__";
 
 		/* override */ public get isLocal():boolean
@@ -184,7 +190,6 @@ namespace weavejs.data.source
 			return this._groupKeys;
 		}
 	}
-	Weave.registerClass(GroupedDataTransform, "weavejs.data.source.GroupedDataTransform", [IDataSource], "Grouped data transform");
 }
 
 import WeaveAPI = weavejs.WeaveAPI;

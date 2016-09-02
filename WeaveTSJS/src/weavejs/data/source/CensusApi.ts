@@ -67,6 +67,8 @@ namespace weavejs.data.source
 
 	export class CensusApi implements ILinkableObject
 	{
+		static WEAVE_INFO = Weave.classInfo(CensusApi, {id: "weavejs.data.source.CensusApi"});
+
 		public static /* readonly */ BASE_URL:string = "http://api.census.gov/";
 		private /* readonly */ jsonCache:JsonCache = Weave.linkableChild(this, JsonCache);
 		
@@ -3582,5 +3584,4 @@ namespace weavejs.data.source
 			}
 		};
 	}
-	Weave.registerClass(CensusApi,  "weavejs.data.source.CensusApi");
 }

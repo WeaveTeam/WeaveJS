@@ -25,6 +25,13 @@ import ScatterPlotLayer from "weaveapp/tool/oltool/layer/ScatterPlotLayer";
 
 export default class GeometryLayer extends AbstractFeatureLayer
 {
+	static WEAVE_INFO = Weave.classInfo(GeometryLayer, {
+		id: "weavejs.tool.oltool.layer.GeometryLayer",
+		label: "Geometries",
+		interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],
+		deprecatedIds: ["weave.visualization.plotters::GeometryPlotter"]
+	});
+
 	private geoJsonParser:ol.format.GeoJSON;
 
 	fill = Weave.linkableChild(this, SolidFillStyle);
@@ -218,10 +225,3 @@ export default class GeometryLayer extends AbstractFeatureLayer
 		}
 	}
 }
-
-Weave.registerClass(
-	GeometryLayer,
-	["weavejs.tool.oltool.layer.GeometryLayer", "weave.visualization.plotters::GeometryPlotter"],
-	[ILinkableObjectWithNewProperties, ISelectableAttributes],
-	"Geometries"
-);

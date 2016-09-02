@@ -24,6 +24,17 @@ export interface PIXIScatterPlotState extends IVisToolState
 
 export default class PIXIScatterPlot extends AbstractVisTool<PIXIScatterPlotProps, PIXIScatterPlotState>
 {
+	static WEAVE_INFO = Weave.classInfo(PIXIScatterPlot, {
+		id: "weavejs.tool.PIXIScatterPlot",
+		label: "Scatter Plot",
+		interfaces: [
+			IVisTool,
+			ILinkableObjectWithNewProperties,
+			ISelectableAttributes,
+		]//,
+		//deprecatedIds: ["weave.visualization.tools::ScatterPlotTool"]
+	});
+
 	element:HTMLDivElement;
 	renderer:PIXI.WebGLRenderer | PIXI.CanvasRenderer;
 	graphics:PIXI.Graphics = new PIXI.Graphics();
@@ -79,14 +90,3 @@ export default class PIXIScatterPlot extends AbstractVisTool<PIXIScatterPlotProp
 		);
 	}
 }
-
-Weave.registerClass(
-	PIXIScatterPlot,
-	["weavejs.tool.PIXIScatterPlot"/*, "weave.visualization.tools::ScatterPlotTool"*/],
-	[
-		IVisTool,
-		ILinkableObjectWithNewProperties,
-		ISelectableAttributes,
-	],
-	"Scatter Plot"
-);
