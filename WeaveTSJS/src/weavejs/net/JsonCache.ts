@@ -67,7 +67,7 @@ namespace weavejs.net
 				request.requestHeaders = this.requestHeaders;
 				request.responseType = ResponseType.JSON;
 				promise = new WeavePromise(this)
-					.setResult((() => WeaveAPI.URLRequestUtils.request(this, request))())
+					.setResult(WeaveAPI.URLRequestUtils.request(this, request))
 					.then((result:Object):Object => { return result || {}; });
 				this.cache.set(url, promise);
 			}
