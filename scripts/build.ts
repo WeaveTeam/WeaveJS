@@ -66,24 +66,20 @@ module.exports = function()
 			}
 			catch (e)
 			{
-				console.log("Failed to find sourcemap for", filename+",", "making stub.")
-				sourceMap = {
-					version: 3,
-					file: path.basename(filename),
-					sourceRoot: cwd,
-					sources: [filename],
-					names: [],
-					mappings: ""
-				}
+				console.log("Failed to find sourcemap for", filename+",", "skipping.");
+				sourceMap = null;
 			}
 
-			sourceMap.sourcesContent = sourceMap.sources.map(
-				(fpath:string):string => {
-					return fs.readFileSync(fpath, 'utf-8');
-				}
-			);
+			if (sourceMap)
+			{
+				sourceMap.sourcesContent = sourceMap.sources.map(
+					(fpath:string):string => {
+						return fs.readFileSync(fpath, 'utf-8');
+					}
+				);
+			}
 
-			sourceMapContent = JSON.stringify(sourceMap);
+			sourceMapContent = sourceMap ? JSON.stringify(sourceMap) : null;
 
 			var contentLines = content.split("\n");
 			/* Remove old sourceMap comments and trailing blanks */
@@ -95,7 +91,15 @@ module.exports = function()
 			}
 			content = contentLines.join("\n") + "\n";
 
-			concat.add(filename, content, sourceMapContent);
+			if (sourceMapContent)
+			{
+				concat.add(filename, content, sourceMapContent);
+			}
+			else
+			{
+				concat.add(null, content);
+			}
+
 		}
 
 		var sourceMapUrl:string;

@@ -13,9 +13,10 @@ var config = {
     "sourceMaps": "true",
     "presets": ["es2015", "react"],
     "plugins": ["transform-object-rest-spread"],
-    "compact": true,
-    "comments": false,
-    "minified": true
+    // Needed to make sourcemaps work properly. Weird file offset issues occur when these are changed.
+    "compact": false,
+    "comments": true,
+    "minified": false
 };
 
 sourceMapObject = JSON.parse(fs.readFileSync(inputSourceMap, 'utf8'));
