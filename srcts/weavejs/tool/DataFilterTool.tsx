@@ -161,10 +161,21 @@ namespace weavejs.tool
 			return <DataFilterEditor filterEditor={ this.filterEditor }  pushCrumb={pushCrumb} selectableAttributes={ this.selectableAttributes }  />
 		}
 
+		setEnabled=(value:boolean)=>
+		{
+			if(this.getFilter())
+				this.getFilter().enabled.value = value;
+		}
+
+		getEnabled=()=>
+		{
+			return this.getFilter() ? this.getFilter().enabled.value : false
+		}
+
 		render():JSX.Element
 		{
 			var editorClass = LinkablePlaceholder.getClass(this.filterEditor.target) as typeof AbstractFilterEditor;
-			
+
 			var editor:JSX.Element = null;
 			if (editorClass)
 				editor = React.createElement(
@@ -179,10 +190,19 @@ namespace weavejs.tool
 				);
 
 			return (
-				<VBox style={{flex: 1}}>
-					{
-						editor
-					}
+				<VBox style={{flex: 1}} padded className="weave-data-filter">
+					<div className="weave-data-filter-checkbox">
+						<Checkbox
+							label={Weave.lang("Enabled")}
+							value={this.getEnabled()}
+							onChange={this.setEnabled}
+						/>
+					</div>
+					<VBox style={{flex: 1}} className={classNames("weave-data-filter-editor", {disabled: !this.getEnabled()})}>
+						{
+							editor
+						}
+					</VBox>
 				</VBox>
 			)
 		}

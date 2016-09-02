@@ -1326,3 +1326,16 @@ div.ui.inverted.segment .weave-list-item-selected:focus{
 .weave .ReactCodeMirror > .CodeMirror {
 	flex: 1
 }
+
+.weave-data-filter-checkbox {
+	padding: 5px;
+}
+
+.weave-data-filter-editor {
+
+}
+
+.weave-data-filter-editor.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
