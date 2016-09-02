@@ -11,8 +11,8 @@
     "compile-module": "npm run clean && npm run copy-typings && tsc && npm run babel",
     "compile-libs": "mkdirp dist && node scripts/browserify libs",
     "compile": "npm run compile-module && npm run browserify && cd .. && node run-ts copy.ts",
-    "move-files": "mv ./bin/js/weaveapp/** ./ && mkdirp weaveapp-typings && cp ./bin/weave-app.d.ts ./weaveapp-typings && cp ./bin/weave-app.js ./weave-app.js",
-    "prepublish": "npm run compile-module && npm run compile-global && npm run move-files"
+    "copy-files": "cp ./package.json ./bin/js/weaveapp/ && mkdirp ./bin/js/weaveapp/weaveapp-typings/ && cp ./bin/weave-app.d.ts ./bin/js/weaveapp/weaveapp-typings/ && cp ./bin/weave-app.js ./bin/js/weaveapp/",
+    "custom-publish": "npm run compile-module && npm run compile-global && npm run copy-files && npm publish ./bin/js/weaveapp/"
   },
   "main": "app/WeaveApp.js",
   "repository": {
