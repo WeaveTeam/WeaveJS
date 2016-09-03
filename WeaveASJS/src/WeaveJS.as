@@ -32,7 +32,6 @@ package
 	import weavejs.data.key.QKeyManager;
 	import weavejs.data.source.CKANDataSource;
 	import weavejs.data.source.CSVDataSource;
-	import weavejs.data.source.DBFDataSource;
 	import weavejs.data.source.ForeignDataMappingTransform;
 	import weavejs.data.source.GeoJSONDataSource;
 	import weavejs.data.source.WeaveDataSource;
@@ -87,7 +86,6 @@ package
 			var IDataSource_Service:Class = IDataSource;
 			var IDataSource_Transform:Class = IDataSource;
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_File, CSVDataSource, "CSV file");
-			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_File, DBFDataSource, "SHP/DBF files");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_File, GeoJSONDataSource, "GeoJSON file");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, WeaveDataSource, "Weave server");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, CKANDataSource, "CKAN server");

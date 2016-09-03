@@ -70,7 +70,6 @@ package
 	import weavejs.data.key.SortedKeySet;
 	import weavejs.data.source.CKANDataSource;
 	import weavejs.data.source.CSVDataSource;
-	import weavejs.data.source.DBFDataSource;
 	import weavejs.data.source.ForeignDataMappingTransform;
 	import weavejs.data.source.GeoJSONDataSource;
 	import weavejs.data.source.WeaveDataSource;
@@ -85,6 +84,22 @@ package
 	import weavejs.util.BackwardsCompatibility;
 	import weavejs.util.JS;
 	import weavejs.util.WeaveMenuItem;
+
+	import org.vanrijkom.dbf.DbfError;
+	import org.vanrijkom.dbf.DbfField;
+	import org.vanrijkom.dbf.DbfFilter;
+	import org.vanrijkom.dbf.DbfHeader;
+	import org.vanrijkom.dbf.DbfRecord;
+	import org.vanrijkom.dbf.DbfTools;
+	import org.vanrijkom.shp.ShpError;
+	import org.vanrijkom.shp.ShpHeader;
+	import org.vanrijkom.shp.ShpObject;
+	import org.vanrijkom.shp.ShpPoint;
+	import org.vanrijkom.shp.ShpPointZ;
+	import org.vanrijkom.shp.ShpPolygon;
+	import org.vanrijkom.shp.ShpRecord;
+	import org.vanrijkom.shp.ShpTools;
+	import org.vanrijkom.shp.ShpType;
 	
 	public class WeaveTest
 	{
@@ -143,7 +158,6 @@ package
 			GeoJSONDataSource,
 			WeaveDataSource,
 			ForeignDataMappingTransform,
-			DBFDataSource,
 			WebSocketDataSource,
 			CKANDataSource,
 			KeyColumn,
@@ -158,7 +172,21 @@ package
 			BackwardsCompatibility,
 			Range,
 			LinkableBounds2D,
-
+			DbfError,
+			DbfField,
+			DbfFilter,
+			DbfHeader,
+			DbfRecord,
+			DbfTools,
+			ShpError,
+			ShpHeader,
+			ShpObject,
+			ShpPoint,
+			ShpPointZ,
+			ShpPolygon,
+			ShpRecord,
+			ShpTools,
+			ShpType,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];
