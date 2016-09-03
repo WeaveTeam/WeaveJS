@@ -18,8 +18,10 @@ before_install:
 - mkdir -p dist
 - yes | npm install
 - npm install
+- npm link
 - pushd WeaveApp
 - npm install
+- npm link weavejs
 - popd
 - pushd node_modules/flexjs/js/bin/
 - chmod a+x *
