@@ -586,6 +586,15 @@ package
 
 			WeaveAPI.ClassRegistry.registerClass(definition, id, allInterfaces, label);
 
+			if(singleton)
+			{
+				var theInterface:Class = (info[INTERFACES] || [])[0];
+				if(!theInterface)
+					throw new Error("An interface must be specified to be registered as a singleton implementation");
+				WeaveAPI.ClassRegistry.registerSingletonImplementation(theInterface, definition);
+			}
+
+
 			for each (var deprecatedId:String in deprecatedIds)
 				WeaveAPI.ClassRegistry.registerClass(definition, deprecatedId);
 
