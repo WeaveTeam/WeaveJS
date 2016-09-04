@@ -30,8 +30,6 @@ package
 	import weavejs.data.CSVParser;
 	import weavejs.data.StatisticsCache;
 	import weavejs.data.key.QKeyManager;
-	import weavejs.data.source.CKANDataSource;
-	import weavejs.data.source.CSVDataSource;
 	import weavejs.data.source.GeoJSONDataSource;
 	import weavejs.data.source.WeaveDataSource;
 	import weavejs.geom.TempHack_SolidFillStyle;
@@ -84,10 +82,8 @@ package
 			var IDataSource_File:Class = IDataSource;
 			var IDataSource_Service:Class = IDataSource;
 			var IDataSource_Transform:Class = IDataSource;
-			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_File, CSVDataSource, "CSV file");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_File, GeoJSONDataSource, "GeoJSON file");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, WeaveDataSource, "Weave server");
-			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, CKANDataSource, "CKAN server");
 
 			Weave.classInfo(TempHack_SolidFillStyle, {id: "ExtendedFillStyle"});
 			Weave.classInfo(TempHack_SolidLineStyle, {id: "ExtendedLineStyle"});

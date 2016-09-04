@@ -22,8 +22,8 @@ package
 	import weavejs.core.LinkableVariable;
 	import weavejs.core.LinkableWatcher;
 	import weavejs.core.SessionStateLog;
-import weavejs.data.DataSourceUtils;
-import weavejs.data.bin.AbstractBinningDefinition;
+	import weavejs.data.DataSourceUtils;
+	import weavejs.data.bin.AbstractBinningDefinition;
 	import weavejs.data.bin.CategoryBinningDefinition;
 	import weavejs.data.bin.CustomSplitBinningDefinition;
 	import weavejs.data.bin.DynamicBinningDefinition;
@@ -70,8 +70,6 @@ import weavejs.data.bin.AbstractBinningDefinition;
 	import weavejs.data.key.KeySetCallbackInterface;
 	import weavejs.data.key.KeySetUnion;
 	import weavejs.data.key.SortedKeySet;
-	import weavejs.data.source.CKANDataSource;
-	import weavejs.data.source.CSVDataSource;
 	import weavejs.data.source.GeoJSONDataSource;
 	import weavejs.data.source.WeaveDataSource;
 	import weavejs.geom.TempHack_SolidFillStyle;
@@ -157,7 +155,6 @@ import weavejs.data.bin.AbstractBinningDefinition;
 			StringLookup,
 			GeoJSONDataSource,
 			WeaveDataSource,
-			CKANDataSource,
 			KeyColumn,
 			ExternalTool,
 			WeaveMenuItem,
@@ -223,18 +220,6 @@ import weavejs.data.bin.AbstractBinningDefinition;
 				for each (var key:IQualifiedKey in this.keys)
 					JS.log(key, this.getValueFromKey(key), this.getValueFromKey(key, Number), this.getValueFromKey(key, String));
 			};
-			weave.path('csv').request(CSVDataSource)
-				.state('csvData', [['a', 'b'], [1, "one"], [2, "two"]])
-				.addCallback(null, function():void {
-					JS.log(this+"");
-					var csv:CSVDataSource = this.getObject() as CSVDataSource;
-					var ids:Array = csv.getColumnIds();
-					for each (var id:* in ids)
-					{
-						var col:IAttributeColumn = csv.getColumnById(id);
-						col.addGroupedCallback(col, print, true);
-					}
-				});
 		}
 	}
 }

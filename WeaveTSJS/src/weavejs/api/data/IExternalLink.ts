@@ -13,18 +13,22 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
 	/**
 	 * This is an interface for an object which references a URL.
 	 * It is intended to be used in conjunction with IWeaveTreeNode.
 	 */
-	public interface IExternalLink
+	export class IExternalLink
 	{
+		static WEAVE_INFO = Weave.classInfo(IExternalLink, {
+			id: "weavejs.api.data.IExternalLink"
+		});
+
 		/**
 		 * Gets the URL associated with this object.
 		 * @return The URL.
 		 */
-		function getURL():String;
+		getURL:()=>string;
 	}
 }
