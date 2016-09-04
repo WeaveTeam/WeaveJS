@@ -12,7 +12,8 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import SessionStateEditor from "weaveapp/editor/SessionStateEditor";
 import InteractiveTour from "weaveapp/dialog/InteractiveTour";
-import {IVisTool} from "weaveapp/api/ui/IVisTool";
+import IVisTool from "weaveapp/api/ui/IVisTool";
+import ILinkableObject = weavejs.api.core.ILinkableObject;
 
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {

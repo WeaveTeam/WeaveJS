@@ -97,7 +97,7 @@ export default class ControllersMenu implements MenuBarItemProps
 		}).filter(item => !!item);
 	}
 
-	static isBeta(impl:Class):boolean
+	static isBeta(impl:Class<IVisTool>):boolean
 	{
 		return impl == SessionStateMenuTool;
 			//impl == DataFilterTool

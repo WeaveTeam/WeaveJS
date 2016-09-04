@@ -23,6 +23,7 @@ import Sparkline from "weaveapp/tool/Sparkline";
 import TableTool from "weaveapp/tool/TableTool";
 import TextTool from "weaveapp/tool/TextTool";
 import OpenLayersMapTool from "weaveapp/tool/oltool/OpenLayersMapTool";
+import IVisTool from "src/weaveapp/api/ui/IVisTool";
 
 export default class ChartsMenu implements MenuBarItemProps
 {
@@ -79,7 +80,7 @@ export default class ChartsMenu implements MenuBarItemProps
 		}).filter(item => !!item);
 	}
 
-	static isBeta(impl:Class):boolean
+	static isBeta(impl:Class<IVisTool|OpenLayersMapTool>):boolean
 	{
 		return impl == C3Gauge || impl == DataMessageTool || impl == C3XYLineChart;
 	}

@@ -130,7 +130,7 @@ export default class DataMenu implements MenuBarItemProps
 					click: () => {
 						var baseName = WeaveAPI.ClassRegistry.getDisplayName(impl);
 						var path = [weave.root.generateUniqueName(baseName)];
-						var dataSource = weave.requestObject(path, impl);
+						var dataSource = weave.requestObject(path, impl) as IDataSource;
 						if (onCreateItem)
 							onCreateItem(dataSource);
 					}
@@ -141,7 +141,7 @@ export default class DataMenu implements MenuBarItemProps
 		return items;
 	}
 
-	static isBeta(impl:new()=>IDataSource):boolean
+	static isBeta(impl:Class<IDataSource>):boolean
 	{
 		return impl == CensusDataSource
 			|| impl == GroupedDataTransform

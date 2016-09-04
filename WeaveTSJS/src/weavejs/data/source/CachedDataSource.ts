@@ -41,7 +41,7 @@ namespace weavejs.data.source
 			var root = Weave.getRoot(this);
 			var names = root.getNames();
 			var name = root.getName(this);
-			var classDef:Class = Weave.getDefinition(this.type.value);
+			var classDef:Class<IDataSource> = Weave.getDefinition(this.type.value);
 			var state:Object = this.state.state;
 			var dataSource:IDataSource = root.requestObject(name, classDef, false);
 			Weave.setState(dataSource, state);

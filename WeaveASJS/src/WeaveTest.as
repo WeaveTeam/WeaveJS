@@ -8,6 +8,7 @@ package
 {
 	import weavejs.api.core.ILinkableVariable;
 	import weavejs.api.data.IAttributeColumn;
+	import weavejs.api.data.IPrimitiveColumn;
 	import weavejs.api.data.IQualifiedKey;
 	import weavejs.core.EventCallbackCollection;
 	import weavejs.core.LinkableBoolean;
@@ -21,7 +22,8 @@ package
 	import weavejs.core.LinkableVariable;
 	import weavejs.core.LinkableWatcher;
 	import weavejs.core.SessionStateLog;
-	import weavejs.data.bin.AbstractBinningDefinition;
+import weavejs.data.DataSourceUtils;
+import weavejs.data.bin.AbstractBinningDefinition;
 	import weavejs.data.bin.CategoryBinningDefinition;
 	import weavejs.data.bin.CustomSplitBinningDefinition;
 	import weavejs.data.bin.DynamicBinningDefinition;
@@ -70,10 +72,8 @@ package
 	import weavejs.data.key.SortedKeySet;
 	import weavejs.data.source.CKANDataSource;
 	import weavejs.data.source.CSVDataSource;
-	import weavejs.data.source.ForeignDataMappingTransform;
 	import weavejs.data.source.GeoJSONDataSource;
 	import weavejs.data.source.WeaveDataSource;
-	import weavejs.data.source.WebSocketDataSource;
 	import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.geom.Range;
@@ -100,7 +100,7 @@ package
 	import org.vanrijkom.shp.ShpRecord;
 	import org.vanrijkom.shp.ShpTools;
 	import org.vanrijkom.shp.ShpType;
-	
+
 	public class WeaveTest
 	{
 		private static const dependencies:Array = [
@@ -157,8 +157,6 @@ package
 			StringLookup,
 			GeoJSONDataSource,
 			WeaveDataSource,
-			ForeignDataMappingTransform,
-			WebSocketDataSource,
 			CKANDataSource,
 			KeyColumn,
 			ExternalTool,
@@ -187,6 +185,8 @@ package
 			ShpRecord,
 			ShpTools,
 			ShpType,
+			IPrimitiveColumn,
+			DataSourceUtils,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];

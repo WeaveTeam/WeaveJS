@@ -443,7 +443,7 @@ package weavejs.data
 		 * @param value A value to cast.
 		 * @param newType Either a qualifiedClassName or a Class object referring to the type to cast the value as.
 		 */
-		public static function cast/*/<T>/*/(value:*, newType:/*/(new(..._:any[])=>T)|string/*/*):/*/T/*/*
+		public static function cast/*/<T>/*/(value:*, newType:/*/Class<T>|string/*/*):/*/T/*/*
 		{
 			if (newType == null)
 				return value;

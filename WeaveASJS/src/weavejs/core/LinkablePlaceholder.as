@@ -16,7 +16,7 @@ package weavejs.core
 	 */
 	public class LinkablePlaceholder/*/<T extends ILinkableObject>/*/ extends LinkableVariable
 	{
-		public function LinkablePlaceholder(classDef:/*/new(..._:any[])=>T/*/Class)
+		public function LinkablePlaceholder(classDef:/*/Class<T>/*/Class)
 		{
 			if (!classDef)
 				throw new Error("classDef cannot be null");
@@ -27,7 +27,7 @@ package weavejs.core
 		private var classDef:Class;
 		private var instance:ILinkableObject;
 		
-		public function getClass():/*/new(..._:any[])=>T/*/Class
+		public function getClass():/*/Class<T>/*/Class
 		{
 			return classDef;
 		}
@@ -100,7 +100,7 @@ package weavejs.core
 		 * @param object An object, which may be null.
 		 * @return The class definition, or null if the object was null.
 		 */
-		public static function getClass(object:/*/ILinkableObject | LinkablePlaceholder<ILinkableObject>/*/Object):/*/new(..._:any[])=>ILinkableObject/*/Class
+		public static function getClass(object:/*/ILinkableObject | LinkablePlaceholder<ILinkableObject>/*/Object):/*/Class<ILinkableObject>/*/Class
 		{
 			var placeholder:LinkablePlaceholder = object as LinkablePlaceholder;
 			if (placeholder)

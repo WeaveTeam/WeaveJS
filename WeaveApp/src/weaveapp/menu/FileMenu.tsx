@@ -389,7 +389,7 @@ export default class FileMenu implements MenuBarItemProps
 		}*/
 	}
 
-	private findDataSource<T extends (new()=>IDataSource)>(type:new(..._:any[])=>T, filter:(dataSource:T)=>boolean, create:boolean = false):T
+	private findDataSource<T extends (new()=>IDataSource)>(type:Class<T>, filter:(dataSource:T)=>boolean, create:boolean = false):T
 	{
 		var weave = this.owner.weave;
 		var results = Weave.getDescendants(weave.root, type).filter(filter);

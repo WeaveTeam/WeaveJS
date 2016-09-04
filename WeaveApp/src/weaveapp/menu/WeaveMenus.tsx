@@ -13,8 +13,9 @@ import DataMenu from "weaveapp/menu/DataMenu";
 import ControllersMenu from "weaveapp/menu/ControllersMenu";
 import ExternalToolMenu from "weaveapp/menu/ExternalToolMenu";
 import {AbstractVisToolImpl} from "weaveapp/tool/AbstractVisTool";
+import IVisTool from "weaveapp/api/ui/IVisTool";
 
-export type CreateObjectFunction = (type:Class)=>void;
+export type CreateObjectFunction = (type:Class<IVisTool>)=>void;
 
 export default class WeaveMenus implements IWeaveMenus
 {

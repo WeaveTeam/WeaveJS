@@ -46,12 +46,12 @@ export default class SolidLineStyle implements ILinkableObject
 	private _triggerCounter:number = 0; // used to detect change
 
 	// This maps an AlwaysDefinedColumn to its preferred value type.
-	private map_column_dataType:Map<AlwaysDefinedColumn, Class> = new Map();
+	private map_column_dataType:Map<AlwaysDefinedColumn, GenericClass> = new Map();
 	// this maps an AlwaysDefinedColumn to the default value for that column.
 	// if there is an internal column in the AlwaysDefinedColumn, the default value is not stored
 	private map_column_defaultValue:Map<AlwaysDefinedColumn, string|number> = new Map();
 
-	private createColumn(dataType:Class, defaultValue:string|number):AlwaysDefinedColumn
+	private createColumn(dataType:GenericClass, defaultValue:string|number):AlwaysDefinedColumn
 	{
 		var column:AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
 		this.map_column_dataType.set(column, dataType);

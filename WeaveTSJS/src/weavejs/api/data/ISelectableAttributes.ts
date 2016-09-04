@@ -13,12 +13,19 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
-	import weavejs.api.core.ILinkableObject;
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
-	public interface ISelectableAttributes extends ILinkableObject
+	export class ISelectableAttributes extends ILinkableObject
 	{
-		function get selectableAttributes():/*/Map<string, (weavejs.api.data.IColumnWrapper|weavejs.api.core.ILinkableHashMap)>/*/Object;
+		// TODO fix classInfo argument so that it accepts abstract classes
+		static WEAVE_INFO = Weave.classInfo(ISelectableAttributes, {
+			id: "weavejs.api.data.ISelectableAttributes"
+		});
+
+		selectableAttributes:Map<string, IColumnWrapper|ILinkableHashMap>
 	}
 }

@@ -451,7 +451,7 @@ namespace weavejs.util
 		/**
 		 * Returns the first ancestor React Component of a particular type which has been registered via ReactUtils.registerComponentRef().
 		 */
-		static findComponent<T extends React.Component<any,any>>(instance:React.ReactInstance, type?:new(..._:any[])=>T):T
+		static findComponent<T extends React.Component<any,any>>(instance:React.ReactInstance, type?:Class<T>):T
 		{
 			var element = ReactUtils.getElement(instance);
 			if (!element)

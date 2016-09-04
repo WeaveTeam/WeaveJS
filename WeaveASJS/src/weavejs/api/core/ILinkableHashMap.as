@@ -50,7 +50,7 @@ package weavejs.api.core
 		 * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
 		 * @return A copy of the ordered list of names of objects contained in this LinkableHashMap.
 		 */
-		function getNames(filter:/*/new(..._:any[])=>any | string/*/Class = null, filterIncludesPlaceholders:Boolean = false):Array/*/<string>/*/;
+		function getNames(filter:/*/GenericClass | string/*/Class = null, filterIncludesPlaceholders:Boolean = false):Array/*/<string>/*/;
 		
 		/**
 		 * This function returns an ordered list of objects in the LinkableHashMap. 
@@ -58,7 +58,7 @@ package weavejs.api.core
 		 * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
 		 * @return An ordered Array of objects that correspond to the names returned by getNames(filter).
 		 */
-		function getObjects/*/<T>/*/(filter:/*/new(..._:any[])=>T | string/*/Class = null, filterIncludesPlaceholders:Boolean = false):Array/*/<T & ILinkableObject>/*/;
+		function getObjects/*/<T>/*/(filter:/*/Class<T> | string/*/Class = null, filterIncludesPlaceholders:Boolean = false):Array/*/<T & ILinkableObject>/*/;
 
 		/**
 		 * This function returns an Object mapping names to objects contained in the LinkableHashMap.
@@ -66,7 +66,7 @@ package weavejs.api.core
 		 * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
 		 * @return An Object mapping names to objects contained in the LinkableHashMap.
 		 */
-		function toObject/*/<T>/*/(filter:/*/new(..._:any[])=>T | string/*/Class = null, filterIncludesPlaceholders:Boolean = false):/*/{[name:string]: T & ILinkableObject}/*/Object;
+		function toObject/*/<T>/*/(filter:/*/Class<T> | string/*/Class = null, filterIncludesPlaceholders:Boolean = false):/*/{[name:string]: T & ILinkableObject}/*/Object;
 		
 		/**
 		 * This function returns a Map containing the entries in the LinkableHashMap.
@@ -74,7 +74,7 @@ package weavejs.api.core
 		 * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
 		 * @return A Map containing the ordered entries in the LinkableHashMap.
 		 */
-		function toMap/*/<T>/*/(filter:/*/new(..._:any[])=>T | string/*/Class = null, filterIncludesPlaceholders:Boolean = false):/*/Map<String, T & ILinkableObject>/*/Object;
+		function toMap/*/<T>/*/(filter:/*/Class<T> | string/*/Class = null, filterIncludesPlaceholders:Boolean = false):/*/Map<String, T & ILinkableObject>/*/Object;
 
 		/**
 		 * This function gets the name of the specified object in the LinkableHashMap.
@@ -107,7 +107,7 @@ package weavejs.api.core
 		 * @param lockObject If this is true, the object will be locked in place under the specified name.
 		 * @return The object under the requested name of the requested type, or null if an error occurred.
 		 */
-		function requestObject/*/<T>/*/(name:String, classDef:/*/new(..._:any[])=>T | string/*/Class, lockObject:Boolean = false):/*/T/*/*;
+		function requestObject/*/<T>/*/(name:String, classDef:/*/Class<T> | string/*/Class, lockObject:Boolean = false):/*/T/*/*;
 
 		/**
 		 * This function will copy the session state of an ILinkableObject to a new object under the given name in this LinkableHashMap.

@@ -114,7 +114,7 @@ package
 		 * @param type The type
 		 * @return Either an instance of the requested type, or null if the object could not be created or a LinkablePlaceholder was created.
 		 */
-		public function requestObject/*/<T>/*/(path:Array/*/<string|number>/*/, type:/*/(new(..._:any[])=>T) | string/*/Class):/*/T/*/ILinkableObject
+		public function requestObject/*/<T>/*/(path:Array/*/<string|number>/*/, type:/*/Class<T> | string/*/Class):/*/T/*/ILinkableObject
 		{
 			// Get parent object first in case there is some backwards compatibility code that gets
 			// executed when it is accessed (registering deprecated class definitions, for example).
@@ -287,7 +287,7 @@ package
 		 * @return The closest ancestor of the given type.
 		 * @see weave.api.core.ISessionManager#getLinkableOwner()
 		 */
-		public static function getAncestor/*/<T>/*/(descendant:ILinkableObject, ancestorType:/*/(new(..._:any[])=>T) | string/*/Class):/*/T & ILinkableObject/*/ILinkableObject
+		public static function getAncestor/*/<T>/*/(descendant:ILinkableObject, ancestorType:/*/Class<T> | string/*/Class):/*/T & ILinkableObject/*/ILinkableObject
 		{
 			if (ancestorType is String)
 				ancestorType = Weave.getDefinition(String(ancestorType), true);
@@ -313,7 +313,7 @@ package
 		 * Shortcut for WeaveAPI.SessionManager.getLinkableDescendants()
 		 * @copy weave.api.core.ISessionManager#getLinkableDescendants()
 		 */
-		public static function getDescendants/*/<T>/*/(object:ILinkableObject, filter:/*/(new(..._:any[])=>T) | string/*/Class = null):Array/*/<T & ILinkableObject>/*/
+		public static function getDescendants/*/<T>/*/(object:ILinkableObject, filter:/*/Class<T> | string/*/Class = null):Array/*/<T & ILinkableObject>/*/
 		{
 			if (filter is String)
 				filter = Weave.getDefinition(String(filter), true);
@@ -470,7 +470,7 @@ package
 		/**
 		 * @return (object as type)
 		 */
-		public static function AS/*/<T>/*/(object:Object, type:/*/new(..._:any[])=>T/*/Class):/*/T/*/*
+		public static function AS/*/<T>/*/(object:Object, type:/*/Class<T>/*/Class):/*/T/*/*
 		{
 			return object as type;
 		}
@@ -487,7 +487,7 @@ package
 		 * Dynamic items in the session state that extend this class will be replaced with
 		 * LinkablePlaceholder objects that can be replaced with actual instances later.
 		 */
-		public static function registerAsyncClass/*/<T>/*/(type:/*/new(..._:any[])=>T/*/Class, instanceHandler:/*/(instance:T)=>void/*/Function):void
+		public static function registerAsyncClass/*/<T>/*/(type:/*/Class<T>/*/Class, instanceHandler:/*/(instance:T)=>void/*/Function):void
 		{
 			var valueInMap:* = instanceHandler || true;
 			map_class_isAsync.set(type, valueInMap);
@@ -541,7 +541,7 @@ package
 		 * @param additionalInterfaces An Array of interfaces (Class objects) that the definition implements in addition to ILinkableObject.
 		 * @param displayName An optional display name for the class definition.
 		 */
-		public static function registerClass(definition:Class, qualifiedName:/*/string|string[]/*/Object, additionalInterfaces:Array/*/<new()=>any>/*/ = null, displayName:String = null):void
+		public static function registerClass(definition:/*/GenericClass/*/Class, qualifiedName:/*/string|string[]/*/Object, additionalInterfaces:Array/*/<GenericClass>/*/ = null, displayName:String = null):void
 		{
 			var ids:Array = qualifiedName is String ? [qualifiedName] : qualifiedName as Array || [];
 			if (!ids.length)
@@ -561,10 +561,10 @@ package
 		 * @param info An object containing the class info.
 		 * @return The same info object passed in as a parameter.
 		 */
-		public static function classInfo(definition:/*/new(..._:any[])=>any/*/Class, info:/*/{
+		public static function classInfo(definition:/*/GenericClass/*/Class, info:/*/{
 			id:string,
 			label?:string,
-			interfaces?:Array<new()=>any>,
+			interfaces?:Array<GenericClass>,
 			deprecatedIds?:string[],
 			singleton?:boolean,
 			linkable?:boolean

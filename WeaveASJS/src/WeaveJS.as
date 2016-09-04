@@ -32,7 +32,6 @@ package
 	import weavejs.data.key.QKeyManager;
 	import weavejs.data.source.CKANDataSource;
 	import weavejs.data.source.CSVDataSource;
-	import weavejs.data.source.ForeignDataMappingTransform;
 	import weavejs.data.source.GeoJSONDataSource;
 	import weavejs.data.source.WeaveDataSource;
 	import weavejs.geom.TempHack_SolidFillStyle;
@@ -89,7 +88,6 @@ package
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_File, GeoJSONDataSource, "GeoJSON file");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, WeaveDataSource, "Weave server");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, CKANDataSource, "CKAN server");
-			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Transform, ForeignDataMappingTransform, "Foreign data mapping");
 
 			Weave.classInfo(TempHack_SolidFillStyle, {id: "ExtendedFillStyle"});
 			Weave.classInfo(TempHack_SolidLineStyle, {id: "ExtendedLineStyle"});

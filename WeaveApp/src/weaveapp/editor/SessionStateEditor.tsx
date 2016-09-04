@@ -46,7 +46,7 @@ export default class SessionStateEditor extends SmartComponent<ISessionStateEdit
 	{
 		let root = Weave.getRoot(object);
 		let path = Weave.findPath(root, object);
-		let name:string = WeaveAPI.ClassRegistry.getDisplayName(object.constructor as Class);
+		let name:string = WeaveAPI.ClassRegistry.getDisplayName(object.constructor as GenericClass);
 		if (path)
 			name = path.length ? path.pop() : "Weave";
 		return (WeaveAPI.SessionManager as SessionManager).getSessionStateTree(object, name);
@@ -210,7 +210,7 @@ export default class SessionStateEditor extends SmartComponent<ISessionStateEdit
 		this.reportError("TODO - implement SessionStateEditor.prototype.showInputDialog()");
 	}
 
-	private newObject(parent:ILinkableObject, classDef:Class):void
+	private newObject(parent:ILinkableObject, classDef:GenericClass):void
 	{
 		var className:string = Weave.className(classDef).split('.').pop();
 

@@ -41,7 +41,7 @@ namespace weavejs.data.source
 		static WEAVE_INFO = Weave.classInfo(GroupedDataTransform, {
 			id: "weavejs.data.source.GroupedDataTransform",
 			label: "Grouped data transform",
-			interfaces: [IDataSource]
+			interfaces: [IDataSource, ISelectableAttributes]
 		});
 
 		public static /* readonly */ DATA_COLUMNNAME_META:string = "__GroupedDataColumnName__";
@@ -273,12 +273,12 @@ class AggregateColumn extends AbstractAttributeColumn implements IPrimitiveColum
 	/**
 	 * @inheritDoc
 	 */
-	/* override */public getValueFromKey(groupKey:IQualifiedKey, dataType:Class = null):any
+	/* override */public getValueFromKey(groupKey:IQualifiedKey, dataType:GenericClass = null):any
 	{
 		if (this.triggerCounter != this._cacheTriggerCounter)
 		{
 			this._cacheTriggerCounter = this.triggerCounter;
-			this.dataCache = new Dictionary2D<Class, IQualifiedKey, any>();
+			this.dataCache = new Dictionary2D<GenericClass, IQualifiedKey, any>();
 		}
 		
 		if (!dataType)
@@ -306,7 +306,7 @@ class AggregateColumn extends AbstractAttributeColumn implements IPrimitiveColum
 	 * @param groupKey A key that references a String value and is associated with a set of input keys.
 	 * @param dataType The dataType parameter passed to the EquationColumn.
 	 */
-	public getAggregateValue(groupKey:IQualifiedKey, dataType:Class):any
+	public getAggregateValue(groupKey:IQualifiedKey, dataType:GenericClass):any
 	{
 		if (groupKey.keyType != this.getMetadata(ColumnMetadata.KEY_TYPE))
 			return undefined;
@@ -317,7 +317,7 @@ class AggregateColumn extends AbstractAttributeColumn implements IPrimitiveColum
 		// get input keys from groupKey
 		var tempKeys:IQualifiedKey[] = EquationColumnLib.getAssociatedKeys(this._groupByColumn, groupKey, true);
 		var meta_dataType:string = this._dataColumn ? this._dataColumn.getMetadata(ColumnMetadata.DATA_TYPE) : null;
-		var inputType:Class = DataType.getClass(meta_dataType);
+		var inputType:GenericClass = DataType.getClass(meta_dataType);
 
 		if (dataType === Array)
 		{
@@ -379,7 +379,7 @@ class AggregateColumn extends AbstractAttributeColumn implements IPrimitiveColum
 	 * Gets an Array of values from a column, excluding missing data.
 	 * Flattens Arrays.
 	 */
-	private static getValues(column:IAttributeColumn, keys:IQualifiedKey[], dataType:Class):any[]
+	private static getValues(column:IAttributeColumn, keys:IQualifiedKey[], dataType:GenericClass):any[]
 	{
 		var values:any[] = [];
 		if (!column)

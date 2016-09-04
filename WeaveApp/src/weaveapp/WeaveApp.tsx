@@ -355,7 +355,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.tabLayout.activeTabIndex = -1;
 	}
 
-	createObject=(type:Class):void=>
+	createObject=(type:GenericClass):void=>
 	{
 		var weave = this.props.weave;
 

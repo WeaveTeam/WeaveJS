@@ -168,7 +168,7 @@ namespace weavejs.util
 		/**
 		 * Shortcut for boilerplate code that creates a LinkableWatcher which calls forceUpdate() on a component.
 		 */
-		static forceUpdateWatcher(component:ReactComponent, type:new(..._:any[])=>ILinkableObject, defaultPath:(typeof LinkableWatcher.prototype.targetPath) = null):LinkableWatcher
+		static forceUpdateWatcher(component:ReactComponent, type:Class<ILinkableObject>, defaultPath:(typeof LinkableWatcher.prototype.targetPath) = null):LinkableWatcher
 		{
 			var watcher = Weave.disposableChild(component, new LinkableWatcher(type, null, component.forceUpdate.bind(component)));
 			if (defaultPath)
@@ -176,7 +176,7 @@ namespace weavejs.util
 			return watcher;
 		}
 
-		static requestObject<T extends ReactComponent>(weave:Weave, path:string[]/* TODO change to WeavePathArray */, type:new(..._:any[])=>T, onCreate:(instance:T) => void):void
+		static requestObject<T extends ReactComponent>(weave:Weave, path:string[]/* TODO change to WeavePathArray */, type:Class<T>, onCreate:(instance:T) => void):void
 		{
 			var oldObject = weave.getObject(path);
 			weave.requestObject(path, type);
