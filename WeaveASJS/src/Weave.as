@@ -566,7 +566,6 @@ package
 			label?:string,
 			interfaces?:Array<new()=>any>,
 			deprecatedIds?:string[],
-			singleton?:boolean,
 			linkable?:boolean
 		}/*/Object):/*/typeof info/*/Object
 		{
@@ -575,12 +574,10 @@ package
 			var INTERFACES:String = 'interfaces';
 			var LABEL:String = 'label';
 			var LINKABLE:String = 'linkable';
-			var SINGLETON:String = 'singleton';
 
 			var id:String = info[ID] as String;
 			var label:String = info[LABEL] as String;
 			var linkable:Boolean = info[LINKABLE] === undefined ? true : !!info[LINKABLE];
-			var singleton:Boolean = !!info[SINGLETON];
 			var allInterfaces:Array = linkable ? [ILinkableObject].concat(info[INTERFACES] || []) : info[INTERFACES] as Array;
 			var deprecatedIds:Array = info[DEPRECATED_IDS] is String ? [info[DEPRECATED_IDS]] : info[DEPRECATED_IDS] as Array || [];
 

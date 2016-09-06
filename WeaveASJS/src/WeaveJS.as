@@ -72,17 +72,18 @@ package
 				'weavejs.path',
 				'weavejs.util'
 			);
-			
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(IURLRequestUtils, URLRequestUtils);
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(IAttributeColumnCache, AttributeColumnCache);
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(ISessionManager, SessionManager);
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(IQualifiedKeyManager, QKeyManager);
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(IScheduler, Scheduler);
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(IProgressIndicator, ProgressIndicator);
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(IStatisticsCache, StatisticsCache);
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(IEditorManager, EditorManager);
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(ICSVParser, CSVParser);
-			WeaveAPI.ClassRegistry.registerSingletonImplementation(ILocale, Locale);
+
+			// register singleton implementations
+			WeaveAPI.ClassRegistry.registerImplementation(IURLRequestUtils, URLRequestUtils);
+			WeaveAPI.ClassRegistry.registerImplementation(IAttributeColumnCache, AttributeColumnCache);
+			WeaveAPI.ClassRegistry.registerImplementation(ISessionManager, SessionManager);
+			WeaveAPI.ClassRegistry.registerImplementation(IQualifiedKeyManager, QKeyManager);
+			WeaveAPI.ClassRegistry.registerImplementation(IScheduler, Scheduler);
+			WeaveAPI.ClassRegistry.registerImplementation(IProgressIndicator, ProgressIndicator);
+			WeaveAPI.ClassRegistry.registerImplementation(IStatisticsCache, StatisticsCache);
+			WeaveAPI.ClassRegistry.registerImplementation(IEditorManager, EditorManager);
+			WeaveAPI.ClassRegistry.registerImplementation(ICSVParser, CSVParser);
+			WeaveAPI.ClassRegistry.registerImplementation(ILocale, Locale);
 			
 			WeaveAPI.ClassRegistry.registerImplementation(ILinkableHashMap, LinkableHashMap);
 			WeaveAPI.ClassRegistry.registerImplementation(ILinkableDynamicObject, LinkableDynamicObject);

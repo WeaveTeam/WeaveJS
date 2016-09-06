@@ -49,21 +49,6 @@ package weavejs.api.core
 			}/*/Object;
 		
 		/**
-		 * Registers an implementation of an interface to be used as a singleton.
-		 * @param theInterface The interface to register.
-		 * @param theImplementation The implementation to register.
-		 * @return A value of true if the implementation was successfully registered.
-		 */
-		function registerSingletonImplementation/*/<T>/*/(theInterface:/*/new()=>T/*/Class, theImplementation:/*/new(..._:any[])=>T/*/Class):Boolean;
-		
-		/**
-		 * Gets the registered implementation of an interface.
-		 * @param theInterface An interface to a singleton class.
-		 * @return The registered implementation Class for the given interface Class.
-		 */
-		function getSingletonImplementation/*/<T>/*/(theInterface:/*/new()=>T/*/Class):/*/new(..._:any[])=>T/*/Class;
-		
-		/**
 		 * This function returns the singleton instance for a registered interface.
 		 *
 		 * This method should not be called at static initialization time,
