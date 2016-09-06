@@ -33,11 +33,6 @@ package weavejs.core
 		public const map_interface_singletonInstance:Object = new JS.Map();
 		
 		/**
-		 * interface Class -&gt; implementation Class
-		 */
-		public const map_interface_singletonImplementation:Object = new JS.Map();
-		
-		/**
 		 * interface Class -&gt; Array&lt;implementation Class&gt;
 		 */
 		public const map_interface_implementations:Object = new JS.Map();
@@ -209,26 +204,11 @@ package weavejs.core
 			return info;
 		}
 		
-		public function registerSingletonImplementation(theInterface:Class, theImplementation:Class):Boolean
-		{
-			if (!map_interface_singletonImplementation.get(theInterface))
-			{
-				verifyImplementation(theInterface, theImplementation);
-				map_interface_singletonImplementation.set(theInterface, theImplementation);
-			}
-			return map_interface_singletonImplementation.get(theInterface) == theImplementation;
-		}
-		
-		public function getSingletonImplementation(theInterface:Class):Class
-		{
-			return map_interface_singletonImplementation.get(theInterface);
-		}
-		
 		public function getSingletonInstance(theInterface:Class):*
 		{
 			if (!map_interface_singletonInstance.get(theInterface))
 			{
-				var classDef:Class = getSingletonImplementation(theInterface);
+				var classDef:Class = getImplementations(theInterface)[0];
 				if (classDef)
 					map_interface_singletonInstance.set(theInterface, new classDef());
 			}

@@ -566,7 +566,6 @@ package
 			label?:string,
 			interfaces?:Array<GenericClass>,
 			deprecatedIds?:string[],
-			singleton?:boolean,
 			linkable?:boolean
 		}/*/Object):/*/typeof info/*/Object
 		{
@@ -575,25 +574,14 @@ package
 			var INTERFACES:String = 'interfaces';
 			var LABEL:String = 'label';
 			var LINKABLE:String = 'linkable';
-			var SINGLETON:String = 'singleton';
 
 			var id:String = info[ID] as String;
 			var label:String = info[LABEL] as String;
 			var linkable:Boolean = info[LINKABLE] === undefined ? true : !!info[LINKABLE];
-			var singleton:Boolean = !!info[SINGLETON];
 			var allInterfaces:Array = linkable ? [ILinkableObject].concat(info[INTERFACES] || []) : info[INTERFACES] as Array;
 			var deprecatedIds:Array = info[DEPRECATED_IDS] is String ? [info[DEPRECATED_IDS]] : info[DEPRECATED_IDS] as Array || [];
 
 			WeaveAPI.ClassRegistry.registerClass(definition, id, allInterfaces, label);
-
-			if(singleton)
-			{
-				var theInterface:Class = (info[INTERFACES] || [])[0];
-				if(!theInterface)
-					throw new Error("An interface must be specified to be registered as a singleton implementation");
-				WeaveAPI.ClassRegistry.registerSingletonImplementation(theInterface, definition);
-			}
-
 
 			for each (var deprecatedId:String in deprecatedIds)
 				WeaveAPI.ClassRegistry.registerClass(definition, deprecatedId);
