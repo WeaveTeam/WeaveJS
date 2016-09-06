@@ -8,6 +8,7 @@
     "outFile": "./bin/es6/weavejs.js",
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
     "listFiles": false,
     "noImplicitReturns": false,
     "pretty": false,

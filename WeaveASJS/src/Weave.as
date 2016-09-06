@@ -556,6 +556,24 @@ package
 		}
 
 		/**
+		 * Decorator-generator for registering a class.
+		 * @param  info An object containing the class info.
+		 * @return      A function which takes a definition and applies the supplied info.
+		 */
+		public static function info(info:/*/{
+			id:string,
+			label?:string,
+			interfaces?:Array<GenericClass>,
+			deprecatedIds?:string[],
+			linkable?:boolean
+		}/*/Object):Function/*/(constructor:GenericClass)=>void/*/
+		{
+			return function (constructor:/*/GenericClass/*/*):void {
+				constructor.WEAVE_INFO = Weave.classInfo(constructor, info);
+			}
+		}
+
+		/**
 		 * Registers a class.
 		 * @param definition The class definition.
 		 * @param info An object containing the class info.
