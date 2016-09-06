@@ -13,32 +13,37 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
-	public interface IDataSourceWithAuthentication extends IDataSource
+	import IDataSource = weavejs.api.data.IDataSource;
+
+	export class IDataSourceWithAuthentication extends IDataSource
 	{
+		static WEAVE_INFO = Weave.classInfo(IDataSourceWithAuthentication, {
+			id: "weavejs.api.data.IDataSourceWithAuthentication"
+		});
 		/**
 		 * Check this to determine if authenticate() may be necessary.
 		 * @return true if authenticate() may be necessary.
 		 */
-		function get authenticationSupported():Boolean;
+		authenticationSupported:boolean;
 		
 		/**
 		 * Check this to determine if authenticate() must be called.
 		 * @return true if authenticate() should be called.
 		 */
-		function get authenticationRequired():Boolean;
+		authenticationRequired:boolean;
 		
 		/**
 		 * The username that has been successfully authenticated.
 		 */
-		function get authenticatedUser():String;
+		authenticatedUser:string;
 		
 		/**
 		 * Authenticates with the server.
 		 * @param user
 		 * @param pass
 		 */
-		function authenticate(user:String, pass:String):void;
+		authenticate:(user:string, pass:string)=>void;
 	}
 }

@@ -13,15 +13,12 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net.beans
+namespace weavejs.net.beans
 {
-	import weavejs.util.JSByteArray;
-
-	public class WeaveFileInfo
+	export class DatabaseConfigInfo
 	{
-		public var lastModified:Number;
-		public var fileSize:Number;
-		public var thumb:JSByteArray;
-		public var fileName:String;
+		/*Bindable*/ public connection:string = "";
+		/*Bindable*/ public schema:string = "weave";
+		/*Bindable*/ public idFields:string[] = null;
 	}
 }

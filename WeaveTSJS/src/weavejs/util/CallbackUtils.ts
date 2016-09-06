@@ -13,11 +13,9 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.util
+namespace weavejs.util
 {
-	import weavejs.util.JS;
-
-	public class CallbackUtils
+	export class CallbackUtils
 	{
 		/**
 		 * This function generates a delayed version of a callback.
@@ -27,28 +25,28 @@ package weavejs.util
 		 * @param passDelayedParameters If this is set to true, the most recent parameters passed to the delayed callback will be passed to the original callback when it is called.  If this is set to false, no parameters will be passed to the original callback.
 		 * @return A wrapper around the callback that remembers the parameters and delays calling the original callback.
 		 */
-		public static function generateDelayedCallback(relevantContext:Object, callback:Function, delay:int = 500, passDelayedParameters:Boolean = false):Function
+		public static generateDelayedCallback(relevantContext:Object, callback:Function, delay:int = 500, passDelayedParameters:boolean = false)
 		{
 			var _timeout:int = 0;
 			var _delayedThisArg:Object;
-			var _delayedParams:Array;
+			var _delayedParams:any[];
 			// this function gets called immediately and delays calling the original callback
-			var delayedCallback:Function = function(...params):void
+			var delayedCallback = function(...params:any[]):void
 			{
 				if (_timeout)
-					JS.clearTimeout(_timeout);
-				_timeout = JS.setTimeout(callback_apply, delay);
+					clearTimeout(_timeout);
+				_timeout = setTimeout(callback_apply, delay);
 				// remember the params passed to this delayedCallback
 				_delayedThisArg = this;
 				_delayedParams = params;
 			};
 			// this function gets called when the timer completes
-			var callback_apply:Function = function(..._):void
+			var callback_apply = function():void
 			{
 				if (Weave.wasDisposed(relevantContext))
 				{
 					if (_timeout)
-						JS.clearTimeout(_timeout);
+						clearTimeout(_timeout);
 					_timeout = 0;
 					_delayedThisArg = null;
 					_delayedParams = null;

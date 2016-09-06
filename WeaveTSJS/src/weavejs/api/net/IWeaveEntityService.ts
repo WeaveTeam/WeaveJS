@@ -13,35 +13,41 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.net
+namespace weavejs.api.net
 {
-	import weavejs.api.core.ILinkableObject;
-	import weavejs.util.WeavePromise;
-	
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import WeavePromise = weavejs.util.WeavePromise;
+	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
+	import EntityHierarchyInfo = weavejs.api.net.beans.EntityHierarchyInfo;
+	import Entity = weavejs.api.net.beans.Entity;
 	/**
 	 * Interface for a service which provides RPC functions for retrieving Weave Entity information.
 	 * @author adufilie
 	 */
-	public interface IWeaveEntityService extends ILinkableObject
+	export class IWeaveEntityService extends ILinkableObject
 	{
+
+		static WEAVE_INFO = Weave.classInfo(IWeaveEntityService, {
+			id: "weavejs.api.net.IWeaveEntityService"
+		});
 		/**
 		 * This will be true when the service is initialized and ready to accept RPC requests.
 		 */
-		function get entityServiceInitialized():Boolean;
+		entityServiceInitialized:boolean;
 
 		/**
 		 * Gets EntityHierarchyInfo objects containing basic information on entities matching public metadata.
 		 * @param publicMetadata Public metadata search criteria.
 		 * @return RPC token for an Array of EntityHierarchyInfo objects.
 		 */
-		function getHierarchyInfo(publicMetadata:Object):WeavePromise/*/<weavejs.api.net.beans.EntityHierarchyInfo[]>/*/;
+		getHierarchyInfo:(publicMetadata:IColumnMetadata)=>WeavePromise<EntityHierarchyInfo[]>;
 		
 		/**
 		 * Gets an Array of Entity objects.
 		 * @param ids A list of entity IDs.
 		 * @return RPC token for an Array of Entity objects.
 		 */
-		function getEntities(ids:Array):WeavePromise/*/<weavejs.api.net.beans.Entity[]>/*/;
+		getEntities:(ids:number[])=>WeavePromise<Entity[]>;
 		
 		/**
 		 * Gets an Array of entity IDs with matching metadata. 
@@ -51,7 +57,7 @@ package weavejs.api.net
 		 *                       and multi-character matching, respectively.
 		 * @return RPC token for an Array of IDs.
 		 */		
-		function findEntityIds(publicMetadata:Object, wildcardFields:Array):WeavePromise/*/<number[]>/*/;
+		findEntityIds:(publicMetadata:IColumnMetadata, wildcardFields:string[])=>WeavePromise<number[]>;
 		
 		/**
 		 * Finds matching values for a public metadata field.
@@ -59,6 +65,6 @@ package weavejs.api.net
 		 * @param valueSearch A search string.
 		 * @return RPC token for an Array of matching values for the specified public metadata field.
 		 */
-		function findPublicFieldValues(fieldName:String, valueSearch:String):WeavePromise/*/<string[]>/*/;
+		findPublicFieldValues:(fieldName:string, valueSearch:string)=>WeavePromise<string[]>;
 	}
 }

@@ -10,6 +10,7 @@ package
 	import weavejs.api.data.IAttributeColumn;
 	import weavejs.api.data.IPrimitiveColumn;
 	import weavejs.api.data.IQualifiedKey;
+	import weavejs.api.data.IWeaveTreeNodeWithPathFinding;
 	import weavejs.core.EventCallbackCollection;
 	import weavejs.core.LinkableBoolean;
 	import weavejs.core.LinkableCallbackScript;
@@ -57,9 +58,9 @@ package
 	import weavejs.data.column.SecondaryKeyNumColumn;
 	import weavejs.data.column.SortedColumn;
 	import weavejs.data.column.SortedIndexColumn;
-	import weavejs.data.column.StringColumn;
+import weavejs.data.column.StreamedGeometryColumn;
+import weavejs.data.column.StringColumn;
 	import weavejs.data.column.StringLookup;
-	import weavejs.data.hierarchy.EntityNodeSearch;
 	import weavejs.data.hierarchy.WeaveRootDataTreeNode;
 	import weavejs.data.key.ColumnDataFilter;
 	import weavejs.data.key.DynamicKeyFilter;
@@ -71,14 +72,14 @@ package
 	import weavejs.data.key.KeySetUnion;
 	import weavejs.data.key.SortedKeySet;
 	import weavejs.data.source.GeoJSONDataSource;
-	import weavejs.data.source.WeaveDataSource;
 	import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
 	import weavejs.geom.LinkableBounds2D;
-	import weavejs.net.Admin;
-	import weavejs.path.ExternalTool;
+import weavejs.net.AMF3Servlet;
+import weavejs.net.AsyncInvocationQueue;
+import weavejs.path.ExternalTool;
 	import weavejs.util.BackwardsCompatibility;
 	import weavejs.util.JS;
 	import weavejs.util.WeaveMenuItem;
@@ -154,7 +155,6 @@ package
 			StringColumn,
 			StringLookup,
 			GeoJSONDataSource,
-			WeaveDataSource,
 			KeyColumn,
 			ExternalTool,
 			WeaveMenuItem,
@@ -162,7 +162,6 @@ package
 			WeaveRootDataTreeNode,
 			TempHack_SolidLineStyle,
 			TempHack_SolidFillStyle,
-			Admin,
 			EventCallbackCollection,
 			BackwardsCompatibility,
 			Range,
@@ -184,6 +183,10 @@ package
 			ShpType,
 			IPrimitiveColumn,
 			DataSourceUtils,
+			IWeaveTreeNodeWithPathFinding,
+			AMF3Servlet,
+			AsyncInvocationQueue,
+			StreamedGeometryColumn,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];

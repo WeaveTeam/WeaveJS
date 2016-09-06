@@ -13,27 +13,33 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
+	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+
 	/**
 	 * Extends IWeaveTreeNode by adding addChildAt() and removeChild().
 	 * @author adufilie
 	 */	
-    public interface IWeaveTreeNodeWithEditableChildren extends IWeaveTreeNode
+    export class IWeaveTreeNodeWithEditableChildren extends IWeaveTreeNode
     {
+		static WEAVE_INFO = Weave.classInfo(IWeaveTreeNodeWithEditableChildren, {
+			id: "weavejs.api.data.IWeaveTreeNodeWithEditableChildren",
+			interfaces: [IWeaveTreeNode]
+		});
 		/**
 		 * Adds a child node.
 		 * @param child The child to add.
 		 * @param index The new child index.
 		 * @return true if successful.
 		 */
-		function addChildAt(newChild:IWeaveTreeNode, index:int):Boolean;
-		
+		addChildAt:(newChild:IWeaveTreeNode, index:int)=>boolean;
+
 		/**
 		 * Removes a child node.
 		 * @param child The child to remove.
 		 * @return true if successful.
 		 */
-		function removeChild(child:IWeaveTreeNode):Boolean;
+		removeChild:(child:IWeaveTreeNode)=>boolean;
     }
 }

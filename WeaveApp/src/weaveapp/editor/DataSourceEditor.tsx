@@ -128,8 +128,7 @@ export default class DataSourceEditor<S extends IDataSourceEditorState> extends 
 
 	private static isNotGeometryList(node:IWeaveTreeNode):boolean
 	{
-		let glnClass = (WeaveDataSource as any).GeomListNode;
-		return !(node instanceof glnClass);
+		return !Weave.IS(node, Weave.getDefinition("weavejs.data.source.GeomListNode"));
 	}
 
 	renderPreviewView():JSX.Element

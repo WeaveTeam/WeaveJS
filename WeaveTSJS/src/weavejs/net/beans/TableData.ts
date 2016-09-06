@@ -10,16 +10,16 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/.
- * 
+ *
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net.beans
-{	
-	public class TableData
+namespace weavejs.net.beans
+{
+	export class TableData
 	{
-		public var id:int;
-		public var keyColumns:Array;
-		public var columns:Object;
-		public var derived_qkeys:Array;
+		public id:number;
+		public keyColumns:string[];
+		public columns:{[keyColumn:string]:string[]};
+		public derived_qkeys:IQualifiedKey[];
 	}
 }

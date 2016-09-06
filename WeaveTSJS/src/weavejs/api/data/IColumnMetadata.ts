@@ -3,7 +3,6 @@ namespace weavejs.api.data
 	; /* Added to work around bug in sourcemap generation */
 	export interface IColumnMetadata
 	{
-		entityType?:string;
 		title?:string;
 		keyType?:string;
 		dataType?:"number"|"string"|"date"|"geometry";

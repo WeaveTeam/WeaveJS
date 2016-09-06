@@ -10,16 +10,17 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/.
- * 
+ *
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.net.beans
+namespace weavejs.api.net.beans
 {
-	import weavejs.api.data.ColumnMetadata;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import IWeaveDataSourceColumnMetadata = weavejs.data.source.IWeaveDataSourceColumnMetadata;
 
-	public class EntityMetadata
+	export class EntityMetadata
 	{
-		public static function getSuggestedPublicPropertyNames():Array
+		public static getSuggestedPublicPropertyNames():string[]
 		{
 			return [
 				ColumnMetadata.TITLE,
@@ -37,8 +38,8 @@ package weavejs.api.net.beans
 				'year'
 			];
 		}
-		
-		public static function getSuggestedPrivatePropertyNames():Array
+
+		public static getSuggestedPrivatePropertyNames():string[]
 		{
 			return [
 				"connection",
@@ -54,25 +55,25 @@ package weavejs.api.net.beans
 				"sqlColumn"
 			];
 		}
-		
-		public var privateMetadata:Object = {};
-		public var publicMetadata:Object = {};
-		
-		private function objToStr(obj:Object):String
+
+		public privateMetadata:Object = {};
+		public publicMetadata:IWeaveDataSourceColumnMetadata = {};
+
+		private objToStr(obj:Object):string
 		{
-			var str:String = '';
-			for (var name:String in obj)
+			var str:string = '';
+			for (var name in obj)
 			{
 				if (str)
 					str += '; ';
-				str += name + ': ' + obj[name];
+				str += name + ': ' + (obj as {[key:string]:string})[name];
 			}
 			return '{' + str + '}';
 		}
-		
-		public function toString():String
+
+		public toString():string
 		{
-			return objToStr({'publicMetadata': objToStr(publicMetadata), 'privateMetadata': objToStr(privateMetadata)});
+			return this.objToStr({'publicMetadata': this.objToStr(this.publicMetadata), 'privateMetadata': this.objToStr(this.privateMetadata)});
 		}
 	}
 }
