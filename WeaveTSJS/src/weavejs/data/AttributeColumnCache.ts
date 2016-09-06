@@ -40,8 +40,7 @@ namespace weavejs.data
 	{
 		static WEAVE_INFO = Weave.classInfo(AttributeColumnCache, {
 			id: "weavejs.data.AttributeColumnCache",
-			interfaces: [IAttributeColumnCache],
-			singleton: true
+			interfaces: [IAttributeColumnCache]
 		});
 
 		public getColumn(dataSource:IDataSource, metadata:{[key:string]:string}):IAttributeColumn
