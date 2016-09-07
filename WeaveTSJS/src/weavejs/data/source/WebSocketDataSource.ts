@@ -41,7 +41,6 @@ namespace weavejs.data.source
 	import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 	import StandardLib = weavejs.util.StandardLib;
 	import IColumnReference = weavejs.api.data.IColumnReference;
-	import JS = weavejs.util.JS;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 
 	export interface IWebSocketColumnMetadata extends IColumnMetadata
@@ -91,15 +90,22 @@ namespace weavejs.data.source
 				this._socket = null;
 			}
 
-			this._socket = new WebSocket(this.url.value);
+			try
+			{
+				this._socket = new WebSocket(this.url.value);
 
-			this._socket.onmessage = this.onMessage;
-			this._socket.onclose = this.onClose;
-			this._socket.onerror = this.onError;
+				this._socket.onmessage = this.onMessage;
+				this._socket.onclose = this.onClose;
+				this._socket.onerror = this.onError;
+			}
+			catch (e)
+			{
+				console.error(e);
+			}
 		}
 
 		private timeoutId:number= 0;
-		private onClose(event:CloseEvent):void
+		private onClose=(event:CloseEvent):void=>
 		{
 			this._socket = null;
 			if (this.url.value && event.code == 1006 /* CLOSE_ABNORMAL */)
@@ -108,7 +114,7 @@ namespace weavejs.data.source
 			}
 		}
 
-		private onError(event:ErrorEvent):void
+		private onError=(event:ErrorEvent):void=>
 		{
 			console.error(event);
 			/* Should we automatically retry here? */
@@ -131,7 +137,7 @@ namespace weavejs.data.source
 			}
 		}
 
-		private onMessage(event:MessageEvent):void
+		private onMessage=(event:MessageEvent):void=>
 		{
 			var str:string = event.data;
 			var message:Object = JSON.parse(str);
