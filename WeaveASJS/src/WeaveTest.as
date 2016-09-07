@@ -62,7 +62,6 @@ import weavejs.core.LinkableString;
 	import weavejs.data.column.StringColumn;
 	import weavejs.data.column.StringLookup;
 	import weavejs.data.hierarchy.WeaveRootDataTreeNode;
-	import weavejs.data.key.ColumnDataFilter;
 	import weavejs.data.key.DynamicKeyFilter;
 	import weavejs.data.key.DynamicKeySet;
 	import weavejs.data.key.FilteredKeySet;
@@ -106,8 +105,7 @@ import weavejs.util.WeaveMenuItem;
 			LinkableNumber,LinkableString,LinkableBoolean,LinkableVariable,
 			LinkableHashMap,LinkableDynamicObject,LinkableWatcher,
 			LinkableCallbackScript,LinkableSynchronizer,LinkableFunction,
-			
-			ColumnDataFilter,
+
 			DynamicKeyFilter,
 			DynamicKeySet,
 			FilteredKeySet,

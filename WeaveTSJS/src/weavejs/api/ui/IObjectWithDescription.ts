@@ -12,18 +12,18 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
  * ***** END LICENSE BLOCK ***** */
-
-package weavejs.api.ui
+namespace weavejs.api.ui
 {
 	/**
 	 * An Object with a description.
 	 */
-	public interface IObjectWithDescription
+	@Weave.classInfo({id: "weavejs.api.ui.IObjectWithDescription"})
+	export class IObjectWithDescription
 	{
 		/**
 		 * Gets a human-readable description for this object.
 		 * @return The human-readable description.
 		 */
-		function getDescription():String;
+		getDescription:()=>string;
 	}
 }
