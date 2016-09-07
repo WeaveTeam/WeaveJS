@@ -35,13 +35,9 @@ namespace weavejs.net
 	/**
 	 * Provides an interface to a set of cached Entity objects.
 	 */
+	@Weave.classInfo({id: "weavejs.net.EntityCache", interfaces: [IDisposableObject]})
     export class EntityCache implements ILinkableObject, IDisposableObject
     {
-    	static WEAVE_INFO = Weave.classInfo(EntityCache, {
-    		id: "weavejs.net.EntityCache",
-			interfaces: [IDisposableObject]
-		});
-
 		/**
 		 * A special flag value to represent a root node, which doesn't actually exist.
 		 */

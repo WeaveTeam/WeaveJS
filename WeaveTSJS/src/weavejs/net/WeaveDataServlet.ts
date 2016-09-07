@@ -34,13 +34,9 @@ namespace weavejs.net
 	 * 
 	 * @author adufilie
 	 */
+	@Weave.classInfo({id: "weavejs.net.WeaveDataServlet", interfaces: [IWeaveEntityService]})
 	export class WeaveDataServlet implements IWeaveEntityService
 	{
-		static WEAVE_INFO = Weave.classInfo(WeaveDataServlet, {
-			id: "weavejs.net.WeaveDataServlet",
-			interfaces: [IWeaveEntityService]
-		});
-
 		public static /* readonly */ DEFAULT_URL:string = '/WeaveServices/DataService';
 		public static /* readonly */ WEAVE_AUTHENTICATION_EXCEPTION:string = 'WeaveAuthenticationException';
 		private static /* readonly */ AUTHENTICATED_USER:string = 'authenticatedUser';
@@ -334,12 +330,9 @@ namespace weavejs.net
 	 *
 	 * @author adufilie
 	 */
+	@Weave.classInfo({id: "weavejs.net.WeaveGeometryTileServlet"})
 	class WeaveGeometryTileServlet implements IWeaveGeometryTileService
 	{
-		static WEAVE_INFO = Weave.classInfo(WeaveGeometryTileServlet, {
-			id: "weavejs.net.WeaveGeometryTileServlet"
-		});
-
 		constructor(service:WeaveDataServlet, columnId:number)
 		{
 			this._service = service;

@@ -17,11 +17,9 @@ namespace weavejs.api.data
 {
 	import IDataSource = weavejs.api.data.IDataSource;
 
+	@Weave.classInfo({id: "weavejs.api.data.IDataSourceWithAuthentication"})
 	export class IDataSourceWithAuthentication extends IDataSource
 	{
-		static WEAVE_INFO = Weave.classInfo(IDataSourceWithAuthentication, {
-			id: "weavejs.api.data.IDataSourceWithAuthentication"
-		});
 		/**
 		 * Check this to determine if authenticate() may be necessary.
 		 * @return true if authenticate() may be necessary.

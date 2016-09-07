@@ -20,12 +20,9 @@ namespace weavejs.api.net.beans
 	/**
 	 * @author adufilie
 	 */
+	@Weave.classInfo({id: "weavejs.api.net.beans"})
 	export class Entity extends EntityMetadata
 	{
-		static WEAVE_INFO = Weave.classInfo(Entity, {
-			id: "weavejs.api.net.beans"
-		});
-
 		constructor(info:EntityHierarchyInfo = null)
 		{
 			super();

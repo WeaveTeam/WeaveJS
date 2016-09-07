@@ -30,12 +30,12 @@ namespace weavejs.data.hierarchy
     import JS = weavejs.util.JS;
 	import IWeaveDataSourceColumnMetadata = weavejs.data.source.IWeaveDataSourceColumnMetadata;
 
+	@Weave.classInfo({
+		id: "weavejs.data.hierarchy.EntityNode",
+		interfaces: [IWeaveTreeNode, IWeaveTreeNodeWithEditableChildren, IWeaveTreeNodeWithPathFinding, IColumnReference]
+	})
     export class EntityNode implements IWeaveTreeNodeWithEditableChildren, IWeaveTreeNodeWithPathFinding, IColumnReference
     {
-    	static WEAVE_INFO = Weave.classInfo(EntityNode, {
-    		id: "weavejs.data.hierarchy.EntityNode",
-			interfaces: [IWeaveTreeNode, IWeaveTreeNodeWithEditableChildren, IWeaveTreeNodeWithPathFinding, IColumnReference]
-		});
 		/**
 		 * Dual lookup: (EntityCache -> int) and (int -> EntityCache)
 		 */

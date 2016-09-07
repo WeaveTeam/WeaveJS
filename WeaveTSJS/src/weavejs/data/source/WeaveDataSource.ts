@@ -65,14 +65,13 @@ namespace weavejs.data.source
 	 * 
 	 * @author adufilie
 	 */
+	@Weave.classInfo({
+		id: "weavejs.data.source.WeaveDataSource",
+		interfaces: [IDataSource, IDataSourceWithAuthentication],
+		label: "Weave server"
+	})
 	export class WeaveDataSource extends AbstractDataSource implements IDataSource, IDataSourceWithAuthentication
 	{
-		static WEAVE_INFO = Weave.classInfo(WeaveDataSource, {
-			id: "weavejs.data.source.WeaveDataSource",
-			interfaces: [IDataSource, IDataSourceWithAuthentication],
-			label: "Weave server"
-		});
-
 		private static /* readonly */ SQLPARAMS:string = 'sqlParams';
 		
 		public static debug:boolean = false;
@@ -631,11 +630,9 @@ namespace weavejs.data.source
 	/**
 	 * Static functions for retrieving values from PGGeom objects coming from servlet.
 	 */
+	@Weave.classInfo({id: "weavejs.data.source.PGGeomUtil"})
 	class PGGeomUtil
 	{
-		static WEAVE_INFO = Weave.classInfo(PGGeomUtil, {
-			id: "weavejs.data.source.PGGeomUtil",
-		});
 		/**
 		 * This will generate an asynchronous task function for use with IScheduler.startTask().
 		 * @param pgGeoms An Array of PGGeom beans from a Weave data service.
@@ -669,13 +666,9 @@ namespace weavejs.data.source
 	/**
 	 * Has two children: "Data Tables" and "Geometry Collections"
 	 */
+	@Weave.classInfo({id: "weavejs.data.source.RootNode_TablesAndGeoms", interfaces: [IWeaveTreeNode]})
 	class RootNode_TablesAndGeoms implements IWeaveTreeNode, IColumnReference
 	{
-		static WEAVE_INFO = Weave.classInfo(RootNode_TablesAndGeoms, {
-			id: "weavejs.data.source.RootNode_TablesAndGeoms",
-			interfaces: [IWeaveTreeNode]
-		});
-
 		private source:WeaveDataSource;
 		private tableList:EntityNode;
 		private geomList:GeomListNode;
@@ -723,13 +716,9 @@ namespace weavejs.data.source
 	/**
 	 * Makes an RPC to find geometry columns for its children
 	 */
+	@Weave.classInfo({id: "weavejs.data.source.GeomListNode", interfaces: [IWeaveTreeNode]})
 	class GeomListNode implements IWeaveTreeNode
 	{
-		static WEAVE_INFO = Weave.classInfo(GeomListNode, {
-			id: "weavejs.data.source.GeomListNode",
-			interfaces: [IWeaveTreeNode]
-		});
-
 		private source:WeaveDataSource;
 		private cache:EntityCache;
 		public children:IWeaveTreeNode[];
@@ -779,12 +768,9 @@ namespace weavejs.data.source
 		}
 	}
 
+	@Weave.classInfo({id: "weavejs.data.source.GeomColumnNode"})
 	class GeomColumnNode extends EntityNode
 	{
-		static WEAVE_INFO = Weave.classInfo(GeomColumnNode, {
-			id: "weavejs.data.source.GeomColumnNode",
-		});
-
 		constructor(cache:EntityCache)
 		{
 			super(cache);

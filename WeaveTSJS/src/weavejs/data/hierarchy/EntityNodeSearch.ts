@@ -23,12 +23,9 @@ namespace weavejs.data.hierarchy
     import JS = weavejs.util.JS;
     import StandardLib = weavejs.util.StandardLib;
 
+	@Weave.classInfo({id: 'weavejs.data.hierarchy.EntityNodeSearch'})
     export class EntityNodeSearch implements ILinkableObject
     {
-    	static WEAVE_INFO = Weave.classInfo(EntityNodeSearch, {
-    		id: 'weavejs.data.hierarchy.EntityNodeSearch'
-		});
-
 		private _includeAllDescendants:boolean = true;
 		private _searchField:string = ColumnMetadata.TITLE; // the field to search
 		private _searchString:string = ''; // the search string containing ?* wildcards
@@ -166,11 +163,9 @@ namespace weavejs.data.hierarchy
 		}
     }
 
+    @Weave.classInfo({id: 'weavejs.data.hierarchy.SearchResults'})
 	class SearchResults
 	{
-		static WEAVE_INFO = Weave.classInfo(SearchResults, {
-			id: 'weavejs.data.hierarchy.SearchResults'
-		});
 		/**
 		 * Usage: if (idLookup[id] & LOOKUP_MATCH_OR_ANCESTOR) ...
 		 */

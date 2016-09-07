@@ -27,12 +27,9 @@ namespace weavejs.net
 	import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
 	import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
 
+	@Weave.classInfo({id: "weavejs.net.Admin"})
 	export class Admin
 	{
-		static WEAVE_INFO = Weave.classInfo(Admin, {
-			id: "weavejs.net.Admin"
-		});
-
 		private static _thisInstance:Admin = null;
 		public static get instance():Admin
 		{

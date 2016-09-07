@@ -20,13 +20,10 @@ namespace weavejs.api.data
 	/**
 	 * Extends IWeaveTreeNode by adding addChildAt() and removeChild().
 	 * @author adufilie
-	 */	
+	 */
+	@Weave.classInfo({id: "weavejs.api.data.IWeaveTreeNodeWithEditableChildren", interfaces: [IWeaveTreeNode]})
     export class IWeaveTreeNodeWithEditableChildren extends IWeaveTreeNode
     {
-		static WEAVE_INFO = Weave.classInfo(IWeaveTreeNodeWithEditableChildren, {
-			id: "weavejs.api.data.IWeaveTreeNodeWithEditableChildren",
-			interfaces: [IWeaveTreeNode]
-		});
 		/**
 		 * Adds a child node.
 		 * @param child The child to add.

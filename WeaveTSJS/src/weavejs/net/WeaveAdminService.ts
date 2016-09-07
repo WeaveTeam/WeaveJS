@@ -36,14 +36,10 @@ namespace weavejs.net
 	 * @author adufilie
 	 * @see WeaveServices/src/weave/servlets/AdminService.java
 	 * @see WeaveServices/src/weave/servlets/DataService.java
-	 */	
+	 */
+	@Weave.classInfo({id: "weavejs.net.WeaveAdminService", interfaces: [IWeaveEntityManagementService]})
 	export class WeaveAdminService implements IWeaveEntityManagementService
 	{
-		static WEAVE_INFO = Weave.classInfo(WeaveAdminService, {
-			id: "weavejs.net.WeaveAdminService",
-			interfaces: [IWeaveEntityManagementService]
-		});
-
 		public static /* readonly */ WEAVE_AUTHENTICATION_EXCEPTION:string = 'WeaveAuthenticationException';
 		
 		private static /* readonly */ _map_url_instance:Map<string, WeaveAdminService> = new Map<string, WeaveAdminService>();

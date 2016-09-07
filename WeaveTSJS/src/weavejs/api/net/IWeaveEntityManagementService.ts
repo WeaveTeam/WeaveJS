@@ -23,12 +23,9 @@ namespace weavejs.api.net
 	 * Interface for a service which provides RPC functions for retrieving and manipulating Weave Entity information.
 	 * @author adufilie
 	 */
+	@Weave.classInfo({id: "weavejs.api.net.IWeaveEntityManagementService"})
 	export class IWeaveEntityManagementService extends IWeaveEntityService
 	{
-		static WEAVE_INFO = Weave.classInfo(IWeaveEntityManagementService, {
-			id: "weavejs.api.net.IWeaveEntityManagementService"
-		});
-
 		/**
 		 * Creates a new entity.
 		 * @param metadata Metadata for the new entity.
