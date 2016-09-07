@@ -24,7 +24,7 @@ export interface PIXIScatterPlotState extends IVisToolState
 
 export default class PIXIScatterPlot extends AbstractVisTool<PIXIScatterPlotProps, PIXIScatterPlotState>
 {
-	static WEAVE_INFO = Weave.classInfo(PIXIScatterPlot, {
+	static WEAVE_INFO = Weave.setClassInfo(PIXIScatterPlot, {
 		id: "weavejs.tool.PIXIScatterPlot",
 		label: "Scatter Plot",
 		interfaces: [

@@ -59,7 +59,7 @@ const stateStructure:Structure = {
 
 export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implements ILinkableVariable
 {
-	static WEAVE_INFO = Weave.classInfo(TabLayout, {
+	static WEAVE_INFO = Weave.setClassInfo(TabLayout, {
 		id: 'weavejs.layout.TabLayout',
 		label: 'Tab Layout',
 		interfaces: [ILinkableVariable]

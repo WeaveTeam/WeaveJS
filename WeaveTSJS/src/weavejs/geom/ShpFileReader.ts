@@ -37,7 +37,7 @@ namespace weavejs.geom
 	 */
 	export class ShpFileReader implements ILinkableObject
 	{
-		static WEAVE_INFO = Weave.classInfo(ShpFileReader, {
+		static WEAVE_INFO = Weave.setClassInfo(ShpFileReader, {
 			id: "weavejs.geom.ShpFileReader",
 		});
 

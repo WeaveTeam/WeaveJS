@@ -106,7 +106,7 @@ const REFERENCELINE_MODES:ComboBoxOption[] = [
 
 export default class Sparkline extends SmartComponent<ISparklineProps, ISparklineState> implements IVisTool, IInitSelectableAttributes
 {
-	static WEAVE_INFO = Weave.classInfo(Sparkline, {
+	static WEAVE_INFO = Weave.setClassInfo(Sparkline, {
 		id: "weavejs.tool.Sparkline",
 		label: "Sparkline",
 		interfaces: [IVisTool, ILinkableObjectWithNewProperties, ISelectableAttributes],

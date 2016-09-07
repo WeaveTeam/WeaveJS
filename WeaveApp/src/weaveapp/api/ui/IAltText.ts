@@ -5,7 +5,7 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 
 export class IAltTextConfig
 {
-	static WEAVE_INFO = Weave.classInfo(IAltTextConfig, {id: "weavejs.api.ui.IAltTextConfig"});
+	static WEAVE_INFO = Weave.setClassInfo(IAltTextConfig, {id: "weavejs.api.ui.IAltTextConfig"});
 
 	text = Weave.linkableChild(this, LinkableString);
 	showAsCaption = Weave.linkableChild(this, new LinkableBoolean(false));
@@ -13,7 +13,7 @@ export class IAltTextConfig
 
 export default class IAltText
 {
-	static WEAVE_INFO = Weave.classInfo(IAltText, {id: "weavejs.api.ui.IAltText"});
+	static WEAVE_INFO = Weave.setClassInfo(IAltText, {id: "weavejs.api.ui.IAltText"});
 
 	altText = Weave.linkableChild(this, IAltTextConfig);
 	getAutomaticDescription:()=>string;

@@ -25,7 +25,7 @@ import ScatterPlotLayer from "weaveapp/tool/oltool/layer/ScatterPlotLayer";
 
 export default class GeometryLayer extends AbstractFeatureLayer
 {
-	static WEAVE_INFO = Weave.classInfo(GeometryLayer, {
+	static WEAVE_INFO = Weave.setClassInfo(GeometryLayer, {
 		id: "weavejs.tool.oltool.layer.GeometryLayer",
 		label: "Geometries",
 		interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],

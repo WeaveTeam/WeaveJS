@@ -76,7 +76,7 @@ const SHAPE_MODES:{label:string, value:any}[] = [
 
 export default class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements ILinkableObjectWithNewProperties, IVisTool, IInitSelectableAttributes
 {
-	static WEAVE_INFO = Weave.classInfo(ColorLegend, {
+	static WEAVE_INFO = Weave.setClassInfo(ColorLegend, {
 		id: "weavejs.tool.ColorLegend",
 		label: "Color Legend",
 		interfaces: [IVisTool, ILinkableObjectWithNewProperties, ISelectableAttributes],

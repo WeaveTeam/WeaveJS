@@ -37,7 +37,7 @@ import {IAltTextConfig} from "weaveapp/api/ui/IAltText";
 export type AbstractVisToolImpl = typeof AbstractVisTool;
 export class Margin
 {
-	static WEAVE_INFO = Weave.classInfo(Margin, {id: "weavejs.tool.Margin"});
+	static WEAVE_INFO = Weave.setClassInfo(Margin, {id: "weavejs.tool.Margin"});
 
 	top = Weave.linkableChild(this, new LinkableNumber(20));
 	bottom = Weave.linkableChild(this, new LinkableNumber(100));
@@ -46,7 +46,7 @@ export class Margin
 }
 export class OverrideBounds
 {
-	static WEAVE_INFO = Weave.classInfo(OverrideBounds, {id: "weavejs.tool.OverrideBounds"});
+	static WEAVE_INFO = Weave.setClassInfo(OverrideBounds, {id: "weavejs.tool.OverrideBounds"});
 
 	xMin = Weave.linkableChild(this, LinkableNumber);
 	yMin = Weave.linkableChild(this, LinkableNumber);

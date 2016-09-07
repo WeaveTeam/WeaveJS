@@ -24,7 +24,7 @@ import {LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_VSLIDER, LAYOUT_HSLIDER, LAYOUT_CHECKB
 
 export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 {
-	static WEAVE_INFO = Weave.classInfo(DiscreteValuesDataFilterEditor, {
+	static WEAVE_INFO = Weave.setClassInfo(DiscreteValuesDataFilterEditor, {
 		id: "weavejs.editor.DiscreteValuesDataFilterEditor",
 		interfaces: [ILinkableObjectWithNewProperties]
 	});

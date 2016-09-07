@@ -48,7 +48,7 @@ export interface IAttributeMenuToolState extends IVisToolState
 
 export default class AttributeMenuTool extends React.Component<IVisToolProps, IAttributeMenuToolState> implements IVisTool
 {
-	static WEAVE_INFO = Weave.classInfo(AttributeMenuTool, {
+	static WEAVE_INFO = Weave.setClassInfo(AttributeMenuTool, {
 		id: "weavejs.tool.AttributeMenu",
 		label: "Attribute Menu Tool",
 		interfaces: [IVisTool, ISelectableAttributes],

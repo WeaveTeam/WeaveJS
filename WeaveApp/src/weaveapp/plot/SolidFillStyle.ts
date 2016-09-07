@@ -24,7 +24,7 @@ import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 
 export default class SolidFillStyle implements ILinkableObject
 {
-	static WEAVE_INFO = Weave.classInfo(SolidFillStyle, {
+	static WEAVE_INFO = Weave.setClassInfo(SolidFillStyle, {
 		id: "weavejs.plot.SolidFillStyle",
 		deprecatedIds: ["ExtendedFillStyle"]
 	});

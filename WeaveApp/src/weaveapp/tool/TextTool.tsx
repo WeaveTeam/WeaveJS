@@ -25,7 +25,7 @@ import {IVisToolState} from "weaveapp/api/ui/IVisTool";
 
 export default class TextTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
 {
-	static WEAVE_INFO = Weave.classInfo(TextTool, {
+	static WEAVE_INFO = Weave.setClassInfo(TextTool, {
 		id: "weavejs.tool.Text",
 		label: "Text",
 		interfaces: [IVisTool, ILinkableObjectWithNewProperties],

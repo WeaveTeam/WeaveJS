@@ -45,7 +45,7 @@ namespace weavejs.data.source
 
     export class CensusDataSource extends AbstractDataSource implements IDataSource
     {
-		static WEAVE_INFO = Weave.classInfo(CensusDataSource, {
+		static WEAVE_INFO = Weave.setClassInfo(CensusDataSource, {
 			id: "weavejs.data.source.CensusDataSource",
 			label: "Census.gov",
 			interfaces: [IDataSource]

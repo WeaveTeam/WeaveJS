@@ -48,7 +48,7 @@ export type FlexibleLayoutState = {title?: string} & LayoutState;
 
 export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> implements ILinkableVariable
 {
-	static WEAVE_INFO = Weave.classInfo(FlexibleLayout, {
+	static WEAVE_INFO = Weave.setClassInfo(FlexibleLayout, {
 		id: 'weavejs.layout.FlexibleLayout',
 		label: 'Flexible Layout',
 		interfaces: [ILinkableVariable]

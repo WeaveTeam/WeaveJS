@@ -175,7 +175,7 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 
 export default class TileLayer extends AbstractLayer
 {
-	static WEAVE_INFO = Weave.classInfo(TileLayer, {
+	static WEAVE_INFO = Weave.setClassInfo(TileLayer, {
 		id: "weavejs.tool.oltool.layer.TileLayer",
 		label: "Base map",
 		interfaces: [ILinkableObjectWithNewProperties],

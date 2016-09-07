@@ -21,7 +21,7 @@ import VSlider from "weaveapp/ui/slider/VSlider";
 
 export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 {
-	static WEAVE_INFO = Weave.classInfo(NumericRangeDataFilterEditor, {
+	static WEAVE_INFO = Weave.setClassInfo(NumericRangeDataFilterEditor, {
 		id: "weavejs.editor.NumericRangeDataFilterEditor",
 		interfaces: [ILinkableObjectWithNewProperties]
 	});

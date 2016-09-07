@@ -25,7 +25,7 @@ const SHAPE_TYPE_LINE:string = "line";
 
 export default class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {
-	static WEAVE_INFO = Weave.classInfo(BarChartLegend, {
+	static WEAVE_INFO = Weave.setClassInfo(BarChartLegend, {
 		id: "weavejs.tool.BarChartLegend",
 		label: "Bar Chart Legend",
 		interfaces: [IVisTool, ILinkableObjectWithNewProperties],

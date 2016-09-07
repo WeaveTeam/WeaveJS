@@ -26,7 +26,7 @@ import GeoJSON = ol.format.GeoJSON;
 
 export default class SpatialJoinTransform extends AbstractDataSource implements ISelectableAttributes
 {
-	static WEAVE_INFO = Weave.classInfo(SpatialJoinTransform, {
+	static WEAVE_INFO = Weave.setClassInfo(SpatialJoinTransform, {
 		id: "weavejs.data.source.SpatialJoinTransform",
 		label: "Spatial Join Transform",
 		interfaces: [IDataSource, ISelectableAttributes]

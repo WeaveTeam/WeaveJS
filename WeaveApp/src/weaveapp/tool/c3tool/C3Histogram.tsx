@@ -67,7 +67,7 @@ declare type AggregationMethod = "count"|"sum"|"mean";
 
 export default class C3Histogram extends AbstractC3Tool
 {
-	static WEAVE_INFO = Weave.classInfo(C3Histogram, {
+	static WEAVE_INFO = Weave.setClassInfo(C3Histogram, {
 		id: "weavejs.tool.c3tool.C3Histogram",
 		label: "Histogram",
 		interfaces: [

@@ -46,7 +46,7 @@ declare type Record = {
 
 export default class C3XYLineChart extends AbstractC3Tool
 {
-	static WEAVE_INFO = Weave.classInfo(C3XYLineChart, {
+	static WEAVE_INFO = Weave.setClassInfo(C3XYLineChart, {
 		id: "weavejs.tool.c3tool.C3XYLineChart",
 		label: "XY Line Chart",
 		interfaces: [

@@ -86,8 +86,8 @@ package
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_File, GeoJSONDataSource, "GeoJSON file");
 			WeaveAPI.ClassRegistry.registerImplementation(IDataSource_Service, WeaveDataSource, "Weave server");
 
-			Weave.classInfo(TempHack_SolidFillStyle, {id: "ExtendedFillStyle"});
-			Weave.classInfo(TempHack_SolidLineStyle, {id: "ExtendedLineStyle"});
+			Weave.setClassInfo(TempHack_SolidFillStyle, {id: "ExtendedFillStyle"});
+			Weave.setClassInfo(TempHack_SolidLineStyle, {id: "ExtendedLineStyle"});
 			
 			// TEMPORARY
 			//WeaveTest.test(weave);

@@ -48,7 +48,7 @@ declare type Record = {
 
 export default class C3ScatterPlot extends AbstractC3Tool
 {
-	static WEAVE_INFO = Weave.classInfo(C3ScatterPlot, {
+	static WEAVE_INFO = Weave.setClassInfo(C3ScatterPlot, {
 		id: "weavejs.tool.c3tool.C3ScatterPlot",
 		label: "Scatter Plot",
 		interfaces: [

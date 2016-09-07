@@ -49,7 +49,7 @@ namespace weavejs.data.source
 	 */
 	export class DBFDataSource extends AbstractDataSource implements IDataSource
 	{
-		static WEAVE_INFO = Weave.classInfo(DBFDataSource, {
+		static WEAVE_INFO = Weave.setClassInfo(DBFDataSource, {
 			id: "weavejs.data.source.DBFDataSource",
 			label: "SHP/DBF files",
 			interfaces: [IDataSource]
@@ -396,7 +396,7 @@ namespace weavejs.data.source
 
 	class DBFColumnNode implements IWeaveTreeNode, IColumnReference
 	{
-		static CLASS_INFO = Weave.classInfo(DBFColumnNode, {
+		static CLASS_INFO = Weave.setClassInfo(DBFColumnNode, {
 			id: "weavejs.data.source.DBFColumnNode",
 			interfaces: [IWeaveTreeNode, IColumnReference]
 		});

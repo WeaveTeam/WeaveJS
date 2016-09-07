@@ -32,7 +32,7 @@ import IVisTool, {IVisToolProps, IVisToolState} from "weaveapp/api/ui/IVisTool";
 
 export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {
-	static WEAVE_INFO = Weave.classInfo(DataFilterTool, {
+	static WEAVE_INFO = Weave.setClassInfo(DataFilterTool, {
 		id: "weavejs.tool.DataFilter",
 		label: "Data Filter",
 		interfaces: [IVisTool, ILinkableObjectWithNewProperties],

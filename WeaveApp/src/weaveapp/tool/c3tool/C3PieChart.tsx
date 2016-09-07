@@ -44,7 +44,7 @@ const recordsToBeDisplayed = 360;
 
 export default class C3PieChart extends AbstractC3Tool
 {
-	static WEAVE_INFO = Weave.classInfo(C3PieChart, {
+	static WEAVE_INFO = Weave.setClassInfo(C3PieChart, {
 		id: "weavejs.tool.c3tool.C3PieChart",
 		label: "Pie Chart",
 		interfaces: [

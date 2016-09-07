@@ -20,7 +20,7 @@ import AbstractFeatureLayer from "weaveapp/tool/oltool/layer/AbstractFeatureLaye
 
 export default class ScatterPlotLayer extends AbstractGlyphLayer
 {
-	static WEAVE_INFO = Weave.classInfo(ScatterPlotLayer, {
+	static WEAVE_INFO = Weave.setClassInfo(ScatterPlotLayer, {
 		id: "weavejs.tool.oltool.layer.ScatterPlotLayer",
 		label: "Bubbles",
 		interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],

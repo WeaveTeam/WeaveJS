@@ -51,7 +51,7 @@ namespace weavejs.data.source
 
 	export class WebSocketDataSource extends AbstractDataSource
 	{
-		WEAVE_INFO = Weave.classInfo(WebSocketDataSource, {
+		WEAVE_INFO = Weave.setClassInfo(WebSocketDataSource, {
 			id: "weavejs.data.source.WeaveSocketDataSource",
 			label: "WebSocket Data Source",
 			interfaces: [IDataSource]

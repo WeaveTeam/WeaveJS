@@ -60,7 +60,7 @@ namespace weavejs.data.source
 	 */
 	export class CSVDataSource extends AbstractDataSource implements IDataSource, ILinkableObjectWithNewProperties
 	{
-		static WEAVE_INFO = Weave.classInfo(CSVDataSource, {
+		static WEAVE_INFO = Weave.setClassInfo(CSVDataSource, {
 			id: "weavejs.data.source.CSVDataSource",
 			interfaces: [IDataSource, ILinkableObjectWithNewProperties],
 			label: "CSV file"

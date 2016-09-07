@@ -24,7 +24,7 @@ export interface ITextPlotter extends IPlotter
 
 export class ITextPlotter
 {
-	static WEAVE_INFO = Weave.classInfo(ITextPlotter, {
+	static WEAVE_INFO = Weave.setClassInfo(ITextPlotter, {
 		id: "weavejs.api.ui.ITextPlotter",
 		interfaces: [IPlotter]
 	});

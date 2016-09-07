@@ -27,7 +27,7 @@ import EquationColumnLib = weavejs.data.EquationColumnLib;
 
 export default class SolidLineStyle implements ILinkableObject
 {
-	static WEAVE_INFO = Weave.classInfo(SolidLineStyle, {
+	static WEAVE_INFO = Weave.setClassInfo(SolidLineStyle, {
 		id: "weavejs.plot.SolidLineStyle",
 		deprecatedIds: ["ExtendedLineStyle"]
 	});

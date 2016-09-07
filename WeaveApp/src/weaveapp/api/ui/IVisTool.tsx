@@ -19,7 +19,7 @@ export interface IVisToolState
 
 export default class IVisTool extends ISelectableAttributes
 {
-	static WEAVE_INFO = Weave.classInfo(IVisTool, {
+	static WEAVE_INFO = Weave.setClassInfo(IVisTool, {
 		id: 'weavejs.api.ui.IVisTool',
 		interfaces: [ISelectableAttributes]
 	});

@@ -21,8 +21,8 @@ namespace weavejs.api.data
 
 	export class ISelectableAttributes extends ILinkableObject
 	{
-		// TODO fix classInfo argument so that it accepts abstract classes
-		static WEAVE_INFO = Weave.classInfo(ISelectableAttributes, {
+		// TODO fix setClassInfo argument so that it accepts abstract classes
+		static WEAVE_INFO = Weave.setClassInfo(ISelectableAttributes, {
 			id: "weavejs.api.data.ISelectableAttributes"
 		});
 

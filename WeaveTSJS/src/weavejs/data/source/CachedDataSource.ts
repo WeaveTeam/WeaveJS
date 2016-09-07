@@ -22,7 +22,7 @@ namespace weavejs.data.source
 
 	export class CachedDataSource extends AbstractDataSource
 	{
-		static WEAVE_INFO = Weave.classInfo(CachedDataSource, {
+		static WEAVE_INFO = Weave.setClassInfo(CachedDataSource, {
 			id: "weavejs.data.source.CachedDataSource",
 			label: "Cached Data Source",
 			interfaces: [IDataSource]

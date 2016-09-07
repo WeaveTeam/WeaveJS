@@ -42,7 +42,7 @@ const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_
 
 export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps, IVisToolState>
 {
-	static WEAVE_INFO = Weave.classInfo(SessionStateMenuTool, {
+	static WEAVE_INFO = Weave.setClassInfo(SessionStateMenuTool, {
 		id: "weavejs.tool.SessionStateMenu",
 		label: "Session State Menu Tool",
 		interfaces: [IVisTool/*, ILinkableObjectWithNewProperties*/],

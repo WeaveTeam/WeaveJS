@@ -29,7 +29,7 @@ import IPlotter from "weaveapp/api/ui/IPlotter";
 
 export default class ScatterPlotPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
 {
-	static WEAVE_INFO = Weave.classInfo(ScatterPlotPlotter, {
+	static WEAVE_INFO = Weave.setClassInfo(ScatterPlotPlotter, {
 		id: 'weavejs.plot.ScatterPlotPlotter',
 		interfaces: [IPlotter, IObjectWithDescription, ISelectableAttributes]
 	});

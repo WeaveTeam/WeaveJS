@@ -38,7 +38,7 @@ namespace weavejs.data.source
 
 	export class GroupedDataTransform extends AbstractDataSource implements ISelectableAttributes
 	{
-		static WEAVE_INFO = Weave.classInfo(GroupedDataTransform, {
+		static WEAVE_INFO = Weave.setClassInfo(GroupedDataTransform, {
 			id: "weavejs.data.source.GroupedDataTransform",
 			label: "Grouped data transform",
 			interfaces: [IDataSource, ISelectableAttributes]

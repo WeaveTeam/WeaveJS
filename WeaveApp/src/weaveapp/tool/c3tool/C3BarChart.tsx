@@ -77,7 +77,7 @@ const LEGEND_POSITIONS:ComboBoxOption[] = [
 
 export default class C3BarChart extends AbstractC3Tool
 {
-	static WEAVE_INFO = Weave.classInfo(C3BarChart, {
+	static WEAVE_INFO = Weave.setClassInfo(C3BarChart, {
 		id: "weavejs.tool.c3tool.C3BarChart",
 		label: "Bar Chart",
 		interfaces: [

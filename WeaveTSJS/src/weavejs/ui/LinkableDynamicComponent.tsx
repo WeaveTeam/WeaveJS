@@ -5,7 +5,7 @@ namespace weavejs.ui
 
 	export class LinkableDynamicComponent extends React.Component<any, any> implements ILinkableVariable
 	{
-		static WEAVE_INFO = Weave.classInfo(LinkableDynamicComponent, {
+		static WEAVE_INFO = Weave.setClassInfo(LinkableDynamicComponent, {
 			id: 'weavejs.ui.LinkableDynamicComponent',
 			interfaces: [ILinkableVariable]
 		});

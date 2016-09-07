@@ -29,7 +29,7 @@ export interface SessionHistorySliderState
 
 export default class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState>
 {
-	static WEAVE_INFO = Weave.classInfo(SessionHistorySlider, {id: "weavejs.editor.SessionHistorySlider"});
+	static WEAVE_INFO = Weave.setClassInfo(SessionHistorySlider, {id: "weavejs.editor.SessionHistorySlider"});
 
 	private _stateLogWatcher:LinkableWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog));
 

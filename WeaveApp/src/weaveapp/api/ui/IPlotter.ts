@@ -9,7 +9,7 @@ import {IPlotTask} from "weaveapp/api/ui/IPlotTask";
 
 export default class IPlotter extends ILinkableObject
 {
-	static WEAVE_INFO = Weave.classInfo(IPlotter, {id: 'weavejs.api.ui.IPlotter'});
+	static WEAVE_INFO = Weave.setClassInfo(IPlotter, {id: 'weavejs.api.ui.IPlotter'});
 
 	/**
 	 * This is an interface for adding callbacks that get called when any spatial properties of the plotter change.

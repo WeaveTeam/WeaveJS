@@ -59,7 +59,7 @@ export interface BoxWhiskerPlotState extends IVisToolState
 
 export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps, BoxWhiskerPlotState>
 {
-	static WEAVE_INFO = Weave.classInfo(BoxWhiskerPlot, {
+	static WEAVE_INFO = Weave.setClassInfo(BoxWhiskerPlot, {
 		id: "weavejs.tool.d3tool.BoxWhiskerPlot",
 		label: "Box and Whisker Plot",
 		interfaces: [IVisTool, ILinkableObjectWithNewProperties]

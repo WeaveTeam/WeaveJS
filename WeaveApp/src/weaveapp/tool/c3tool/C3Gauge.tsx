@@ -35,7 +35,7 @@ declare type Record = {
 
 export default class C3Gauge extends AbstractC3Tool
 {
-	static WEAVE_INFO = Weave.classInfo(C3Gauge, {
+	static WEAVE_INFO = Weave.setClassInfo(C3Gauge, {
 		id: "weavejs.tool.c3tool.C3Gauge",
 		label: "Gauge",
 		interfaces: [

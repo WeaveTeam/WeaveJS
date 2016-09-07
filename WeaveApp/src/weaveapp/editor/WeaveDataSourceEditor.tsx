@@ -30,7 +30,7 @@ const dataImportTypes:string[] = [SQL];
 
 export default class WeaveDataSourceEditor extends DataSourceEditor<IDataSourceEditorState>
 {
-	static WEAVE_INFO = Weave.classInfo(WeaveDataSourceEditor, {id: "weavejs.editor.WeaveDataSourceEditor", linkable: false});
+	static WEAVE_INFO = Weave.setClassInfo(WeaveDataSourceEditor, {id: "weavejs.editor.WeaveDataSourceEditor", linkable: false});
 
 	componentWillReceiveProps(props:IDataSourceEditorProps)
 	{

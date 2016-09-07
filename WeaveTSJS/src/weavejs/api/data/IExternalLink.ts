@@ -21,7 +21,7 @@ namespace weavejs.api.data
 	 */
 	export class IExternalLink
 	{
-		static WEAVE_INFO = Weave.classInfo(IExternalLink, {
+		static WEAVE_INFO = Weave.setClassInfo(IExternalLink, {
 			id: "weavejs.api.data.IExternalLink"
 		});
 

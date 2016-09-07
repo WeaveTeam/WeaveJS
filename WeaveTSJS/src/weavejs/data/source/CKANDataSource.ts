@@ -86,7 +86,7 @@ namespace weavejs.data.source
 
 	export class CKANDataSource extends AbstractDataSource implements IDataSource
 	{
-		static WEAVE_INFO = Weave.classInfo(CKANDataSource, {
+		static WEAVE_INFO = Weave.setClassInfo(CKANDataSource, {
 			id: "weavejs.data.source.CKANDataSource",
 			interfaces: [IDataSource],
 			label: "CKAN Server"
@@ -305,7 +305,7 @@ namespace weavejs.data.source
 
 	class CKANAction implements IWeaveTreeNode, IColumnReference, IWeaveTreeNodeWithPathFinding
 	{
-		static WEAVE_INFO = Weave.classInfo(CKANAction, {
+		static WEAVE_INFO = Weave.setClassInfo(CKANAction, {
 			id: "weavejs.data.source.CKANAction",
 			interfaces: [IWeaveTreeNode, IColumnReference, IWeaveTreeNodeWithPathFinding]
 		});
@@ -778,7 +778,7 @@ namespace weavejs.data.source
 	 */
 	class MetadataNode extends CKANAction implements IExternalLink
 	{
-		static WEAVE_INFO = Weave.classInfo(MetadataNode, {
+		static WEAVE_INFO = Weave.setClassInfo(MetadataNode, {
 			id: "weavejs.data.source.MetadataNode",
 			interfaces: [IWeaveTreeNode, IColumnReference, IWeaveTreeNodeWithPathFinding, IExternalLink]
 		});

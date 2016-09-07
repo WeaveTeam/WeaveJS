@@ -28,7 +28,7 @@ interface LabelRecord
 
 export default class LabelLayer extends AbstractGlyphLayer
 {
-	static WEAVE_INFO = Weave.classInfo(LabelLayer, {
+	static WEAVE_INFO = Weave.setClassInfo(LabelLayer, {
 		id: "weavejs.tool.oltool.layer.LabelLayer",
 		label: "Labels",
 		interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],

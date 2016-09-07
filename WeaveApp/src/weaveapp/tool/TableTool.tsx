@@ -55,7 +55,7 @@ export class AttributeColumnTable extends DataTable<IQualifiedKey>
 
 export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool, IInitSelectableAttributes
 {
-	static WEAVE_INFO = Weave.classInfo(TableTool, {
+	static WEAVE_INFO = Weave.setClassInfo(TableTool, {
 		id: "weavejs.tool.TableTool",
 		label: "Table",
 		interfaces: [IVisTool, ILinkableObjectWithNewProperties, ISelectableAttributes],

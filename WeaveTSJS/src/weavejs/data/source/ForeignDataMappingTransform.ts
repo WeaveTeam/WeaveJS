@@ -39,7 +39,7 @@ namespace weavejs.data.source
 
 	export class ForeignDataMappingTransform extends AbstractDataSource implements ISelectableAttributes
 	{
-		static WEAVE_INFO = Weave.classInfo(ForeignDataMappingTransform, {
+		static WEAVE_INFO = Weave.setClassInfo(ForeignDataMappingTransform, {
 			id: "weavejs.data.source.ForeignDataMappingTransform",
 			label: "Foreign data mapping",
 			interfaces: [IDataSource, ISelectableAttributes]
@@ -149,7 +149,7 @@ namespace weavejs.data.source
 
 	class ForeignDataColumn extends AbstractAttributeColumn implements IPrimitiveColumn
 	{
-		static WEAVE_INFO = Weave.classInfo(ForeignDataColumn, {
+		static WEAVE_INFO = Weave.setClassInfo(ForeignDataColumn, {
 			id: "weavejs.data.source.ForeignDataColumn",
 			interfaces: [IPrimitiveColumn]
 		});

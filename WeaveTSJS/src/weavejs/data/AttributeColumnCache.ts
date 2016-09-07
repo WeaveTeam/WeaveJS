@@ -38,7 +38,7 @@ namespace weavejs.data
 
 	export class AttributeColumnCache implements IAttributeColumnCache
 	{
-		static WEAVE_INFO = Weave.classInfo(AttributeColumnCache, {
+		static WEAVE_INFO = Weave.setClassInfo(AttributeColumnCache, {
 			id: "weavejs.data.AttributeColumnCache",
 			interfaces: [IAttributeColumnCache]
 		});

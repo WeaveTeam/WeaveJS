@@ -14,7 +14,7 @@ import IAltText from "weaveapp/api/ui/IAltText";
 
 export default class C3ColorHistogram extends C3Histogram
 {
-	static WEAVE_INFO = Weave.classInfo(C3ColorHistogram, {
+	static WEAVE_INFO = Weave.setClassInfo(C3ColorHistogram, {
 		id: "weavejs.tool.c3tool.C3ColorHistogram",
 		label: "Color Histogram",
 		interfaces: [

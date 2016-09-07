@@ -17,7 +17,7 @@ import AbstractFeatureLayer from "weaveapp/tool/oltool/layer/AbstractFeatureLaye
 
 export default class ImageGlyphLayer extends AbstractGlyphLayer
 {
-	static WEAVE_INFO = Weave.classInfo(ImageGlyphLayer, {
+	static WEAVE_INFO = Weave.setClassInfo(ImageGlyphLayer, {
 		id: "weavejs.tool.oltool.layer.ImageGlyphLayer",
 		label: "Icons",
 		interfaces: [ILinkableObjectWithNewProperties, ISelectableAttributes],

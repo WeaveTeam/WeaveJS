@@ -13,7 +13,7 @@ import FilteredColumn = weavejs.data.column.FilteredColumn;
 
 export class AccessibilityProperties
 {
-	static WEAVE_INFO = Weave.classInfo(AccessibilityProperties, {id: "weavejs.app.AccessibilityProperties"});
+	static WEAVE_INFO = Weave.setClassInfo(AccessibilityProperties, {id: "weavejs.app.AccessibilityProperties"});
 
 	enableAccessibilityFeatures = Weave.linkableChild(this, LinkableBoolean);
 	enableCaptioning = Weave.linkableChild(this, LinkableBoolean);
@@ -21,7 +21,7 @@ export class AccessibilityProperties
 
 export default class WeaveProperties implements ILinkableObject, ILinkableObjectWithNewProperties
 {
-	static WEAVE_INFO = Weave.classInfo(WeaveProperties, {
+	static WEAVE_INFO = Weave.setClassInfo(WeaveProperties, {
 		id: "weavejs.app.WeaveProperties",
 		interfaces: [ILinkableObject, ILinkableObjectWithNewProperties],
 		deprecatedIds: ["weave::WeaveProperties"]

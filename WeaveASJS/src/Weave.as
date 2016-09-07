@@ -547,7 +547,7 @@ package
 			if (!ids.length)
 				throw new Error("registerClass() requires at least one name under which to register a class definition");
 
-			definition['WEAVE_INFO'] = classInfo(definition, {
+			definition['WEAVE_INFO'] = setClassInfo(definition, {
 				"id": ids[0],
 				"label": displayName,
 				"interfaces": additionalInterfaces,
@@ -560,16 +560,16 @@ package
 		 * @param  info An object containing the class info.
 		 * @return      A function which takes a definition and applies the supplied info.
 		 */
-		public static function info(info:/*/{
+		public static function classInfo(info:/*/{
 			id:string,
 			label?:string,
 			interfaces?:Array<GenericClass>,
 			deprecatedIds?:string[],
 			linkable?:boolean
-		}/*/Object):Function/*/(constructor:GenericClass)=>void/*/
+		}/*/Object):/*/(constructor:GenericClass)=>void/*/Function
 		{
 			return function (constructor:/*/GenericClass/*/*):void {
-				constructor.WEAVE_INFO = Weave.classInfo(constructor, info);
+				constructor.WEAVE_INFO = Weave.setClassInfo(constructor, info);
 			}
 		}
 
@@ -579,7 +579,7 @@ package
 		 * @param info An object containing the class info.
 		 * @return The same info object passed in as a parameter.
 		 */
-		public static function classInfo(definition:/*/GenericClass/*/Class, info:/*/{
+		public static function setClassInfo(definition:/*/GenericClass/*/Class, info:/*/{
 			id:string,
 			label?:string,
 			interfaces?:Array<GenericClass>,

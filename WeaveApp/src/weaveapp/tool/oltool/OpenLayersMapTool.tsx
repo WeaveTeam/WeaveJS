@@ -99,7 +99,7 @@ const LARGE = "large";
 
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> implements IOpenLayersMapTool, IAltText
 {
-	static WEAVE_INFO = Weave.classInfo(OpenLayersMapTool, {
+	static WEAVE_INFO = Weave.setClassInfo(OpenLayersMapTool, {
 		id: "weavejs.tool.oltool.OpenLayersMapTool",
 		label: "Map",
 		interfaces: [
