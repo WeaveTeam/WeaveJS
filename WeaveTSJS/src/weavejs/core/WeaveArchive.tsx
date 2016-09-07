@@ -11,7 +11,7 @@ namespace weavejs.core
 
 	export type UpdateCallback = (meta: { percent: number, currentFile: string }) => void;
 
-	@Weave.info({id: "weavejs.core.WeaveArchive"})
+	@Weave.classInfo({id: "weavejs.core.WeaveArchive"})
 	export class WeaveArchive
 	{
 		private static FOLDER_AMF = "weave-amf";
