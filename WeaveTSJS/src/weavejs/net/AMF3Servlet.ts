@@ -13,17 +13,19 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net
+namespace weavejs.net
 {
-	import weavejs.util.WeavePromise;
+	import WeavePromise = weavejs.util.WeavePromise;
+	import Servlet = weavejs.net.Servlet;
 
-	public class AMF3Servlet extends Servlet
+	@Weave.classInfo({id: "weavejs.net.AMF3Servlet"})
+	export class AMF3Servlet extends Servlet
 	{
 		/**
 		 * @param servletURL The URL of the servlet (everything before the question mark in a URL request).
 		 * @param invokeImmediately Set this to false if you don't want the ProxyAsyncTokens created by invokeAsyncMethod() to be invoked automatically.
 		 */
-		public function AMF3Servlet(servletURL:String, invokeImmediately:Boolean = true)
+		constructor(servletURL:string, invokeImmediately:boolean = true)
 		{
 			// params get sent as an AMF3-serialized object
 			super(servletURL, "method", Protocol.JSONRPC_2_0_AMF);
@@ -33,9 +35,9 @@ package weavejs.net
 		/**
 		 * If <code>invokeImmediately</code> was set to false in the constructor, this will invoke a deferred request.
 		 */
-		public function invokeDeferred(promise:WeavePromise/*/<any>/*/):void
+		public invokeDeferred(promise:WeavePromise<any>):void
 		{
-			invokeNow(promise);
+			this.invokeNow(promise);
 		}
 	}
 }

@@ -13,109 +13,109 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net
+namespace weavejs.net
 {	
-	import weavejs.api.core.IDisposableObject;
-	import weavejs.api.core.ILinkableObjectWithBusyStatus;
-	import weavejs.util.JS;
-	import weavejs.net.AMF3Servlet;
-	import weavejs.util.WeavePromise;
-	import weavejs.WeaveAPI;
+	import IDisposableObject = weavejs.api.core.IDisposableObject;
+	import ILinkableObjectWithBusyStatus = weavejs.api.core.ILinkableObjectWithBusyStatus;
+	import AMF3Servlet = weavejs.net.AMF3Servlet;
+	import WeavePromise = weavejs.util.WeavePromise;
+	import WeaveAPI = weavejs.WeaveAPI;
 	
 	/**
 	 * this class contains functions that handle a queue of remote procedure calls
 	 * 
 	 * @author adufilie
 	 */
-	public class AsyncInvocationQueue implements ILinkableObjectWithBusyStatus, IDisposableObject
+	@Weave.classInfo({id: "weavejs.net.AsyncInvocationQueue", interfaces: [ILinkableObjectWithBusyStatus, IDisposableObject]})
+	export class AsyncInvocationQueue implements ILinkableObjectWithBusyStatus, IDisposableObject
 	{
-		public static var debug:Boolean = false;
+		public static debug:boolean = false;
 		
 		/**
 		 * @param paused When set to true, no queries will be executed until begin() is called.
 		 */
-		public function AsyncInvocationQueue(paused:Boolean = false)
+		constructor(paused:boolean = false)
 		{
-			_paused = paused;
+			this._paused = paused;
 		}
 		
-		public function isBusy():Boolean
+		public isBusy():boolean
 		{
-			assertQueueValid();
-			return _downloadQueue.length > 0;
+			this.assertQueueValid();
+			return this._downloadQueue.length > 0;
 		}
 		
-		public function dispose():void
+		public dispose():void
 		{
-			assertQueueValid();
-			for each (var query:WeavePromise in _downloadQueue)
+			this.assertQueueValid();
+			for (var query of this._downloadQueue)
 				WeaveAPI.ProgressIndicator.removeTask(query);
-			_downloadQueue.length = 0;
+			this._downloadQueue.length = 0;
 		}
 		
-		private var _paused:Boolean = false;
+		private _paused:boolean = false;
 		
 		/**
 		 * If the 'paused' constructor parameter was set to true, use this function to start invoking queued queries.
 		 */		
-		public function begin():void
+		public begin():void
 		{
-			assertQueueValid();
+			this.assertQueueValid();
 
-			if (_paused)
+			if (this._paused)
 			{
-				_paused = false;
+				this._paused = false;
 				
-				for each (var query:WeavePromise in _downloadQueue)
+				for (var query of this._downloadQueue)
 					WeaveAPI.ProgressIndicator.addTask(query);
 				
-				if (_downloadQueue.length)
-					performQuery(_downloadQueue[0]);
+				if (this._downloadQueue.length)
+					this.performQuery(this._downloadQueue[0]);
 			}
 		}
 
-		private var map_queryToService: Object = new JS.WeakMap();
+		private map_queryToService = new WeakMap<WeavePromise<any>, AMF3Servlet>();
 
 		// interface to add a query to the download queue. 
-		public function addToQueue(query:WeavePromise/*/<any>/*/, service:AMF3Servlet):void
+		public addToQueue(query:WeavePromise<any>, service:AMF3Servlet):void
 		{
-			assertQueueValid();
+			this.assertQueueValid();
 			
 			//trace("addToQueue",query);
 			
 			// if this query has already been queued, then do not queue it again
-			if (_downloadQueue.indexOf(query) >= 0)
+			if (this._downloadQueue.indexOf(query) >= 0)
 			{
 				//JS.error("already queued", query);
 				return;
 			}
 			
-			if (!_paused)
+			if (!this._paused)
 				WeaveAPI.ProgressIndicator.addTask(query);
 
-			map_queryToService.set(query, service);
+			this.map_queryToService.set(query, service);
 			
-			if (debug)
+			if (AsyncInvocationQueue.debug)
 			{
 				query.then(
-					function(result:*):void
+					function(result:any):void
 					{
-						JS.log('Query returned: ', query);
+						console.log('Query returned: ', query);
 					},
-					function (fault:*):void
+					function (fault:any):void
 					{
-						JS.log('Query failed: ', query);
+						console.log('Query failed: ', query);
 					}
 				);
 			}
 
 			
-			_downloadQueue.push(query);
+			this._downloadQueue.push(query);
 			
-			if (!_paused && _downloadQueue.length == 1)
+			if (!this._paused && this._downloadQueue.length == 1)
 			{
 				//trace("downloading immediately", query);
-				performQuery(query);
+				this.performQuery(query);
 			}
 			else
 			{
@@ -124,40 +124,40 @@ package weavejs.net
 		}
 	
 		// Queue to handle concurrent requests to be downloaded.
-		private var _downloadQueue:Array = new Array();
+		private _downloadQueue:WeavePromise<any>[] = new Array();
 
 		// perform a query in the queue
-		protected function performQuery(query:WeavePromise/*/<any>/*/):void
+		protected performQuery(query:WeavePromise<any>):void
 		{
-			assertQueueValid();
+			this.assertQueueValid();
 			
 			//trace("performQuery (timeout = "+query.webService.requestTimeout+")",query.toString());
 			//
 			
 			query.then(
-				function (result:*):void {handleQueryResultOrFault(result, query)},
-				function (fault:*):void {handleQueryResultOrFault(fault, query)}
+				(result:any):void => {this.handleQueryResultOrFault(result, query)},
+				(fault:any):void => {this.handleQueryResultOrFault(fault, query)}
 			);
 			
 			//URLRequestUtils.reportProgress = false;
 			
 			
-			var service:AMF3Servlet = map_queryToService.get(query);
+			var service:AMF3Servlet = this.map_queryToService.get(query);
 
 			if (service)
 			{
-				if (debug)
-					JS.log('Query sent: ', query);
+				if (AsyncInvocationQueue.debug)
+					console.log('Query sent: ', query);
 				service.invokeDeferred(query);
 			}
 			else
-				if (debug) JS.log('Query had no associated service: ', query);
+				if (AsyncInvocationQueue.debug) console.log('Query had no associated service: ', query);
 			
 			//URLRequestUtils.reportProgress = true;
 		}
 		
 		// This function gets called when a query has been downloaded.  It will download the next query if available
-		protected function handleQueryResultOrFault(result:*, query:WeavePromise/*/<any>/*/):void
+		protected handleQueryResultOrFault(result:any, query:WeavePromise<any>):void
 		{
 			if (Weave.wasDisposed(this))
 				return;
@@ -165,30 +165,30 @@ package weavejs.net
 			WeaveAPI.ProgressIndicator.removeTask(query);
 			
 			// see if the query is in the queue
-			var index:int = _downloadQueue.indexOf(query);
+			var index:int = this._downloadQueue.indexOf(query);
 			// stop if query not found in queue
 			if (index < 0)
 			{
-				JS.log("Query not found in queue: ", query);
+				console.log("Query not found in queue: ", query);
 				return;
 			}
 			
 			//trace("remove from queue (position "+index+", length: "+_downloadQueue.length+")", query);
 			
 			// remove the query from the queue
-			_downloadQueue.splice(index, 1);
+			this._downloadQueue.splice(index, 1);
 			
 			// if the position was 0, start downloading the next query
-			if (index == 0 && _downloadQueue.length > 0)
+			if (index == 0 && this._downloadQueue.length > 0)
 			{
 				//trace("perform next query", _downloadQueue[0] as DelayedAsyncCall);
 				// get the next item in the list
-				performQuery(_downloadQueue[0]);
+				this.performQuery(this._downloadQueue[0]);
 			}
 			return;
 		}
 		
-		private function assertQueueValid():void
+		private assertQueueValid():void
 		{
 			if (Weave.wasDisposed(this))
 				throw new Error("AsyncInvocationQueue was already disposed");

@@ -13,15 +13,13 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net.beans
+namespace weavejs.net
 {
-	import weavejs.util.JSByteArray;
-
-	public class GeometryStreamMetadata
+	export class Protocol
 	{
-		public var id:int;
-		public var metadata:Object;
-		public var metadataTileDescriptors:JSByteArray;
-		public var geometryTileDescriptors:JSByteArray;
+		public static /* readonly */ URL_PARAMS:string = "url params/jsonrpc 2.0"
+		public static /* readonly */ COMPRESSED_AMF:string = "amf3/compressed amf3";
+		public static /* readonly */ JSONRPC_2_0:string = "jsonrpc 2.0";
+		public static /* readonly */ JSONRPC_2_0_AMF:string = "jsonrpc 2.0/amf3";
 	}
 }

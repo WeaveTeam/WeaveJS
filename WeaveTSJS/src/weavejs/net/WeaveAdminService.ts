@@ -254,7 +254,7 @@ namespace weavejs.net
 		 */
 		private generateQuery(service:AMF3Servlet, methodName:string, parameters:IArguments|any[], queued:boolean, returnType:GenericClass):WeavePromise<any>
 		{
-			var query:WeavePromise<any> = service.invokeAsyncMethod(methodName, parameters);
+			var query:WeavePromise<any> = service.invokeAsyncMethod(methodName, parameters as any);
 			var castedQuery:WeavePromise<any>;
 
 			if (queued)

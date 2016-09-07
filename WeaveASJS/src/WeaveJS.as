@@ -9,7 +9,6 @@ package
 	import weavejs.WeaveAPI;
 	import weavejs.api.core.ILinkableDynamicObject;
 	import weavejs.api.core.ILinkableHashMap;
-	import weavejs.api.core.ILocale;
 	import weavejs.api.core.IProgressIndicator;
 	import weavejs.api.core.IScheduler;
 	import weavejs.api.core.ISessionManager;
@@ -24,7 +23,6 @@ package
 	import weavejs.core.EditorManager;
 	import weavejs.core.LinkableDynamicObject;
 	import weavejs.core.LinkableHashMap;
-	import weavejs.core.Locale;
 	import weavejs.core.ProgressIndicator;
 	import weavejs.core.Scheduler;
 	import weavejs.core.SessionManager;
@@ -33,7 +31,6 @@ package
 	import weavejs.data.key.QKeyManager;
 	import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
-	import weavejs.net.URLRequestUtils;
 
 public class WeaveJS
 	{
@@ -64,7 +61,6 @@ public class WeaveJS
 			);
 			
 			// register singleton implementations
-			WeaveAPI.ClassRegistry.registerImplementation(IURLRequestUtils, URLRequestUtils);
 			WeaveAPI.ClassRegistry.registerImplementation(ISessionManager, SessionManager);
 			WeaveAPI.ClassRegistry.registerImplementation(IQualifiedKeyManager, QKeyManager);
 			WeaveAPI.ClassRegistry.registerImplementation(IScheduler, Scheduler);
@@ -72,8 +68,7 @@ public class WeaveJS
 			WeaveAPI.ClassRegistry.registerImplementation(IStatisticsCache, StatisticsCache);
 			WeaveAPI.ClassRegistry.registerImplementation(IEditorManager, EditorManager);
 			WeaveAPI.ClassRegistry.registerImplementation(ICSVParser, CSVParser);
-			WeaveAPI.ClassRegistry.registerImplementation(ILocale, Locale);
-			
+
 			WeaveAPI.ClassRegistry.registerImplementation(ILinkableHashMap, LinkableHashMap);
 			WeaveAPI.ClassRegistry.registerImplementation(ILinkableDynamicObject, LinkableDynamicObject);
 			

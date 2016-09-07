@@ -13,17 +13,17 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.net
+namespace weavejs.api.net
 {
-	import weavejs.api.core.ILinkableObject;
-	import weavejs.util.WeavePromise;
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import WeavePromise = weavejs.util.WeavePromise;
 	
 	/**
 	 * This is an interface for an asynchronous service.
 	 * The invokeAsyncMethod() function invokes an asynchronous method and returns an AsyncToken which you can add IResponder objects to.
 	 * This is an ILinkableObject so its busy status can be checked and its URL requests will be cancelled when it is disposed.
 	 */
-	public interface IAsyncService extends ILinkableObject
+	export class IAsyncService extends ILinkableObject
 	{
 		/**
 		 * This function will invoke an asynchronous method using the given parameters object.
@@ -32,6 +32,6 @@ package weavejs.api.net
 		 * @param methodParameters Either an Array or an Object to use as a list of parameters.
 		 * @return An AsyncToken that you can add responders to.
 		 */
-		function invokeAsyncMethod(methodName:String, methodParameters:Object = null):WeavePromise/*/<any>/*/;
+		invokeAsyncMethod:(methodName:string, methodParameters:string[]|Object) => WeavePromise<any>;
 	}
 }

@@ -83,14 +83,14 @@ namespace weavejs.net
 		 *     It is unnecessary to specify this parameter if the return type is a primitive value.
 		 * @return The AsyncToken object representing the servlet method invocation.
 		 */		
-		private invoke(method:Function|string, parameters:IArguments, returnType_or_castFunction:GenericClass|Function = null):WeavePromise<any>
+		private invoke(method:Function|string, parameters:IArguments|string[], returnType_or_castFunction:GenericClass|Function = null):WeavePromise<any>
 		{
-			parameters = JS.toArray(parameters) as any || parameters;
+			parameters = (JS.toArray(parameters) || parameters) as string[];
 			var methodName:string = this.getMethodName(method);
 			if (!methodName)
 				throw new Error("method must be a member of " + Weave.className(this));
 			
-			var promise:WeavePromise<any> = this.servlet.invokeAsyncMethod(methodName, parameters);
+			var promise:WeavePromise<any> = this.servlet.invokeAsyncMethod(methodName, parameters as string[]);
 			var promiseThen:WeavePromise<any> = promise;
 			if (!this._authenticationRequired)
 				this.servlet.invokeDeferred(promise);

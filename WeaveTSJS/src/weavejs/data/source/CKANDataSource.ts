@@ -302,6 +302,7 @@ namespace weavejs.data.source
 	import StandardLib = weavejs.util.StandardLib;
 	import ICSVColumnMetadata = weavejs.data.source.ICSVColumnMetadata;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
+	import ResquestMethod = weavejs.net.RequestMethod;
 
 	class CKANAction implements IWeaveTreeNode, IColumnReference, IWeaveTreeNodeWithPathFinding
 	{
@@ -397,7 +398,7 @@ namespace weavejs.data.source
 				{
 					if (this.source.useHttpPost.value)
 					{
-						request.method = "POST";
+						request.method = ResquestMethod.POST;
 						request.requestHeaders = {"Content-Type": "application/json; charset=utf-8"};
 						request.data = JSON.stringify(this.params);
 					}

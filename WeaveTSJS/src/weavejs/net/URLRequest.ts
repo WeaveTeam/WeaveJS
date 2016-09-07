@@ -13,11 +13,14 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net
+namespace weavejs.net
 {
-	public class URLRequest
+	import RequestMethod = weavejs.net.RequestMethod;
+	import ResponseType = weavejs.net.ResponseType;
+
+	export class URLRequest
 	{
-		public function URLRequest(url:String = null)
+		constructor(url:string = null)
 		{
 			this.url = url;
 		}
@@ -26,32 +29,32 @@ package weavejs.net
 		 * Either "get" or "post"
 		 * @default "get"
 		 */
-		public var method:String = RequestMethod.GET;
+		public method:string = RequestMethod.GET;
 		
 		/**
 		 * The URL
 		 */
-		public var url:String;
+		public url:string;
 		
 		/**
 		 * Specified if method is "post"
 		 */
-		public var data:String;
+		public data:string;
 		
 		/**
 		 * Maps request header names to values
 		 */
-		public var requestHeaders:Object;
+		public requestHeaders:{[key:string]: string};
 		
 		/**
 		 * Can be one of the constants defined in the ResponseType class.
-		 * @see weavejs.net.ResponseType
+		 * @see ResponseType
 		 */
-		public var responseType:String = ResponseType.UINT8ARRAY;
+		public responseType:string = ResponseType.UINT8ARRAY;
 		
 		/**
 		 * Specifies the mimeType for the Data URI returned when responseType === "datauri".
 		 */
-		public var mimeType:String;
+		public mimeType:string;
 	}
 }

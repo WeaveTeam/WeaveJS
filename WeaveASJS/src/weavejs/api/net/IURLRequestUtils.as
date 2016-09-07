@@ -16,7 +16,6 @@
 package weavejs.api.net
 {
 	import weavejs.api.core.ILinkableHashMap;
-	import weavejs.net.URLRequest;
 	import weavejs.util.WeavePromise;
 
 	public interface IURLRequestUtils
@@ -26,7 +25,7 @@ package weavejs.api.net
 		 * @param urlRequest A URLRequest object.
 		 * @return A WeavePromise
 		 */
-		function request(relevantContext:Object, urlRequest:URLRequest):WeavePromise/*/<any>/*/;
+		function request(relevantContext:Object, urlRequest:Object/*weavejs.net.URLRequest*/):WeavePromise/*/<any>/*/;
 		
 		/**
 		 * This will save a file in memory so that it can be accessed later via getURL().

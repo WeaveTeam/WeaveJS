@@ -13,13 +13,16 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net
+namespace weavejs.net
 {
-	public class Protocol
+	export class ResponseType
 	{
-		public static const URL_PARAMS:String = "url params/jsonrpc 2.0"
-		public static const COMPRESSED_AMF:String = "amf3/compressed amf3";
-		public static const JSONRPC_2_0:String = "jsonrpc 2.0";
-		public static const JSONRPC_2_0_AMF:String = "jsonrpc 2.0/amf3";
+		public static /* readonly */ UINT8ARRAY:string = 'uint8array';
+		public static /* readonly */ ARRAYBUFFER:string = 'arraybuffer';
+		public static /* readonly */ BLOB:string = 'blob';
+		public static /* readonly */ DOCUMENT:string = 'document';
+		public static /* readonly */ JSON:string = 'json';
+		public static /* readonly */ TEXT:string = 'text';
+		public static /* readonly */ DATAURI:string = 'datauri';
 	}
 }

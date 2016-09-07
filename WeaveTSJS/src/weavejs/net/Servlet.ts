@@ -13,69 +13,72 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net
+namespace weavejs.net
 {
-	import weavejs.WeaveAPI;
-	import weavejs.api.net.IAsyncService;
-	import weavejs.util.JS;
-	import weavejs.util.JSByteArray;
-	import weavejs.util.WeavePromise;
-	
+	import WeaveAPI = weavejs.WeaveAPI;
+	import IAsyncService = weavejs.api.net.IAsyncService;
+	import JSByteArray = weavejs.util.JSByteArray;
+	import WeavePromise = weavejs.util.WeavePromise;
+	import Protocol = weavejs.net.Protocol;
+	import JS = weavejs.util.JS;
+
 	/**
 	 * This is an IAsyncService interface for a servlet that takes its parameters from URL variables.
 	 * 
 	 * @author adufilie
-	 */	
-	public class Servlet implements IAsyncService
+	 */
+	@Weave.classInfo({id: "weavejs.net.Servlet", interfaces: [IAsyncService]})
+	export class Servlet implements IAsyncService
 	{
 		/**
 		 * WeavePromise -> [methodName, params, id]
 		 */
-		protected var map_promise_methodParamsId:Object = new JS.WeakMap();
+		protected map_promise_methodParamsId = new WeakMap<WeavePromise<any>, [string, string[], number]>();
 		
-		private var nextId:int = 1;
+		private nextId:int = 1;
 		
 		/**
 		 * @param servletURL The URL of the servlet (everything before the question mark in a URL request).
 		 * @param methodParamName This is the name of the URL parameter that specifies the method to be called on the servlet.
 		 * @param urlRequestDataFormat This is the format to use when sending parameters to the servlet.
 		 */
-		public function Servlet(servletURL:String, methodVariableName:String, protocol:String)
+		constructor(servletURL:string, methodVariableName:string, protocol:string)
 		{
 			if ([Protocol.URL_PARAMS, Protocol.JSONRPC_2_0, Protocol.JSONRPC_2_0_AMF].indexOf(protocol) < 0)
 				throw new Error(Weave.className(Servlet) + ': protocol not supported: "' + protocol + '"');
 			
-			_servletURL = servletURL;
-			_protocol = protocol;
-			METHOD = methodVariableName;
+			this._servletURL = servletURL;
+			this._protocol = protocol;
+			this.METHOD = methodVariableName;
 		}
 		
 		/**
 		 * The name of the property which contains the remote method name.
 		 */
-		private var METHOD:String = "method";
+		private METHOD:string = "method";
 		/**
 		 * The name of the property which contains method parameters.
 		 */
-		private var PARAMS:String = "params";
+		private PARAMS:string = "params";
 		
 		/**
 		 * This is the base URL of the servlet.
 		 * The base url is everything before the question mark in a url request like the following:
 		 *     http://www.example.com/servlet?param=123
 		 */
-		public function get servletURL():String
+		public get servletURL():string
 		{
-			return _servletURL;
+			return this._servletURL;
 		}
-		protected var _servletURL:String;
+
+		protected _servletURL:string;
 
 		/**
 		 * This is the data format of the results from HTTP GET requests.
 		 */
-		protected var _protocol:String;
+		protected _protocol:string;
 		
-		protected var _invokeLater:Boolean = false;
+		protected _invokeLater:boolean = false;
 		
 		/**
 		 * This function makes a remote procedure call.
@@ -83,14 +86,14 @@ package weavejs.net
 		 * @param methodParameters The parameters to use when calling the method.
 		 * @return A WeavePromise generated for the call.
 		 */
-		public function invokeAsyncMethod(methodName:String, methodParameters:Object = null):WeavePromise/*/<any>/*/
+		public invokeAsyncMethod(methodName:string, methodParameters:string[] = null):WeavePromise<any>
 		{
-			var promise:WeavePromise = new WeavePromise(this);
+			var promise:WeavePromise<any> = new WeavePromise(this);
 			
-			map_promise_methodParamsId.set(promise, [methodName, methodParameters, nextId++]);
+			this.map_promise_methodParamsId.set(promise, [methodName, methodParameters, this.nextId++]);
 			
-			if (!_invokeLater)
-				invokeNow(promise);
+			if (!this._invokeLater)
+				this.invokeNow(promise);
 			
 			return promise;
 		}
@@ -100,38 +103,38 @@ package weavejs.net
 		 * @param methodName The method.
 		 * @return The servlet url for the method.
 		 */
-		protected function getServletURLForMethod(methodName:String):String
+		protected getServletURLForMethod(methodName:string):string
 		{
-			return _servletURL;
+			return this._servletURL;
 		}
 		
 		/**
 		 * This will make a url request that was previously delayed.
 		 * @param promise A WeavePromise generated from a previous call to invokeAsyncMethod().
 		 */
-		protected function invokeNow(promise:WeavePromise/*/<any>/*/):void
+		protected invokeNow(promise:WeavePromise<any>):void
 		{
 			//TODO - need a way to cancel previous request
 			// if promise.setResult was called with a urlPromise, dispose the old urlPromise or re-invoke it
 			
-			var method0_params1_id2:Array = map_promise_methodParamsId.get(promise);
+			var method0_params1_id2:[string, string[], number] = this.map_promise_methodParamsId.get(promise);
 			if (!method0_params1_id2)
 				return;
 			
-			var method:String = method0_params1_id2[0];
-			var params:Object = method0_params1_id2[1];
-			var id:int = method0_params1_id2[2];
+			var method = method0_params1_id2[0];
+			var params = method0_params1_id2[1];
+			var id = method0_params1_id2[2];
 			
-			var url:String = getServletURLForMethod(method);
+			var url:string = this.getServletURLForMethod(method);
 			var request:URLRequest = new URLRequest(url);
-			if (_protocol == Protocol.URL_PARAMS)
+			if (this._protocol == Protocol.URL_PARAMS)
 			{
-				params = JS.copyObject(params);
-				params[METHOD] = method;
-				request.url = buildUrlWithParams(url, params);
+				params = _.cloneDeep(params);
+				(params as any)[this.METHOD] = method;
+				request.url = Servlet.buildUrlWithParams(url, params);
 				request.method = RequestMethod.GET;
 			}
-			else if (_protocol == Protocol.JSONRPC_2_0)
+			else if (this._protocol == Protocol.JSONRPC_2_0)
 			{
 				request.method = RequestMethod.POST;
 				request.data = JSON.stringify({
@@ -142,7 +145,7 @@ package weavejs.net
 				});
 				request.responseType = ResponseType.JSON;
 			}
-			else if (_protocol == Protocol.JSONRPC_2_0_AMF)
+			else if (this._protocol == Protocol.JSONRPC_2_0_AMF)
 			{
 				request.method = RequestMethod.POST;
 				request.data = JSON.stringify({
@@ -153,10 +156,10 @@ package weavejs.net
 				});
 			}
 			
-			var result:WeavePromise = WeaveAPI.URLRequestUtils.request(this, request);
+			var result:WeavePromise<any> = WeaveAPI.URLRequestUtils.request(this, request);
 			
-			if (_protocol == Protocol.JSONRPC_2_0_AMF)
-				result = result.then(readAmf3Object);
+			if (this._protocol == Protocol.JSONRPC_2_0_AMF)
+				result = result.then(Servlet.readAmf3Object);
 			
 			promise.setResult(result);
 		}
@@ -168,21 +171,21 @@ package weavejs.net
 		 * @return The result of calling readObject() on the ByteArray, or null if the RPC returns void.
 		 * @throws Error if unable to read the result.
 		 */
-		public static function readAmf3Object(bytes:/*/Uint8Array/*/Array):Object
+		public static readAmf3Object(bytes:Uint8Array):Object
 		{
 			// length may be zero for void result
 			var obj:Object = bytes && bytes.length && new JSByteArray(bytes).readObject();
 			
 			// TEMPORARY SOLUTION to detect errors
-			if (obj && (obj.faultCode && obj.faultString))
-				throw new Error(obj.faultCode + ": " + obj.faultString);
+			if (obj && ((obj as any).faultCode && (obj as any).faultString))
+				throw new Error((obj as any).faultCode + ": " + (obj as any).faultString);
 			
 			return obj;
 		}
 		
-		public static function buildUrlWithParams(url:String, params:Object):String
+		public static buildUrlWithParams(url:string, params:{[key:string]:any}):string
 		{
-			var queryString:String = '';
+			var queryString:string = '';
 			var qi:int = url.indexOf('?');
 			if (qi >= 0)
 			{
@@ -190,11 +193,11 @@ package weavejs.net
 				url = url.substr(0, qi);
 			}
 			
-			for (var key:String in params)
+			for (var key in params)
 			{
 				if (queryString)
 					queryString += '&';
-				var value:* = params[key];
+				var value:any = params[key];
 				if (params != null && typeof params === 'object')
 					value = JS.isPrimitive(value) ? value : JSON.stringify(value);
 				queryString += encodeURIComponent(key) + '=' + encodeURIComponent(value);

@@ -16,11 +16,11 @@ package
 	import weavejs.core.LinkableBoolean;
 	import weavejs.core.LinkableCallbackScript;
 	import weavejs.core.LinkableDynamicObject;
-	import weavejs.core.LinkableFile;
 	import weavejs.core.LinkableFunction;
 	import weavejs.core.LinkableHashMap;
 	import weavejs.core.LinkableNumber;
-	import weavejs.core.LinkableString;
+import weavejs.core.LinkablePromise;
+import weavejs.core.LinkableString;
 	import weavejs.core.LinkableSynchronizer;
 	import weavejs.core.LinkableVariable;
 	import weavejs.core.LinkableWatcher;
@@ -59,8 +59,8 @@ package
 	import weavejs.data.column.SecondaryKeyNumColumn;
 	import weavejs.data.column.SortedColumn;
 	import weavejs.data.column.SortedIndexColumn;
-import weavejs.data.column.StreamedGeometryColumn;
-import weavejs.data.column.StringColumn;
+	import weavejs.data.column.StreamedGeometryColumn;
+	import weavejs.data.column.StringColumn;
 	import weavejs.data.column.StringLookup;
 	import weavejs.data.hierarchy.WeaveRootDataTreeNode;
 	import weavejs.data.key.ColumnDataFilter;
@@ -77,9 +77,7 @@ import weavejs.data.column.StringColumn;
 	import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
 	import weavejs.geom.LinkableBounds2D;
-import weavejs.net.AMF3Servlet;
-import weavejs.net.AsyncInvocationQueue;
-import weavejs.path.ExternalTool;
+	import weavejs.path.ExternalTool;
 	import weavejs.util.BackwardsCompatibility;
 	import weavejs.util.JS;
 	import weavejs.util.WeaveMenuItem;
@@ -182,10 +180,8 @@ import weavejs.path.ExternalTool;
 			ShpType,
 			IPrimitiveColumn,
 			IWeaveTreeNodeWithPathFinding,
-			AMF3Servlet,
-			AsyncInvocationQueue,
 			StreamedGeometryColumn,
-			LinkableFile,
+			LinkablePromise,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];

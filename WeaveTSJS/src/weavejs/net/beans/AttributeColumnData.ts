@@ -13,11 +13,23 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net
-{
-	public class RequestMethod
+namespace weavejs.net.beans
+{	
+	import JSByteArray = weavejs.util.JSByteArray;
+	import IWeaveDataSourceColumnMetadata = weavejs.data.source.IWeaveDataSourceColumnMetadata;
+
+	export class AttributeColumnData
 	{
-		public static const GET:String = 'get';
-		public static const POST:String = 'post';
+		public static /* readonly */ NO_TABLE_ID:int = -1;
+		
+		public id:int;
+		public tableId:int;
+		public tableField:string;
+		public metadata:IWeaveDataSourceColumnMetadata;
+		public keys:string[];
+		public data:any[];
+		public thirdColumn:string[];
+		public metadataTileDescriptors:JSByteArray;
+		public geometryTileDescriptors:JSByteArray;
 	}
 }

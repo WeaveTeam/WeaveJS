@@ -13,22 +13,16 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net.beans
-{	
-	import weavejs.util.JSByteArray;
+namespace weavejs.net.beans
+{
+	import JSByteArray = weavejs.util.JSByteArray;
+	import IWeaveDataSourceColumnMetadata = weavejs.data.source.IWeaveDataSourceColumnMetadata;
 
-	public class AttributeColumnData 
+	export class GeometryStreamMetadata
 	{
-		public static const NO_TABLE_ID:int = -1;
-		
-		public var id:int;
-		public var tableId:int;
-		public var tableField:String;
-		public var metadata:Object;
-		public var keys:Array;
-		public var data:Array;
-		public var thirdColumn:Array;
-		public var metadataTileDescriptors:JSByteArray;
-		public var geometryTileDescriptors:JSByteArray;
+		public id:int;
+		public metadata:IWeaveDataSourceColumnMetadata;
+		public metadataTileDescriptors:JSByteArray;
+		public geometryTileDescriptors:JSByteArray;
 	}
 }

@@ -13,16 +13,11 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.net
+namespace weavejs.net
 {
-	public class ResponseType
+	export class RequestMethod
 	{
-		public static const UINT8ARRAY:String = 'uint8array';
-		public static const ARRAYBUFFER:String = 'arraybuffer';
-		public static const BLOB:String = 'blob';
-		public static const DOCUMENT:String = 'document';
-		public static const JSON:String = 'json';
-		public static const TEXT:String = 'text';
-		public static const DATAURI:String = 'datauri';
+		public static /* readonly */ GET:string = 'get';
+		public static /* readonly */ POST:string = 'post';
 	}
 }
