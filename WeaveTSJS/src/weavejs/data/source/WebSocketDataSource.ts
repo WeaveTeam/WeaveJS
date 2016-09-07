@@ -244,7 +244,7 @@ namespace weavejs.data.source
 		{
 			var columnName:string = proxyColumn.getMetadata(WebSocketDataSource.DATA_COLUMNNAME_META);
 
-			var keys:string[]|number[];
+			var keys:string[];
 			var data:any[] = _.map(this.records, columnName);/*.map(
 				function (d:*,i:int,a:Array):*
 				{
@@ -258,7 +258,7 @@ namespace weavejs.data.source
 			}
 			else
 			{
-				keys = _.range(data.length) as number[];
+				keys = _.range(data.length).map(String);
 			}
 
 			var metadata:IWebSocketColumnMetadata = this.getColumnMetadata(columnName);
