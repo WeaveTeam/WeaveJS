@@ -25,7 +25,6 @@ package
 	import weavejs.core.LinkableVariable;
 	import weavejs.core.LinkableWatcher;
 	import weavejs.core.SessionStateLog;
-	import weavejs.data.DataSourceUtils;
 	import weavejs.data.bin.AbstractBinningDefinition;
 	import weavejs.data.bin.CategoryBinningDefinition;
 	import weavejs.data.bin.CustomSplitBinningDefinition;
@@ -182,7 +181,6 @@ import weavejs.path.ExternalTool;
 			ShpTools,
 			ShpType,
 			IPrimitiveColumn,
-			DataSourceUtils,
 			IWeaveTreeNodeWithPathFinding,
 			AMF3Servlet,
 			AsyncInvocationQueue,
