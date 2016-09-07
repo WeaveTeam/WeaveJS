@@ -48,17 +48,10 @@ namespace weavejs.data.source
 	{
 		jsonPropertyName?:string;
 	}
-
+	@Weave.classInfo({id: "weavejs.data.source.WebSocketDataSource", interfaces: [IDataSource], label: "WebSocket Data Source"})
 	export class WebSocketDataSource extends AbstractDataSource
 	{
-		WEAVE_INFO = Weave.setClassInfo(WebSocketDataSource, {
-			id: "weavejs.data.source.WeaveSocketDataSource",
-			label: "WebSocket Data Source",
-			interfaces: [IDataSource]
-		});
-
 		public static /* readonly */ DATA_COLUMNNAME_META:string = "jsonPropertyName";
-
 
 		public /* readonly */ keyType:LinkableString = Weave.linkableChild(this, LinkableString);
 		public /* readonly */ keyProperty:LinkableString = Weave.linkableChild(this, LinkableString);
