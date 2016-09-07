@@ -13,21 +13,22 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data.source
+namespace weavejs.data.source
 {
-	import weavejs.WeaveAPI;
-	import weavejs.api.core.ICallbackCollection;
-	import weavejs.api.core.IDisposableObject;
-	import weavejs.api.core.ILinkableHashMap;
-	import weavejs.api.data.IAttributeColumn;
-	import weavejs.api.data.IDataSource;
-	import weavejs.api.data.IWeaveTreeNode;
-	import weavejs.core.CallbackCollection;
-	import weavejs.core.LinkableString;
-	import weavejs.data.column.ProxyColumn;
-	import weavejs.data.hierarchy.HierarchyUtils;
-	import weavejs.util.DebugUtils;
-	import weavejs.util.JS;
+	import WeaveAPI = weavejs.WeaveAPI;
+	import IColumnReference = weavejs.api.data.IColumnReference;
+	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
+	import IDisposableObject = weavejs.api.core.IDisposableObject;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IDataSource = weavejs.api.data.IDataSource;
+	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+	import CallbackCollection = weavejs.core.CallbackCollection;
+	import LinkableString = weavejs.core.LinkableString;
+	import ProxyColumn = weavejs.data.column.ProxyColumn;
+	import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
+	import DebugUtils = weavejs.util.DebugUtils;
+	import JS = weavejs.util.JS;
 	
 	/**
 	 * This is a base class to make it easier to develope a new class that implements IDataSource.
@@ -36,31 +37,32 @@ package weavejs.data.source
 	 * 
 	 * @author adufilie
 	 */
-	public class AbstractDataSource implements IDataSource, IDisposableObject
+	@Weave.classInfo({id: "weavejs.data.source.AbstractDataSource", interfaces: [IDataSource, IDisposableObject]})
+	export class AbstractDataSource implements IDataSource, IDisposableObject
 	{
-		public function AbstractDataSource()
+		public constructor()
 		{
 			var cc:ICallbackCollection = Weave.getCallbacks(this);
-			cc.addImmediateCallback(this, uninitialize);
-			cc.addGroupedCallback(this, initialize, true, false);
+			cc.addImmediateCallback(this, this.uninitialize);
+			cc.addGroupedCallback(this, this.initialize, true, false);
 		}
 		
 		/**
 		 * Overrides root hierarchy label.
 		 */
-		public const label:LinkableString = Weave.linkableChild(this, LinkableString);
+		public /* readonly */ label:LinkableString = Weave.linkableChild(this, LinkableString);
 		
-		public function getLabel():String
+		public getLabel():string
 		{
-			if (label.value)
-				return label.value;
+			if (this.label.value)
+				return this.label.value;
 			var root:ILinkableHashMap = Weave.getRoot(this);
 			if (root)
 				return root.getName(this);
 			return null;
 		}
 
-		public function get isLocal():Boolean
+		public get isLocal():boolean
 		{
 			return false;
 		}
@@ -68,32 +70,32 @@ package weavejs.data.source
 		/**
 		 * This variable is set to false when the session state changes and true when initialize() is called.
 		 */
-		protected var _initializeCalled:Boolean = false;
+		protected _initializeCalled:boolean = false;
 		
 		/**
 		 * This should be used to keep a pointer to the hierarchy root node.
 		 */
-		protected var _rootNode:/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode;
+		protected _rootNode:IWeaveTreeNode & IColumnReference;
 		
 		/**
 		 * ProxyColumn -> (true if pending, false if not pending)
 		 */
-		protected var map_proxyColumn_pending:Object = new JS.Map();
+		protected map_proxyColumn_pending = new Map<ProxyColumn, boolean>()
 		
-		private var _hierarchyRefresh:ICallbackCollection = Weave.linkableChild(this, CallbackCollection, refreshHierarchy);
+		private _hierarchyRefresh:ICallbackCollection = Weave.linkableChild(this, CallbackCollection, this.refreshHierarchy);
 		
-		public function get hierarchyRefresh():ICallbackCollection
+		public get hierarchyRefresh():ICallbackCollection
 		{
-			return _hierarchyRefresh;
+			return this._hierarchyRefresh;
 		}
 		
 		/**
 		 * Sets _rootNode to null and triggers callbacks.
 		 * @inheritDoc
 		 */
-		protected function refreshHierarchy():void
+		protected refreshHierarchy():void
 		{
-			_rootNode = null;
+			this._rootNode = null;
 		}
 		
 		/**
@@ -101,9 +103,9 @@ package weavejs.data.source
 		 * This function should set _rootNode if it is null, which may happen from calling refreshHierarchy().
 		 * @inheritDoc
 		 */
-		/* abstract */ public function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
+		/* abstract */ public getHierarchyRoot():IWeaveTreeNode & IColumnReference
 		{
-			return _rootNode;
+			return this._rootNode;
 		}
 
 		/**
@@ -111,45 +113,45 @@ package weavejs.data.source
 		 * This function should make a request to the source to fill in the proxy column.
 		 * @param proxyColumn Contains metadata for the column request and will be used to store column data when it is ready.
 		 */
-		/* abstract */ protected function requestColumnFromSource(proxyColumn:ProxyColumn):void { }
+		/* abstract */ protected requestColumnFromSource(proxyColumn:ProxyColumn):void { }
 
 		/**
 		 * This function must be implemented by classes that extend AbstractDataSource.
 		 * @param metadata A set of metadata that may identify a column in this IDataSource.
 		 * @return A node that contains the metadata.
 		 */
-		/* abstract */ protected function generateHierarchyNode(metadata:Object):IWeaveTreeNode { return null; }
+		/* abstract */ protected generateHierarchyNode(metadata:Object):IWeaveTreeNode { return null; }
 		
 		/**
 		 * Classes that extend AbstractDataSource can define their own replacement for this function.
 		 * All column requests will be delayed as long as this accessor function returns false.
 		 * The default behavior is to return false during the time between a change in the session state and when initialize() is called.
 		 */		
-		protected function get initializationComplete():Boolean
+		protected get initializationComplete():boolean
 		{
-			return _initializeCalled;
+			return this._initializeCalled;
 		}
 
 		/**
 		 * This function is called as an immediate callback and sets initialized to false.
 		 */
-		protected function uninitialize():void
+		protected uninitialize():void
 		{
-			_initializeCalled = false;
+			this._initializeCalled = false;
 		}
 		
 		/**
 		 * This function will be called as a grouped callback the frame after the session state for the data source changes.
 		 * When overriding this function, super.initialize() should be called.
 		 */
-		protected function initialize(forceRefresh:Boolean = false):void
+		protected initialize(forceRefresh:boolean = false):void
 		{
 			// set initialized to true so other parts of the code know if this function has been called.
-			_initializeCalled = true;
+			this._initializeCalled = true;
 			if (forceRefresh)
-				refreshAllProxyColumns(initializationComplete);
+				this.refreshAllProxyColumns(this.initializationComplete);
 			else
-				handleAllPendingColumnRequests(initializationComplete);
+				this.handleAllPendingColumnRequests(this.initializationComplete);
 		}
 		
 		/**
@@ -159,11 +161,11 @@ package weavejs.data.source
 		 * may result in traversing the entire hierarchy, causing many remote procedure calls if
 		 * the hierarchy is stored remotely.
 		 */
-		public function findHierarchyNode(metadata:Object):/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode
+		public findHierarchyNode(metadata:Object):IWeaveTreeNode & IColumnReference
 		{
-			var path:Array = HierarchyUtils.findPathToNode(getHierarchyRoot(), generateHierarchyNode(metadata));
+			var path = HierarchyUtils.findPathToNode(this.getHierarchyRoot(), this.generateHierarchyNode(metadata));
 			if (path)
-				return path[path.length - 1];
+				return path[path.length - 1] as IWeaveTreeNode & IColumnReference;
 			return null;
 		}
 		
@@ -172,15 +174,15 @@ package weavejs.data.source
 		 * @param metadata An object that contains all the information required to request the column from this IDataSource. 
 		 * @return A ProxyColumn object that will be updated when the column data is ready.
 		 */
-		public function generateNewAttributeColumn(metadata:Object):IAttributeColumn
+		public generateNewAttributeColumn(metadata:Object):IAttributeColumn
 		{
 			var proxyColumn:ProxyColumn = Weave.disposableChild(this, ProxyColumn);
 			proxyColumn.setMetadata(metadata);
-			var name:String = this.getLabel() || Weave.className(this).split('.').pop();
-			var description:String = name + " pending column request";
+			var name:string = this.getLabel() || Weave.className(this).split('.').pop();
+			var description:string = name + " pending column request";
 			WeaveAPI.ProgressIndicator.addTask(proxyColumn, this, description);
 			WeaveAPI.ProgressIndicator.addTask(proxyColumn, proxyColumn, description);
-			handlePendingColumnRequest(proxyColumn);
+			this.handlePendingColumnRequest(proxyColumn);
 			return proxyColumn;
 		}
 		
@@ -192,54 +194,54 @@ package weavejs.data.source
 		 * for the pending column, it is recommended to call super.handlePendingColumnRequest() instead.
 		 * @param request The request that needs to be handled.
 		 */
-		protected function handlePendingColumnRequest(column:ProxyColumn, forced:Boolean = false):void
+		protected handlePendingColumnRequest(column:ProxyColumn, forced:boolean = false):void
 		{
 			// If data source is already initialized (session state is stable, not currently changing), we can request the column now.
 			// Otherwise, we have to wait.
-			if (initializationComplete || forced)
+			if (this.initializationComplete || forced)
 			{
-				map_proxyColumn_pending.set(column, false); // no longer pending
+				this.map_proxyColumn_pending.set(column, false); // no longer pending
 				WeaveAPI.ProgressIndicator.removeTask(column);
-				requestColumnFromSource(column);
+				this.requestColumnFromSource(column);
 			}
 			else
 			{
-				map_proxyColumn_pending.set(column, true); // pending
+				this.map_proxyColumn_pending.set(column, true); // pending
 			}
 		}
 		
 		/**
 		 * This function will call handlePendingColumnRequest() on each pending column request.
 		 */
-		protected function handleAllPendingColumnRequests(forced:Boolean = false):void
+		protected handleAllPendingColumnRequests(forced:boolean = false):void
 		{
-			var cols:Array = JS.mapKeys(map_proxyColumn_pending);
-			for each (var proxyColumn:Object in cols)
-				if (map_proxyColumn_pending.get(proxyColumn)) // pending?
-					handlePendingColumnRequest(proxyColumn as ProxyColumn, forced);
+			var cols = JS.mapKeys(this.map_proxyColumn_pending);
+			for (var proxyColumn of cols)
+				if (this.map_proxyColumn_pending.get(proxyColumn)) // pending?
+					this.handlePendingColumnRequest(proxyColumn, forced);
 		}
 		
 		/**
 		 * Calls requestColumnFromSource() on all ProxyColumn objects created previously via generateNewAttributeColumn().
 		 */
-		protected function refreshAllProxyColumns(forced:Boolean = false):void
+		protected refreshAllProxyColumns(forced:boolean = false):void
 		{
-			var cols:Array = JS.mapKeys(map_proxyColumn_pending);
-			for each (var proxyColumn:Object in cols)
-				handlePendingColumnRequest(proxyColumn as ProxyColumn, forced);
+			var cols = JS.mapKeys(this.map_proxyColumn_pending);
+			for (var proxyColumn of cols)
+				this.handlePendingColumnRequest(proxyColumn, forced);
 		}
 		
 		/**
 		 * This function should be called when the IDataSource is no longer in use.
 		 * All existing pointers to objects should be set to null so they can be garbage collected.
 		 */
-		public function dispose():void
+		public dispose():void
 		{
-			var cols:Array = JS.mapKeys(map_proxyColumn_pending);
-			for each (var column:Object in cols)
+			var cols = JS.mapKeys(this.map_proxyColumn_pending);
+			for (var column of cols)
 				WeaveAPI.ProgressIndicator.removeTask(column);
-			_initializeCalled = false;
-			map_proxyColumn_pending = null;
+			this._initializeCalled = false;
+			this.map_proxyColumn_pending = null;
 		}
 	}
 }

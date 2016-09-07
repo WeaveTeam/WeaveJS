@@ -73,7 +73,6 @@ import weavejs.data.column.StringColumn;
 	import weavejs.data.key.KeySetCallbackInterface;
 	import weavejs.data.key.KeySetUnion;
 	import weavejs.data.key.SortedKeySet;
-	import weavejs.data.source.AbstractDataSource;
 	import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.geom.Range;
@@ -188,8 +187,6 @@ import weavejs.path.ExternalTool;
 			AMF3Servlet,
 			AsyncInvocationQueue,
 			StreamedGeometryColumn,
-			LinkableFile,
-			AbstractDataSource,
 			LinkableFile,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
