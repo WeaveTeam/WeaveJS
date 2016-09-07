@@ -59,7 +59,6 @@ import weavejs.core.LinkableString;
 	import weavejs.data.column.SecondaryKeyNumColumn;
 	import weavejs.data.column.SortedColumn;
 	import weavejs.data.column.SortedIndexColumn;
-	import weavejs.data.column.StreamedGeometryColumn;
 	import weavejs.data.column.StringColumn;
 	import weavejs.data.column.StringLookup;
 	import weavejs.data.hierarchy.WeaveRootDataTreeNode;
@@ -72,7 +71,8 @@ import weavejs.core.LinkableString;
 	import weavejs.data.key.KeySetCallbackInterface;
 	import weavejs.data.key.KeySetUnion;
 	import weavejs.data.key.SortedKeySet;
-	import weavejs.geom.TempHack_SolidFillStyle;
+import weavejs.geom.GeometryStreamDecoder;
+import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
@@ -80,7 +80,8 @@ import weavejs.core.LinkableString;
 	import weavejs.path.ExternalTool;
 	import weavejs.util.BackwardsCompatibility;
 	import weavejs.util.JS;
-	import weavejs.util.WeaveMenuItem;
+import weavejs.util.JSByteArray;
+import weavejs.util.WeaveMenuItem;
 
 	import org.vanrijkom.dbf.DbfError;
 	import org.vanrijkom.dbf.DbfField;
@@ -180,8 +181,9 @@ import weavejs.core.LinkableString;
 			ShpType,
 			IPrimitiveColumn,
 			IWeaveTreeNodeWithPathFinding,
-			StreamedGeometryColumn,
 			LinkablePromise,
+			JSByteArray,
+			GeometryStreamDecoder,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];

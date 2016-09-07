@@ -348,7 +348,7 @@ namespace weavejs.data.hierarchy
 			{
 				// root table node only has two levels - table, column
 				// return path of EntityNode objects
-				for (var id of node.getEntity().parentIds)
+				for (var id of node.getEntity().parentIds || [])
 				{
 					if (cache.getEntity(id).getEntityType() == EntityType.TABLE)
 					{

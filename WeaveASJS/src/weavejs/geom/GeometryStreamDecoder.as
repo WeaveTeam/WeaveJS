@@ -99,7 +99,7 @@ package weavejs.geom
 		 * @param geometryKey A String identifier.
 		 * @return An Array of GeneralizedGeometry objects with keys matching the specified key. 
 		 */
-		public function getGeometriesFromKey(geometryKey:IQualifiedKey):Array
+		public function getGeometriesFromKey(geometryKey:IQualifiedKey):Array/*/<GeneralizedGeometry>/*/
 		{
 			return map_key_geoms.get(geometryKey);
 		}
