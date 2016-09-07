@@ -468,7 +468,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		var tabLayoutState = tabLayout.getSessionState();
 		var tabs = tabLayoutState && tabLayoutState.tabs;
-		var activeTabIndex = tabLayoutState && tabLayoutState.activeTabIndex || -1;
+		var activeTabIndex = (tabLayoutState && tabLayoutState.activeTabIndex) || (this.urlParams.file ?  0:-1);
 		var title = tabLayoutState && tabLayoutState.title;
 
 		if (!tabs || (tabs && !tabs.length))
