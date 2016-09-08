@@ -200,7 +200,7 @@ namespace weavejs.data.source
 			{
 				node.id = Weave.AS(id, Number) as number;
 			}
-			else if (Weave.detectChange(this.getHierarchyRoot, this.rootId))
+			else if (Weave.detectChange(this.getHierarchyRootObserver, this.rootId))
 			{
 				node.id = -1;
 				this._service.findEntityIds(id as IWeaveDataSourceColumnMetadata, null).then((result:number[]) => this.handleRootId(this.rootId.triggerCounter, result));
@@ -208,6 +208,7 @@ namespace weavejs.data.source
 			
 			return this._rootNode;
 		}
+		private getHierarchyRootObserver=this.getHierarchyRoot.bind(this);
 
 		private handleRootId(triggerCount:number, result:number[]):void
 		{

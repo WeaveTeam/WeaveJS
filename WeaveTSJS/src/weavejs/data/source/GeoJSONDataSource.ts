@@ -101,7 +101,7 @@ namespace weavejs.data.source {
 		{
 			this._rootNode = null;
 			
-			if (Weave.detectChange(this.initialize, this.keyType, this.keyProperty))
+			if (Weave.detectChange(this.initializeObserver, this.keyType, this.keyProperty))
 			{
 				if (this.jsonData)
 					this.jsonData.resetQKeys(this.getKeyType(), this.keyProperty.value);
@@ -110,6 +110,7 @@ namespace weavejs.data.source {
 			// recalculate all columns previously requested because data may have changed.
 			super.initialize(true);
 		}
+		private initializeObserver = this.initialize.bind(this);
 		
 		private handleFile():void
 		{

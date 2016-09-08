@@ -165,7 +165,7 @@ namespace weavejs.data.source
 		private _groupKeys:IQualifiedKey[];
 		private getGroupKeys():IQualifiedKey[]
 		{
-			if (Weave.detectChange(this.getGroupKeys, this.groupByColumn, this.groupKeyType))
+			if (Weave.detectChange(this.getGroupKeysObserver, this.groupByColumn, this.groupKeyType))
 			{
 				this._groupKeys = [];
 				var stringLookup:{[key:string]:boolean} = {};
@@ -189,6 +189,7 @@ namespace weavejs.data.source
 			}
 			return this._groupKeys;
 		}
+		private getGroupKeysObserver=this.getGroupKeys.bind(this);
 	}
 }
 

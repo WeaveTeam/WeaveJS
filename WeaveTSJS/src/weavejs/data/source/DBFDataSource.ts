@@ -88,31 +88,33 @@ namespace weavejs.data.source
 		/* override */ protected uninitialize():void
 		{
 			super.uninitialize();
-			if (Weave.detectChange(this.uninitialize, this.dbfUrl))
+			if (Weave.detectChange(this.uninitializeObserver, this.dbfUrl))
 			{
 				this.dbfData = null;
 				this.dbfHeader = null;
 			}
-			if (Weave.detectChange(this.uninitialize, this.shpUrl))
+			if (Weave.detectChange(this.uninitializeObserver, this.shpUrl))
 			{
 				if (this.shpfile)
 					Weave.dispose(this.shpfile);
 				this.shpfile = null;
 			}
 		}
+		private uninitializeObserver=this.uninitialize.bind(this);
 
 		/* override */ protected initialize(forceRefresh:boolean = false):void
 		{
-			if (Weave.detectChange(this.initialize, this.dbfUrl) && this.dbfUrl.value)
+			if (Weave.detectChange(this.initializeObserver, this.dbfUrl) && this.dbfUrl.value)
 				WeaveAPI.URLRequestUtils.request(this, new URLRequest(this.dbfUrl.value))
 					.then(this.handleDBFDownload.bind(this, this.dbfUrl.value), this.handleDBFDownloadError.bind(this, this.dbfUrl.value));
-			if (Weave.detectChange(this.initialize, this.shpUrl) && this.shpUrl.value)
+			if (Weave.detectChange(this.initializeObserver, this.shpUrl) && this.shpUrl.value)
 				WeaveAPI.URLRequestUtils.request(this, new URLRequest(this.shpUrl.value))
 					.then(this.handleShpDownload.bind(this, this.shpUrl.value), this.handleShpDownloadError.bind(this, this.shpUrl.value));
 
 			// recalculate all columns previously requested because data may have changed.
 			super.initialize(true);
 		}
+		private initializeObserver = this.initialize.bind(this);
 
 		public /* readonly */ keyType:LinkableString = Weave.linkableChild(this, LinkableString);
 		public /* readonly */ keyColName:LinkableString = Weave.linkableChild(this, LinkableString);

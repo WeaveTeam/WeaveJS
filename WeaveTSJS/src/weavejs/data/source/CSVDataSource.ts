@@ -109,7 +109,7 @@ namespace weavejs.data.source
 		public /* readonly */ delimiter:LinkableString = Weave.linkableChild(this, new LinkableString(',', this.verifyDelimiter), this.parseRawData);
 
 		private verifyDelimiter(value:string):boolean { return value && value.length == 1 && value != '"'; }
-		
+
 		private parseRawData():void
 		{
 			if (!this.url.value)
@@ -121,7 +121,7 @@ namespace weavejs.data.source
 			if (this.url.error)
 				console.error(this.url.error);
 			
-			if (Weave.detectChange(this.parseRawData, this.delimiter))
+			if (Weave.detectChange(this.parseRawDataObserver, this.delimiter))
 			{
 				if (this.csvParser)
 					Weave.dispose(this.csvParser);
@@ -133,6 +133,7 @@ namespace weavejs.data.source
 			
 			this.csvParser.parseCSV(String(this.url.result || ''));
 		}
+		private parseRawDataObserver=this.parseRawData.bind(this);
 		
 		private csvParser:CSVParser;
 		
@@ -198,7 +199,7 @@ namespace weavejs.data.source
 		
 		private updateKeys(forced:boolean = false):void
 		{
-			var changed:boolean = Weave.detectChange(this.updateKeys, this.keyType, this.keyColumn);
+			var changed:boolean = Weave.detectChange(this.updateKeysObserver, this.keyType, this.keyColumn);
 			if (this.parsedRows && (forced || changed))
 			{
 				var colNames:string[] = this.parsedRows[0] || [];
@@ -222,6 +223,7 @@ namespace weavejs.data.source
 				(WeaveAPI.QKeyManager as QKeyManager).getQKeysAsync(this.keysCallbacks, this.keyType.value, keyStrings, () => this.handleUpdatedKeys(), this.keysArray);
 			}
 		}
+		private updateKeysObserver=this.updateKeys.bind(this);
 		
 		private handleUpdatedKeys():void
 		{
