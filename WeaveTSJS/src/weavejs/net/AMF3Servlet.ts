@@ -17,8 +17,9 @@ namespace weavejs.net
 {
 	import WeavePromise = weavejs.util.WeavePromise;
 	import Servlet = weavejs.net.Servlet;
+	import IAsyncService = weavejs.api.net.IAsyncService;
 
-	@Weave.classInfo({id: "weavejs.net.AMF3Servlet"})
+	@Weave.classInfo({id: "weavejs.net.AMF3Servlet", interfaces: [IAsyncService]})
 	export class AMF3Servlet extends Servlet
 	{
 		/**
