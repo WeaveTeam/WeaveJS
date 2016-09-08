@@ -176,7 +176,7 @@ namespace weavejs.geom
 			this.maxKDKey[GeometryStreamDecoder.XMIN_INDEX] = bounds.getXNumericMax();
 			this.maxKDKey[GeometryStreamDecoder.YMIN_INDEX] = bounds.getYNumericMax();
 			
-			var tiles:TileDescriptor[] = tileTree.queryRange(this.minKDKey, this.maxKDKey, true);
+			var tiles:TileDescriptor[] = tileTree.queryRange(this.minKDKey, this.maxKDKey, true) as TileDescriptor[];
 			tiles = tiles.filter(this._filterTiles);
 			StandardLib.sortOn(tiles, this._getMaxImportance, -1);
 			

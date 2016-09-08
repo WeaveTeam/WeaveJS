@@ -13,25 +13,33 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.geom
+namespace weavejs.geom
 {
-	import weavejs.util.ArrayUtils;
-	import weavejs.util.JS;
-	import weavejs.util.StandardLib;
-	
+	import ArrayUtils = weavejs.util.ArrayUtils;
+	import StandardLib = weavejs.util.StandardLib;
+
+	interface KDNodeParams<T>
+	{
+		parent?: KDNode<T>;
+		firstIndex?: int;
+		lastIndex?: int;
+		axis?: int;
+		side?: int;
+	}
 	/**
 	 * This class defines a K-Dimensional Tree.
 	 * 
 	 * @author adufilie
 	 */
-	public class KDTree/*/<T>/*/
+	@Weave.classInfo({id: "weavejs.geom.KDTree"})
+	export class KDTree<T>
 	{
 		/**
 		 * Constructs an empty KDTree with the given dimensionality.
 		 * 
 		 * TODO: add parameter for an Array of key,object pairs and create a balanced tree from those.
 		 */
-		public function KDTree(dimensionality:uint)
+		constructor(dimensionality:uint)
 		{
 			this.dimensionality = dimensionality;
 			if (dimensionality <= 0)
@@ -41,24 +49,24 @@ package weavejs.geom
 		/**
 		 * The dimensionality of the KDTree.
 		 */
-		private var dimensionality:int;
+		private dimensionality:int;
 		
 		/**
 		 * This is the root of the tree.
 		 */
-		private var rootNode:KDNode/*/<T>/*/ = null;
+		private rootNode:KDNode<T> = null;
 		
 		/**
 		 * This Array contains pointers to all nodes in the tree.
 		 */
-		private var allNodes:Array/*/<KDNode<T>>/*/ = [];
+		private allNodes:KDNode<T>[] = [];
 		
 		/**
 		 * The number of nodes in the tree.
 		 */
-		public function get nodeCount():int
+		public get nodeCount():int
 		{
-			return allNodes.length;
+			return this.allNodes.length;
 		}
 		
 		/**
@@ -66,15 +74,16 @@ package weavejs.geom
 		 * 
 		 * NOTE: Balancing a large tree is very slow, so this will not give any benefit if the tree changes often.
 		 */
-		public var autoBalance:Boolean = false; // should stay false except for special cases
+		public autoBalance:boolean = false; // should stay false except for special cases
 		
 		/**
 		 * This flag will be true if the tree needs to be balanced before querying.
 		 */
-		private var needsBalancing:Boolean = false;
-		
-		private var balanceStack:Array = [];
-		private const LEFT_SIDE:int = 0, RIGHT_SIDE:int = 1;
+		private needsBalancing:boolean = false;
+
+		private balanceStack:KDNodeParams<T>[] = [];
+		private static /* readonly */ LEFT_SIDE:int = 0;
+		private static /* readonly */ RIGHT_SIDE:int = 1;
 		/**
 		 * Balance the tree so there are an (approximately) equal number of points
 		 * on either side of any given node. A balanced tree yields faster query
@@ -82,58 +91,58 @@ package weavejs.geom
 		 * 
 		 * NOTE: Balancing a large tree is very slow, so this should not be called very often.
 		 */
-		public function balance():void
+		public balance():void
 		{
 			//trace("balance "+nodeCount+" nodes");
 			
 			// tree will be balanced after calling this function, so clear needsBalancing flag
-			needsBalancing = false;
+			this.needsBalancing = false;
 			// do nothing if there are no nodes
-			if (nodeCount == 0)
+			if (this.nodeCount == 0)
 				return;
-			var params:Object;
+			var params:KDNodeParams<T>;
 			var medianIndex:int, firstIndex:int, lastIndex:int;
-			var medianNode:KDNode;
+			var medianNode:KDNode<T>;
 			var nextAxis:int;
 			// begin by sorting the entire collection of nodes on the first dimension (axis)
 			var stackPos:int = 0;
-			balanceStack[0] = {parent: null, firstIndex: 0, lastIndex: allNodes.length - 1, axis: 0};
+			this.balanceStack[0] = {parent: null, firstIndex: 0, lastIndex: this.allNodes.length - 1, axis: 0};
 			while (stackPos >= 0)
 			{
 				// pop params off stack
-				params = balanceStack[stackPos] as Object;
-				balanceStack[stackPos] = null;
+				params = this.balanceStack[stackPos];
+				this.balanceStack[stackPos] = null;
 				stackPos--;
 				// get values from params
 				firstIndex = params.firstIndex;
 				lastIndex = params.lastIndex;
 				nextAxis = params.axis;
 				// set static variable used by the compareNodes function
-				compareNodesSortDimension = nextAxis;
+				KDTree.compareNodesSortDimension = nextAxis;
 				// get index of median node
-				medianIndex = ArrayUtils.getMedianIndex(allNodes, compareNodes, firstIndex, lastIndex);
+				medianIndex = ArrayUtils.getMedianIndex(this.allNodes, KDTree.compareNodes, firstIndex, lastIndex);
 				
 				//if (params.parent == null)
 				//	trace("sort "+nodes.length+" "+DebugUtils.getTime());
 				
 				// get median node and initialize split dimension
-				medianNode = allNodes[medianIndex];
+				medianNode = this.allNodes[medianIndex];
 				medianNode.clearChildrenAndSetSplitDimension(params.axis);
 				// add median node to tree according to params
 				if (params.parent == null)
-					rootNode = medianNode;
-				else if (params.side == LEFT_SIDE)
-					(params.parent as KDNode).left = medianNode;
+					this.rootNode = medianNode;
+				else if (params.side == KDTree.LEFT_SIDE)
+					Weave.AS(params.parent, KDNode).left = medianNode;
 				else // right side
-					(params.parent as KDNode).right = medianNode;
+					Weave.AS(params.parent, KDNode).right = medianNode;
 				// calculate split dimension for next group of nodes
-				nextAxis = (params.axis + 1) % dimensionality;
+				nextAxis = (params.axis + 1) % this.dimensionality;
 				// push params for balancing left side of median
 				if (medianIndex > firstIndex)
 				{
-					balanceStack[++stackPos] = {
+					this.balanceStack[++stackPos] = {
 						parent: medianNode,
-						side: LEFT_SIDE,
+						side: KDTree.LEFT_SIDE,
 						firstIndex: firstIndex,
 						lastIndex: medianIndex - 1,
 							axis: nextAxis
@@ -142,9 +151,9 @@ package weavejs.geom
 				if (medianIndex < lastIndex)
 				{
 					// push params for balancing right side of median
-					balanceStack[++stackPos] = {
+					this.balanceStack[++stackPos] = {
 						parent: medianNode,
-						side: RIGHT_SIDE,
+						side: KDTree.RIGHT_SIDE,
 						firstIndex: medianIndex + 1,
 							lastIndex: lastIndex,
 							axis: nextAxis
@@ -160,19 +169,19 @@ package weavejs.geom
 		 * @param object The object to insert in the tree.
 		 * @return A KDNode object that can be used as a parameter to the remove() function.
 		 */
-		public function insert(key:Array/*/<number>/*/, obj:/*/T/*/Object):KDNode/*/<T>/*/
+		public insert(key:number[], obj:T):KDNode<T>
 		{
-			if (key.length != dimensionality)
+			if (key.length != this.dimensionality)
 				throw new Error("KDTree.insert key parameter must have same dimensionality as tree");
 			
-			var newNode:KDNode;
-			if (autoBalance)
+			var newNode:KDNode<T>;
+			if (this.autoBalance)
 			{
 				// add the node to the list of all nodes
-				newNode = getUnusedNode(key, obj);
-				allNodes.push(newNode);
+				newNode = KDTree.getUnusedNode(key, obj);
+				this.allNodes.push(newNode);
 				// make sure the tree will balance itself before querying
-				needsBalancing = true;
+				this.needsBalancing = true;
 				return newNode;
 			}
 			
@@ -180,13 +189,13 @@ package weavejs.geom
 			if (obj == null)
 				return null;
 			// base case: if the tree is empty, store this key,object pair at the root node
-			if (rootNode == null)
+			if (this.rootNode == null)
 			{
-				rootNode = getUnusedNode(key, obj);
-				allNodes.push(rootNode);
-				return rootNode;
+				this.rootNode = KDTree.getUnusedNode(key, obj);
+				this.allNodes.push(this.rootNode);
+				return this.rootNode;
 			}
-			var node:KDNode = rootNode;
+			var node:KDNode<T> = this.rootNode;
 			while (true)
 			{
 				if (key[node.splitDimension] < node.location)
@@ -195,8 +204,8 @@ package weavejs.geom
 					if (node.left == null)
 					{
 						// no node to the left, insert there
-						node.left = getUnusedNode(key, obj, (node.splitDimension + 1) % dimensionality);
-						allNodes.push(node.left);
+						node.left = KDTree.getUnusedNode(key, obj, (node.splitDimension + 1) % this.dimensionality);
+						this.allNodes.push(node.left);
 						return node.left;
 					}
 					// go down the tree
@@ -207,7 +216,7 @@ package weavejs.geom
 					// identical key
 					if (node.siblings == null)
 						node.siblings = [];
-					newNode = getUnusedNode(key, obj, node.splitDimension);
+					newNode = KDTree.getUnusedNode(key, obj, node.splitDimension);
 					node.siblings.push(newNode);
 					return newNode;
 				}
@@ -217,29 +226,29 @@ package weavejs.geom
 					if (node.right == null)
 					{
 						// no node to the right, insert there
-						node.right = getUnusedNode(key, obj, (node.splitDimension + 1) % dimensionality);
-						allNodes.push(node.right);
+						node.right = KDTree.getUnusedNode(key, obj, (node.splitDimension + 1) % this.dimensionality);
+						this.allNodes.push(node.right);
 						return node.right;
 					}
 					// go down the tree
 					node = node.right;
 				}
 			}
-			throw "unreachable";
+			// throw "unreachable";
 		}
 		
 		/**
 		 * Remove a single node from the tree.
 		 * @param node The node to remove from the tree.
 		 */
-		public function remove(node:KDNode/*/<T>/*/):void
+		public remove(node:KDNode<T>):void
 		{
-			var index:int = allNodes.indexOf(node);
+			var index:int = this.allNodes.indexOf(node);
 			// stop if node not in tree
 			if (index < 0)
 				return;
 			// remove node from allNodes Array
-			allNodes.splice(index, 1);
+			this.allNodes.splice(index, 1);
 			//temporary solution: set object to null so it won't be returned in future query results
 			node.object = null;
 			//TODO: should restructure the tree by re-inserting descendants of this node.
@@ -248,23 +257,24 @@ package weavejs.geom
 		/**
 		 * Remove all nodes from the tree.
 		 */
-		public function clear():void
+		public clear():void
 		{
-			rootNode = null;
-			for (var i:int = allNodes.length; i--;)
-				saveUnusedNode(allNodes[i] as KDNode);
-			allNodes.length = 0; // clear references to nodes
+			this.rootNode = null;
+			for (var i:int = this.allNodes.length; i--;)
+				KDTree.saveUnusedNode(Weave.AS(this.allNodes[i], KDNode));
+			this.allNodes.length = 0; // clear references to nodes
 		}
 		
 		/**
 		 * used internally to keep track of the current traversal operation
 		 */
-		private var nodeStack:Array/*/<KDNode>/*/ = [];
+		private nodeStack:KDNode<T>[] = [];
 		
 		/**
 		 * Use these values for the sortDirection parameter of queryRange().
 		 */
-		public static const ASCENDING:String = "ascending", DESCENDING:String = "descending";
+		public static /* readonly */ ASCENDING:string = "ascending";
+		public static /* readonly */ DESCENDING:string = "descending";
 		
 		/**
 		 * @param minKey The minimum key values allowed for results of this query
@@ -274,42 +284,42 @@ package weavejs.geom
 		 * @param sortDirection Specify either ASCENDING or DESCENDING
 		 * @return An array of pointers to objects with K-Dimensional keys that fall between minKey and maxKey.
 		 */
-		public function queryRange(minKey:Array/*/<number>/*/, maxKey:Array/*/<number>/*/, boundaryInclusive:Boolean = true, sortDimension:int = -1, sortDirection:String = 'ascending'):Array/*/<T>/*/
+		public queryRange(minKey:number[], maxKey:number[], boundaryInclusive:boolean = true, sortDimension:int = -1, sortDirection:string = 'ascending'):(KDNode<T>|T)[]
 		{
-			var queryResult:Array = new Array();
-			if (minKey.length != dimensionality || maxKey.length != dimensionality)
+			var queryResult:(KDNode<T>|T)[] = new Array();
+			if (minKey.length != this.dimensionality || maxKey.length != this.dimensionality)
 				throw new Error("KDTree.queryRange parameters must have same dimensionality as tree");
 			
 			// if tree needs to be balanced before querying, balance it now
-			if (needsBalancing)
-				balance();
+			if (this.needsBalancing)
+				this.balance();
 			
 			var i:int;
 			
 			// make sure parameters are valid before continuing
-			var parametersAreValid:Boolean = true;
-			for (i = 0; i < dimensionality; i++)
+			var parametersAreValid:boolean = true;
+			for (i = 0; i < this.dimensionality; i++)
 				if (isNaN(minKey[i]) || isNaN(maxKey[i]))
 					parametersAreValid = false;
 			
-			var map_ignore:Object = new JS.Map();
+			var map_ignore = new Map<T, boolean>();
 			var resultCount:int = 0;
 			// only continue if root node is not null and rootNode location is defined
-			if (rootNode != null && !isNaN(rootNode.location) && parametersAreValid)
+			if (this.rootNode != null && !isNaN(this.rootNode.location) && parametersAreValid)
 			{
 				// declare temp variables
-				var inRange:Boolean;
-				var node:KDNode, sibling:KDNode, key:Array, keyVal:Number, dimension:int, location:Number;
+				var inRange:boolean;
+				var node:KDNode<T>, sibling:KDNode<T>, key:number[], keyVal:number, dimension:int, location:number;
 				// traverse the tree
 				// begin by putting the root node on the stack
 				var stackPos:int = 0;
-				nodeStack[0] = rootNode;
+				this.nodeStack[0] = this.rootNode;
 				// loop until the stack is empty
 				while (stackPos >= 0)
 				{
 					// pop a node off the stack (and clean up pointer)
-					node = nodeStack[stackPos];
-					nodeStack[stackPos] = null;
+					node = this.nodeStack[stackPos];
+					this.nodeStack[stackPos] = null;
 					stackPos--;
 					
 					key = node.key;
@@ -320,7 +330,7 @@ package weavejs.geom
 					{
 						// see if this node falls within query range
 						inRange = true;
-						for (i = 0; i < dimensionality; i++)
+						for (i = 0; i < this.dimensionality; i++)
 						{
 							keyVal = key[i];
 							if (boundaryInclusive == true)
@@ -346,15 +356,15 @@ package weavejs.geom
 							// if sort dimension is specified, add node to query result array
 							if (sortDimension >= 0)
 							{
-								queryResult[resultCount++] = node;
-								for each (sibling in node.siblings)
+								queryResult[resultCount++] = node as KDNode<T>;
+								for (sibling of node.siblings || [])
 								queryResult[resultCount++] = sibling;
 							}
 							else // if no sort dimension specified, add object to result array
 							{
-								queryResult[resultCount++] = node.object;
-								for each (sibling in node.siblings)
-								queryResult[resultCount++] = sibling.object;
+								queryResult[resultCount++] = node.object as T;
+								for (sibling of node.siblings || [])
+								queryResult[resultCount++] = sibling.object as T;
 							}
 							// avoid adding the object to the result more than once
 							map_ignore.set(node.object, true);
@@ -365,14 +375,14 @@ package weavejs.geom
 					if (node.left != null && !(minKey[dimension] > location)) // if location is NaN, '>' comparison is false
 					{
 						// push left child node on the stack
-						nodeStack[++stackPos] = node.left;
+						this.nodeStack[++stackPos] = node.left;
 					}
 					
 					// traverse right as long as there may be results on the right side of the splitting plane
 					if (node.right != null && !(maxKey[dimension] < location)) // if location is NaN, '<' comparison is false
 					{
 						// push right child node on the stack
-						nodeStack[++stackPos] = node.right;
+						this.nodeStack[++stackPos] = node.right;
 					}
 				}
 			}
@@ -382,13 +392,13 @@ package weavejs.geom
 			if (sortDimension >= 0)
 			{
 				KDTree.compareNodesSortDimension = sortDimension;
-				KDTree.compareNodesDescending = sortDirection == DESCENDING;
-				StandardLib.sortOn(queryResult, getNodeSortValue, compareNodesDescending ? -1 : 1);
+				KDTree.compareNodesDescending = sortDirection == KDTree.DESCENDING;
+				StandardLib.sortOn(queryResult, KDTree.getNodeSortValue, KDTree.compareNodesDescending ? -1 : 1);
 				
 				// replace nodes with objects in queryResult
 				i = resultCount;
 				while (i--)
-					queryResult[i] = (queryResult[i] as KDNode).object;
+					queryResult[i] = Weave.AS(queryResult[i], KDNode).object;
 			}
 			return queryResult;
 		}
@@ -396,34 +406,36 @@ package weavejs.geom
 		/**
 		 * This function is used to sort the results of queryRange().
 		 */
-		private static function getNodeSortValue(node:KDNode/*/<T>/*/):Number
+		private static getNodeSortValue<T>(node:KDNode<T>):number
 		{
-			return node.key[compareNodesSortDimension];
+			return node.key[KDTree.compareNodesSortDimension];
 		}
-		private static function compareNodes(node1:KDNode/*/<T>/*/, node2:KDNode/*/<T>/*/):int
+
+		private static compareNodes<T>(node1:KDNode<T>, node2:KDNode<T>):int
 		{
 			var result:int = StandardLib.numericCompare(
-				node1.key[compareNodesSortDimension],
-				node2.key[compareNodesSortDimension]
+				node1.key[KDTree.compareNodesSortDimension],
+				node2.key[KDTree.compareNodesSortDimension]
 			);
-			return compareNodesDescending ? -result : result;
+			return KDTree.compareNodesDescending ? -result : result;
 		}
-		private static var compareNodesSortDimension:int = 0;
-		private static var compareNodesDescending:Boolean = false;
+
+		private static compareNodesSortDimension:int = 0;
+		private static compareNodesDescending:boolean = false;
 		
 		
 		/**
 		 * This array contains nodes no longer in use.
 		 */
-		private static const unusedNodes:Array = [];
+		private static /* readonly */ unusedNodes:KDNode<any>[] = [];
 		/**
 		 * This function is used to save old nodes for later use.
 		 * @param node The node to save for later.
 		 */		
-		private static function saveUnusedNode(node:KDNode/*/<T>/*/):void
+		private static saveUnusedNode<T>(node:KDNode<T>):void
 		{
-			for each (var sibling:KDNode in node.siblings)
-			saveUnusedNode(sibling);
+			for (var sibling of node.siblings || [])
+			KDTree.saveUnusedNode(sibling);
 			// clear all pointers stored in node
 			node.object = null;
 			node.left = null;
@@ -431,20 +443,20 @@ package weavejs.geom
 			if (node.siblings)
 				node.siblings.length = 0;
 			// save node
-			unusedNodes.push(node);
+			KDTree.unusedNodes.push(node);
 		}
 		/**
 		 * This function uses object pooling to get an instance of KDNode.
 		 * @return Either a previously saved unused node, or a new node.
 		 */
-		private static function getUnusedNode(key:Array/*/<number>/*/, object:/*/T/*/Object, splitDimension:int = 0):KDNode/*/<T>/*/
+		private static getUnusedNode<T>(key:number[], object:T, splitDimension:int = 0):KDNode<T>
 		{
-			var node:KDNode;
+			var node:KDNode<T>;
 			// if no more unused nodes left, return new node
-			if (unusedNodes.length == 0)
-				node = new KDNode();
+			if (this.unusedNodes.length == 0)
+				node = new KDNode<T>();
 			else // get last unused node and remove from unusedNodes array
-				node = unusedNodes.pop() as KDNode;
+				node = Weave.AS(this.unusedNodes.pop(), KDNode);
 			// initialize node
 			var i:int = node.key.length = key.length;
 			while (i--)

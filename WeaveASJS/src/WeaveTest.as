@@ -70,7 +70,6 @@ import weavejs.core.LinkableString;
 	import weavejs.data.key.KeySetCallbackInterface;
 	import weavejs.data.key.KeySetUnion;
 	import weavejs.data.key.SortedKeySet;
-import weavejs.geom.KDTree;
 import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.geom.Range;
@@ -181,7 +180,6 @@ import weavejs.util.WeaveMenuItem;
 			IWeaveTreeNodeWithPathFinding,
 			LinkablePromise,
 			JSByteArray,
-			KDTree,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];
