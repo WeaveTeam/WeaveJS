@@ -114,7 +114,7 @@ package weavejs.data.key
 			}
 			
 			// last step - canonicalize session states containing ranges
-			if (_ranges)
+			if (_ranges || _regexps)
 			{
 				var newState:Array = [];
 				for each (value in state)
