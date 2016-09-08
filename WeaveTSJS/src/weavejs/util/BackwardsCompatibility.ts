@@ -1,83 +1,85 @@
-package weavejs.util
+namespace weavejs.util
 {
-	import weavejs.api.core.DynamicState;
-	import weavejs.core.LinkableHashMap;
-	import weavejs.core.LinkableString;
-	import weavejs.core.LinkableVariable;
-	import weavejs.path.ExternalTool;
+	import DynamicState = weavejs.api.core.DynamicState;
+	import LinkableHashMap = weavejs.core.LinkableHashMap;
+	import LinkableString = weavejs.core.LinkableString;
+	import LinkableVariable = weavejs.core.LinkableVariable;
+	import ExternalTool = weavejs.path.ExternalTool;
 
-	public class BackwardsCompatibility
+	export class BackwardsCompatibility
 	{
-		public static function forceDeprecatedState(classDef:Class):void
+		public static forceDeprecatedState(classDef:GenericClass):void
 		{
-			map_class_ignore.set(classDef, true);
+			BackwardsCompatibility.map_class_ignore.set(classDef, true);
 		}
 		
-		private static const map_class_ignore:Object = new JS.Map();
-		private static const CLASS:String = 'class';
+		private static /* readonly */ map_class_ignore = new Map<GenericClass, boolean>();
+		private static /* readonly */ CLASS:string = 'class';
 		
-		public static function updateSessionState(state:Object):Object
+		public static updateSessionState(state:{[key:string]: any}):{[key:string]: any}
 		{
-			var key:String;
+			var key:string;
 			if (!DynamicState.isDynamicStateArray(state))
 			{
 				if (typeof state === 'object')
 					for (key in state)
-						state[key] = updateSessionState(state[key]);
+						state[key] = BackwardsCompatibility.updateSessionState(state[key]);
 				return state;
 			}
 			
-			for each (var typedState:Object in state)
+			for (key in state)
 			{
-				var className:String = typedState[DynamicState.CLASS_NAME];
-				if (!classLookup.hasOwnProperty(className))
+				var typedState = state[key];
+				var className:string = typedState[DynamicState.CLASS_NAME];
+				if (!BackwardsCompatibility.classLookup.hasOwnProperty(className))
 					continue;
 
-				var classDef:Class = Weave.getDefinition(className);
+				var classDef:GenericClass = Weave.getDefinition(className);
 				
-				var externalToolClass:String = DynamicState.traverseState(typedState[DynamicState.SESSION_STATE], [CLASS]);
+				var externalToolClass:string = DynamicState.traverseState(typedState[DynamicState.SESSION_STATE], [BackwardsCompatibility.CLASS]);
 				if (classDef == ExternalTool && Weave.getDefinition(externalToolClass))
 				{
 					typedState[DynamicState.CLASS_NAME] = externalToolClass;
-					var newState:Object = {};
-					for each (var item:Object in typedState[DynamicState.SESSION_STATE])
+					var newState:{[key:string]: any} = {};
+					for (var key in typedState[DynamicState.SESSION_STATE])
 					{
-						var itemName:String = item[DynamicState.OBJECT_NAME];
-						if (itemName != CLASS)
+						var item = typedState[DynamicState.SESSION_STATE][key];
+						var itemName:string = item[DynamicState.OBJECT_NAME];
+						if (itemName != BackwardsCompatibility.CLASS)
 							newState[itemName] = item[DynamicState.SESSION_STATE];
 					}
 					typedState[DynamicState.SESSION_STATE] = newState;
 				}
 				
-				if (classDef && !map_class_ignore.get(classDef))
+				if (classDef && !BackwardsCompatibility.map_class_ignore.get(classDef))
 					continue;
 				
-				if (!classLookup[className])
+				if (!BackwardsCompatibility.classLookup[className])
 				{
 					typedState[DynamicState.CLASS_NAME] = Weave.className(LinkableVariable);
 					continue;
 				}
 				
 				typedState[DynamicState.CLASS_NAME] = Weave.className(LinkableHashMap);
-				var classNameState:Object = DynamicState.create(CLASS, Weave.className(LinkableString), className);
-				var childState:Object = typedState[DynamicState.SESSION_STATE];
+				var classNameState:{[key:string]: any} = DynamicState.create(BackwardsCompatibility.CLASS, Weave.className(LinkableString), className);
+				var childState:{[key:string]: any} = typedState[DynamicState.SESSION_STATE];
 				if (DynamicState.isDynamicStateArray(childState))
 				{
-					childState.unshift(classNameState);
+					(childState as any[]).unshift(classNameState);
 				}
 				else
 				{
-					var typedChildState:Array = [classNameState];
-					var childStateKeys:Array = JS.objectKeys(childState).sort();
-					for each (key in childStateKeys)
+					var typedChildState:any[] = [classNameState];
+					var childStateKeys:string[] = Object.keys(childState).sort();
+					for (var key of childStateKeys || [])
 					{
-						var propType:String = classLookup[className][key];
+						var propType:string = BackwardsCompatibility.classLookup[className][key];
 						if (propType)
 						{
 							// Hack - if the class name is an interface, remove the package and the "I" from the beginning to get the implementation.
 							if (propType.indexOf('weave.api.') == 0)
 							{
-								var name:String = propType.split('::').pop();
+								var name:string = propType.split('::').pop();
 								if (name.charAt(0) === 'I' && name.charAt(1) === name.charAt(1).toUpperCase())
 								{
 									name = name.substr(1);
@@ -87,17 +89,17 @@ package weavejs.util
 								}
 							}
 							
-							typedChildState.push(DynamicState.create(key, propType, updateSessionState(childState[key])));
+							typedChildState.push(DynamicState.create(key, propType, BackwardsCompatibility.updateSessionState(childState[key])));
 						}
 					}
 					childState = typedChildState;
 				}
-				typedState[DynamicState.SESSION_STATE] = updateSessionState(childState);
+				typedState[DynamicState.SESSION_STATE] = BackwardsCompatibility.updateSessionState(childState);
 			}
 			return state;
 		}
 		
-		public static const classLookup:Object = {
+		public static /* readonly */ classLookup:{[key:string]: any} = {
 			"weave.core::CallbackCollection": null,
 			"weave.core::ChildListCallbackInterface": {
 				"lastObjectAdded": "weave.api.core::ILinkableObject",

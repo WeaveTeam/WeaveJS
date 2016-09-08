@@ -74,9 +74,6 @@ import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
-	import weavejs.geom.LinkableBounds2D;
-	import weavejs.path.ExternalTool;
-	import weavejs.util.BackwardsCompatibility;
 	import weavejs.util.JS;
 import weavejs.util.JSByteArray;
 import weavejs.util.WeaveMenuItem;
@@ -151,16 +148,13 @@ import weavejs.util.WeaveMenuItem;
 			StringColumn,
 			StringLookup,
 			KeyColumn,
-			ExternalTool,
 			WeaveMenuItem,
 			ZoomBounds,
 			WeaveRootDataTreeNode,
 			TempHack_SolidLineStyle,
 			TempHack_SolidFillStyle,
 			EventCallbackCollection,
-			BackwardsCompatibility,
 			Range,
-			LinkableBounds2D,
 			DbfError,
 			DbfField,
 			DbfFilter,
