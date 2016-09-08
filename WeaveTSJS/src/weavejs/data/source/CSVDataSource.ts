@@ -133,7 +133,7 @@ namespace weavejs.data.source
 			
 			this.csvParser.parseCSV(String(this.url.result || ''));
 		}
-		private parseRawDataObserver=this.parseRawData.bind(this);
+		private parseRawDataObserver={};
 		
 		private csvParser:CSVParser;
 		
@@ -223,7 +223,7 @@ namespace weavejs.data.source
 				(WeaveAPI.QKeyManager as QKeyManager).getQKeysAsync(this.keysCallbacks, this.keyType.value, keyStrings, () => this.handleUpdatedKeys(), this.keysArray);
 			}
 		}
-		private updateKeysObserver=this.updateKeys.bind(this);
+		private updateKeysObserver={};
 		
 		private handleUpdatedKeys():void
 		{

@@ -110,7 +110,7 @@ namespace weavejs.data.source {
 			// recalculate all columns previously requested because data may have changed.
 			super.initialize(true);
 		}
-		private initializeObserver = this.initialize.bind(this);
+		private initializeObserver = {};
 		
 		private handleFile():void
 		{

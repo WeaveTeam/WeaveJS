@@ -100,7 +100,7 @@ namespace weavejs.data.source
 				this.shpfile = null;
 			}
 		}
-		private uninitializeObserver=this.uninitialize.bind(this);
+		private uninitializeObserver = {};
 
 		/* override */ protected initialize(forceRefresh:boolean = false):void
 		{
@@ -114,7 +114,7 @@ namespace weavejs.data.source
 			// recalculate all columns previously requested because data may have changed.
 			super.initialize(true);
 		}
-		private initializeObserver = this.initialize.bind(this);
+		private initializeObserver = {};
 
 		public /* readonly */ keyType:LinkableString = Weave.linkableChild(this, LinkableString);
 		public /* readonly */ keyColName:LinkableString = Weave.linkableChild(this, LinkableString);

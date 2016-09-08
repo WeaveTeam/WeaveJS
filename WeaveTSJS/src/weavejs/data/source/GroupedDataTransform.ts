@@ -189,7 +189,7 @@ namespace weavejs.data.source
 			}
 			return this._groupKeys;
 		}
-		private getGroupKeysObserver=this.getGroupKeys.bind(this);
+		private getGroupKeysObserver = {};
 	}
 }
 

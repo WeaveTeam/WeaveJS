@@ -208,7 +208,7 @@ namespace weavejs.data.source
 			
 			return this._rootNode;
 		}
-		private getHierarchyRootObserver=this.getHierarchyRoot.bind(this);
+		private getHierarchyRootObserver = {};
 
 		private handleRootId(triggerCount:number, result:number[]):void
 		{
