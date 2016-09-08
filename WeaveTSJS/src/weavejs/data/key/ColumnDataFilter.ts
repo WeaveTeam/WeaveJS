@@ -111,7 +111,7 @@ namespace weavejs.data.key
 			}
 			
 			// last step - canonicalize session states containing ranges
-			if (this._ranges)
+			if (this._ranges || this._regexps)
 			{
 				var newState:(string|number|IRegExpState|IRangeState)[] = [];
 				for (value of state)
@@ -119,7 +119,7 @@ namespace weavejs.data.key
 					if (typeof value === typeof 0 || typeof value === typeof "")
 						newState.push(value as number|string);
 				}
-				for (range of this._ranges)
+				for (range of this._ranges || [])
 				{
 					newState.push(range.getState());
 				}
