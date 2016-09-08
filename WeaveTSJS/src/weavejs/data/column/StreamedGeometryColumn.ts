@@ -110,7 +110,7 @@ namespace weavejs.data.column
 			else if (dataType as any == Number)
 			{
 				var sum:number = Weave.IS(value, Array) ? 0 : NaN;
-				for (var geom of (value as GeneralizedGeometry[]))
+				for (var geom of (value as GeneralizedGeometry[]) || [])
 					sum += geom.bounds.getArea();
 				value = sum as any;
 			}

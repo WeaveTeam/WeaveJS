@@ -13,22 +13,21 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.geom
+namespace weavejs.geom
 {
-	import weavejs.WeaveAPI;
-	import weavejs.api.core.ICallbackCollection;
-	import weavejs.api.core.ILinkableObject;
-	import weavejs.api.data.IQualifiedKey;
-	import weavejs.core.CallbackCollection;
-	import weavejs.geom.Bounds2D;
-	import weavejs.geom.GeneralizedGeometry;
-	import weavejs.geom.GeometryType;
-	import weavejs.geom.KDTree;
-	import weavejs.util.ArrayUtils;
-	import weavejs.util.Dictionary2D;
-	import weavejs.util.JS;
-	import weavejs.util.JSByteArray;
-	import weavejs.util.StandardLib;
+	import WeaveAPI = weavejs.WeaveAPI;
+	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import CallbackCollection = weavejs.core.CallbackCollection;
+	import Bounds2D = weavejs.geom.Bounds2D;
+	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
+	import GeometryType = weavejs.geom.GeometryType;
+	import KDTree = weavejs.geom.KDTree;
+	import ArrayUtils = weavejs.util.ArrayUtils;
+	import Dictionary2D = weavejs.util.Dictionary2D;
+	import JSByteArray = weavejs.util.JSByteArray;
+	import StandardLib = weavejs.util.StandardLib;
 
 	/**
 	 * This class provides functions for parsing a binary geometry stream.
@@ -45,63 +44,65 @@ package weavejs.geom
 	 * 
 	 * @author adufilie
 	 */
-	public class GeometryStreamDecoder implements ILinkableObject
+	@Weave.classInfo({id: "weavejs.geom.GeometryStreamDecoder"})
+	export class GeometryStreamDecoder implements ILinkableObject
 	{
-		public static var debug:Boolean = false;
-		public var totalGeomTiles:int = 0;
-		public var totalVertices:int = 0;
+		public static debug:boolean = false;
+		public totalGeomTiles:int = 0;
+		public totalVertices:int = 0;
 		
-		private var streamVersion:int = 0;
+		private streamVersion:int = 0;
 		
-		public function GeometryStreamDecoder()
+		constructor()
 		{
-			if (debug)
-				Weave.getCallbacks(this).addImmediateCallback(this, function():void { JS.log(totalGeomTiles,'geomTiles,',totalVertices,'vertices'); });
+			if (GeometryStreamDecoder.debug)
+				Weave.getCallbacks(this).addImmediateCallback(this, ():void => { console.log(this.totalGeomTiles,'geomTiles,', this.totalVertices, 'vertices'); });
 		}
 		
 		/**
 		 * This is an Array of GeneralizedGeometry objects that have been decoded from a stream.
 		 */
-		public const geometries:Array = [];
+		public geometries:GeneralizedGeometry[] = [];
 		
 		/**
 		 * This is the bounding box containing all tile boundaries.
 		 */
-		public const collectiveBounds:Bounds2D = new Bounds2D();
+		public collectiveBounds:Bounds2D = new Bounds2D();
 		
 		/**
 		 * This function sets the keyType of the keys that will be
 		 * added as a result of downloading the geometries.
 		 */		
-		public function set keyType(value:String):void
+		public set keyType(value:string)
 		{
-			_keyType = value;
+			this._keyType = value;
 		}
-		private var _keyType:String = null;
+
+		private _keyType:string = null;
 
 		/**
 		 * This is the set of geometry keys that have been decoded so far.
 		 */
-		public const keys:Array = [];
+		public /* readonly */ keys:IQualifiedKey[] = [];
 		
 		/**
 		 * These callbacks get called when the keys or bounds change.
 		 */
-		public const metadataCallbacks:ICallbackCollection = Weave.linkableChild(this, CallbackCollection);
+		public /* readonly */ metadataCallbacks:ICallbackCollection = Weave.linkableChild(this, CallbackCollection);
 
 		/**
 		 * This object maps a key to an array of geometries.
 		 */
-		private const map_key_geoms:Object = new JS.Map();
+		private /* readonly */ map_key_geoms = new Map<IQualifiedKey, GeneralizedGeometry[]>();
 
 		
 		/**
 		 * @param geometryKey A String identifier.
 		 * @return An Array of GeneralizedGeometry objects with keys matching the specified key. 
 		 */
-		public function getGeometriesFromKey(geometryKey:IQualifiedKey):Array/*/<GeneralizedGeometry>/*/
+		public getGeometriesFromKey(geometryKey:IQualifiedKey):GeneralizedGeometry[]
 		{
-			return map_key_geoms.get(geometryKey);
+			return this.map_key_geoms.get(geometryKey);
 		}
 
 		/**
@@ -110,26 +111,29 @@ package weavejs.geom
 		 * The dimensions are minImportance, maxImportance, xMin, yMin, xMax, yMax.
 		 * The objects contained in the KDNodes are integers representing tile ID numbers.
 		 */
-		private const metadataTiles:KDTree = Weave.disposableChild(this, new KDTree(KD_DIMENSIONALITY));
-		private const geometryTiles:KDTree = Weave.disposableChild(this, new KDTree(KD_DIMENSIONALITY));
+		private /* readonly */ metadataTiles:KDTree<TileDescriptor> = Weave.disposableChild(this, new KDTree<TileDescriptor>(GeometryStreamDecoder.KD_DIMENSIONALITY));
+		private /* readonly */ geometryTiles:KDTree<TileDescriptor> = Weave.disposableChild(this, new KDTree<TileDescriptor>(GeometryStreamDecoder.KD_DIMENSIONALITY));
 		
 		/**
 		 * (KDTree, int) -> TileDescriptor
 		 */
-		private const tileLookup:Dictionary2D = new Dictionary2D();
-		
+		private /* readonly */ tileLookup:Dictionary2D<KDTree<TileDescriptor>, int, TileDescriptor> = new Dictionary2D<KDTree<TileDescriptor>, int, TileDescriptor>();
+
+		// TODO these should be static variables
 		/**
 		 * These constants define indices in a KDKey corresponding to the different KDTree dimensions.
 		 */
-		private const XMIN_INDEX:int = 0, YMIN_INDEX:int = 1;
-		private const XMAX_INDEX:int = 2, YMAX_INDEX:int = 3;
-		private const IMAX_INDEX:int = 4;
-		private const KD_DIMENSIONALITY:int = 5;
+		private static /* readonly */ XMIN_INDEX:int = 0;
+		private static /* readonly */ YMIN_INDEX:int = 1;
+		private static /* readonly */ XMAX_INDEX:int = 2;
+		private static /* readonly */ YMAX_INDEX:int = 3;
+		private static /* readonly */ IMAX_INDEX:int = 4;
+		private static /* readonly */ KD_DIMENSIONALITY:int = 5;
 		/**
 		 * These KDKey arrays are created once and reused to avoid unnecessary creation of objects.
 		 */
-		private const minKDKey:Array = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
-		private const maxKDKey:Array = [Infinity, Infinity, Infinity, Infinity, Infinity];
+		private /* readonly */ minKDKey = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
+		private /* readonly */ maxKDKey = [Infinity, Infinity, Infinity, Infinity, Infinity];
 		
 		/**
 		 * These functions return an array of tiles that need to be downloaded in
@@ -137,90 +141,91 @@ package weavejs.geom
 		 * Tiles that have already been decoded from a stream will not be returned.
 		 * @return A list of tiles, sorted descending by maxImportance.
 		 */
-		public function getRequiredMetadataTileIDs(bounds:Bounds2D, minImportance:Number, removeTilesFromList:Boolean):Array
+		public getRequiredMetadataTileIDs(bounds:Bounds2D, minImportance:number, removeTilesFromList:boolean):number[]
 		{
-			return getRequiredTileIDs(metadataTiles, bounds, minImportance, removeTilesFromList);
+			return this.getRequiredTileIDs(this.metadataTiles, bounds, minImportance, removeTilesFromList);
 		}
-		public function getRequiredGeometryTileIDs(bounds:Bounds2D, minImportance:Number, removeTilesFromList:Boolean):Array
+		public getRequiredGeometryTileIDs(bounds:Bounds2D, minImportance:number, removeTilesFromList:boolean):number[]
 		{
-			return getRequiredTileIDs(geometryTiles, bounds, minImportance, removeTilesFromList);
+			return this.getRequiredTileIDs(this.geometryTiles, bounds, minImportance, removeTilesFromList);
 		}
 		
-		private function _filterTiles(tile:TileDescriptor, ..._):Boolean
+		private _filterTiles(tile:TileDescriptor):boolean
 		{
 			return !tile.exclude;
 		}
-		private function _tileToId(tile:TileDescriptor, ..._):int
+		private _tileToId(tile:TileDescriptor):int
 		{
 			return tile.tileID;
 		}
-		private function _getMaxImportance(tile:TileDescriptor):Number
+
+		private _getMaxImportance(tile:TileDescriptor):number
 		{
-			return tile.kdKey[IMAX_INDEX];
+			return tile.kdKey[GeometryStreamDecoder.IMAX_INDEX];
 		}
 		
-		private function getRequiredTileIDs(tileTree:KDTree, bounds:Bounds2D, minImportance:Number, removeTilesFromList:Boolean):Array
+		private getRequiredTileIDs(tileTree:KDTree<TileDescriptor>, bounds:Bounds2D, minImportance:number, removeTilesFromList:boolean):number[]
 		{
 			//JS.log("getRequiredTileIDs, minImportance="+minImportance);
 			// filter out tiles with maxImportance less than the specified minImportance
-			minKDKey[IMAX_INDEX] = minImportance;
+			this.minKDKey[GeometryStreamDecoder.IMAX_INDEX] = minImportance;
 			// set the minimum query values for xMax, yMax
-			minKDKey[XMAX_INDEX] = bounds.getXNumericMin();
-			minKDKey[YMAX_INDEX] = bounds.getYNumericMin();
+			this.minKDKey[GeometryStreamDecoder.XMAX_INDEX] = bounds.getXNumericMin();
+			this.minKDKey[GeometryStreamDecoder.YMAX_INDEX] = bounds.getYNumericMin();
 			// set the maximum query values for xMin, yMin
-			maxKDKey[XMIN_INDEX] = bounds.getXNumericMax();
-			maxKDKey[YMIN_INDEX] = bounds.getYNumericMax();
+			this.maxKDKey[GeometryStreamDecoder.XMIN_INDEX] = bounds.getXNumericMax();
+			this.maxKDKey[GeometryStreamDecoder.YMIN_INDEX] = bounds.getYNumericMax();
 			
-			var tiles:Array = tileTree.queryRange(minKDKey, maxKDKey, true);
-			tiles = tiles.filter(_filterTiles);
-			StandardLib.sortOn(tiles, _getMaxImportance, -1);
+			var tiles:TileDescriptor[] = tileTree.queryRange(this.minKDKey, this.maxKDKey, true);
+			tiles = tiles.filter(this._filterTiles);
+			StandardLib.sortOn(tiles, this._getMaxImportance, -1);
 			
 			if (removeTilesFromList)
-				for each (var tile:TileDescriptor in tiles)
+				for (var tile of tiles || [])
 					tile.exclude = true;
 			
-			return tiles.map(_tileToId);
+			return tiles.map(this._tileToId);
 		}
 
 		/**
 		 * This function will decode a tile list stream.
 		 * @param stream A list of metadata tiles encoded in a ByteArray stream.
 		 */
-		public function decodeMetadataTileList(stream:JSByteArray):void
+		public  decodeMetadataTileList(stream:JSByteArray):void
 		{
-			decodeTileList(metadataTiles, stream);
+			this.decodeTileList(this.metadataTiles, stream);
 		}
 		/**
 		 * This function will decode a tile list stream.
 		 * @param stream A list of geometry tiles encoded in a ByteArray stream.
 		 */
-		public function decodeGeometryTileList(stream:JSByteArray):void
+		public decodeGeometryTileList(stream:JSByteArray):void
 		{
-			decodeTileList(geometryTiles, stream);
+			this.decodeTileList(this.geometryTiles, stream);
 		}
 		/**
 		 * @private
 		 */
-		private function decodeTileList(tileTree:KDTree, stream:JSByteArray):void
+		private decodeTileList(tileTree:KDTree<TileDescriptor>, stream:JSByteArray):void
 		{
-			var tiles:Array = []; // array of descriptor objects containing kdKey and tileID
+			var tiles:TileDescriptor[] = []; // array of descriptor objects containing kdKey and tileID
 			// read tile descriptors from stream
 			var tileID:int = 0;
 			while (stream.position < stream.length)
 			{
-				var kdKey:Array = new Array(KD_DIMENSIONALITY);
-				kdKey[XMIN_INDEX] = stream.readDouble();
-				kdKey[YMIN_INDEX] = stream.readDouble();
-				kdKey[XMAX_INDEX] = stream.readDouble();
-				kdKey[YMAX_INDEX] = stream.readDouble();
-				kdKey[IMAX_INDEX] = stream.readFloat();
+				var kdKey:number[] = new Array(GeometryStreamDecoder.KD_DIMENSIONALITY);
+				kdKey[GeometryStreamDecoder.XMIN_INDEX] = stream.readDouble();
+				kdKey[GeometryStreamDecoder.YMIN_INDEX] = stream.readDouble();
+				kdKey[GeometryStreamDecoder.XMAX_INDEX] = stream.readDouble();
+				kdKey[GeometryStreamDecoder.YMAX_INDEX] = stream.readDouble();
+				kdKey[GeometryStreamDecoder.IMAX_INDEX] = stream.readFloat();
 				if (stream.position > stream.length)
 					throw new Error("Unexpected EOF in stream");
-				if (debug)
-					JS.log((tileTree == metadataTiles ? "metadata tile" : "geometry tile") + " " + tileID + "[" + kdKey + "]");
+				if (GeometryStreamDecoder.debug)
+					console.log((tileTree == this.metadataTiles ? "metadata tile" : "geometry tile") + " " + tileID + "[" + kdKey + "]");
 				tiles.push(new TileDescriptor(kdKey, tileID));
-				collectiveBounds.includeCoords(kdKey[XMIN_INDEX], kdKey[YMIN_INDEX]);
-				collectiveBounds.includeCoords(kdKey[XMAX_INDEX], kdKey[YMAX_INDEX]);
+				this.collectiveBounds.includeCoords(kdKey[GeometryStreamDecoder.XMIN_INDEX], kdKey[GeometryStreamDecoder.YMIN_INDEX]);
+				this.collectiveBounds.includeCoords(kdKey[GeometryStreamDecoder.XMAX_INDEX], kdKey[GeometryStreamDecoder.YMAX_INDEX]);
 				tileID++;
 			}
 			
@@ -228,39 +233,38 @@ package weavejs.geom
 			// poorly-performing KDTree structure due to the given ordering.
 			ArrayUtils.randomSort(tiles);
 			// insert tileDescriptors into tree
-			for each (var tile:TileDescriptor in tiles)
+			for (var tile of tiles || [])
 			{
 				// insert a new node in the tree, mapping kdKey to tile
 				tileTree.insert(tile.kdKey, tile);
 				// save mapping from tile ID to TileDescriptor so it can be excluded later
-				tileLookup.set(tileTree, tile.tileID, tile);
+				this.tileLookup.set(tileTree, tile.tileID, tile);
 			}
 
 			// collective bounds changed
 			
 			// Weave automatically triggers callbacks when all tasks complete
-			if (!Weave.isBusy(metadataCallbacks))
-				metadataCallbacks.triggerCallbacks();
+			if (!Weave.isBusy(this.metadataCallbacks))
+				this.metadataCallbacks.triggerCallbacks();
 		}
 
-		private var _projectionWKT:String = ""; // stores the well-known-text defining the projection
+		private _projectionWKT:string = ""; // stores the well-known-text defining the projection
 		
 		
 		/**
 		 * This value specifies the type of the geometries currently being streamed
 		 */
 		
-		private var _currentGeometryType:String = GeometryType.POLYGON;
-		private function setGeometryType(value:String):void
+		private _currentGeometryType:string = GeometryType.POLYGON;
+		private setGeometryType(value:string):void
 		{
-			if (_currentGeometryType == value)
+			if (this._currentGeometryType == value)
 				return;
 			
-			_currentGeometryType = value;
+			this._currentGeometryType = value;
 			
 			//TEMPORARY SOLUTION -- copy type to all existing geometries
-			var geom:GeneralizedGeometry;
-			for each (geom in geometries)
+			for (var geom of this.geometries || [])
 				if (geom != null)
 					geom.geomType = value;
 		}
@@ -269,9 +273,9 @@ package weavejs.geom
 		 * This extracts metadata from a ByteArray.
 		 * Callbacks are triggered when all active decoding tasks are completed.
 		 */
-		public function decodeMetadataStream(stream:JSByteArray):void
+		public decodeMetadataStream(stream:JSByteArray):void
 		{
-			var task:Function = function(stopTime:int):Number
+			var task = (stopTime:int):number =>
 			{
 				//JS.log("decodeMetadataStream",_queuedStreamDictionary[stream],hex(stream));
 		    	// declare temp variables
@@ -288,48 +292,48 @@ package weavejs.geom
 					if (flag < 0) // flag is negativeTileID
 					{
 						var tileID:int = (-1 - flag); // decode negativeTileID
-						var tile:TileDescriptor = tileLookup.get(metadataTiles, tileID);
+						var tile:TileDescriptor = this.tileLookup.get(this.metadataTiles, tileID);
 						if (tile)
 						{
 							tile.exclude = true;
 							
 							flag = stream.readInt();
 							if (flag < 0)
-								streamVersion = -flag;
+								this.streamVersion = -flag;
 							else
 								stream.position -= 4; // version 0; rewind
 
-							if (debug)
-								JS.log("got metadata tileID=" + tileID + "; "+stream.position+'/'+stream.length);
+							if (GeometryStreamDecoder.debug)
+								console.log("got metadata tileID=" + tileID + "; "+stream.position+'/'+stream.length);
 						}
 						else
 						{
 							// something went wrong
 							// either the tileDescriptors were not requested yet,
 							// or the service is returning incorrect data.
-							JS.error("ERROR! decodeMetadataStream(): tileID "+tileID+" is out of range");
+							console.error("ERROR! decodeMetadataStream(): tileID "+tileID+" is out of range");
 							break;
 						}
 						
 						// allow resuming later after finding a tileID.
-						if (JS.now() > stopTime)
+						if (Date.now() > stopTime)
 							return stream.position / stream.length;
 					}
 					else // flag is geometryID
 					{
 						geometryID = flag;
 						// read geometry key (null-terminated string)
-						key = WeaveAPI.QKeyManager.getQKey(_keyType, readString(stream));
+						key = WeaveAPI.QKeyManager.getQKey(this._keyType, this.readString(stream));
 						// initialize geometry at geometryID
-						geometry = geometries[geometryID] as GeneralizedGeometry;
+						geometry = Weave.AS(this.geometries[geometryID], GeneralizedGeometry);
 						if (!geometry)
-							geometries[geometryID] = geometry = new GeneralizedGeometry(_currentGeometryType);
+							this.geometries[geometryID] = geometry = new GeneralizedGeometry(this._currentGeometryType);
 						// save mapping from key to geom
-						var geomsForKey:Array = map_key_geoms.get(key);
+						var geomsForKey = this.map_key_geoms.get(key);
 						if (!geomsForKey)
 						{
-							keys.push(key); // keep track of unique keys
-							map_key_geoms.set(key, geomsForKey = []);
+							this.keys.push(key); // keep track of unique keys
+							this.map_key_geoms.set(key, geomsForKey = []);
 						}
 						geomsForKey.push(geometry);
 						// read bounds xMin, yMin, xMax, yMax
@@ -358,9 +362,9 @@ package weavejs.geom
 						// if flag is < -1, it means the shapeType follows
 						if (vertexID < -1)
 						{
-							readShapeType(stream);
+							this.readShapeType(stream);
 							if (vertexID < -2)
-								_projectionWKT = readString(stream);
+								this._projectionWKT = this.readString(stream);
 						}
 					}
 				}
@@ -370,10 +374,10 @@ package weavejs.geom
 			
 			// Weave automatically triggers callbacks when all tasks complete
 			// high priority because metadata affects keys and keys are a prerequisite for many things
-			WeaveAPI.Scheduler.startTask(metadataCallbacks, task, WeaveAPI.TASK_PRIORITY_HIGH);
+			WeaveAPI.Scheduler.startTask(this.metadataCallbacks, task, WeaveAPI.TASK_PRIORITY_HIGH);
 		}
 		
-		private function readShapeType(stream:JSByteArray):void
+		private readShapeType(stream:JSByteArray):void
 		{
 			/*
 			0 	Null Shape 	Empty ST_Geometry
@@ -400,23 +404,23 @@ package weavejs.geom
 					//MultiPoint
 				case 8:
 				case 28:
-					setGeometryType(GeometryType.POINT);
+					this.setGeometryType(GeometryType.POINT);
 					break;
 				//PolyLine
 				case 3:
 				case 23:
-					setGeometryType(GeometryType.LINE);
+					this.setGeometryType(GeometryType.LINE);
 					break;
 				//Polygon
 				case 5:
 				case 25:
-					setGeometryType(GeometryType.POLYGON);
+					this.setGeometryType(GeometryType.POLYGON);
 					break;
 				default:
 			}
 		}
 		
-		private function readString(stream:JSByteArray):String
+		private readString(stream:JSByteArray):string
 		{
 			var start:int = stream.position;
 			while (stream.position < stream.length)
@@ -427,7 +431,7 @@ package weavejs.geom
 			}
 			var end:int = stream.position - 1;
 			stream.position = start;
-			var str:String = stream.readUTFBytes(end - start);
+			var str:string = stream.readUTFBytes(end - start);
 			stream.position = end + 1;
 			return str;
 		}
@@ -436,9 +440,9 @@ package weavejs.geom
 		 * This extracts points from a ByteArray.
 		 * Callbacks are triggered when all active decoding tasks are completed.
 		 */
-		public function decodeGeometryStream(stream:JSByteArray):void
+		public decodeGeometryStream(stream:JSByteArray):void
 		{
-			var task:Function = function(stopTime:int):Number
+			var task = (stopTime:int):number =>
 			{
 				//JS.log("decodeGeometryStream",_queuedStreamDictionary[stream],hex(stream));
 		    	// declare temp variables
@@ -446,7 +450,7 @@ package weavejs.geom
 				var flag:int;
 				var geometryID:int;
 				var vertexID:int;
-				var x:Number, y:Number, importance:Number = 0;
+				var x:number, y:number, importance:number = 0;
 				// read objects from stream
 				while (stream.position < stream.length)
 				{
@@ -454,68 +458,68 @@ package weavejs.geom
 					//JS.log("flag",flag);
 					if (flag < 0) // flag is negativeTileID
 					{
-						totalGeomTiles++;
+						this.totalGeomTiles++;
 						
 						var tileID:int = (-1 - flag); // decode negativeTileID
-						var tile:TileDescriptor = tileLookup.get(geometryTiles, tileID);
+						var tile:TileDescriptor = this.tileLookup.get(this.geometryTiles, tileID);
 						if (tile)
 						{
 							tile.exclude = true;
 
 							flag = stream.readInt();
 							if (flag < 0)
-								streamVersion = -flag;
+								this.streamVersion = -flag;
 							else
 								stream.position -= 4; // version 0; rewind
 
-							if (debug)
-								JS.log("got geometry tileID=" + tileID + "; "+stream.length);
+							if (GeometryStreamDecoder.debug)
+								console.log("got geometry tileID=" + tileID + "; "+stream.length);
 						}
 						else
 						{
 							// something went wrong
 							// either the tileDescriptors were not requested yet,
 							// or the service is returning incorrect data.
-							JS.error("ERROR! decodeGeometryStream(): tileID "+tileID+" is out of range");
+							console.error("ERROR! decodeGeometryStream(): tileID "+tileID+" is out of range");
 							break;
 						}
 						
 						// allow resuming later after finding a tileID.
-						if (JS.now() > stopTime)
+						if (Date.now() > stopTime)
 							return stream.position / stream.length;
 					}
 					else // flag is geometryID
 					{
-						totalVertices++;
+						this.totalVertices++;
 						
 						geometryID = flag;
 						// reset lists of IDs
-						geometryIDArray.length = 0;
-						vertexIDArray.length = 0;
-						geometryIDArray.push(geometryID); // save first geometryID
+						GeometryStreamDecoder.geometryIDArray.length = 0;
+						GeometryStreamDecoder.vertexIDArray.length = 0;
+						GeometryStreamDecoder.geometryIDArray.push(geometryID); // save first geometryID
 						while (stream.position < stream.length)
 						{
 							vertexID = stream.readInt(); // read vertexID for current geometryID
 							if (vertexID < 0)
 							{
 								vertexID = (-1 - vertexID); // decode negativeVertexID
-								vertexIDArray.push(vertexID); // save vertexID for previous geometryID 
+								GeometryStreamDecoder.vertexIDArray.push(vertexID); // save vertexID for previous geometryID
 								break; // this was the last vertexID
 							}
- 							vertexIDArray.push(vertexID); // save vertexID for previous geometryID
+							GeometryStreamDecoder.vertexIDArray.push(vertexID); // save vertexID for previous geometryID
  							geometryID = stream.readInt(); // read next geometryID
 							if (geometryID == -2) // polygon marker (v2) ?
-								vertexIDArray.push(stream.readInt()); // read end-of-part vertexID
+								GeometryStreamDecoder.vertexIDArray.push(stream.readInt()); // read end-of-part vertexID
 							if (geometryID < 0) // polygon marker (v1 or v2)?
 								break;
-							geometryIDArray.push(geometryID); // save next geometryID
+							GeometryStreamDecoder.geometryIDArray.push(geometryID); // save next geometryID
 						}
 						
 						if (geometryID < 0)
 						{
 							importance = geometryID; // used as flag for polygon marker
-							if (vertexIDArray.length == 1)
-								vertexIDArray.unshift(0);
+							if (GeometryStreamDecoder.vertexIDArray.length == 1)
+								GeometryStreamDecoder.vertexIDArray.unshift(0);
 						}
 						else
 						{
@@ -529,18 +533,18 @@ package weavejs.geom
 						}
 
 						// save vertex in all corresponding geometries
-						for (i = geometryIDArray.length; i--;)
+						for (i = GeometryStreamDecoder.geometryIDArray.length; i--;)
 						{
 							//JS.log("geom "+geometryIDArray[i]+" insert "+vertexIDArray[i]+" "+importance+" "+x+" "+y);
-							geometryID = geometryIDArray[i];
-							vertexID = vertexIDArray[i];
+							geometryID = GeometryStreamDecoder.geometryIDArray[i];
+							vertexID = GeometryStreamDecoder.vertexIDArray[i];
 							
-							var geometry:GeneralizedGeometry = geometries[geometryID] as GeneralizedGeometry;
+							var geometry:GeneralizedGeometry = Weave.AS(this.geometries[geometryID], GeneralizedGeometry);
 							if (!geometry)
-								geometries[geometryID] = geometry = new GeneralizedGeometry(_currentGeometryType);
+								this.geometries[geometryID] = geometry = new GeneralizedGeometry(this._currentGeometryType);
 							
 							if (importance < 0) // part marker
-								geometry.addPartMarker(vertexID, vertexIDArray[i + 1]);
+								geometry.addPartMarker(vertexID, GeometryStreamDecoder.vertexIDArray[i + 1]);
 							else
 								geometry.addPoint(vertexID, importance, x, y);
 						}
@@ -557,8 +561,8 @@ package weavejs.geom
 
 		
 		// reusable temporary objects to reduce GC activity
-		private static const geometryIDArray:Array = []; // temporary list of geometryIDs
-		private static const vertexIDArray:Array = []; // temporary list of vertexIDs
+		private static /* readonly */ geometryIDArray:number[] = []; // temporary list of geometryIDs
+		private static /* readonly */ vertexIDArray:number[] = []; // temporary list of vertexIDs
 		
 		/*
 		private static function hex(bytes:JSByteArray):String
@@ -576,5 +580,18 @@ package weavejs.geom
 			return result;
 		}
 		*/
+	}
+
+	class TileDescriptor
+	{
+		constructor(kdKey:number[], tileID:int)
+		{
+			this.kdKey = kdKey;
+			this.tileID = tileID;
+		}
+
+		public kdKey:number[];
+		public tileID:int;
+		public exclude:boolean = false;
 	}
 }
