@@ -61,7 +61,7 @@ import weavejs.core.LinkableString;
 	import weavejs.data.column.SortedIndexColumn;
 	import weavejs.data.column.StringColumn;
 	import weavejs.data.column.StringLookup;
-	import weavejs.data.hierarchy.WeaveRootDataTreeNode;
+	import weavejs.data.hierarchy.WeaveTreeDescriptorNode;
 	import weavejs.data.key.DynamicKeyFilter;
 	import weavejs.data.key.DynamicKeySet;
 	import weavejs.data.key.FilteredKeySet;
@@ -150,7 +150,6 @@ import weavejs.util.WeaveMenuItem;
 			KeyColumn,
 			WeaveMenuItem,
 			ZoomBounds,
-			WeaveRootDataTreeNode,
 			TempHack_SolidLineStyle,
 			TempHack_SolidFillStyle,
 			EventCallbackCollection,
@@ -174,6 +173,7 @@ import weavejs.util.WeaveMenuItem;
 			IWeaveTreeNodeWithPathFinding,
 			LinkablePromise,
 			JSByteArray,
+			WeaveTreeDescriptorNode,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];
