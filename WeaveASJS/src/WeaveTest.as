@@ -70,7 +70,6 @@ import weavejs.core.LinkableString;
 	import weavejs.data.key.KeySetCallbackInterface;
 	import weavejs.data.key.KeySetUnion;
 	import weavejs.data.key.SortedKeySet;
-import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
@@ -151,7 +150,6 @@ import weavejs.util.WeaveMenuItem;
 			WeaveMenuItem,
 			ZoomBounds,
 			TempHack_SolidLineStyle,
-			TempHack_SolidFillStyle,
 			EventCallbackCollection,
 			Range,
 			DbfError,

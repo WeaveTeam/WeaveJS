@@ -29,7 +29,6 @@ package
 	import weavejs.data.CSVParser;
 	import weavejs.data.StatisticsCache;
 	import weavejs.data.key.QKeyManager;
-	import weavejs.geom.TempHack_SolidFillStyle;
 	import weavejs.geom.TempHack_SolidLineStyle;
 
 public class WeaveJS
@@ -78,7 +77,6 @@ public class WeaveJS
 			var IDataSource_Service:Class = IDataSource;
 			var IDataSource_Transform:Class = IDataSource;
 
-			Weave.setClassInfo(TempHack_SolidFillStyle, {id: "ExtendedFillStyle"});
 			Weave.setClassInfo(TempHack_SolidLineStyle, {id: "ExtendedLineStyle"});
 			
 			// TEMPORARY
