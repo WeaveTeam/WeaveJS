@@ -1,5 +1,5 @@
 new WeaveJS().start();
-console.log(weavejs);
+//console.log(weavejs);
 var weavejs = weavejs || {};
 weavejs.util = weavejs.util || {};
 weavejs.util.DateUtils = weavejs.util.DateUtils || {};

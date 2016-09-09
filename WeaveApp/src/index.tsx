@@ -45,13 +45,13 @@ function embed(element:string|Element, weave:Weave, sessionUrl?:string, path?:st
 $(function ()
 {
 	var weave_elements = $(".weave");
-	console.log(weave_elements);
+	//console.log(weave_elements);
 	weave_elements.map((index, weave_element) => {
 		var weave_instance:Weave;
 		var appMode = $(weave_element).data("appmode");
 		var sessionUrl = $(weave_element).data("sessionurl");
 		var path = $(weave_element).data("path");
-		console.log(appMode, sessionUrl, path);
+		//console.log(appMode, sessionUrl, path);
 		weave_instance = map_session_url_instance.get(sessionUrl);
 		if(!weave_instance)
 		{

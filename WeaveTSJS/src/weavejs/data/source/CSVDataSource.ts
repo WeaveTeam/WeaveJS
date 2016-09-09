@@ -479,7 +479,6 @@ namespace weavejs.data.source
 		}
 		private getColumnNodeLabel(node:any/*ColumnTreeNode*/):string
 		{
-			console.log(node);
 			var title:string = node.data[ColumnMetadata.TITLE] || node.data[CSVDataSource.METADATA_COLUMN_NAME];
 			if (!title && node.data['name'])
 			{
