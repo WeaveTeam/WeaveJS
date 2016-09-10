@@ -31,7 +31,9 @@ namespace weavejs.data.source {
 	import ResponseType = weavejs.net.ResponseType;
 	import ArrayUtils = weavejs.util.ArrayUtils;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import IColumnReference = weavejs.api.data.IColumnReference;
 	import JS = weavejs.util.JS;
+	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 	
 	@Weave.classInfo({id: "weavejs.data.source.GeoJSONDataSource", interfaces: [IDataSource]})
 	export class GeoJSONDataSource extends AbstractDataSource
@@ -151,14 +153,14 @@ namespace weavejs.data.source {
 		/**
 		 * Gets the root node of the attribute hierarchy.
 		 */
-		/*override*/ public getHierarchyRoot():IWeaveTreeNode & weavejs.api.data.IColumnReference
+		/*override*/ public getHierarchyRoot():IWeaveTreeNode & IColumnReference
 		{
 			if (!Weave.IS(this._rootNode, GeoJSONDataSourceNode))
 			{
-				var meta:{[key:string]:string} = {};
-				meta[ColumnMetadata.TITLE] = this.getLabel();
+				var meta:IColumnMetadata = {};
+				meta.title = this.getLabel();
 				
-				var rootChildren:IWeaveTreeNode[] = [];
+				var rootChildren:(IWeaveTreeNode&IColumnReference)[] = [];
 				if (this.jsonData)
 				{
 					// include empty string for the geometry column
@@ -172,7 +174,7 @@ namespace weavejs.data.source {
 			return this._rootNode;
 		}
 		
-		/*override*/ protected generateHierarchyNode(metadata:{[key:string]:string}|string):IWeaveTreeNode
+		/*override*/ protected generateHierarchyNode(metadata:{[key:string]:string}|string):IWeaveTreeNode&IColumnReference
 		{
 			if (metadata == null || !this.jsonData)
 				return null;

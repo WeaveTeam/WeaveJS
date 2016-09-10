@@ -172,7 +172,7 @@ namespace weavejs.data.source
 			return this._rootNode;
 		}
 
-		/* override */ protected generateHierarchyNode(metadata:IDBFColumnMetadata):IWeaveTreeNode
+		/* override */ protected generateHierarchyNode(metadata:IDBFColumnMetadata):IWeaveTreeNode&IColumnReference
 		{
 			if (!metadata)
 				return null;

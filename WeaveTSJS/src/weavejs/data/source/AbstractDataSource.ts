@@ -29,6 +29,7 @@ namespace weavejs.data.source
 	import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 	import DebugUtils = weavejs.util.DebugUtils;
 	import JS = weavejs.util.JS;
+	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 	
 	/**
 	 * This is a base class to make it easier to develope a new class that implements IDataSource.
@@ -120,7 +121,7 @@ namespace weavejs.data.source
 		 * @param metadata A set of metadata that may identify a column in this IDataSource.
 		 * @return A node that contains the metadata.
 		 */
-		/* abstract */ protected generateHierarchyNode(metadata:Object):IWeaveTreeNode { return null; }
+		/* abstract */ protected generateHierarchyNode(metadata:IColumnMetadata):IWeaveTreeNode&IColumnReference { return null; }
 		
 		/**
 		 * Classes that extend AbstractDataSource can define their own replacement for this function.
@@ -174,7 +175,7 @@ namespace weavejs.data.source
 		 * @param metadata An object that contains all the information required to request the column from this IDataSource. 
 		 * @return A ProxyColumn object that will be updated when the column data is ready.
 		 */
-		public generateNewAttributeColumn(metadata:Object):IAttributeColumn
+		public generateNewAttributeColumn(metadata:IColumnMetadata):IAttributeColumn
 		{
 			var proxyColumn:ProxyColumn = Weave.disposableChild(this, ProxyColumn);
 			proxyColumn.setMetadata(metadata);

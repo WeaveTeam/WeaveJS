@@ -13,15 +13,16 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data.hierarchy
+namespace weavejs.data.hierarchy
 {
-    import weavejs.api.data.ColumnMetadata;
-    import weavejs.api.data.IColumnReference;
-    import weavejs.api.data.IDataSource;
-    import weavejs.api.data.IWeaveTreeNode;
-    import weavejs.api.data.IWeaveTreeNodeWithPathFinding;
-    import weavejs.data.hierarchy.HierarchyUtils;
-    import weavejs.util.StandardLib;
+    import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+    import IColumnReference = weavejs.api.data.IColumnReference;
+    import IDataSource = weavejs.api.data.IDataSource;
+    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+    import IWeaveTreeNodeWithPathFinding = weavejs.api.data.IWeaveTreeNodeWithPathFinding;
+    import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
+    import StandardLib = weavejs.util.StandardLib;
+	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 
 	/**
 	 * A node in a tree whose leaves identify attribute columns.
@@ -31,7 +32,8 @@ package weavejs.data.hierarchy
 	 * The following properties are used by ColumnTreeNode but not for equality comparison:<br>
 	 * <code>label, children, hasChildBranches</code><br>
 	 */
-	[RemoteClass] public class ColumnTreeNode extends WeaveTreeDescriptorNode implements IWeaveTreeNodeWithPathFinding, IColumnReference
+	@Weave.classInfo({id: "weavejs.data.hierarchy", interfaces: [IWeaveTreeNodeWithPathFinding, IColumnReference]})
+	export class ColumnTreeNode extends WeaveTreeDescriptorNode implements IWeaveTreeNodeWithPathFinding, IColumnReference
 	{
 		/**
 		 * The <code>data</code> parameter is used for column metadata on leaf nodes.
@@ -43,38 +45,38 @@ package weavejs.data.hierarchy
 		 *               The <code>dataSource</code> property is required.
 		 *               If no <code>dependency</code> property is given, <code>dataSource.hierarchyRefresh</code> will be used as the dependency.
 		 */
-		public function ColumnTreeNode(params:Object)
+		constructor(params:Object)
 		{
 			super(params);
 			
-			childItemClass = ColumnTreeNode;
+			this.childItemClass = ColumnTreeNode;
 			
 			if (!params || !params.hasOwnProperty('dataSource'))
 				throw new Error('ColumnTreeNode constructor: "dataSource" parameter is required');
-			if (!dependency && dataSource)
-				dependency = dataSource.hierarchyRefresh;
+			if (!this.dependency && this.dataSource)
+				this.dependency = this.dataSource.hierarchyRefresh;
 		}
 		
 		/**
 		 * IDataSource for this node.
 		 */
-		public var dataSource:IDataSource = null;
+		public dataSource:IDataSource = null;
 		
 		/**
 		 * A list of data fields to use for node equality tests.
 		 */
-		public var idFields:Array = null;
+		public idFields:string[] = null;
 
 		/**
 		 * If there is no label, this will use data['title'] if defined.
 		 */
-		override public function get label():*
+		/* override */ public get label():string
 		{
-			var str:String = super.label;
-			if (!str && data)
+			var str:string = super.label;
+			if (!str && this.data)
 			{
-				if (typeof data == 'object')
-					str = data.hasOwnProperty(ColumnMetadata.TITLE) ? data[ColumnMetadata.TITLE] : Weave.lang('(Untitled)');
+				if (typeof this.data == 'object')
+					str = this.data.hasOwnProperty(ColumnMetadata.TITLE) ? (this.data as IColumnMetadata).title : Weave.lang('(Untitled)');
 				else
 					str = String(data);
 			}
@@ -84,9 +86,9 @@ package weavejs.data.hierarchy
 		/**
 		 * Compares constructor, dataSource, dependency, data, idFields.
 		 */
-		override public function equals(other:IWeaveTreeNode):Boolean
+		/* override */ public equals(other:IWeaveTreeNode):boolean
 		{
-			var that:ColumnTreeNode = other as ColumnTreeNode;
+			var that:ColumnTreeNode = Weave.AS(other, ColumnTreeNode);
 			if (!that)
 				return false;
 			
@@ -109,7 +111,7 @@ package weavejs.data.hierarchy
 			// compare data
 			if (this.idFields) // partial data comparison
 			{
-				for each (var field:String in idFields)
+				for (var field of this.idFields)
 					if (StandardLib.compare(this.data[field], that.data[field]) != 0)
 						return false; // data differs
 			}
@@ -119,26 +121,26 @@ package weavejs.data.hierarchy
 			return true;
 		}
 		
-		public function getDataSource():IDataSource
+		public getDataSource():IDataSource
 		{
-			return dataSource;
+			return this.dataSource;
 		}
 		
-		public function getColumnMetadata():/*/{[name:string]:string}/*/Object
+		public getColumnMetadata():IColumnMetadata
 		{
-			if (isBranch())
+			if (this.isBranch())
 				return null;
-			return data;
+			return this.data;
 		}
 		
-		public function findPathToNode(descendant:IWeaveTreeNode):Array
+		public findPathToNode(descendant:IWeaveTreeNode&IColumnReference):(IWeaveTreeNode&IColumnReference)[]
 		{
 			// base case - if nodes are equal
 			if (this.equals(descendant))
 				return [this];
 			
 			// stopping condition - if ColumnTreeNode descendant dataSource or idFields values differ
-			var _descendant:ColumnTreeNode = descendant as ColumnTreeNode;
+			var _descendant:ColumnTreeNode = Weave.AS(descendant, ColumnTreeNode);
 			if (_descendant)
 			{
 				// don't look for a descendant with different a dataSource
@@ -147,16 +149,16 @@ package weavejs.data.hierarchy
 				
 				// if this node has idFields, make sure the id values match those of the descendant
 				if (this.idFields && this.data && _descendant.data)
-					for each (var field:String in this.idFields)
+					for (var field of this.idFields || [])
 						if (this.data[field] != _descendant.data[field])
 							return null;
 			}
 			
 			// finally, check each child
-			var childs:Array = this.getChildren();
-			for each (var child:IWeaveTreeNode in childs)
+			var childs:ColumnTreeNode[] = this.getChildren();
+			for (var child of childs || [])
 			{
-				var path:Array = HierarchyUtils.findPathToNode(child, descendant);
+				var path = HierarchyUtils.findPathToNode(child, descendant);
 				if (path)
 				{
 					path.unshift(this);

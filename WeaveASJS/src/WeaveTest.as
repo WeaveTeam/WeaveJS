@@ -10,7 +10,6 @@ package
 	import weavejs.api.data.IAttributeColumn;
 	import weavejs.api.data.IPrimitiveColumn;
 	import weavejs.api.data.IQualifiedKey;
-	import weavejs.api.data.IWeaveTreeNodeWithPathFinding;
 	import weavejs.api.data.IDataSource;
 	import weavejs.core.EventCallbackCollection;
 	import weavejs.core.LinkableBoolean;
@@ -25,26 +24,11 @@ import weavejs.core.LinkableString;
 	import weavejs.core.LinkableVariable;
 	import weavejs.core.LinkableWatcher;
 	import weavejs.core.SessionStateLog;
-	import weavejs.data.bin.AbstractBinningDefinition;
-	import weavejs.data.bin.CategoryBinningDefinition;
-	import weavejs.data.bin.CustomSplitBinningDefinition;
-	import weavejs.data.bin.DynamicBinningDefinition;
-	import weavejs.data.bin.EqualIntervalBinningDefinition;
-	import weavejs.data.bin.ExplicitBinningDefinition;
-	import weavejs.data.bin.NaturalJenksBinningDefinition;
-	import weavejs.data.bin.NumberClassifier;
-	import weavejs.data.bin.QuantileBinningDefinition;
-	import weavejs.data.bin.SimpleBinningDefinition;
-	import weavejs.data.bin.SingleValueClassifier;
-	import weavejs.data.bin.StandardDeviationBinningDefinition;
-	import weavejs.data.bin.StringClassifier;
 	import weavejs.data.column.AbstractAttributeColumn;
 	import weavejs.data.column.AlwaysDefinedColumn;
-	import weavejs.data.column.BinnedColumn;
 	import weavejs.data.column.CSVColumn;
 	import weavejs.data.column.ColorColumn;
 	import weavejs.data.column.ColumnDataTask;
-	import weavejs.data.column.CombinedColumn;
 	import weavejs.data.column.DateColumn;
 	import weavejs.data.column.DynamicColumn;
 	import weavejs.data.column.EquationColumn;
@@ -55,13 +39,11 @@ import weavejs.core.LinkableString;
 	import weavejs.data.column.NormalizedColumn;
 	import weavejs.data.column.NumberColumn;
 	import weavejs.data.column.ProxyColumn;
-	import weavejs.data.column.ReferencedColumn;
 	import weavejs.data.column.SecondaryKeyNumColumn;
 	import weavejs.data.column.SortedColumn;
 	import weavejs.data.column.SortedIndexColumn;
 	import weavejs.data.column.StringColumn;
 	import weavejs.data.column.StringLookup;
-	import weavejs.data.hierarchy.WeaveTreeDescriptorNode;
 	import weavejs.data.key.DynamicKeyFilter;
 	import weavejs.data.key.DynamicKeySet;
 	import weavejs.data.key.FilteredKeySet;
@@ -94,26 +76,10 @@ import weavejs.core.LinkableString;
 			KeySetUnion,
 			SortedKeySet,
 			
-			AbstractBinningDefinition,
-			CategoryBinningDefinition,
-			CustomSplitBinningDefinition,
-			DynamicBinningDefinition,
-			EqualIntervalBinningDefinition,
-			ExplicitBinningDefinition,
-			NaturalJenksBinningDefinition,
-			NumberClassifier,
-			QuantileBinningDefinition,
-			SimpleBinningDefinition,
-			SingleValueClassifier,
-			StandardDeviationBinningDefinition,
-			StringClassifier,
-			
 			AbstractAttributeColumn,
 			AlwaysDefinedColumn,
-			BinnedColumn,
 			ColorColumn,
 			ColumnDataTask,
-			CombinedColumn,
 			CSVColumn,
 			DateColumn,
 			DynamicColumn,
@@ -124,7 +90,6 @@ import weavejs.core.LinkableString;
 			NormalizedColumn,
 			NumberColumn,
 			ProxyColumn,
-			ReferencedColumn,
 			SecondaryKeyNumColumn,
 			SortedColumn,
 			SortedIndexColumn,
@@ -137,10 +102,8 @@ import weavejs.core.LinkableString;
 			EventCallbackCollection,
 			Range,
 			IPrimitiveColumn,
-			IWeaveTreeNodeWithPathFinding,
 			LinkablePromise,
 			JSByteArray,
-			WeaveTreeDescriptorNode,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];

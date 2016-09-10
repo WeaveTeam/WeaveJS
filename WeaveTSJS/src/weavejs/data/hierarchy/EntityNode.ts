@@ -337,7 +337,7 @@ namespace weavejs.data.hierarchy
 			return false;
 		}
 		
-		public findPathToNode(descendant:IWeaveTreeNode):IWeaveTreeNode[]
+		public findPathToNode(descendant:IWeaveTreeNode&IColumnReference):(IWeaveTreeNode&IColumnReference)[]
 		{
 			var node:EntityNode = Weave.AS(descendant, EntityNode);
 			if (!node || this._cacheId != node._cacheId)

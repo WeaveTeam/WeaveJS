@@ -13,13 +13,17 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
+	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+	import IColumnReference = weavejs.api.data.IColumnReference;
+
 	/**
 	 * Extends IWeaveTreeNode by adding findPathToNode().
 	 * @author adufilie
-	 */	
-    public interface IWeaveTreeNodeWithPathFinding extends IWeaveTreeNode
+	 */
+	@Weave.classInfo({id: "weavejs.api.data.IWeaveTreeNodeWithPathFinding"})
+    export class IWeaveTreeNodeWithPathFinding extends IWeaveTreeNode
     {
 		/**
 		 * Finds a series of IWeaveTreeNode objects which can be traversed as a path to a descendant node.
@@ -27,6 +31,6 @@ package weavejs.api.data
 		 * @return An Array of IWeaveTreeNode objects which can be followed as a path from this node to the descendant, including this node and the descendant node.
 		 *         Returns null if the descendant is unreachable from this node.
 		 */
-		function findPathToNode(descendant:IWeaveTreeNode):Array/*/<IWeaveTreeNode>/*/;
+		findPathToNode:(descendant:IWeaveTreeNode&IColumnReference) => (IWeaveTreeNode&IColumnReference)[];
     }
 }

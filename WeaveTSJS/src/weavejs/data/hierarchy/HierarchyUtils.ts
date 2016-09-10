@@ -13,36 +13,37 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data.hierarchy
+namespace weavejs.data.hierarchy
 {
-	import weavejs.api.data.IColumnReference;
-	import weavejs.api.data.IDataSource;
-	import weavejs.api.data.IDataSource_File;
-	import weavejs.api.data.IWeaveTreeNode;
-	import weavejs.api.data.IWeaveTreeNodeWithPathFinding;
+	import IColumnReference = weavejs.api.data.IColumnReference;
+	import IDataSource = weavejs.api.data.IDataSource;
+	import IDataSource_File = weavejs.api.data.IDataSource_File;
+	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+	import IWeaveTreeNodeWithPathFinding = weavejs.api.data.IWeaveTreeNodeWithPathFinding;
+	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 
 	/**
 	 * An all-static class containing functions for dealing with data hierarchies.
 	 * 
 	 * @author adufilie
 	 */
-	public class HierarchyUtils
+	export class HierarchyUtils
 	{
-		public static function findParentNode/*/<T extends IWeaveTreeNode>/*/(root:/*/T/*/IWeaveTreeNode, dataSource:IDataSource, metadata:Object):/*/T/*/IWeaveTreeNode
+		public static findParentNode(root:IWeaveTreeNode&IColumnReference, dataSource:IDataSource, metadata:IColumnMetadata):IWeaveTreeNode&IColumnReference
 		{
-			var leaf:IWeaveTreeNode = dataSource.findHierarchyNode(metadata);
-			var path:Array = findPathToNode(root, leaf);
+			var leaf:IWeaveTreeNode&IColumnReference = dataSource.findHierarchyNode(metadata);
+			var path:(IWeaveTreeNode&IColumnReference)[] = HierarchyUtils.findPathToNode(root, leaf);
 			if (path && path.length > 1)
 				return path[path.length - 2];
 			return null;
 		}
 		
-		public static function findSiblingNodes(dataSource:IDataSource, metadata:Object):Array/*/<IWeaveTreeNode>/*/
+		public static findSiblingNodes(dataSource:IDataSource, metadata:IColumnMetadata):(IWeaveTreeNode&IColumnReference)[]
 		{
 			if (!dataSource || !metadata)
 				return [];
 			
-			var parent:IWeaveTreeNode = findParentNode(dataSource.getHierarchyRoot(), dataSource, metadata);
+			var parent:IWeaveTreeNode&IColumnReference = HierarchyUtils.findParentNode(dataSource.getHierarchyRoot(), dataSource, metadata);
 			return parent ? parent.getChildren() : []
 		}
 		
@@ -55,21 +56,21 @@ package weavejs.data.hierarchy
 		 *         Returns null if the descendant is unreachable from this node.
 		 * @see weave.api.data.IWeaveTreeNode#equals()
 		 */
-		public static function findPathToNode/*/<T extends IWeaveTreeNode>/*/(root:/*/T/*/IWeaveTreeNode, descendant:/*/T/*/IWeaveTreeNode):Array/*/<T>/*/
+		public static findPathToNode(root:IWeaveTreeNode&IColumnReference, descendant:IWeaveTreeNode&IColumnReference):(IWeaveTreeNode&IColumnReference)[]
 		{
 			if (!root || !descendant)
 				return null;
 			
-			if (root is IWeaveTreeNodeWithPathFinding)
-				return (root as IWeaveTreeNodeWithPathFinding).findPathToNode(descendant);
+			if (Weave.IS(root, IWeaveTreeNodeWithPathFinding))
+				return Weave.AS(root, IWeaveTreeNodeWithPathFinding).findPathToNode(descendant);
 			
 			if (root.equals(descendant))
 				return [root];
 			
-			var childs:Array = root.getChildren();
-			for each (var child:IWeaveTreeNode in childs)
+			var childs = root.getChildren();
+			for (var child of childs)
 			{
-				var path:Array = findPathToNode(child, descendant);
+				var path = HierarchyUtils.findPathToNode(child, descendant);
 				if (path)
 				{
 					path.unshift(root);
@@ -84,20 +85,20 @@ package weavejs.data.hierarchy
 		 * Traverses an entire hierarchy and returns all nodes that
 		 * implement IColumnReference and have column metadata.
 		 */
-		public static function getAllColumnReferenceDescendants(source:IDataSource_File):Array/*/<IColumnReference>/*/
+		public static getAllColumnReferenceDescendants(source:IDataSource):IColumnReference[]
 		{
-			return getAllColumnReferences(source.getHierarchyRoot(), []);
+			return HierarchyUtils.getAllColumnReferences(source.getHierarchyRoot(), []);
 		}
-		private static function getAllColumnReferences(node:/*/IWeaveTreeNode & IColumnReference/*/IWeaveTreeNode, output:Array/*/<IColumnReference>/*/):Array/*/<IColumnReference>/*/
+		private static getAllColumnReferences(node:IWeaveTreeNode&IColumnReference, output:IColumnReference[]):IColumnReference[]
 		{
-			var ref:IColumnReference = node as IColumnReference;
+			var ref:IColumnReference = Weave.AS(node, IColumnReference);
 			if (ref && ref.getColumnMetadata())
 				output.push(ref);
 			if (node)
 			{
-				var childs:Array = node.getChildren();
-				for each (var child:IWeaveTreeNode in childs)
-					getAllColumnReferences(child, output);
+				var childs:(IWeaveTreeNode&IColumnReference)[] = node.getChildren();
+				for (var child of childs || [])
+					HierarchyUtils.getAllColumnReferences(child, output);
 			}
 			return output;
 		}

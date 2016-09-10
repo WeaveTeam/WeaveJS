@@ -306,7 +306,7 @@ package weavejs.util
 		 * @param destination An Array to append items to.  If none specified, a new one will be created.
 		 * @return The destination Array with all the nested items in the source appended to it.
 		 */
-		public static function flatten/*/<T>/*/(source:Array/*/<T>/*/, destination:Array/*/<T>/*/ = null):Array/*/<T>/*/
+		public static function flatten/*/<T>/*/(source:/*/T[]|T/*/Array, destination:Array/*/<T>/*/ = null):Array/*/<T>/*/
 		{
 			if (destination == null)
 				destination = [];

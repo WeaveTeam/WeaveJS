@@ -376,6 +376,6 @@ package weavejs.util
 		 * This can be any data associated with this tree item.
 		 * For example, it can be used to store state information if the tree is populated asynchronously.
 		 */
-		public var data:Object = null;
+		public var data:/*/{[key:string]:any}/*/Object = null;
 	}
 }

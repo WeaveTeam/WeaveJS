@@ -17,7 +17,6 @@ package
 	import weavejs.api.data.IDataSource_Transform;
 	import weavejs.api.data.IQualifiedKeyManager;
 	import weavejs.api.data.IStatisticsCache;
-	import weavejs.api.data.IWeaveTreeNodeWithPathFinding
 	import weavejs.api.net.IURLRequestUtils;
 	import weavejs.api.ui.IEditorManager;
 	import weavejs.core.EditorManager;

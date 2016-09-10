@@ -106,7 +106,7 @@ namespace weavejs.data.source
 			return this._rootNode;
 		}
 
-		/* override */protected generateHierarchyNode(metadata:{[key:string]:string}):IWeaveTreeNode
+		/* override */protected generateHierarchyNode(metadata:{[key:string]:string}):IWeaveTreeNode&IColumnReference
 		{
 			if (!metadata)
 				return null;

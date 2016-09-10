@@ -227,7 +227,7 @@ namespace weavejs.data.source
 			Weave.getCallbacks(this).triggerCallbacks();
 		}
 		
-		/* override */ protected generateHierarchyNode(metadata:IWeaveDataSourceColumnMetadata):IWeaveTreeNode
+		/* override */ protected generateHierarchyNode(metadata:IWeaveDataSourceColumnMetadata):IWeaveTreeNode&IColumnReference
 		{
 			if (!metadata)
 				return null;
@@ -673,7 +673,7 @@ namespace weavejs.data.source
 		private source:WeaveDataSource;
 		private tableList:EntityNode;
 		private geomList:GeomListNode;
-		private children:IWeaveTreeNode[];
+		private children:(IWeaveTreeNode&IColumnReference)[];
 
 		constructor(source:WeaveDataSource)
 		{
@@ -697,7 +697,7 @@ namespace weavejs.data.source
 		}
 		public isBranch():boolean { return true; }
 		public hasChildBranches():boolean { return true; }
-		public getChildren():IWeaveTreeNode[]
+		public getChildren():(IWeaveTreeNode&IColumnReference)[]
 		{
 			this.tableList.setEntityCache(this.source.entityCache);
 
@@ -718,11 +718,11 @@ namespace weavejs.data.source
 	 * Makes an RPC to find geometry columns for its children
 	 */
 	@Weave.classInfo({id: "weavejs.data.source.GeomListNode", interfaces: [IWeaveTreeNode]})
-	class GeomListNode implements IWeaveTreeNode
+	class GeomListNode implements IWeaveTreeNode, IColumnReference
 	{
 		private source:WeaveDataSource;
 		private cache:EntityCache;
-		public children:IWeaveTreeNode[];
+		public children:(IWeaveTreeNode&IColumnReference)[];
 
 		constructor(source:WeaveDataSource)
 		{
@@ -740,7 +740,7 @@ namespace weavejs.data.source
 		}
 		public isBranch():boolean { return true; }
 		public hasChildBranches():boolean { return false; }
-		public getChildren():IWeaveTreeNode[]
+		public getChildren():(IWeaveTreeNode&IColumnReference)[]
 		{
 			if (!this.children || this.cache != this.source.entityCache)
 			{
@@ -766,6 +766,14 @@ namespace weavejs.data.source
 				children.push(node);
 			}
 			Weave.getCallbacks(this.source).triggerCallbacks();
+		}
+		public getDataSource()
+		{
+			return this.source;
+		}
+		public getColumnMetadata():IWeaveDataSourceColumnMetadata
+		{
+			return null;
 		}
 	}
 

@@ -20,15 +20,16 @@ namespace weavejs.data.source
 	import IDataSource = weavejs.api.data.IDataSource;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import StandardLib = weavejs.util.StandardLib;
+	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 	
 	export class GeoJSONDataSourceNode implements IWeaveTreeNode, IColumnReference
 	{
 		private idFields:string[];
 		private source:IDataSource;
 		private metadata:{[id:string]:string};
-		private children:IWeaveTreeNode[];
+		private children:(IWeaveTreeNode&IColumnReference)[];
 		
-		constructor(source:IDataSource, metadata:{[id:string]:string}, children:IWeaveTreeNode[] = null, idFields:string[] = null)
+		constructor(source:IDataSource, metadata:IColumnMetadata, children:(IWeaveTreeNode&IColumnReference)[] = null, idFields:string[] = null)
 		{
 			this.source = source;
 			this.metadata = metadata || {};
@@ -65,7 +66,7 @@ namespace weavejs.data.source
 		{
 			return false;
 		}
-		public getChildren():IWeaveTreeNode[]
+		public getChildren():(IWeaveTreeNode&IColumnReference)[]
 		{
 			return this.children;
 		}
@@ -74,7 +75,7 @@ namespace weavejs.data.source
 		{
 			return this.source;
 		}
-		public getColumnMetadata():{[name:string]:string}
+		public getColumnMetadata():IColumnMetadata
 		{
 			return this.children ? null : this.metadata;
 		}

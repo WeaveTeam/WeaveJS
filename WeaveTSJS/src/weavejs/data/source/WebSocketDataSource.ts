@@ -204,7 +204,7 @@ namespace weavejs.data.source
 			return this._rootNode;
 		}
 
-		/* override */ protected generateHierarchyNode(metadata:IWebSocketColumnMetadata):IWeaveTreeNode
+		/* override */ protected generateHierarchyNode(metadata:IWebSocketColumnMetadata):IWeaveTreeNode&IColumnReference
 		{
 			if (!metadata)
 				return null;

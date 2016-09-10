@@ -139,7 +139,7 @@ namespace weavejs.data.source
 			return this._rootNode;
 		}
 
-		protected generateHierarchyNode(metadata:ICKANActionMetadata):IWeaveTreeNode
+		protected generateHierarchyNode(metadata:ICKANActionMetadata):IWeaveTreeNode&IColumnReference
 		{
 			if (!metadata)
 				return null;
@@ -577,7 +577,7 @@ namespace weavejs.data.source
 			return this._childNodes;
 		}
 
-		public getChildren():IWeaveTreeNode[]
+		public getChildren():(IWeaveTreeNode&IColumnReference)[]
 		{
 			if (this.internalNode)
 				return this.internalNode.getChildren();
@@ -745,7 +745,7 @@ namespace weavejs.data.source
 			return null;
 		}
 
-		public findPathToNode(descendant:IWeaveTreeNode):IWeaveTreeNode[]
+		public findPathToNode(descendant:IWeaveTreeNode):(IWeaveTreeNode&IColumnReference)[]
 		{
 			if (!descendant)
 				return null;

@@ -70,7 +70,7 @@ namespace weavejs.path
 		
 		public static launch(owner:ILinkableObject, url:string, windowName:string = '', features:string = null):boolean
 		{
-			var path:WeavePath = Weave.getPath(owner);
+			var path:any/*WeavePath*/ = Weave.getPath(owner); // TODO fix this
 			if (!(window as any)[ExternalTool.WEAVE_EXTERNAL_TOOLS]) {
 				(window as any)[ExternalTool.WEAVE_EXTERNAL_TOOLS] = {};
 			    // when we close this window, close all popups

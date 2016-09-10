@@ -358,7 +358,7 @@ namespace weavejs.data.source
 		{
 			if (typeof metadata != 'object')
 				metadata = this.generateMetadataForColumnId(metadata as string|number);
-			return super.generateNewAttributeColumn(metadata);
+			return super.generateNewAttributeColumn(metadata as ICSVColumnMetadata);
 		}
 		
 		/**
@@ -457,7 +457,7 @@ namespace weavejs.data.source
 			return this._rootNode;
 		}
 		
-		/* override */ protected generateHierarchyNode(metadata:ICSVColumnMetadata|string|number):IWeaveTreeNode
+		/* override */ protected generateHierarchyNode(metadata:ICSVColumnMetadata|string|number):IWeaveTreeNode&IColumnReference
 		{
 			if (typeof metadata != 'object')
 				metadata = this.generateMetadataForColumnId(metadata as string|number);
