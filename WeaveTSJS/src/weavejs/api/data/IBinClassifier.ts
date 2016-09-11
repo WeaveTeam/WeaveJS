@@ -13,12 +13,24 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	
 	/**
-	 * Use this interface to indicate that an IDataSource represents a file.
+	 * A class implementing IBinClassifier should contain sessioned properties
+	 * that define what values are contained in the bin.
+	 * 
+	 * @author adufilie
 	 */
-	public interface IDataSource_File /* extends IDataSource */
+	@Weave.classInfo({id: "weavejs.api.data.IBinClassifier"})
+	export class IBinClassifier extends ILinkableObject
 	{
+		/**
+		 * This function tests if a data value is contained in this IBinClassifier.
+		 * @param value A data value to test.
+		 * @return true If this IBinClassifier contains the given value.
+		 */
+		contains:(value:any)=>boolean;
 	}
 }

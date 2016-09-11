@@ -18,7 +18,7 @@ package weavejs.api.data
 	/**
 	 * Use this interface to indicate that an IDataSource represents a service.
 	 */
-	public interface IDataSource_Service extends IDataSource
+	public interface IDataSource_Service/* extends IDataSource */
 	{
 	}
 }

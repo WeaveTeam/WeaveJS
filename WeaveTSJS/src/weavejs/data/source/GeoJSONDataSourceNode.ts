@@ -21,7 +21,8 @@ namespace weavejs.data.source
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import StandardLib = weavejs.util.StandardLib;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
-	
+
+	@Weave.classInfo({id: "weavejs.data.source.GeoJSONDataSourceNode", interfaces: [IWeaveTreeNode, IColumnReference]})
 	export class GeoJSONDataSourceNode implements IWeaveTreeNode, IColumnReference
 	{
 		private idFields:string[];
@@ -80,5 +81,4 @@ namespace weavejs.data.source
 			return this.children ? null : this.metadata;
 		}
 	}
-	Weave.registerClass(GeoJSONDataSourceNode, "weavejs.data.source.GeoJSONDataSourceNode", [IWeaveTreeNode, IColumnReference]);
 }

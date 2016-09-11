@@ -362,7 +362,7 @@ namespace weavejs.net
 		
 		private handleTableImportResult(result:number):void
 		{
-			var tableId:number = Math.floor(Number(result)); // TODO check if this is the correct way to cast to int
+			var tableId:number = int(result); // TODO check if this is the correct way to cast to int
 			var exists:boolean = false;
 			var title:string;
 			var info:EntityHierarchyInfo = this.entityCache.getBranchInfo(tableId);

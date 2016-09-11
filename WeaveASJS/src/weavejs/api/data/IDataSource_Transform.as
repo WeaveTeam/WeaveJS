@@ -18,7 +18,7 @@ package weavejs.api.data
 	/**
 	 * Use this interface to indicate that an IDataSource acts as a data transform.
 	 */
-	public interface IDataSource_Transform extends IDataSource
+	public interface IDataSource_Transform/* extends IDataSource */
 	{
 	}
 }

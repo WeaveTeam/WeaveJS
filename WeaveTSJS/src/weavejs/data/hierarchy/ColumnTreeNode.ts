@@ -155,7 +155,7 @@ namespace weavejs.data.hierarchy
 			}
 			
 			// finally, check each child
-			var childs:ColumnTreeNode[] = this.getChildren();
+			var childs:(IWeaveTreeNode&IColumnReference)[] = this.getChildren();
 			for (var child of childs || [])
 			{
 				var path = HierarchyUtils.findPathToNode(child, descendant);

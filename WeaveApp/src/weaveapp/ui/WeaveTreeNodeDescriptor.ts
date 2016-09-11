@@ -20,11 +20,12 @@ import ArrayUtils = weavejs.util.ArrayUtils;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import IWeaveTreeNodeWithEditableChildren = weavejs.api.data.IWeaveTreeNodeWithEditableChildren;
 import {ITreeDescriptor} from "weaveapp/ui/WeaveTree";
+import IColumnReference = weavejs.api.data.IColumnReference;
 
 /**
  * Tells a Tree control how to work with IWeaveTreeNode objects.
  */
-export default class WeaveTreeNodeDescriptor<Node extends IWeaveTreeNode> implements ITreeDescriptor<Node>
+export default class WeaveTreeNodeDescriptor<Node extends IWeaveTreeNode&IColumnReference> implements ITreeDescriptor<Node>
 {
 	getLabel(node:Node):string
 	{

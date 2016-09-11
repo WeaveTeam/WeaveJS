@@ -13,12 +13,15 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data.hierarchy
+namespace weavejs.data.hierarchy
 {
-    import weavejs.api.data.IWeaveTreeNode;
-    import weavejs.util.JS;
-    import weavejs.util.StandardLib;
-    import weavejs.util.WeaveTreeItem;
+    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+	import IColumnReference = weavejs.api.data.IColumnReference;
+    import JS = weavejs.util.JS;
+    import StandardLib = weavejs.util.StandardLib;
+    import WeaveTreeItem = weavejs.util.WeaveTreeItem;
+	import IDataSource = weavejs.api.data.IDataSource;
+	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 
 	/**
 	 * A node in a tree whose leaves identify attribute columns.
@@ -27,7 +30,8 @@ package weavejs.data.hierarchy
 	 * The following properties are used by WeaveTreeDescriptorNode but not for equality comparison:<br>
 	 * <code>label, children, hasChildBranches</code><br>
 	 */
-	[RemoteClass] public class WeaveTreeDescriptorNode extends WeaveTreeItem implements IWeaveTreeNode
+	@Weave.classInfo({id: "weavejs.data.hierarchy.WeaveTreeDescriptorNode", interfaces: [IWeaveTreeNode, IColumnReference]})
+	export class WeaveTreeDescriptorNode extends WeaveTreeItem implements IWeaveTreeNode, IColumnReference
 	{
 		/**
 		 * The following properties are used for equality comparison, in addition to node class definitions:
@@ -36,19 +40,19 @@ package weavejs.data.hierarchy
 		 *     <code>label, children, hasChildBranches</code><br>
 		 * @param params An values for the properties of this WeaveTreeDescriptorNode.
 		 */
-		public function WeaveTreeDescriptorNode(params:Object)
+		constructor(params:{[key:string]:any})
 		{
 			super();
-			childItemClass = WeaveTreeDescriptorNode;
+			this.childItemClass = WeaveTreeDescriptorNode;
 			
 			if (typeof params === 'object')
 			{
-				for (var key:String in params)
+				for (var key in params)
 				{
-					if (this[key] is Function && JS.hasProperty(this, '_' + key))
-						this['_' + key] = params[key];
+					if (Weave.IS((this as any)[key], Function) && JS.hasProperty(this, '_' + key))
+						(this as any)['_' + key] = params[key];
 					else
-						this[key] = params[key];
+						(this as any)[key] = params[key];
 				}
 			}
 		}
@@ -57,16 +61,16 @@ package weavejs.data.hierarchy
 		 * Set this to true if this node is a branch, or false if it is not.
 		 * Otherwise, hasChildBranches() will check isBranch() on each child returned by getChildren().
 		 */
-		public function set _hasChildBranches(value:*):void
+		public set _hasChildBranches(value:any)
 		{
-			_counter['hasChildBranches'] = undefined;
-			__hasChildBranches = value;
+			(this._counter as any)['hasChildBranches'] = undefined;
+			this.__hasChildBranches = value;
 		}
-		private var __hasChildBranches:* = null;
+		private __hasChildBranches:any = null;
 		
-		public function equals(other:IWeaveTreeNode):Boolean
+		public equals(other:IWeaveTreeNode):boolean
 		{
-			var that:WeaveTreeDescriptorNode = other as WeaveTreeDescriptorNode;
+			var that:WeaveTreeDescriptorNode = Weave.AS(other, WeaveTreeDescriptorNode);
 			if (!that)
 				return false;
 			
@@ -84,36 +88,46 @@ package weavejs.data.hierarchy
 			return true;
 		}
 		
-		public function getLabel():String
+		public getLabel():string
 		{
-			return label;
+			return this.label;
 		}
 		
-		public function isBranch():Boolean
+		public isBranch():boolean
 		{
 			// assume that if children property was defined that this is a branch
-			return _children != null;
+			return this._children != null;
 		}
 		
-		public function hasChildBranches():Boolean
+		public hasChildBranches():boolean
 		{
-			var id:String = 'hasChildBranches';
-			if (isCached(id))
-				return cache(id);
+			var id:string = 'hasChildBranches';
+			if (this.isCached(id))
+				return this.cache(id);
 			
-			if (__hasChildBranches != null)
-				return cache(id, getBoolean(__hasChildBranches, id));
+			if (this.__hasChildBranches != null)
+				return this.cache(id, this.getBoolean(this.__hasChildBranches, id));
 			
-			var children:Array = getChildren();
-			for each (var child:IWeaveTreeNode in children)
+			var children = this.getChildren();
+			for (var child of children || [])
 				if (child.isBranch())
-					return cache(id, true);
-			return cache(id, false);
+					return this.cache(id, true);
+			return this.cache(id, false);
 		}
 		
-		public function getChildren():Array
+		public getChildren():(IWeaveTreeNode&IColumnReference)[]
 		{
-			return children;
+			return this.children;
+		}
+
+		public getDataSource():IDataSource
+		{
+			return null;
+		}
+
+		public getColumnMetadata():IColumnMetadata
+		{
+			return null;
 		}
 	}
 }

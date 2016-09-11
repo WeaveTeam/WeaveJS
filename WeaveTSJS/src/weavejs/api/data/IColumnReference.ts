@@ -13,7 +13,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
 	/**
 	 * A column reference contains all the information required to retrieve a column of data.
@@ -21,13 +21,14 @@ package weavejs.api.data
 	 * 
 	 * @author adufilie
 	 */
-	public interface IColumnReference
+	@Weave.classInfo({id: "weavejs.api.data.IColumnReference"})
+	export class IColumnReference
 	{
 		/**
 		 * This function returns the IDataSource that knows how to get the column this object refers to.
 		 * @return The IDataSource that can be used to retrieve the column that this object refers to.
 		 */
-		function getDataSource():IDataSource;
+		getDataSource:()=>IDataSource;
 		
 		/**
 		 * This function gets metadata associated with the column.
@@ -35,6 +36,6 @@ package weavejs.api.data
 		 * For standard metadata property names, refer to the ColumnMetadata class.
 		 * @return An Object mapping metadata property names to values, or null if there is no column referenced.
 		 */
-		function getColumnMetadata():/*/{[name:string]:string}/*/Object;
+		getColumnMetadata:()=>IColumnMetadata;
 	}
 }

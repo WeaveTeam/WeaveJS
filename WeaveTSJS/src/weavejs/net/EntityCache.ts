@@ -205,7 +205,7 @@ namespace weavejs.net
 					this.service.getHierarchyInfo(hierarchyMetadata).then(this.handleEntityHierarchyInfo.bind(this, hierarchyMetadata));
 				}
 				else
-					ids.push(Math.floor(Number(id)));
+					ids.push(int(id));
 			}
 			
 			delete this.idsToFetch[EntityCache.ROOT_ID];

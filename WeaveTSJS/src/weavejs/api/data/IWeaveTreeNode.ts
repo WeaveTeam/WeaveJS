@@ -13,7 +13,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
 	/**
 	 * Interface for a node for use with WeaveTreeDataDescriptor and WeaveTree.
@@ -24,7 +24,8 @@ package weavejs.api.data
 	 * making excess RPC calls wherever possible.
 	 * @author adufilie 
 	 */	
-    public interface IWeaveTreeNode
+	@Weave.classInfo({id: "weavejs.api.data.IWeaveTreeNode"})
+    export class IWeaveTreeNode
     {
 		/**
 		 * Checks if this node is equivalent to another.
@@ -32,30 +33,30 @@ package weavejs.api.data
 		 * @param other Another node to compare.
 		 * @return true if this node is equivalent to the other node.
 		 */
-		function equals(other:IWeaveTreeNode):Boolean;
+		equals:(other:IWeaveTreeNode)=>boolean;
 		
 		/**
 		 * Gets a label for this node.
 		 * @return A label to display in the tree.
 		 */
-		function getLabel():String;
+		getLabel:()=>string;
 		
 		/**
 		 * Checks if this node is a branch.
 		 * @return true if this node is a branch
 		 */
-		function isBranch():Boolean;
+		isBranch:()=>boolean;
 		
 		/**
 		 * Checks if this node has any children which are branches.
 		 * @return true if this node has any children which are branches
 		 */
-		function hasChildBranches():Boolean;
+		hasChildBranches:()=>boolean;
 		
 		/**
 		 * Gets children for this node.
 		 * @return A list of children implementing IWeaveTreeNode or null if this node has no children.
 		 */
-		function getChildren():Array/*/<IWeaveTreeNode&weavejs.api.data.IColumnReference>/*/;
+		getChildren:()=>(IWeaveTreeNode&IColumnReference)[];
     }
 }

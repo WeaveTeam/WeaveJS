@@ -13,7 +13,6 @@ package
 	import weavejs.api.core.IScheduler;
 	import weavejs.api.core.ISessionManager;
 	import weavejs.api.data.ICSVParser;
-	import weavejs.api.data.IDataSource;
 	import weavejs.api.data.IDataSource_Transform;
 	import weavejs.api.data.IQualifiedKeyManager;
 	import weavejs.api.data.IStatisticsCache;
@@ -72,9 +71,9 @@ public class WeaveJS
 			
 			// temporary hack
 			//TODO - traverse weavejs namespace and register all classes with all their interfaces
-			var IDataSource_File:Class = IDataSource;
-			var IDataSource_Service:Class = IDataSource;
-			var IDataSource_Transform:Class = IDataSource;
+//			var IDataSource_File:Class = IDataSource;
+//			var IDataSource_Service:Class = IDataSource;
+//			var IDataSource_Transform:Class = IDataSource;
 
 			Weave.setClassInfo(TempHack_SolidLineStyle, {id: "ExtendedLineStyle"});
 			

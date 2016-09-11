@@ -10,7 +10,6 @@ package
 	import weavejs.api.data.IAttributeColumn;
 	import weavejs.api.data.IPrimitiveColumn;
 	import weavejs.api.data.IQualifiedKey;
-	import weavejs.api.data.IDataSource;
 	import weavejs.core.EventCallbackCollection;
 	import weavejs.core.LinkableBoolean;
 	import weavejs.core.LinkableCallbackScript;

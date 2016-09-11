@@ -13,23 +13,26 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.data.bin
 {
-	import weavejs.api.core.ILinkableObject;
+	import IBinClassifier = weavejs.api.data.IBinClassifier;
+	import LinkableVariable = weavejs.core.LinkableVariable;
 	
 	/**
-	 * A class implementing IBinClassifier should contain sessioned properties
-	 * that define what values are contained in the bin.
+	 * This classifies a single value.
 	 * 
 	 * @author adufilie
 	 */
-	public interface IBinClassifier extends ILinkableObject
+	@Weave.classInfo({id: "weavejs.data.bin.SingleValueClassifier", interfaces:[IBinClassifier]})
+	export class SingleValueClassifier extends LinkableVariable implements IBinClassifier
 	{
 		/**
-		 * This function tests if a data value is contained in this IBinClassifier.
-		 * @param value A data value to test.
+		 * @param value A value to test.
 		 * @return true If this IBinClassifier contains the given value.
 		 */
-		function contains(value:*):Boolean;
+		public contains(value:any):boolean
+		{
+			return this.sessionStateEquals(value);
+		}
 	}
 }

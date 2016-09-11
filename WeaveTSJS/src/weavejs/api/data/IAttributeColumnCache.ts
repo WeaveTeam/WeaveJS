@@ -10,17 +10,22 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/.
- * 
+ *
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
+	import IDataSource = weavejs.api.data.IDataSource;
+	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+
 	/**
 	 * This is a cache used to avoid making duplicate column requests.
-	 * 
+	 *
 	 * @author adufilie
 	 */
-	public interface IAttributeColumnCache
+	@Weave.classInfo({id: "weavejs.api.data.IAttributeColumnCache"})
+	export class IAttributeColumnCache
 	{
 		/**
 		 * This function will return the same IAttributeColumn for identical metadata values.
@@ -30,6 +35,6 @@ package weavejs.api.data
 		 * @return The cached column object.
 		 * @see weave.api.data.IDataSource#generateNewAttributeColumn()
 		 */
-		function getColumn(dataSource:IDataSource, metadata:Object):IAttributeColumn;
+		getColumn:(dataSource:IDataSource, metadata:IColumnMetadata)=>IAttributeColumn;
 	}
 }

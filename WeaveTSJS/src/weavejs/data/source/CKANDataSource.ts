@@ -192,7 +192,7 @@ namespace weavejs.data.source
 			{
 				if ((metadata as ICKANActionMetadata).ckan_format == CKANDataSource.DATASTORE_FORMAT)
 					metadata = (metadata as ICKANActionMetadata).ckan_field;
-				proxyColumn.setInternalColumn(dataSource.generateNewAttributeColumn(metadata));
+				proxyColumn.setInternalColumn(dataSource.generateNewAttributeColumn(metadata as ICSVColumnMetadata));
 			}
 			else
 				proxyColumn.dataUnavailable();

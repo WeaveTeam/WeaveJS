@@ -84,7 +84,7 @@ export default class SpatialJoinTransform extends AbstractDataSource implements 
 		return this._rootNode;
 	}
 
-	protected generateHierarchyNode(metadata:{[property:string]:string}):IWeaveTreeNode
+	protected generateHierarchyNode(metadata:{[property:string]:string}):IWeaveTreeNode&IColumnReference
 	{
 		metadata[ColumnMetadata.TITLE] = ColumnUtils.getTitle(this.geometryColumn);
 		metadata[ColumnMetadata.KEY_TYPE] = this.xColumn.getMetadata(ColumnMetadata.KEY_TYPE);

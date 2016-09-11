@@ -9,18 +9,22 @@ package weavejs.path
 	import weavejs.WeaveAPI;
 	import weavejs.api.core.ILinkableObject;
 	import weavejs.api.data.IAttributeColumn;
-	import weavejs.api.data.IDataSource;
+	// import weavejs.api.data.IDataSource;
 	import weavejs.api.data.IKeySet;
 	import weavejs.api.data.IKeySetCallbackInterface;
 	import weavejs.api.data.IQualifiedKey;
-	import weavejs.data.ColumnUtils;
+	//import weavejs.data.ColumnUtils;
 	import weavejs.data.column.DynamicColumn;
 	import weavejs.data.column.ExtendedDynamicColumn;
-	import weavejs.data.column.ReferencedColumn;
+	//import weavejs.data.column.ReferencedColumn;
 	import weavejs.util.JS;
 
 	public class WeavePathData extends WeavePath
 	{
+		public var IDataSource:* = JS.global['weavejs']['api']['data']['IDataSource'];
+		public var ColumnUtils:* = JS.global['weavejs']['data']['ColumnUtils'];
+		public var ReferencedColumn:* = JS.global['weavejs']['data']['ReferencedColumn'];
+
 		public function WeavePathData(weave:Weave, basePath:Array)
 		{
 			super(weave, basePath);
@@ -486,8 +490,8 @@ package weavejs.path
 			{
 				if (arguments.length < 2)
 					dataSourceName = weave.root.getNames(IDataSource)[0];
-				var dataSource:IDataSource = weave.root.getObject(dataSourceName) as IDataSource;
-				(object as ReferencedColumn).setColumnReference(dataSource, metadata);
+				var dataSource:* /*IDataSource*/ = weave.root.getObject(dataSourceName) as IDataSource;
+				((object as ReferencedColumn) as Object).setColumnReference(dataSource, metadata);
 			}
 			else
 				_failMessage('setColumn', 'Not a compatible column object', this._path);

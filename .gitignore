@@ -44,7 +44,6 @@ scripts/outts
 *.iml
 
 lib/
-bin/
 
 # auto generated typings
 weave-typings/weavejs.d.ts

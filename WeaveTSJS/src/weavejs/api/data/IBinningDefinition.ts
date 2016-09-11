@@ -13,15 +13,17 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
-	import weavejs.api.core.ICallbackCollection;
-	import weavejs.api.core.ILinkableObject;
-	
+	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IBinClassifier = weavejs.api.data.IBinClassifier;
 	/**
 	 * @author adufilie
 	 */
-	public interface IBinningDefinition extends ILinkableObject
+	@Weave.classInfo({id: "weavejs.api.data.IBinningDefinition"})
+	export class IBinningDefinition extends ILinkableObject
 	{
 		/**
 		 * This will begin an asynchronous task to generate a list of IBinClassifier objects.
@@ -33,7 +35,7 @@ package weavejs.api.data
 		 * @see weave.api.data.IBinClassifier
 		 * @see #resultCallbacks
 		 */
-		function generateBinClassifiersForColumn(column:IAttributeColumn):void;
+		generateBinClassifiersForColumn:(column:IAttributeColumn)=>void;
 		
 		/**
 		 * These callbacks will be triggered when the current asynchronous task completes.
@@ -43,20 +45,20 @@ package weavejs.api.data
 		 * @see #getBinClassifiers()
 		 * @see #getBinNames()
 		 */		
-		function get asyncResultCallbacks():ICallbackCollection;
+		asyncResultCallbacks:ICallbackCollection;
 		
 		/**
 		 * This accesses the result from the asynchronous task started by generateBinClassifiersForColumn().
 		 * @return An Array of IBinClassifier objects, or null if the current task has not completed yet.
 		 * @see #resultCallbacks
 		 */
-		function getBinClassifiers():Array/*/<IBinClassifier>/*/;
+		getBinClassifiers:()=>IBinClassifier[];
 		
 		/**
 		 * This accesses the result from the asynchronous task started by generateBinClassifiersForColumn().
 		 * @return An Array of Strings, or null if the current task has not completed yet.
 		 * @see #resultCallbacks
 		 */
-		function getBinNames():Array/*/<string>/*/;
+		getBinNames:()=>string[];
 	}
 }

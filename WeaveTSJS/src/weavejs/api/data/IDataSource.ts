@@ -13,53 +13,54 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.data
+namespace weavejs.api.data
 {
-	import weavejs.api.core.ICallbackCollection;
-	import weavejs.api.core.ILinkableObject;
-	
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
+
 	/**
 	 * This is a simple and generic interface for getting columns of data from a source.
 	 * 
 	 * @author adufilie
 	 */
-	public interface IDataSource extends ILinkableObject
+	@Weave.classInfo({id: "weavejs.api.data.IDataSource"})
+	export class IDataSource extends ILinkableObject
 	{
 		/**
 		 * A boolean determining whether or not a datasource depends on only session-local resources.
 		 * @return False if the datasource uses or depends on remote/network resources, true otherwise.
 		 */
-		function get isLocal():Boolean;
+		isLocal:boolean;
 		/**
 		 * Gets the label of the root hierarchy node.
 		 * @return The label of the root hierarchy node.
 		 */
-		function getLabel():String;
-		
+		getLabel:()=>string;
+
 		/**
 		 * When explicitly triggered, this will force the hierarchy to be refreshed.
 		 * This should not be used to determine when the hierarchy is updated.
 		 * For that purpose, add a callback directly to the IDataSource instead.
 		 */
-		function get hierarchyRefresh():ICallbackCollection;
+		hierarchyRefresh:ICallbackCollection;
 		
 		/**
 		 * Gets the root node of the attribute hierarchy, which should have descendant nodes that implement IColumnReference.
 		 */
-		function getHierarchyRoot():/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode;
+		getHierarchyRoot:()=>IWeaveTreeNode&IColumnReference;
 		
 		/**
 		 * Finds the hierarchy node that corresponds to a set of metadata, or null if there is no such node.
 		 * @param metadata Metadata used to identify a node in the hierarchy, which may or may not reference a column.
 		 * @return The hierarchy node corresponding to the metadata or null if there is no corresponding node.
 		 */
-		function findHierarchyNode(metadata:Object):/*/IWeaveTreeNode & weavejs.api.data.IColumnReference/*/IWeaveTreeNode;
+		findHierarchyNode:(metadata:IColumnMetadata)=>IWeaveTreeNode&IColumnReference;
 		
 		/**
 		 * Generates a new IAttributeColumn which will receive data from this IDataSource.
 		 * @param metadata Metadata used to identify a column in this IDataSource.
 		 * @return A new IAttributeColumn object that will be updated when the column data is available.
 		 */
-		function generateNewAttributeColumn(metadata:Object):IAttributeColumn;
+		generateNewAttributeColumn:(metadata:IColumnMetadata)=>IAttributeColumn;
 	}
 }

@@ -269,7 +269,7 @@ package weavejs.core
 		public function verifyImplementation(theInterface:Class, theImplementation:Class):void
 		{
 			if (!theInterface)
-				throw new Error("interface cannot be " + theInterface);
+				throw new Error("interface cannot be " + theInterface + " check " + theImplementation);
 			if (!theImplementation)
 				throw new Error("implementation cannot be " + theImplementation);
 			if (!(theImplementation.prototype is theInterface))

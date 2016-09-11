@@ -20,14 +20,15 @@ package weavejs
 	import weavejs.api.core.IProgressIndicator;
 	import weavejs.api.core.IScheduler;
 	import weavejs.api.core.ISessionManager;
-	import weavejs.api.data.IAttributeColumnCache;
+	//import weavejs.api.data.IAttributeColumnCache;
 	import weavejs.api.data.ICSVParser;
 	import weavejs.api.data.IQualifiedKeyManager;
 	import weavejs.api.data.IStatisticsCache;
 	import weavejs.api.net.IURLRequestUtils;
 	import weavejs.api.ui.IEditorManager;
 	import weavejs.core.ClassRegistryImpl;
-	
+	import weavejs.util.JS;
+
 	/**
 	 * Static functions for managing implementations of Weave framework classes.
 	 * 
@@ -108,8 +109,9 @@ package weavejs
 		/**
 		 * This is the singleton instance of the registered IAttributeColumnCache implementation.
 		 */
-		public static function get AttributeColumnCache():IAttributeColumnCache
+		public static function get AttributeColumnCache():*
 		{
+			var IAttributeColumnCache:* = JS.global['weavejs']['api']['data']['IAttributeColumnCache'];
 			return (_classRegistry || ClassRegistry as ClassRegistryImpl).map_interface_singletonInstance.get(IAttributeColumnCache)
 				|| _classRegistry.getSingletonInstance(IAttributeColumnCache);
 		}

@@ -822,9 +822,9 @@ namespace weavejs.data
 			// if keyType not specified, find the most common keyType
 			if (!keyType)
 			{
-				var keyTypeCounts:{[keyType:string]:number} = {};
+				var keyTypeCounts:{[keyType:string]:int} = {};
 				for (var column of columns || [])
-					keyTypeCounts[ColumnUtils.getKeyType(column)] = Math.floor(Number(keyTypeCounts[ColumnUtils.getKeyType(column)])) + 1;
+					keyTypeCounts[ColumnUtils.getKeyType(column)] = int(keyTypeCounts[ColumnUtils.getKeyType(column)]) + 1;
 				var count:int = 0;
 				for (var kt in keyTypeCounts)
 					if (keyTypeCounts[kt] > count)

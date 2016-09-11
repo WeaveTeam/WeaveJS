@@ -16,8 +16,8 @@ package
 	import weavejs.api.core.ISessionManager;
 	import weavejs.api.data.IAttributeColumn;
 	import weavejs.core.SessionStateLog;
-	/* import weavejs.path.WeavePath; */
-	/* import weavejs.path.WeavePathUI; */
+	import weavejs.path.WeavePath;
+	import weavejs.path.WeavePathUI;
 	import weavejs.util.DebugUtils;
 	import weavejs.util.Dictionary2D;
 	import weavejs.util.JS;
@@ -33,7 +33,7 @@ package
 		public function Weave()
 		{
 			// set this property for backwards compatibility
-			// this['WeavePath'] = WeavePathUI;
+			this['WeavePath'] = WeavePathUI;
 
 			root = disposableChild(this, WeaveAPI.ClassRegistry.getImplementations(ILinkableHashMap)[0]);
 			history = disposableChild(this, new SessionStateLog(root, HISTORY_SYNC_DELAY));
@@ -81,14 +81,14 @@ package
 		 * @return A WeavePath object.
 		 * @see WeavePath
 		 */
-		public function path(...basePath/*/(string|number|(string|number)[])[]/*/):*/*WeavePath*/
+		public function path(...basePath/*/(string|number|(string|number)[])[]/*/):WeavePath
 		{
 			if (basePath.length == 1 && basePath[0] is Array)
 				basePath = basePath[0];
 			// handle path(linkableObject)
 			if (basePath.length == 1 && isLinkable(basePath[0]))
 				basePath = findPath(root, basePath[0]);
-			return basePath ? /* new WeavePathUI(this, basePath) */null : null;
+			return basePath ? new WeavePathUI(this, basePath) : null;
 		}
 
 		/**
@@ -100,8 +100,8 @@ package
 		{
 			if (path.length == 1)
 			{
-				if (path[0] is Object/*WeavePath*/)
-					return (path[0] as Object /*WeavePath*/).getObject();
+				if (path[0] is WeavePath)
+					return (path[0] as WeavePath).getObject();
 				if (path[0] is Array)
 					path = path[0];
 			}
@@ -177,7 +177,7 @@ package
 		 * @param object An ILinkableObject.
 		 * @return A WeavePath, or null if the object is not registered with a Weave instance.
 		 */
-		public static function getPath(object:ILinkableObject):*/*WeavePath*/
+		public static function getPath(object:ILinkableObject):WeavePath
 		{
 			var weave:Weave = Weave.getWeave(object);
 			return weave ? weave.path(object) : null;

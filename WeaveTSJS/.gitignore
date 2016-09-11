@@ -1,6 +1,5 @@
 # reference files
 bin
-bin/tsd
 src/_lib-references.ts
 src/_references.ts
 typings/weave/weavejs-core.d.ts

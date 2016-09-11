@@ -296,6 +296,4 @@ namespace weavejs.data.source {
 			return Weave.lang("{0} geometry", this.getLabel());
 		}
 	}
-
-	Weave.registerClass(GeoJSONDataSource, "weavejs.data.source.GeoJSONDataSource", [IDataSource], "GeoJSON file");
 }
