@@ -16,10 +16,12 @@
 /*																			*/
 /* ************************************************************************ */
 
-package org.vanrijkom.shp
+namespace org.vanrijkom.shp
 {
 
-import weavejs.util.JSByteArray;
+import JSByteArray = weavejs.util.JSByteArray;
+import ShpRecord = org.vanrijkom.shp.ShpRecord;
+import ShpError = org.vanrijkom.shp.ShpError;
 
 /**
  * The ShpTools class contains static tool methods for working with
@@ -27,7 +29,7 @@ import weavejs.util.JSByteArray;
  * @author Edwin van Rijkom
  * 
  */	
-public class ShpTools
+export class ShpTools
 {
 	/**
 	 * Reads all available ESRI Shape records from the specified ByteArray.
@@ -35,16 +37,16 @@ public class ShpTools
 	 * 
 	 * @param src ByteArray to read ESRI Shape records from.
 	 * @return An Array containing zoomero or more ShpRecord typed values.
-	 * @see ShpRecord 
+	 * @see org.vanrijkom.shp.ShpRecord
 	 */	
-	public static function readRecords(src: JSByteArray): Array {
+	public static readRecords(src: JSByteArray): ShpRecord[] {
 		var record: ShpRecord;
-		var records: Array = []
+		var records: ShpRecord[] = [];
 		while (true) {			
 			try {		
 				record = new ShpRecord(src);
 				records.push(record);				
-			} catch (e: ShpError) {
+			} catch (e) {
 				if (e.errorID == ShpError.ERROR_NODATA)
 					break;
 				else	

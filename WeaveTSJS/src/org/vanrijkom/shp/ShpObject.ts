@@ -16,26 +16,26 @@
 /*																			*/
 /* ************************************************************************ */
 
-package org.vanrijkom.shp
+namespace org.vanrijkom.shp
 {
 	
 /**
  * The ShpObject class is the base class of all specialized Shapefile
  * record type parsers.
  * @author Edwin van Rijkom
- * @see ShpPoint
- * @see ShpPointZ
- * @see ShpPolygon
- * @see ShpPolyline
+ * @see org.vanrijkom.shp.ShpPoint
+ * @see org.vanrijkom.shp.ShpPointZ
+ * @see org.vanrijkom.shp.ShpPolygon
+ * @see org.vanrijkom.shp.ShpPolyline
  */	
-public class ShpObject
+export class ShpObject
 {
 	/**
 	 * Type of this Shape object. Should match one of the constant 
 	 * values defined in the ShpType class.
-	 * @see ShpType
+	 * @see org.vanrijkom.shp.ShpType
 	 */	
-	public var type: int;	
+	public type: number;
 }
 
 } // package

@@ -1,6 +1,6 @@
 /* ************************************************************************ */
 /*																			*/
-/*  SHP (ESRI ShapeFile Reader)												*/
+/*  DBF (XBase File Reader) 												*/
 /*  Copyright (c)2007 Edwin van Rijkom										*/
 /*  http://www.vanrijkom.org												*/
 /*																			*/
@@ -16,36 +16,33 @@
 /*																			*/
 /* ************************************************************************ */
 
-package org.vanrijkom.shp
+namespace org.vanrijkom.dbf
 {
+	import JSByteArray = weavejs.util.JSByteArray;
 
-import weavejs.util.JSByteArray;
-
-/**
- * The ShpPoint class parses an ESRI Shapefile Point record from a ByteArray.
- * @author Edwin van Rijkom
- * 
- */	
-public class ShpPoint extends ShpObject
-{
 	/**
-	 * Constructor
-	 * @throws ShpError Not a Point record 
-	 */	
-	public var x: Number; 
-	public var y: Number;
-	
-	public function ShpPoint(src: JSByteArray = null, size: uint = 0) {
-		type = ShpType.SHAPE_POINTZ;
-		if (src) {			
-			if (src.length - src.position < size)
-				throw(new ShpError("Not a Point record (to small)"));
-			
-			x = (size > 0)	? src.readDouble() : NaN;
-			y = (size > 8) 	? src.readDouble() : NaN;			
-		}
-		//trace("Point", x,y);		
-	}
-}
+	 * The DbfRecord class parses a record from a DBF file loade to a ByteArray.
+	 * To do so it requires a DbfHeader instance previously read from the
+	 * ByteArray.
+	 * @author Edwin van Rijkom
+	 * @see vanrijkom.dbf.DbfHeader
+	 *
+	 */
+	export class DbfRecord
+	{
+		/**
+		 * Record field values. Use values["fieldname"] to get a value.
+		 */
+		public map_field_value:Map<string, any>;
 
+		private offset: number;
+
+		constructor(src: JSByteArray, header: DbfHeader) {
+			this.offset = src.position;
+			this.map_field_value = new Map<string, any>();
+			for(var field of header.fields) {
+				this.map_field_value.set(field.name, src.readUTFBytes(field.length));
+			}
+		}
+	}
 } // package

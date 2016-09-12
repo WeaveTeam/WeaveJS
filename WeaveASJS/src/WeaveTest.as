@@ -74,24 +74,8 @@ import weavejs.core.LinkableString;
 	import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
 	import weavejs.util.JS;
-import weavejs.util.JSByteArray;
-import weavejs.util.WeaveMenuItem;
-
-	import org.vanrijkom.dbf.DbfError;
-	import org.vanrijkom.dbf.DbfField;
-	import org.vanrijkom.dbf.DbfFilter;
-	import org.vanrijkom.dbf.DbfHeader;
-	import org.vanrijkom.dbf.DbfRecord;
-	import org.vanrijkom.dbf.DbfTools;
-	import org.vanrijkom.shp.ShpError;
-	import org.vanrijkom.shp.ShpHeader;
-	import org.vanrijkom.shp.ShpObject;
-	import org.vanrijkom.shp.ShpPoint;
-	import org.vanrijkom.shp.ShpPointZ;
-	import org.vanrijkom.shp.ShpPolygon;
-	import org.vanrijkom.shp.ShpRecord;
-	import org.vanrijkom.shp.ShpTools;
-	import org.vanrijkom.shp.ShpType;
+	import weavejs.util.JSByteArray;
+	import weavejs.util.WeaveMenuItem;
 
 	public class WeaveTest
 	{
@@ -152,21 +136,6 @@ import weavejs.util.WeaveMenuItem;
 			TempHack_SolidLineStyle,
 			EventCallbackCollection,
 			Range,
-			DbfError,
-			DbfField,
-			DbfFilter,
-			DbfHeader,
-			DbfRecord,
-			DbfTools,
-			ShpError,
-			ShpHeader,
-			ShpObject,
-			ShpPoint,
-			ShpPointZ,
-			ShpPolygon,
-			ShpRecord,
-			ShpTools,
-			ShpType,
 			IPrimitiveColumn,
 			IWeaveTreeNodeWithPathFinding,
 			LinkablePromise,

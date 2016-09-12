@@ -1,6 +1,6 @@
 /* ************************************************************************ */
 /*																			*/
-/*  DBF (XBase File Reader) 												*/
+/*  SHP (ESRI ShapeFile Reader)												*/
 /*  Copyright (c)2007 Edwin van Rijkom										*/
 /*  http://www.vanrijkom.org												*/
 /*																			*/
@@ -16,30 +16,38 @@
 /*																			*/
 /* ************************************************************************ */
 
-package org.vanrijkom.dbf
+namespace org.vanrijkom.shp
 {
 
+import JSByteArray = weavejs.util.JSByteArray;
+import ShpObject = org.vanrijkom.shp.ShpObject;
+import ShpError = org.vanrijkom.shp.ShpError;
+import ShpType = org.vanrijkom.shp.ShpType;
 /**
- * Instances of the DbfError class are thrown from the DBF library classes
- * on encountering errors.
+ * The ShpPoint class parses an ESRI Shapefile Point record from a ByteArray.
  * @author Edwin van Rijkom
  * 
  */	
-public class DbfError extends Error
+export class ShpPoint extends ShpObject
 {
 	/**
-	 * Defines the identifier value of an undefined error.  
+	 * Constructor
+	 * @throws org.vanrijkom.shp.ShpError Not a Point record
 	 */	
-	public static const ERROR_UNDEFINED		: int = 0;
-	/**
-	 * Defines the identifier value of a 'out of bounds' error, which is thrown
-	 * when an invalid item index is passed.
-	 */	
-	public static const ERROR_OUTOFBOUNDS	: int = 1;
+	public x: number;
+	public y: number;
 	
-	public function DbfError(msg: String, id: int=0) {
-		super(msg);
-		this['errorID'] = id;
+	constructor(src: JSByteArray = null, size: number = 0) {
+		super();
+		this.type = ShpType.SHAPE_POINTZ;
+		if (src) {			
+			if (src.length - src.position < size)
+				throw(new ShpError("Not a Point record (to small)"));
+			
+			this.x = (size > 0)	? src.readDouble() : NaN;
+			this.y = (size > 8) 	? src.readDouble() : NaN;
+		}
+		//trace("Point", x,y);		
 	}
 }
 

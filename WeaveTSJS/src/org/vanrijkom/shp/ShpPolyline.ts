@@ -16,37 +16,29 @@
 /*																			*/
 /* ************************************************************************ */
 
-package org.vanrijkom.shp
+namespace org.vanrijkom.shp
 {
-	
+
+import JSByteArray = weavejs.util.JSByteArray;
+import ShpPolygon = org.vanrijkom.shp.ShpPolygon;
 /**
- * Instances of the ShpError class are thrown from the SHP library classes
- * on encountering errors.
- * @author Edwin van Rijkom 
+ * The ShpPoint class parses an ESRI Shapefile Polyline record from a ByteArray.
+ * @author Edwin van Rijkom
+ * 
  */	
-public class ShpError extends Error
+export class ShpPolyline extends ShpPolygon
 {
-	/**
-	 * Defines the identifier value of an undefined error.  
-	 */	
-	public static const ERROR_UNDEFINED		: int = 0;
-	/**
-	 * Defines the identifier value of a 'no data' error, which is thrown
-	 * when a ByteArray runs out of data.
-	 */	
-	public static const ERROR_NODATA		: int = 1;
-	
 	/**
 	 * Constructor.
-	 * @param msg
-	 * @param id
+	 * @param src
+	 * @param size
 	 * @return 
 	 * 
 	 */	
-	public function ShpError(msg: String, id: int=0) {
-		super(msg);
-		this['errorID'] = id;
+	constructor(src: JSByteArray = null, size: number = 0) {
+		super(src, size);
+		this.type = ShpType.SHAPE_POLYLINE;
 	}
 }
 
-} // package
+} // package;

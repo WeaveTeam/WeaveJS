@@ -16,41 +16,38 @@
 /*																			*/
 /* ************************************************************************ */
 
-package org.vanrijkom.shp
+namespace org.vanrijkom.shp
 {
-
-import weavejs.util.JSByteArray;
-
-/**
- * The ShpPointZ class parses an ESRI Shapefile PointZ record from a ByteArray. 
- * @author Edwin van Rijkom
- * 
- */	
-public class ShpPointZ extends ShpPoint
-{
-	/**
-	 * Z value
-	 */
-	public var z: Number;
-	/**
-	 * M value (measure)
-	 */ 
-	public var m: int; // Measure;
 	
+/**
+ * Instances of the ShpError class are thrown from the SHP library classes
+ * on encountering errors.
+ * @author Edwin van Rijkom 
+ */	
+export class ShpError extends Error
+{
 	/**
-	 * Constructor
-	 * @param src
-	 * @param size
-	 * @return	 
+	 * Defines the identifier value of an undefined error.  
+	 */	
+	public static /* readonly */ ERROR_UNDEFINED		: number = 0;
+	/**
+	 * Defines the identifier value of a 'no data' error, which is thrown
+	 * when a ByteArray runs out of data.
+	 */	
+	public static /* readonly */ ERROR_NODATA		: number = 1;
+
+	public errorID:number;
+
+	/**
+	 * Constructor.
+	 * @param msg
+	 * @param id
+	 * @return 
 	 * 
 	 */	
-	public function ShpPointZ(src: JSByteArray = null, size: uint = 0) {
-		super();
-		type = ShpType.SHAPE_POINT;
-		if (src) {			
-			z = (size > 16) ? src.readDouble() : NaN;			
-			m = (size > 24) ? src.readDouble() : NaN;
-		}		
+	constructor(msg:string, id: number=0) {
+		super(msg);
+		this.errorID = id;
 	}
 }
 

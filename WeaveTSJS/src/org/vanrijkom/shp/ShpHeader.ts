@@ -16,60 +16,61 @@
 /*																			*/
 /* ************************************************************************ */
 
-package org.vanrijkom.shp
+namespace org.vanrijkom.shp
 {
-	
-import weavejs.util.JSByteArray;
-import weavejs.geom.Rectangle;
-import weavejs.geom.Point;
+
+import ShpError = org.vanrijkom.shp.ShpError;
+import JSByteArray = weavejs.util.JSByteArray;
+import Rectangle = weavejs.geom.Rectangle;
+import Point = weavejs.geom.Point;
 
 /**
  * The ShpHeader class parses an ESRI Shapefile Header from a ByteArray.
  * @author Edwin van Rijkom
  * 
  */
-public class ShpHeader
+export class ShpHeader
 {
 	/**
 	 * Size of the entire Shapefile as stored in the Shapefile, in bytes.
 	 */	
-	public var fileLength: int;
+	public fileLength: number;
 	/**
 	 * Shapefile version. Expected value is 1000. 
 	 */		
-	public var version: int;
+	public version: number;
 	/**
 	 * Type of the Shape records contained in the remainder of the
 	 * Shapefile. Should match one of the constant values defined
 	 * in the ShpType class.
-	 * @see ShpType
+	 * @see vanrijkom.shp.ShpType
 	 */	
-	public var shapeType: int;
+	public shapeType: number;
 	/**
 	 * The cartesian bounding box of all Shape records contained
 	 * in this file.
 	 */	
-	public var boundsXY: Rectangle;
+	public boundsXY: Rectangle;
 	/**
 	 * The minimum (Point.x) and maximum Z (Point.y) value expected
 	 * to be encountered in this file.
 	 */	
-	public var boundsZ: Point;
+	public boundsZ: Point;
 	/**
 	 * The minimum (Point.x) and maximum M (Point.y) value expected
 	 * to be encountered in this file.
 	 */	
-	public var boundsM: Point;
+	public boundsM: Point;
 	
 	/**
 	 * Constructor.
 	 * @param src
 	 * @return
-	 * @throws ShpError Not a valid shape file header
-	 * @throws ShpError Not a valid signature
+	 * @throws vanrijkom.shp.ShpError Not a valid shape file header
+	 * @throws vanrijkom.shp.ShpError Not a valid signature
 	 * 
 	 */			
-	public function ShpHeader(src: JSByteArray) {
+	constructor(src: JSByteArray) {
 		// endian:
 		src.littleEndian = false;		
 		
@@ -81,28 +82,28 @@ public class ShpHeader
 		if (src.readInt() != 9994)
 			throw (new ShpError("Not a valid signature. Expected 9994"));
 		
-		 // skip 5 integers;
+		 // skip 5 numberegers;
 		src.position += 5*4;
 		
 		// read file-length:
-		fileLength = src.readInt();
+		this.fileLength = src.readInt();
 		
 		// switch endian:
 		src.littleEndian = true;
 		
 		// read version:
-		version = src.readInt();
+		this.version = src.readInt();
 				
 		// read shape-type:
-		shapeType = src.readInt();
+		this.shapeType = src.readInt();
 		
 		// read bounds:
-		boundsXY = new Rectangle
+		this.boundsXY = new Rectangle
 			( src.readDouble(), src.readDouble()
 			, src.readDouble(), src.readDouble()
 			);
-		boundsZ = new Point( src.readDouble(), src.readDouble() );
-		boundsM = new Point( src.readDouble(), src.readDouble() );				
+		this.boundsZ = new Point( src.readDouble(), src.readDouble() );
+		this.boundsM = new Point( src.readDouble(), src.readDouble() );
 	}
 }
 

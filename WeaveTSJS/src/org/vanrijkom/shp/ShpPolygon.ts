@@ -16,73 +16,77 @@
 /*																			*/
 /* ************************************************************************ */
 
-package org.vanrijkom.shp
+namespace org.vanrijkom.shp
 {
 
-import weavejs.util.JSByteArray;
-import weavejs.geom.Rectangle;
-
+import JSByteArray = weavejs.util.JSByteArray;
+import Rectangle = weavejs.geom.Rectangle;
+import ShpPoint = org.vanrijkom.shp.ShpPoint;
+import ShpObject = org.vanrijkom.shp.ShpObject;
+import ShpType = org.vanrijkom.shp.ShpType;
+import ShpError = org.vanrijkom.shp.ShpError;
 /**
  * The ShpPoint class parses an ESRI Shapefile Polygon record from a ByteArray.
  * @author Edwin van Rijkom
  * 
  */	
-public class ShpPolygon extends ShpObject
+export class ShpPolygon extends ShpObject
 {
 	/**
 	 * Cartesian bounding box of all the rings found in this Polygon record.
 	 */	
-	public var box: Rectangle;
+	public box: Rectangle;
 	/**
 	 * Array containing zero or more Arrays containing zero or more ShpPoint
 	 * typed values, constituting the rings found in this Polygon record.
-	 * @see ShpPoint 
+	 * @see org.vanrijkom.shp.ShpPoint
 	 */	
-	public var rings: Array;
+	public rings: ShpPoint[][];
 	
 	/**
 	 * Constructor.
 	 * @param src
 	 * @param size
 	 * @return 
-	 * @throws ShpError Not a Polygon record
+	 * @throws org.vanrijkom.shp.ShpError Not a Polygon record
 	 */	
-	public function ShpPolygon(src: JSByteArray = null, size: uint = 0) {
-		type = ShpType.SHAPE_POLYGON;
-		rings = [];		
+	constructor(src: JSByteArray = null, size: number = 0) {
+		super();
+		this.type = ShpType.SHAPE_POLYGON;
+		this.rings = [];
 		if (src) {			
 			if (src.length - src.position < size)
 				throw(new ShpError("Not a Polygon record (to small)"));
 			
 			src.littleEndian = true;
 			
-			box = new Rectangle
+			this.box = new Rectangle
 				( src.readDouble(), src.readDouble()
 				, src.readDouble(), src.readDouble()
 				);
 				
-			var rc: int = src.readInt();
-			var pc: int = src.readInt();			
-			var ringOffsets: Array = [];
+			var rc: number = src.readInt();
+			var pc: number = src.readInt();
+			var ringOffsets: number[] = [];
 			while(rc--) {
 				ringOffsets.push(src.readInt());
 			}
 			
-			var points: Array = [];			
+			var points: ShpPoint[] = [];
 			while(pc--) {
 				points.push(new ShpPoint(src,16));
 			}
 			
 			// convert points, and ringOffsets arrays to an array of rings:
-			var removed: uint = 0;
-			var split: int;
+			var removed: number = 0;
+			var split: number;
 			ringOffsets.shift();			
 			while(ringOffsets.length) {
 				split = ringOffsets.shift();
-				rings.push(points.splice(0,split-removed));
+				this.rings.push(points.splice(0,split-removed));
 				removed = split;
 			}	
-			rings.push(points);					
+			this.rings.push(points);
 		}		
 	}
 }

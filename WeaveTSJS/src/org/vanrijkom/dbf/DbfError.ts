@@ -1,6 +1,6 @@
 /* ************************************************************************ */
 /*																			*/
-/*  SHP (ESRI ShapeFile Reader)												*/
+/*  DBF (XBase File Reader) 												*/
 /*  Copyright (c)2007 Edwin van Rijkom										*/
 /*  http://www.vanrijkom.org												*/
 /*																			*/
@@ -16,29 +16,31 @@
 /*																			*/
 /* ************************************************************************ */
 
-package org.vanrijkom.shp
-{
-
-import weavejs.util.JSByteArray;
-
-/**
- * The ShpPoint class parses an ESRI Shapefile Polyline record from a ByteArray.
- * @author Edwin van Rijkom
- * 
- */	
-final public class ShpPolyline extends ShpPolygon
+namespace org.vanrijkom.dbf
 {
 	/**
-	 * Constructor.
-	 * @param src
-	 * @param size
-	 * @return 
-	 * 
-	 */	
-	public function ShpPolyline(src: JSByteArray = null, size: uint = 0) {
-		super(src,size);
-		type = ShpType.SHAPE_POLYLINE;		
-	}
-}
+	 * Instances of the DbfError class are thrown from the DBF library classes
+	 * on encountering errors.
+	 * @author Edwin van Rijkom
+	 *
+	 */
+	export class DbfError extends Error
+	{
+		/**
+		 * Defines the identifier value of an undefined error.
+		 */
+		public static /* readonly */ ERROR_UNDEFINED = 0;
+		/**
+		 * Defines the identifier value of a 'out of bounds' error, which is thrown
+		 * when an invalid item index is passed.
+		 */
+		public static /* readonly */ ERROR_OUTOFBOUNDS = 1;
 
-} // package;
+		public errorID:number;
+
+		constructor(msg:string, id:number=0) {
+			super(msg);
+			this.errorID = id;
+		}
+	}
+} // package

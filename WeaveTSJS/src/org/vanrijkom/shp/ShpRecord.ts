@@ -16,15 +16,18 @@
 /*																			*/
 /* ************************************************************************ */
 
-package org.vanrijkom.shp
+namespace org.vanrijkom.shp
 {
 
-import weavejs.util.JSByteArray;
-import org.vanrijkom.shp.ShpPointZ;
-import org.vanrijkom.shp.ShpError;
-import org.vanrijkom.shp.ShpPoint;
+import JSByteArray = weavejs.util.JSByteArray;
+import ShpPointZ = org.vanrijkom.shp.ShpPointZ;
+import ShpError = org.vanrijkom.shp.ShpError;
+import ShpPoint = org.vanrijkom.shp.ShpPoint;
+import ShpPolygon = org.vanrijkom.shp.ShpPolygon;
+import ShpType = org.vanrijkom.shp.ShpType;
+import ShpPolyline = org.vanrijkom.shp.ShpPolyline;
 
-/**
+	/**
  * The ShpPoint class parses an ESRI Shapefile Record Header from a ByteArray
  * as well as its associated Shape Object. The parsed object is stored as a 
  * ShpObject that can be cast to a specialized ShpObject deriving class using 
@@ -32,44 +35,44 @@ import org.vanrijkom.shp.ShpPoint;
  * @author Edwin van Rijkom
  * 
  */
-public class ShpRecord
+export class ShpRecord
 {
 	/**
 	 * Record number 
 	 */	
-	public var number: int;
+	public number: number;
 	/**
 	 * Content length in 16-bit words 
 	 */
-	public var contentLength: int;
+	public contentLength: number;
 	/**
 	 * Content length in bytes 
 	 */
-	public var contentLengthBytes: uint;
+	public contentLengthBytes: number;
 	/**
 	 * Type of the Shape Object associated with this Record Header.
 	 * Should match one of the constant values defined in the ShpType class.
-	 * @see ShpType
+	 * @see org.vanrijkom.shp.ShpType
 	 */	
-	public var shapeType: int;
+	public shapeType: number;
 	/**
 	 * Parsed Shape Object. Cast to the specialized ShpObject deriving class
 	 * indicated by the shapeType property to obtain Shape type specific
 	 * data. 
 	 */	
-	public var shape: ShpObject;
+	public shape: ShpObject;
 	
 	/**
 	 * Constructor.
 	 * @param src
 	 * @return 
-	 * @throws ShpError Not a valid header
+	 * @throws org.vanrijkom.shp.ShpError Not a valid header
 	 * @throws Shape type is currently unsupported by this library
 	 * @throws Encountered unknown shape type
 	 * 
 	 */	
-	public function ShpRecord(src: JSByteArray) {
-		var availableBytes: int = src.length - src.position;
+	constructor(src: JSByteArray) {
+		var availableBytes:number = src.length - src.position;
 		
 		if (availableBytes == 0) 
 			throw(new ShpError("",ShpError.ERROR_NODATA));
@@ -79,30 +82,30 @@ public class ShpRecord
 	
 		src.littleEndian = false;
 
-		number = src.readInt();
-		contentLength = src.readInt();
-		contentLengthBytes = contentLength*2 - 4;			
+		this.number = src.readInt();
+		this.contentLength = src.readInt();
+		this.contentLengthBytes = this.contentLength*2 - 4;
 		src.littleEndian = true;
-		var shapeOffset: uint = src.position;
-		shapeType = src.readInt();
+		var shapeOffset:number = src.position;
+		this.shapeType = src.readInt();
 				
-		switch(shapeType) {
+		switch(this.shapeType) {
 			
 			// Added for Weave
 			case ShpType.SHAPE_NULL:
 				break;
 			
 			case ShpType.SHAPE_POINT:
-				shape = new ShpPoint(src,contentLengthBytes);
+				this.shape = new ShpPoint(src,this.contentLengthBytes);
 				break;
 			case ShpType.SHAPE_POINTZ:
-				shape = new ShpPointZ(src,contentLengthBytes);
+				this.shape = new ShpPointZ(src,this.contentLengthBytes);
 				break;
 			case ShpType.SHAPE_POLYGON:
-				shape = new ShpPolygon(src, contentLengthBytes);
+				this.shape = new ShpPolygon(src, this.contentLengthBytes);
 				break;
 			case ShpType.SHAPE_POLYLINE:
-				shape = new ShpPolyline(src, contentLengthBytes);
+				this.shape = new ShpPolyline(src, this.contentLengthBytes);
 				break;
 			case ShpType.SHAPE_MULTIPATCH:
 			case ShpType.SHAPE_MULTIPOINT:
@@ -113,11 +116,9 @@ public class ShpRecord
 			case ShpType.SHAPE_POLYGONZ:
 			case ShpType.SHAPE_POLYLINEZ:
 			case ShpType.SHAPE_POLYLINEM:
-				throw(new ShpError(shapeType+" Shape type is currently unsupported by this library"));
-				break;	
-			default:	
-				throw(new ShpError("Encountered unknown shape type ("+shapeType+")"));
-				break;
+				throw(new ShpError(this.shapeType+" Shape type is currently unsupported by this library"));
+			default:
+				throw(new ShpError("Encountered unknown shape type ("+this.shapeType+")"));
 		}
 					
 	}
