@@ -1,5 +1,6 @@
 namespace weavejs.api.data
 {
+	; /* Added to work around bug in sourcemap generation */
 	export interface IGeoJSON
 	{
 		type?: string;
