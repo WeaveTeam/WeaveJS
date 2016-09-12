@@ -1,5 +1,6 @@
 # reference files
-bin
+bin/es6
+bin/js
 src/_lib-references.ts
 src/_references.ts
 typings/weave/weavejs-core.d.ts
