@@ -29,7 +29,7 @@ namespace weavejs.data.bin
 	 * 
 	 * @author adufilie
 	 */
-	Weave.classInfo({id: "weavejs.data.bin.CategoryBinningDefinition", interfaces: [IBinningDefinition]})
+	@Weave.classInfo({id: "weavejs.data.bin.CategoryBinningDefinition", interfaces: [IBinningDefinition]})
 	export class CategoryBinningDefinition extends AbstractBinningDefinition
 	{
 		constructor()
