@@ -27,6 +27,7 @@ namespace weavejs.data.column
 	import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
 	import StandardLib = weavejs.util.StandardLib;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
+	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 	
 	/**
@@ -34,7 +35,7 @@ namespace weavejs.data.column
 	 * 
 	 * @author adufilie
 	 */
-	@Weave.classInfo({id: "weavejs.data.column.BinnedColumn", interfaces: [IPrimitiveColumn]})
+	@Weave.classInfo({id: "weavejs.data.column.BinnedColumn", interfaces: [IPrimitiveColumn, IColumnWrapper, IAttributeColumn]})
 	export class BinnedColumn extends ExtendedDynamicColumn implements IPrimitiveColumn
 	{
 		constructor()

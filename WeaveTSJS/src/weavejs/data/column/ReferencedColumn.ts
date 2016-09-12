@@ -35,7 +35,7 @@ namespace weavejs.data.column
 	 * 
 	 * @author adufilie
 	 */
-	@Weave.classInfo({id:"weavejs.data.column.ReferencedColumn", interfaces: [IColumnWrapper]})
+	@Weave.classInfo({id:"weavejs.data.column.ReferencedColumn", interfaces: [IColumnWrapper, IAttributeColumn]})
 	export class ReferencedColumn extends CallbackCollection implements IColumnWrapper
 	{
 		constructor()
