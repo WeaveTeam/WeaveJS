@@ -57,7 +57,7 @@ namespace weavejs.data.hierarchy
 			var source:IDataSource = this;
 			this._rootNode = new ColumnTreeNode({
 				dataSource: source,
-				label: () => this.getLabel,
+				label: () => this.getLabel(),
 				hasChildBranches: false,
 				children: ():ColumnTreeNode[] => {
 					return this.getGlobalColumns().map((column:IAttributeColumn):ColumnTreeNode => {
