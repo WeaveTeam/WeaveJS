@@ -161,7 +161,6 @@ namespace weavejs.data.column
 		 */
 		public get numberOfBins():uint
 		{
-			console.log("number of bins", this._binNames.length);
 			this.validateBins();
 			return this._binNames.length;
 		}
