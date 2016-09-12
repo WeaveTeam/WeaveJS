@@ -325,7 +325,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				selectedIds={this.selectionKeySet && this.selectionKeySet.keys.map(String) as any}
 				probedIds={this.probeKeySet && this.probeKeySet.keys.map(String) as any}
 				sortId={columnNames[this.sortFieldIndex.value]}
-				sortDirection={this.sortInDescendingOrder.value == true ? SortTypes.DESC : SortTypes.ASC}
+				sortDirection={(this.sortInDescendingOrder.value == true ? SortTypes.DESC : SortTypes.ASC) as SortDirection}
 				onHover={this.handleProbe}
 				onSelection={this.handleSelection}
 				onCellDoubleClick={this.handleCellDoubleClick}

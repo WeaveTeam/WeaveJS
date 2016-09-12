@@ -86,9 +86,9 @@ export class SortHeaderCell extends SmartComponent<ISortHeaderProps, Object>
 		if (this.props.onSortChange && !this.props.disableSort) {
 			this.props.onSortChange(
 				this.props.columnKey,
-				this.props.sortDirection ?
+				(this.props.sortDirection ?
 					this.reverseSortDirection(this.props.sortDirection) :
-					SortTypes.DESC
+					SortTypes.DESC) as SortDirection
 			);
 		}
 	};

@@ -46,9 +46,9 @@ export default class LandingPage extends React.Component<LandingPageProps, Landi
 		var view = props.initialView;
 		var exportedFromFlash = weaveExternalTools && weaveExternalTools[window.name];
 		if (this.urlParams.skipIntro || this.urlParams.file || exportedFromFlash)
-			view = "default";
+			view = "default" as LandingPageView;
 
-		this.state = {view};
+		this.state = {view: view as LandingPageView};
 	}
 
 	loadGetStartedComponentWithTourList=()=>{
