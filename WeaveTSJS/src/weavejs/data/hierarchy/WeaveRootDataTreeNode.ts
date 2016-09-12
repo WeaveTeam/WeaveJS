@@ -22,7 +22,7 @@ namespace weavejs.data.hierarchy
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import WeaveTreeDescriptorNode = weavejs.data.hierarchy.WeaveTreeDescriptorNode;
 
-	@Weave.classInfo({id: "weavejs.data.hierarchy.WeaveRootDataTreeNode", interfaces: [ILinkableObject, IColumnReference]})
+	@Weave.classInfo({id: "weavejs.data.hierarchy.WeaveRootDataTreeNode", interfaces: [IWeaveTreeNode, IColumnReference]})
 	export class WeaveRootDataTreeNode extends WeaveTreeDescriptorNode implements ILinkableObject, IColumnReference
 	{
 		public constructor(root:ILinkableHashMap)

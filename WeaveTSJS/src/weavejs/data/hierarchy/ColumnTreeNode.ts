@@ -32,7 +32,7 @@ namespace weavejs.data.hierarchy
 	 * The following properties are used by ColumnTreeNode but not for equality comparison:<br>
 	 * <code>label, children, hasChildBranches</code><br>
 	 */
-	@Weave.classInfo({id: "weavejs.data.hierarchy", interfaces: [IWeaveTreeNodeWithPathFinding, IColumnReference]})
+	@Weave.classInfo({id: "weavejs.data.hierarchy", interfaces: [IWeaveTreeNode, IWeaveTreeNodeWithPathFinding, IColumnReference]})
 	export class ColumnTreeNode extends WeaveTreeDescriptorNode implements IWeaveTreeNodeWithPathFinding, IColumnReference
 	{
 		/**
@@ -60,12 +60,12 @@ namespace weavejs.data.hierarchy
 		/**
 		 * IDataSource for this node.
 		 */
-		public dataSource:IDataSource = null;
+		public dataSource:IDataSource;
 		
 		/**
 		 * A list of data fields to use for node equality tests.
 		 */
-		public idFields:string[] = null;
+		public idFields:string[];
 
 		/**
 		 * If there is no label, this will use data['title'] if defined.
