@@ -159,6 +159,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (_.isEqual(this.getRenderPath(), this.getRootLayoutPath()))
 		{
 			let window = ReactUtils.getWindow(this);
+			(window as any).weave = this.props.weave;
 			window.addEventListener("beforeunload", this.handleBeforeUnload);
 			window.addEventListener("unload", this.handleUnload);
 		}
