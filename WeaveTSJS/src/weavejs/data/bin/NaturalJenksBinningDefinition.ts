@@ -215,7 +215,7 @@ namespace weavejs.data.bin
 				}
 				for (; this._m < this._count + 1; this._m++)
 				{
-					if(JS.now()>returnTime)
+					if(Date.now()>returnTime)
 					{
 						return this._count/(this._sortedValues.length+1);
 					}

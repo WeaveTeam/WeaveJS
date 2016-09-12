@@ -849,7 +849,7 @@ namespace weavejs.data
 			var newState:any[] = [];
 			for (var iRef:int = 0; iRef < columnReferences.length; iRef++)
 			{
-				var ref:IColumnReference = columnReferences[iRef] as IColumnReference;
+				var ref:IColumnReference = Weave.AS(columnReferences[iRef], IColumnReference);
 				if (ref)
 				{
 					var objectName:string = names[newState.length] || destination.generateUniqueName(baseName);

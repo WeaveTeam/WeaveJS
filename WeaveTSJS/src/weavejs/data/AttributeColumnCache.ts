@@ -36,13 +36,9 @@ namespace weavejs.data
 
 	export declare type CachedColumnData = [string, string, {[property:string]:string}, string[], any[]][];
 
+	@Weave.classInfo({id: "weavejs.data.AttributeColumnCache", interfaces: [IAttributeColumnCache]})
 	export class AttributeColumnCache implements IAttributeColumnCache
 	{
-		static WEAVE_INFO = Weave.setClassInfo(AttributeColumnCache, {
-			id: "weavejs.data.AttributeColumnCache",
-			interfaces: [IAttributeColumnCache]
-		});
-
 		public getColumn(dataSource:IDataSource, metadata:{[key:string]:string}):IAttributeColumn
 		{
 			// null means no column

@@ -22,6 +22,7 @@ namespace weavejs.data.bin
 	import JS = weavejs.util.JS;
 	import StandardLib = weavejs.util.StandardLib;
 	import IBinningDefinition = weavejs.api.data.IBinningDefinition;
+	import AbstractBinningDefinition = weavejs.data.bin.AbstractBinningDefinition;
 
 	/**
 	 * Creates a separate bin for every string value in a column.

@@ -58,7 +58,7 @@ namespace weavejs.data.column
 				root.childListCallbacks.addImmediateCallback(this, this.updateDataSource);
 				this._initialized = true;
 			}
-			
+
 			var ds:IDataSource = Weave.AS(root.getObject(this.dataSourceName.value), IDataSource);
 			if (!ds)
 				ds = GlobalColumnDataSource.getInstance(root);
@@ -135,7 +135,7 @@ namespace weavejs.data.column
 			{
 				if (Weave.wasDisposed(this._dataSource))
 					this._dataSource = null;
-				
+
 				this._columnWatcher.target = this._internalColumn = WeaveAPI.AttributeColumnCache.getColumn(this._dataSource, this.metadata.state);
 				
 				this._prevTriggerCounter = this.triggerCounter;

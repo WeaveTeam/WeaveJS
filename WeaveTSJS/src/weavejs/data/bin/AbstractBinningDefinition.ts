@@ -84,7 +84,6 @@ namespace weavejs.data.bin
 		private _overrideInputMax:LinkableNumber;
 		private _overrideBinNamesArray:string[] = [];
 
-		private overrideBinNamesObserver = {};
 		public get overrideBinNames():LinkableString { return this._overrideBinNames; }
 		public get overrideInputMin():LinkableNumber { return this._overrideInputMin; }
 		public get overrideInputMax():LinkableNumber { return this._overrideInputMax; }
@@ -92,7 +91,7 @@ namespace weavejs.data.bin
 		private getOverrideNamesObserver = {};
 		protected getOverrideNames():string[]
 		{
-			if (this.overrideBinNames && Weave.detectChange(this.getOverrideNamesObserver, this.overrideBinNamesObserver))
+			if (this.overrideBinNames && Weave.detectChange(this.getOverrideNamesObserver, this.overrideBinNames))
 				this._overrideBinNamesArray = WeaveAPI.CSVParser.parseCSVRow(this.overrideBinNames.value) || [];
 			return this._overrideBinNamesArray;
 		}

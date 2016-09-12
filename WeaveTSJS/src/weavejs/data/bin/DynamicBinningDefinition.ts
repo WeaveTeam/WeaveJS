@@ -26,13 +26,14 @@ namespace weavejs.data.bin
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 	import JS = weavejs.util.JS;
 	import StandardLib = weavejs.util.StandardLib;
+	import ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
 	
 	/**
 	 * This provides a wrapper for a dynamically created IBinningDefinition.
 	 * When <code>generateBinClassifiersForColumn(column)</code> is called, the column
 	 * will be monitored for changes and results will be computed automatically.
 	 */
-	@Weave.classInfo({id: "weavejs.data.bin.DynamicBinningDefinition", interfaces: [IBinningDefinition]})
+	@Weave.classInfo({id: "weavejs.data.bin.DynamicBinningDefinition", interfaces: [IBinningDefinition, ILinkableDynamicObject, ICallbackCollection]})
 	export class DynamicBinningDefinition extends LinkableDynamicObject implements IBinningDefinition
 	{
 		/**
@@ -41,7 +42,7 @@ namespace weavejs.data.bin
 		constructor(lockFirstColumn:boolean = false)
 		{
 			super(IBinningDefinition);
-			this.addImmediateCallback(null, this.watchInternalObject);
+			this.addImmediateCallback(this, this.watchInternalObject);
 			this._columnLocked = lockFirstColumn;
 		}
 		
@@ -50,7 +51,7 @@ namespace weavejs.data.bin
 		private internalObjectWatcher:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher, this.handleInternalObjectChange);
 		private columnWatcher:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher, this.generateBins);
 		private statsWatcher:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher, this.generateBins);
-		
+
 		private watchInternalObject():void
 		{
 			this.internalObjectWatcher.target = this.internalObject;
@@ -59,7 +60,7 @@ namespace weavejs.data.bin
 		private handleInternalObjectChange():void
 		{
 			if (this.internalObject)
-				this.internalResultWatcher.target = Weave.AS(this.internalObject, IBinningDefinition).asyncResultCallbacks
+				this.internalResultWatcher.target = Weave.AS(this.internalObject, IBinningDefinition).asyncResultCallbacks;
 			this.generateBins();
 		}
 		
@@ -81,7 +82,7 @@ namespace weavejs.data.bin
 				this.asyncResultCallbacks.triggerCallbacks();
 			else
 				this.overrideBinsOutput.removeAllObjects();
-			
+
 			if (this.internalObject && column)
 				Weave.AS(this.internalObject, IBinningDefinition).generateBinClassifiersForColumn(column);
 			else

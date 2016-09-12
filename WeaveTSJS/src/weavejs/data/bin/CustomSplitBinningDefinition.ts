@@ -52,7 +52,7 @@ namespace weavejs.data.bin
 			this.output.removeAllObjects();
 			
 			var i:int;
-			var values:any[] /* string[]|number[] */ = String(this.splitValues.value || '').split(',');
+			var values:any[] /* string[]|number[] */ = String(this.splitValues.value || '').split(','); // TODO
 			// remove bad values
 			for ( i = values.length; i--;)
 			{

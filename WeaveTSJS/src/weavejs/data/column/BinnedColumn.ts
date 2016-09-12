@@ -45,7 +45,7 @@ namespace weavejs.data.column
 			this.binningDefinition.generateBinClassifiersForColumn(this.internalDynamicColumn);
 			Weave.linkableChild(this, this.binningDefinition.asyncResultCallbacks);
 		}
-		
+
 		/**
 		 * This number overrides the min,max metadata values.
 		 * @param propertyName The name of a metadata property.
@@ -161,6 +161,7 @@ namespace weavejs.data.column
 		 */
 		public get numberOfBins():uint
 		{
+			console.log("number of bins", this._binNames.length);
 			this.validateBins();
 			return this._binNames.length;
 		}
