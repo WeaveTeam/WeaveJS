@@ -35,7 +35,7 @@ namespace weavejs.data.source {
 	import JS = weavejs.util.JS;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 	
-	@Weave.classInfo({id: "weavejs.data.source.GeoJSONDataSource", interfaces: [IDataSource]})
+	@Weave.classInfo({id: "weavejs.data.source.GeoJSONDataSource", label: "GeoJSON file", interfaces: [IDataSource]})
 	export class GeoJSONDataSource extends AbstractDataSource
 	{
 		/*override*/ get isLocal():boolean

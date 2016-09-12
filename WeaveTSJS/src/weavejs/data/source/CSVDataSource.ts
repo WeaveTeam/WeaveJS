@@ -58,14 +58,9 @@ namespace weavejs.data.source
 	 * @author adufilie
 	 * @author skolman
 	 */
+	@Weave.classInfo({id: "weavejs.data.source.CSVDataSource", label: "CSV file", interfaces: [IDataSource, ILinkableObjectWithNewProperties]})
 	export class CSVDataSource extends AbstractDataSource implements IDataSource, ILinkableObjectWithNewProperties
 	{
-		static WEAVE_INFO = Weave.setClassInfo(CSVDataSource, {
-			id: "weavejs.data.source.CSVDataSource",
-			interfaces: [IDataSource, ILinkableObjectWithNewProperties],
-			label: "CSV file"
-		});
-
 		constructor()
 		{
 			super();
@@ -477,7 +472,7 @@ namespace weavejs.data.source
 			
 			return null;
 		}
-		private getColumnNodeLabel(node:any/*ColumnTreeNode*/):string
+		private getColumnNodeLabel(node:ColumnTreeNode):string
 		{
 			var title:string = node.data[ColumnMetadata.TITLE] || node.data[CSVDataSource.METADATA_COLUMN_NAME];
 			if (!title && node.data['name'])
