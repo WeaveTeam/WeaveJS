@@ -22,7 +22,7 @@ package weavejs.data
 	import weavejs.api.data.IAttributeColumn;
 	import weavejs.api.data.IKeySet;
 	import weavejs.api.data.IQualifiedKey;
-	import weavejs.data.column.DynamicColumn;
+	// import weavejs.data.column.DynamicColumn;
 	import weavejs.util.JS;
 	import weavejs.util.StandardLib;
 	
@@ -35,6 +35,7 @@ package weavejs.data
 	 */
 	public class EquationColumnLib
 	{
+		public var DynamicColumn:* = JS.global['weavejs']["data"]["column"]["DynamicColumn"];
 		public static var debug:Boolean = false;
 		
 		/**
@@ -142,7 +143,7 @@ package weavejs.data
 		 * @return the correct filtered value from the data column
 		 * @author kmanohar
 		 */		
-		public static function getValueFromFilterColumn(keyColumn:DynamicColumn, filter:IAttributeColumn, data:IAttributeColumn, filterValue:String, dataType:* = null):Object
+		public static function getValueFromFilterColumn(keyColumn:*/*DynamicColumn*/, filter:IAttributeColumn, data:IAttributeColumn, filterValue:String, dataType:* = null):Object
 		{
 			var key:IQualifiedKey = getKey();
 			var foreignKeyType:String = keyColumn.getMetadata(ColumnMetadata.DATA_TYPE);

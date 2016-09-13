@@ -14,8 +14,8 @@ package weavejs.path
 	import weavejs.api.data.IKeySetCallbackInterface;
 	import weavejs.api.data.IQualifiedKey;
 	//import weavejs.data.ColumnUtils;
-	import weavejs.data.column.DynamicColumn;
-	import weavejs.data.column.ExtendedDynamicColumn;
+	// import weavejs.data.column.DynamicColumn;
+	// import weavejs.data.column.ExtendedDynamicColumn;
 	//import weavejs.data.column.ReferencedColumn;
 	import weavejs.util.JS;
 
@@ -24,6 +24,8 @@ package weavejs.path
 		public var IDataSource:* = JS.global['weavejs']['api']['data']['IDataSource'];
 		public var ColumnUtils:* = JS.global['weavejs']['data']['ColumnUtils'];
 		public var ReferencedColumn:* = JS.global['weavejs']['data']['ReferencedColumn'];
+		public var DynamicColumn:* = JS.global['weavejs']['data']['DynamicColumn'];
+		public var ExtendedDynamicColumn:* = JS.global['weavejs']['data']['ExtendedDynamicColumn'];
 
 		public function WeavePathData(weave:Weave, basePath:Array)
 		{
@@ -482,9 +484,9 @@ package weavejs.path
 				object = this.request(ReferencedColumn).getObject();
 			
 			if (object is ExtendedDynamicColumn)
-				object = (object as ExtendedDynamicColumn).internalDynamicColumn.requestLocalObject(ReferencedColumn, false);
+				object = (object /* as ExtendedDynamicColumn*/)["internalDynamicColumn"].requestLocalObject(ReferencedColumn, false);
 			else if (object is DynamicColumn)
-				object = (object as DynamicColumn).requestLocalObject(ReferencedColumn, false);
+				object = (object /* as DynamicColumn*/)["requestLocalObject"](ReferencedColumn, false);
 			
 			if (object is ReferencedColumn)
 			{

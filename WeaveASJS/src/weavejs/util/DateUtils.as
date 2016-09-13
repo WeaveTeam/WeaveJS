@@ -36,7 +36,7 @@ package weavejs.util
 		{
 			return !isNaN(date as Number) ? moment.duration(date).humanize() : "";
 		}
-		public static function detectFormats(dates:Array/*/<string>/*/, moment_formats:Array/*/<string>/*/):Array/*/<string>/*/
+		public static function detectFormats(dates:Array/*/<string|number>/*/, moment_formats:Array/*/<string>/*/):Array/*/<string>/*/
 		{
 			var validFormatsSparse:Array = [].concat(moment_formats);
 			var fmt:String;

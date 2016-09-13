@@ -8,7 +8,9 @@ package
 {
 	import weavejs.api.core.ILinkableVariable;
 	import weavejs.api.data.IAttributeColumn;
-	import weavejs.api.data.IPrimitiveColumn;
+import weavejs.api.data.IBaseColumn;
+import weavejs.api.data.IColumnWrapper;
+import weavejs.api.data.IPrimitiveColumn;
 	import weavejs.api.data.IQualifiedKey;
 	import weavejs.core.EventCallbackCollection;
 	import weavejs.core.LinkableBoolean;
@@ -22,27 +24,8 @@ import weavejs.core.LinkableString;
 	import weavejs.core.LinkableVariable;
 	import weavejs.core.LinkableWatcher;
 	import weavejs.core.SessionStateLog;
-	import weavejs.data.column.AbstractAttributeColumn;
-	import weavejs.data.column.AlwaysDefinedColumn;
-	import weavejs.data.column.CSVColumn;
-	import weavejs.data.column.ColorColumn;
-	import weavejs.data.column.ColumnDataTask;
-	import weavejs.data.column.DateColumn;
-	import weavejs.data.column.DynamicColumn;
-	import weavejs.data.column.EquationColumn;
-	import weavejs.data.column.ExtendedDynamicColumn;
-	import weavejs.data.column.FilteredColumn;
-	import weavejs.data.column.GeometryColumn;
-	import weavejs.data.column.KeyColumn;
-	import weavejs.data.column.NormalizedColumn;
-	import weavejs.data.column.NumberColumn;
-	import weavejs.data.column.ProxyColumn;
-	import weavejs.data.column.SecondaryKeyNumColumn;
-	import weavejs.data.column.SortedColumn;
-	import weavejs.data.column.SortedIndexColumn;
-	import weavejs.data.column.StringColumn;
-	import weavejs.data.column.StringLookup;
-	import weavejs.data.key.DynamicKeyFilter;
+import weavejs.data.EquationColumnLib;
+import weavejs.data.key.DynamicKeyFilter;
 	import weavejs.data.key.DynamicKeySet;
 	import weavejs.data.key.FilteredKeySet;
 	import weavejs.data.key.KeyFilter;
@@ -50,12 +33,16 @@ import weavejs.core.LinkableString;
 	import weavejs.data.key.KeySetCallbackInterface;
 	import weavejs.data.key.KeySetUnion;
 	import weavejs.data.key.SortedKeySet;
-	import weavejs.geom.TempHack_SolidLineStyle;
 	import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
-	import weavejs.util.JS;
+import weavejs.util.ArrayUtils;
+import weavejs.util.AsyncSort;
+import weavejs.util.ColorRamp;
+import weavejs.util.DateUtils;
+import weavejs.util.JS;
 	import weavejs.util.JSByteArray;
-	import weavejs.util.WeaveMenuItem;
+import weavejs.util.StandardLib;
+import weavejs.util.WeaveMenuItem;
 
 	public class WeaveTest
 	{
@@ -74,34 +61,21 @@ import weavejs.core.LinkableString;
 			KeySetUnion,
 			SortedKeySet,
 			
-			AbstractAttributeColumn,
-			AlwaysDefinedColumn,
-			ColorColumn,
-			ColumnDataTask,
-			CSVColumn,
-			DateColumn,
-			DynamicColumn,
-			EquationColumn,
-			ExtendedDynamicColumn,
-			FilteredColumn,
-			GeometryColumn,
-			NormalizedColumn,
-			NumberColumn,
-			ProxyColumn,
-			SecondaryKeyNumColumn,
-			SortedColumn,
-			SortedIndexColumn,
-			StringColumn,
-			StringLookup,
-			KeyColumn,
 			WeaveMenuItem,
 			ZoomBounds,
-			TempHack_SolidLineStyle,
 			EventCallbackCollection,
 			Range,
 			IPrimitiveColumn,
+			IColumnWrapper,
+			IBaseColumn,
+			ColorRamp,
 			LinkablePromise,
 			JSByteArray,
+			AsyncSort,
+			ArrayUtils,
+			StandardLib,
+			DateUtils,
+			EquationColumnLib,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];
