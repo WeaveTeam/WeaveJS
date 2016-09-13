@@ -163,7 +163,7 @@ namespace weavejs.core
 			return WeaveAPI.URLRequestUtils
 				.request(weave.root, new URLRequest(url))
 				.then(WeaveArchive.deserialize)
-				.then((archive) => {
+				.then((archive:WeaveArchive) => {
 					archive.setSessionFromArchive(weave);
 					return archive;
 				});

@@ -242,13 +242,13 @@ export default class FileMenu implements MenuBarItemProps
 			WeaveAPI.URLRequestUtils
 				.request(this.owner.weave.root, new URLRequest(url))
 				.then(
-					(result) => {
+					(result:Uint8Array) => {
 						// this check attempts to invalidate old requests
 						if (fileName == this.fileName)
 							this.loadArchive(result);
 						//WeaveProperties.notify(this.owner.weave, 'success', Weave.lang("File Opened Successfully"));
 					},
-					(result) => {
+					(result:any) => {
 						if (fileName == this.fileName)
 							WeaveProperties.notify(this.owner.weave, 'error', Weave.lang('Failed to open file "{0}"', fileName));
 					}

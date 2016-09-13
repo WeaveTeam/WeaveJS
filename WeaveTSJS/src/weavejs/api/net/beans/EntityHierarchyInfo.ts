@@ -13,13 +13,13 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.net.beans
+namespace weavejs.api.net.beans
 {
-	public class EntityHierarchyInfo
+	export class EntityHierarchyInfo
 	{
-		public var id:int;
-		public var entityType:String;
-		public var title:String;
-		public var numChildren:int;
+		public id:int;
+		public entityType:string;
+		public title:string;
+		public numChildren:int;
 	}
 }

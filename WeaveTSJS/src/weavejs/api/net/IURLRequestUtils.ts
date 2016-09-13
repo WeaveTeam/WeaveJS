@@ -13,19 +13,20 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.net
+namespace weavejs.api.net
 {
-	import weavejs.api.core.ILinkableHashMap;
-	import weavejs.util.WeavePromise;
+	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import WeavePromise = weavejs.util.WeavePromise;
+	import URLRequest = weavejs.net.URLRequest;
 
-	public interface IURLRequestUtils
+	export class IURLRequestUtils
 	{
 		/**
 		 * Makes a URL request.
 		 * @param urlRequest A URLRequest object.
 		 * @return A WeavePromise
 		 */
-		function request(relevantContext:Object, urlRequest:Object/*weavejs.net.URLRequest*/):WeavePromise/*/<any>/*/;
+		request:(relevantContext:any, urlRequest:URLRequest)=>WeavePromise<any>;
 		
 		/**
 		 * This will save a file in memory so that it can be accessed later via getURL().
@@ -33,25 +34,25 @@ package weavejs.api.net
 		 * @param byteArray The file content in a Uint8Array.
 		 * @return The URL at which the file can be accessed later via getURL(). This will be the string "local://" followed by the filename.
 		 */
-		function saveLocalFile(weaveRoot:ILinkableHashMap, name:String, byteArray:/*/Uint8Array/*/Array):String;
+		saveLocalFile:(weaveRoot:ILinkableHashMap, name:string, byteArray:Uint8Array)=>string;
 		
 		/**
 		 * Retrieves file content previously saved via saveLocalFile().
 		 * @param The file name that was passed to saveLocalFile().
 		 * @return The file content in a Uint8Array.
 		 */
-		function getLocalFile(weaveRoot:ILinkableHashMap, name:String):/*/Uint8Array/*/Array;
+		getLocalFile:(weaveRoot:ILinkableHashMap, name:string)=>Uint8Array;
 		
 		/**
 		 * Removes a local file that was previously added via saveLocalFile().
 		 * @param name The file name which was passed to saveLocalFile().
 		 */
-		function removeLocalFile(weaveRoot:ILinkableHashMap, name:String):void;
+		removeLocalFile:(weaveRoot:ILinkableHashMap, name:string)=>void;
 		
 		/**
 		 * Gets a list of names of files saved via saveLocalFile().
 		 * @return An Array of file names.
 		 */
-		function getLocalFileNames(weaveRoot:ILinkableHashMap):Array;
+		getLocalFileNames:(weaveRoot:ILinkableHashMap)=>string[];
 	}
 }

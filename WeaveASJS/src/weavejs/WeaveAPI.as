@@ -24,7 +24,7 @@ package weavejs
 	import weavejs.api.data.ICSVParser;
 	import weavejs.api.data.IQualifiedKeyManager;
 	import weavejs.api.data.IStatisticsCache;
-	import weavejs.api.net.IURLRequestUtils;
+	//import weavejs.api.net.IURLRequestUtils;
 	import weavejs.api.ui.IEditorManager;
 	import weavejs.core.ClassRegistryImpl;
 	import weavejs.util.JS;
@@ -146,8 +146,9 @@ package weavejs
 		/**
 		 * This is the singleton instance of the registered IURLRequestUtils implementation.
 		 */
-		public static function get URLRequestUtils():IURLRequestUtils
+		public static function get URLRequestUtils():*
 		{
+			var IURLRequestUtils:* = JS.global['weavejs']['api']['net']['IURLRequestUtils'];
 			return (_classRegistry || ClassRegistry as ClassRegistryImpl).map_interface_singletonInstance.get(IURLRequestUtils)
 				|| _classRegistry.getSingletonInstance(IURLRequestUtils);
 		}
