@@ -60,7 +60,7 @@ namespace weavejs.data.bin
 		private str:string;
 		private column:IAttributeColumn;
 		private keys:IQualifiedKey[];
-		private _iterateAll = Scheduler.generateCompoundIterativeTask((stopTime:int) => this._iterate1(stopTime), (stopTime:int) => this._iterate1(stopTime));
+		private _iterateAll = Scheduler.generateCompoundIterativeTask((stopTime:int) => this._iterate1(stopTime), (stopTime:int) => this._iterate2(stopTime));
 		private asyncSort:AsyncSort = Weave.disposableChild(this, AsyncSort);
 		
 		private _iterate1(stopTime:int):number
