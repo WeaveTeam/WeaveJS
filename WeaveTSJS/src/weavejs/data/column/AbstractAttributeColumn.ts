@@ -13,56 +13,59 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data.column
+namespace weavejs.data.column
 {
-	import weavejs.api.data.ColumnMetadata;
-	import weavejs.api.data.IAttributeColumn;
-	import weavejs.api.data.IQualifiedKey;
-	import weavejs.core.CallbackCollection;
-	import weavejs.util.Dictionary2D;
-	import weavejs.util.JS;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import CallbackCollection = weavejs.core.CallbackCollection;
+	import Dictionary2D = weavejs.util.Dictionary2D;
+	import JS = weavejs.util.JS;
+	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
+	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 	
 	/**
 	 * This object contains a mapping from keys to data values.
 	 * 
 	 * @author adufilie
 	 */
-	public class AbstractAttributeColumn extends CallbackCollection implements IAttributeColumn
+	@Weave.classInfo({id: "weavejs.data.column.AbstractAttributeColumn", interfaces: [ICallbackCollection, IAttributeColumn]})
+	export class AbstractAttributeColumn extends CallbackCollection implements IAttributeColumn
 	{
-		public function AbstractAttributeColumn(metadata:Object = null)
+		constructor(metadata:IColumnMetadata = null)
 		{
 			super();
 			if (metadata)
-				setMetadata(metadata);
+				this.setMetadata(metadata);
 		}
 		
-		protected var _metadata:Object = null;
+		protected _metadata:IColumnMetadata = null;
 
 		/**
 		 * This function should only be called once, before setting the record data.
 		 * @param metadata Metadata for this column.
 		 */
-		public function setMetadata(metadata:Object):void
+		public setMetadata(metadata:IColumnMetadata):void
 		{
-			if (_metadata !== null)
+			if (this._metadata !== null)
 				throw new Error("Cannot call setMetadata() if already set");
 			// make a copy because we don't want any surprises (metadata being set afterwards)
-			_metadata = copyValues(metadata);
+			this._metadata = AbstractAttributeColumn.copyValues(metadata);
 			// make sure dataType will be included in getMetadataPropertyNames() result
-			_metadata[ColumnMetadata.DATA_TYPE] = getMetadata(ColumnMetadata.DATA_TYPE);
+			this._metadata.dataType = this.getMetadata(ColumnMetadata.DATA_TYPE) as any; // TODO
 		}
 		
 		/**
 		 * Copies key/value pairs from an Object.
 		 * Converts Array values to Strings using WeaveAPI.CSVParser.createCSVRow().
 		 */
-		protected static function copyValues(object:Object):Object
+		protected static copyValues(object:{[key:string]:any}):{[key:string]:any}
 		{
-			var copy:Object = {};
-			for (var key:String in object)
+			var copy:{[key:string]:any} = {};
+			for (var key in object)
 			{
-				var value:* = object[key];
-				if (value is Array)
+				var value:any = object[key];
+				if (Weave.IS(value, Array))
 					copy[key] = JSON.stringify(value);
 				else
 					copy[key] = value;
@@ -71,17 +74,17 @@ package weavejs.data.column
 		}
 		
 		// metadata for this attributeColumn (statistics, description, unit, etc)
-		public function getMetadata(propertyName:String):String
+		public getMetadata(propertyName:string):string
 		{
-			var value:String = null;
-			if (_metadata)
-				value = _metadata[propertyName] || null;
+			var value:string = null;
+			if (this._metadata)
+				value = this._metadata[propertyName] || null;
 			return value;
 		}
 		
-		public function getMetadataPropertyNames():Array
+		public getMetadataPropertyNames():string[]
 		{
-			return JS.objectKeys(_metadata);
+			return JS.objectKeys(this._metadata);
 		}
 		
 		// 'abstract' functions, should be defined with override when extending this class
@@ -89,39 +92,39 @@ package weavejs.data.column
 		/**
 		 * Used by default getValueFromKey() implementation. Must be explicitly initialized.
 		 */
-		protected var dataTask:ColumnDataTask;
+		protected dataTask:ColumnDataTask;
 		
 		/**
 		 * Used by default getValueFromKey() implementation. Must be explicitly initialized.
 		 */
-		protected var dataCache:Dictionary2D/*/<GenericClass, IQualifiedKey, any>/*/;
+		protected dataCache:Dictionary2D<GenericClass, IQualifiedKey, any>;
 		
-		public function get keys():Array
+		public get keys():IQualifiedKey[]
 		{
-			return dataTask.uniqueKeys;
+			return this.dataTask.uniqueKeys;
 		}
 		
-		public function containsKey(key:IQualifiedKey):Boolean
+		public containsKey(key:IQualifiedKey):boolean
 		{
-			return dataTask.map_key_arrayData.has(key);
+			return this.dataTask.map_key_arrayData.has(key);
 		}
 
-		public function getValueFromKey(key:IQualifiedKey, dataType:Class = null):*
+		public getValueFromKey(key:IQualifiedKey, dataType:GenericClass = null):any
 		{
-			var array:Array = dataTask.map_key_arrayData.get(key);
+			var array:any[] = this.dataTask.map_key_arrayData.get(key);
 			if (!array)
 				return dataType === String ? '' : undefined;
 			
 			if (!dataType || dataType === Array)
 				return array;
 			
-			var value:* = dataCache.get(dataType, key);
+			var value:any = this.dataCache.get(dataType, key);
 			if (value === undefined)
 			{
-				value = generateValue(key, dataType);
-				if (!value is dataType)
+				value = this.generateValue(key, dataType);
+				if (!Weave.IS(value, dataType))
 					throw new Error("generateValue() did not produce a value of the requested type. Expected " + Weave.className(dataType) + ", got " + Weave.className(value));
-				dataCache.set(dataType, key, value);
+				this.dataCache.set(dataType, key, value);
 			}
 			return value;
 		}
@@ -129,7 +132,7 @@ package weavejs.data.column
 		/**
 		 * Used by default getValueFromKey() implementation to cache values.
 		 */
-		protected /* abstract */ function generateValue(key:IQualifiedKey, dataType:Class):Object
+		protected /* abstract */ generateValue(key:IQualifiedKey, dataType:GenericClass):Object
 		{
 			return null;
 		}

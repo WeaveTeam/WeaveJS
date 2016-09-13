@@ -29,13 +29,14 @@ namespace weavejs.data.column
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 	import GlobalColumnDataSource = weavejs.data.hierarchy.GlobalColumnDataSource;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
+	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 	
 	/**
 	 * This provides a wrapper for a referenced column.
 	 * 
 	 * @author adufilie
 	 */
-	@Weave.classInfo({id:"weavejs.data.column.ReferencedColumn", interfaces: [IColumnWrapper, IAttributeColumn]})
+	@Weave.classInfo({id:"weavejs.data.column.ReferencedColumn", interfaces: [IColumnWrapper, IAttributeColumn, ICallbackCollection]})
 	export class ReferencedColumn extends CallbackCollection implements IColumnWrapper
 	{
 		constructor()

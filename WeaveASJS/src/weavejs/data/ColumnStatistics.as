@@ -87,7 +87,7 @@ package weavejs.data
 			return validateCache(getMedian, NaN);
 		}
 		
-		public function getSortIndex():Object
+		public function getSortIndex():/*/Map<IQualifiedKey, number>/*/Object
 		{
 			return validateCache(getSortIndex, null);
 		}

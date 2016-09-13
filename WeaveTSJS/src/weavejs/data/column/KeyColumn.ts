@@ -13,49 +13,53 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data.column
+namespace weavejs.data.column
 {
-	import weavejs.api.data.ColumnMetadata;
-	import weavejs.api.data.IQualifiedKey;
-	import weavejs.core.LinkableString;
-	import weavejs.data.CSVParser;
-	import weavejs.data.EquationColumnLib;
-	import weavejs.util.ArrayUtils;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import LinkableString = weavejs.core.LinkableString;
+	import CSVParser = weavejs.data.CSVParser;
+	import EquationColumnLib = weavejs.data.EquationColumnLib;
+	import ArrayUtils = weavejs.util.ArrayUtils;
+	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
+	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
-	public class KeyColumn extends AbstractAttributeColumn
+	@Weave.classInfo({id: "weavejs.data.column.KeyColumn", interfaces: [IAttributeColumn, ICallbackCollection]})
+	export class KeyColumn extends AbstractAttributeColumn
 	{
-		public function KeyColumn(metadata:Object = null)
+		constructor(metadata:IColumnMetadata = null)
 		{
 			super(metadata || {});
 		}
 		
-		private static var csvParser:CSVParser;
+		private static csvParser:CSVParser;
 		
-		override public function getMetadata(propertyName:String):String
+		/* override */ public getMetadata(propertyName:string):string
 		{
 			if (propertyName == ColumnMetadata.TITLE)
 			{
-				var kt:String = keyType.value;
+				var kt:string = this.keyType.value;
 				if (kt)
 					return Weave.lang("Key ({0})", kt);
 				return Weave.lang("Key");
 			}
 			if (propertyName == ColumnMetadata.KEY_TYPE)
-				return keyType.value;
+				return this.keyType.value;
 			
 			return super.getMetadata(propertyName);
 		}
 		
-		override public function getMetadataPropertyNames():Array
+		/* override */ public getMetadataPropertyNames():string[]
 		{
 			return ArrayUtils.union(super.getMetadataPropertyNames(), [ColumnMetadata.TITLE, ColumnMetadata.KEY_TYPE]);
 		}
 		
-		public const keyType:LinkableString = Weave.linkableChild(this, LinkableString);
+		public /* readonly */ keyType:LinkableString = Weave.linkableChild(this, LinkableString);
 		
-		override public function getValueFromKey(key:IQualifiedKey, dataType:Class=null):*
+		/* override */ public getValueFromKey(key:IQualifiedKey, dataType:GenericClass=null):any
 		{
-			var kt:String = keyType.value;
+			var kt:string = this.keyType.value;
 			if (kt && key.keyType != kt)
 				return EquationColumnLib.cast(undefined, dataType);
 			
@@ -69,7 +73,7 @@ package weavejs.data.column
 			return EquationColumnLib.cast(key, dataType);
 		}
 		
-		override public function get keys():Array
+		/* override */ public get keys():IQualifiedKey[]
 		{
 			return [];
 		}

@@ -35,7 +35,7 @@ namespace weavejs.data
 	{
 		private static /* readonly */ numberRegex:RegExp = /^(0|0?\\.[0-9]+|[1-9][0-9]*(\\.[0-9]+)?)([eE][-+]?[0-9]+)?$/;
 
-		public static guessDataType(data:number[]|string[]):string
+		public static guessDataType(data:(number|string)[]):string
 		{
 			var dateFormats:string[] = DateColumn.detectDateFormats(data);
 			if (dateFormats.length)
@@ -88,7 +88,7 @@ namespace weavejs.data
 		 * @param keys An Array of either IQualifiedKeys or Strings
 		 * @param data An Array of data values corresponding to the keys.
 		 */
-		public static initColumn(proxyColumn:ProxyColumn, keys:string[]|IQualifiedKey[], data:string[]|number[]):void
+		public static initColumn(proxyColumn:ProxyColumn, keys:string[]|IQualifiedKey[], data:(string|number)[]):void
 		{
 			var asyncCallback = function ():void
 			{
@@ -106,7 +106,7 @@ namespace weavejs.data
 				else
 				{
 					newColumn = new StringColumn(metadata);
-					(newColumn as StringColumn).setRecords(qkeys, data);
+					(newColumn as StringColumn).setRecords(qkeys, data as string[]);
 				}
 				proxyColumn.setInternalColumn(newColumn);
 			}
