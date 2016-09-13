@@ -13,26 +13,27 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.net
+namespace weavejs.api.net
 {
-	import weavejs.api.core.ILinkableObject;
-	import weavejs.util.WeavePromise;
-	
+	; /* Added to work around bug in sourcemap generation */
+	import JSByteArray = weavejs.util.JSByteArray;
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import WeavePromise = weavejs.util.WeavePromise;
 	/**
 	 * This is an interface for requesting tiles for a streamed geometry collection.
 	 * 
 	 * @author adufilie
 	 */
-	public interface IWeaveGeometryTileService extends ILinkableObject
+	export interface IWeaveGeometryTileService extends ILinkableObject
 	{
 		/**
 		 * @return A WeavePromise which returns a JSByteArray
 		 */
-		function getMetadataTiles(tileIDs:Array):WeavePromise/*/<weavejs.util.JSByteArray>/*/;
+		getMetadataTiles(tileIDs:number[]):WeavePromise<weavejs.util.JSByteArray>;
 		
 		/**
 		 * @return A WeavePromise which returns a JSByteArray
 		 */
-		function getGeometryTiles(tileIDs:Array):WeavePromise/*/<weavejs.util.JSByteArray>/*/;
+		getGeometryTiles(tileIDs:number[]):WeavePromise<weavejs.util.JSByteArray>;
 	}
 }

@@ -330,7 +330,7 @@ namespace weavejs.net
 	 *
 	 * @author adufilie
 	 */
-	@Weave.classInfo({id: "weavejs.net.WeaveGeometryTileServlet"})
+	@Weave.classInfo({id: "weavejs.net.WeaveGeometryTileServlet", linkable: true})
 	class WeaveGeometryTileServlet implements IWeaveGeometryTileService
 	{
 		constructor(service:WeaveDataServlet, columnId:number)

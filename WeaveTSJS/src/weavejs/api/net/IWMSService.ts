@@ -13,10 +13,10 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.api.net
+namespace weavejs.api.net
 {
-	import weavejs.api.core.ILinkableObject;
-	import weavejs.geom.Bounds2D;
+	import ILinkableObject = weavejs.api.core.ILinkableObject;
+	import Bounds2D = weavejs.geom.Bounds2D;
 
 	/**
 	 * This is the interface for WMS services. We require each WMS service to provide
@@ -25,19 +25,19 @@ package weavejs.api.net
 	 * 
 	 * @author kmonico
 	 */
-	public interface IWMSService extends ILinkableObject
+	export interface IWMSService extends ILinkableObject
 	{
 		/**
 		 * This function will cancel all the pending requests.
 		 */
-		function cancelPendingRequests():void;
+		cancelPendingRequests():void;
 
 		/**
 		 * This function will return the number of pending requests.
 		 * 
 		 * @return The number of pending requests for this service.
 		 */ 
-		function getNumPendingRequests():int;
+		getNumPendingRequests():int;
 			
 		/**
 		 * This function will make the requests for new images.
@@ -49,13 +49,13 @@ package weavejs.api.net
 		 * @return An array of downloaded images. The array is filled with lower quality images followed by
 		 * the requested quality. These images may overlap.
 		 */
-		function requestImages(dataBounds:Bounds2D, screenBounds:Bounds2D, preferLowerQuality:Boolean = false, layerLowerQuality:Boolean = false):Array;
+		requestImages(dataBounds:Bounds2D, screenBounds:Bounds2D, preferLowerQuality:boolean, layerLowerQuality:boolean):Array;
 		
 		/**
 		 * Outputs the bounds which contains all valid tile requests. If a tile request is
 		 * not contained inside this bounds, the request is invalid.
 		 */ 
-		function getAllowedBounds(output:Bounds2D):void;
+		getAllowedBounds(output:Bounds2D):void;
 		
 		/**
 		 * This function will return the SRS code of the tile requests.
@@ -63,7 +63,7 @@ package weavejs.api.net
 		 * @return A string corresponding to a projection SRS code.
 		 * eg) EPSG:4326
 		 */
-		function getProjectionSRS():String;
+		getProjectionSRS():string;
 		
 		/**
 		 * Get a string which contains copyright information for the
@@ -72,16 +72,16 @@ package weavejs.api.net
 		 * @return A string which contains the copyright information 
 		 * for the provider.
 		 */ 
-		function getCreditInfo():String;
+		getCreditInfo():string;
 		
 		/**
 		 * Gets the width in pixels of an image tile.
 		 */
-		function getImageWidth():int;
+		getImageWidth():int;
 		
 		/**
 		 * Gets the height in pixels of an image tile.
 		 */
-		function getImageHeight():int;
+		getImageHeight():int;
 	}
 }
