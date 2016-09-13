@@ -19,7 +19,6 @@ package
 	import weavejs.core.LinkableNumber;
 import weavejs.core.LinkablePromise;
 import weavejs.core.LinkableString;
-	import weavejs.core.LinkableSynchronizer;
 	import weavejs.core.LinkableVariable;
 	import weavejs.core.LinkableWatcher;
 	import weavejs.core.SessionStateLog;
@@ -64,7 +63,7 @@ import weavejs.core.LinkableString;
 			ILinkableVariable,
 			LinkableNumber,LinkableString,LinkableBoolean,LinkableVariable,
 			LinkableHashMap,LinkableDynamicObject,LinkableWatcher,
-			LinkableCallbackScript,LinkableSynchronizer,LinkableFunction,
+			LinkableCallbackScript,LinkableFunction,
 
 			DynamicKeyFilter,
 			DynamicKeySet,
