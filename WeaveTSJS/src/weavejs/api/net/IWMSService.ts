@@ -49,7 +49,7 @@ namespace weavejs.api.net
 		 * @return An array of downloaded images. The array is filled with lower quality images followed by
 		 * the requested quality. These images may overlap.
 		 */
-		requestImages(dataBounds:Bounds2D, screenBounds:Bounds2D, preferLowerQuality:boolean, layerLowerQuality:boolean):Array;
+		requestImages(dataBounds:Bounds2D, screenBounds:Bounds2D, preferLowerQuality:boolean, layerLowerQuality:boolean):any[];
 		
 		/**
 		 * Outputs the bounds which contains all valid tile requests. If a tile request is
