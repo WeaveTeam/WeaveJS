@@ -428,7 +428,7 @@ package weavejs.data
 				var result:Number = NaN;
 				if (column != null)
 				{
-					var runningTotals:Object = (WeaveAPI.StatisticsCache as StatisticsCache).getRunningTotals(column);
+					var runningTotals:Object = (WeaveAPI.StatisticsCache /* as StatisticsCache*/).getRunningTotals(column);
 					if (runningTotals != null)
 						result = runningTotals.get(key);
 				}

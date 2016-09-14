@@ -24,8 +24,6 @@ package
 	import weavejs.core.Scheduler;
 	import weavejs.core.SessionManager;
 	import weavejs.data.CSVParser;
-	import weavejs.data.StatisticsCache;
-	import weavejs.data.key.QKeyManager;
 
 public class WeaveJS
 	{
@@ -57,10 +55,8 @@ public class WeaveJS
 			
 			// register singleton implementations
 			WeaveAPI.ClassRegistry.registerImplementation(ISessionManager, SessionManager);
-			WeaveAPI.ClassRegistry.registerImplementation(IQualifiedKeyManager, QKeyManager);
 			WeaveAPI.ClassRegistry.registerImplementation(IScheduler, Scheduler);
 			WeaveAPI.ClassRegistry.registerImplementation(IProgressIndicator, ProgressIndicator);
-			WeaveAPI.ClassRegistry.registerImplementation(IStatisticsCache, StatisticsCache);
 			WeaveAPI.ClassRegistry.registerImplementation(IEditorManager, EditorManager);
 			WeaveAPI.ClassRegistry.registerImplementation(ICSVParser, CSVParser);
 

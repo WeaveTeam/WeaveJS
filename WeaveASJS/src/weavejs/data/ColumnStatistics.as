@@ -20,13 +20,15 @@ package weavejs.data
 	import weavejs.api.data.IAttributeColumn;
 	import weavejs.api.data.IColumnStatistics;
 	import weavejs.api.data.IQualifiedKey;
-	import weavejs.data.key.QKeyManager;
+	// import weavejs.data.key.QKeyManager;
 	import weavejs.util.DebugUtils;
 	import weavejs.util.JS;
 	import weavejs.util.StandardLib;
 	
 	internal class ColumnStatistics implements IColumnStatistics
 	{
+		public static var QKeyManager:* = JS.global["weavejs"]["data"]["key"]["QKeyManager"];
+
 		public function ColumnStatistics(column:IAttributeColumn)
 		{
 			this.column = column;
@@ -92,7 +94,7 @@ package weavejs.data
 			return validateCache(getSortIndex, null);
 		}
 		
-		public function hack_getNumericData():Object
+		public function hack_getNumericData():/*/Map<IQualifiedKey, number>/*/Object
 		{
 			return validateCache(hack_getNumericData, null);
 		}
@@ -100,7 +102,7 @@ package weavejs.data
 		/**
 		 * Gets a Dictionary that maps a IQualifiedKey to a running total numeric value, based on the order of the keys in the column.
 		 */
-		public function getRunningTotals():Object
+		public function getRunningTotals():/*/Map<IQualifiedKey, number>/*/Object
 		{
 			return validateCache(getRunningTotals, null);
 		}
@@ -244,7 +246,7 @@ package weavejs.data
 			
 			outKeys.length = count;
 			outNumbers.length = count;
-			var qkm:QKeyManager = WeaveAPI.QKeyManager as QKeyManager;
+			var qkm:*/*QKeyManager*/ = WeaveAPI.QKeyManager /*as QKeyManager*/;
 			var outIndices:Array = StandardLib.sortOn(outKeys, [outNumbers, qkm.map_qkey_keyType, qkm.map_qkey_localName], null, false, true);
 			median = outNumbers[outIndices[int(count / 2)]];
 			i = count;

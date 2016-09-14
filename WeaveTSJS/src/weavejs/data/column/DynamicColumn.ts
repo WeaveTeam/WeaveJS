@@ -33,11 +33,22 @@ namespace weavejs.data.column
 	{
 		constructor(columnTypeRestriction:GenericClass = null)
 		{
-			super(columnTypeRestriction && Weave.IS(columnTypeRestriction && columnTypeRestriction.prototype, IAttributeColumn) ? columnTypeRestriction : IAttributeColumn);
-			if (columnTypeRestriction && !Weave.IS(columnTypeRestriction.prototype, IAttributeColumn))
-			{
-				console.error("DynamicColumn(): columnTypeRestriction does not implement IAttributeColumn:", columnTypeRestriction);
-			}
+			super(function():GenericClass {
+				if (columnTypeRestriction == null)
+				{
+					columnTypeRestriction = IAttributeColumn;
+				}
+				else
+				{
+					// make sure the columnTypeRestriction implements IAttributeColumn
+					if (!Weave.IS(columnTypeRestriction.prototype, IAttributeColumn))
+					{
+						console.error("DynamicColumn(): columnTypeRestriction does not implement IAttributeColumn:", columnTypeRestriction);
+						columnTypeRestriction = IAttributeColumn;
+					}
+				}
+				return columnTypeRestriction;
+			}());
 		}
 		
 		/**

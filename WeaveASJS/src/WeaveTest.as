@@ -25,14 +25,6 @@ import weavejs.core.LinkableString;
 	import weavejs.core.LinkableWatcher;
 	import weavejs.core.SessionStateLog;
 import weavejs.data.EquationColumnLib;
-import weavejs.data.key.DynamicKeyFilter;
-	import weavejs.data.key.DynamicKeySet;
-	import weavejs.data.key.FilteredKeySet;
-	import weavejs.data.key.KeyFilter;
-	import weavejs.data.key.KeySet;
-	import weavejs.data.key.KeySetCallbackInterface;
-	import weavejs.data.key.KeySetUnion;
-	import weavejs.data.key.SortedKeySet;
 import weavejs.geom.GeneralizedGeometry;
 import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
@@ -53,15 +45,6 @@ import weavejs.util.WeaveMenuItem;
 			LinkableHashMap,LinkableDynamicObject,LinkableWatcher,
 			LinkableCallbackScript,LinkableFunction,
 
-			DynamicKeyFilter,
-			DynamicKeySet,
-			FilteredKeySet,
-			KeyFilter,
-			KeySet,
-			KeySetCallbackInterface,
-			KeySetUnion,
-			SortedKeySet,
-			
 			WeaveMenuItem,
 			ZoomBounds,
 			EventCallbackCollection,

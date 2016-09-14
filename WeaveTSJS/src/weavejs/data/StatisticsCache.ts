@@ -13,49 +13,50 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data
+namespace weavejs.data
 {
-	import weavejs.api.data.IAttributeColumn;
-	import weavejs.api.data.IColumnStatistics;
-	import weavejs.api.data.IStatisticsCache;
-	import weavejs.util.JS;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+	import IStatisticsCache = weavejs.api.data.IStatisticsCache;
+	import JS = weavejs.util.JS;
 	
 	/**
 	 * This is an all-static class containing numerical statistics on columns and functions to access the statistics.
 	 * 
 	 * @author adufilie
 	 */
-	public class StatisticsCache implements IStatisticsCache
+	@Weave.classInfo({id: "weavejs.data.StatisticsCache", interfaces: [IStatisticsCache]})
+	export class StatisticsCache implements IStatisticsCache
 	{
 		/**
 		 * @param column A column to get statistics for.
 		 * @return A Map that maps a IQualifiedKey to a running total numeric value, based on the order of the keys in the column.
 		 */
-		public function getRunningTotals(column:IAttributeColumn):Object
+		public getRunningTotals(column:IAttributeColumn):Map<IQualifiedKey, number>
 		{
-			return (getColumnStatistics(column) as ColumnStatistics).getRunningTotals();
+			return Weave.AS(this.getColumnStatistics(column), ColumnStatistics).getRunningTotals();
 		}
 
-		private var map_column_stats:Object = new JS.WeakMap();
+		private map_column_stats = new WeakMap<IAttributeColumn, IColumnStatistics>();
 		
-		public function getColumnStatistics(column:IAttributeColumn):IColumnStatistics
+		public getColumnStatistics(column:IAttributeColumn):IColumnStatistics
 		{
 			if (column == null)
 				throw new Error("getColumnStatistics(): Column parameter cannot be null.");
 			
 			if (Weave.wasDisposed(column))
 			{
-				map_column_stats['delete'](column);
+				this.map_column_stats.delete(column);
 				throw new Error("Invalid attempt to retrieve statistics for a disposed column.");
 			}
 
-			var stats:IColumnStatistics = map_column_stats.get(column);
+			var stats:IColumnStatistics = this.map_column_stats.get(column);
 			if (!stats)
 			{
 				stats = new ColumnStatistics(column);
 				
 				// when the column is disposed, the stats should be disposed
-				map_column_stats.set(column, Weave.disposableChild(column, stats));
+				this.map_column_stats.set(column, Weave.disposableChild(column, stats));
 			}
 			return stats;
 		}

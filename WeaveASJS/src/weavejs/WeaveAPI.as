@@ -119,7 +119,7 @@ package weavejs
 		/**
 		 * This is the singleton instance of the registered IStatisticsCache implementation.
 		 */
-		public static function get StatisticsCache():IStatisticsCache
+		public static function get StatisticsCache():*/*IStatisticsCache*/
 		{
 			return (_classRegistry || ClassRegistry as ClassRegistryImpl).map_interface_singletonInstance.get(IStatisticsCache)
 				|| _classRegistry.getSingletonInstance(IStatisticsCache);
@@ -128,7 +128,7 @@ package weavejs
 		/**
 		 * This is the singleton instance of the registered IQualifiedKeyManager implementation.
 		 */
-		public static function get QKeyManager():IQualifiedKeyManager
+		public static function get QKeyManager():*/*IQualifiedKeyManager*/
 		{
 			return (_classRegistry || ClassRegistry as ClassRegistryImpl).map_interface_singletonInstance.get(IQualifiedKeyManager)
 				|| _classRegistry.getSingletonInstance(IQualifiedKeyManager);

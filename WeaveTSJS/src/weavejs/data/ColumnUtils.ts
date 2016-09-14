@@ -44,8 +44,7 @@ namespace weavejs.data
 	import JS = weavejs.util.JS;
 	import StandardLib = weavejs.util.StandardLib;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
-
-	export declare type QKeyLike = {keyType: string, localName: string};
+	import QKeyLike = weavejs.data.key.QKeyLike;
 
 	/**
 	 * This class contains static functions that access values from IAttributeColumn objects.

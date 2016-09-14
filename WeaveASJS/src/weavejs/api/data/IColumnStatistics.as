@@ -86,6 +86,6 @@ package weavejs.api.data
 		/**
 		 * TEMPORARY SOLUTION - Gets a Dictionary mapping IQualifiedKey to Numeric data.
 		 */
-		function hack_getNumericData():Object;
+		function hack_getNumericData():/*/Map<IQualifiedKey, number>/*/Object;
 	}
 }

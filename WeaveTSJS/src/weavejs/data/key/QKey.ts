@@ -13,55 +13,58 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data.key
+namespace weavejs.data.key
 {
-	import weavejs.api.data.IQualifiedKey;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+
+	export declare type QKeyLike = {keyType: string, localName: string};
 
 	/**
 	 * This class is internal to QKeyManager because instances
 	 * of QKey should not be instantiated outside QKeyManager.
 	 */
-	internal class QKey implements IQualifiedKey
+	@Weave.classInfo({id: "weavejs.data.key.QKey ", interfaces: [IQualifiedKey]})
+	export class QKey implements IQualifiedKey
 	{
-		private static var serial:uint = 0;
+		private static serial:uint = 0;
 		
-		public function QKey(keyType:String, localName:String, toString:String)
+		constructor(keyType:string, localName:string, toString:string)
 		{
-			kt = keyType;
-			ln = localName;
-			_toNumber = serial++;
-			_toString = toString;
+			this.kt = keyType;
+			this.ln = localName;
+			this._toNumber = QKey.serial++;
+			this._toString = toString;
 		}
 		
-		private var kt:String;
-		private var ln:String;
-		private var _toNumber:Number;
-		private var _toString:String;
+		private kt:string;
+		private ln:string;
+		private _toNumber:number;
+		private _toString:string;
 		
 		/**
 		 * This is the namespace of the QKey.
 		 */
-		public function get keyType():String
+		public get keyType():string
 		{
-			return kt;
+			return this.kt;
 		}
 		
 		/**
 		 * This is local record identifier in the namespace of the QKey.
 		 */
-		public function get localName():String
+		public get localName():string
 		{
-			return ln;
+			return this.ln;
 		}
 		
-		public function toNumber():Number
+		public toNumber():number
 		{
-			return _toNumber;
+			return this._toNumber;
 		}
 		
-		public function toString():String
+		public toString():string
 		{
-			return _toString;
+			return this._toString;
 		}
 	}
 }
