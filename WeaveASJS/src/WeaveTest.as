@@ -33,7 +33,8 @@ import weavejs.data.key.DynamicKeyFilter;
 	import weavejs.data.key.KeySetCallbackInterface;
 	import weavejs.data.key.KeySetUnion;
 	import weavejs.data.key.SortedKeySet;
-	import weavejs.geom.Range;
+import weavejs.geom.GeneralizedGeometry;
+import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
 import weavejs.util.ArrayUtils;
 import weavejs.util.AsyncSort;
@@ -76,6 +77,7 @@ import weavejs.util.WeaveMenuItem;
 			StandardLib,
 			DateUtils,
 			EquationColumnLib,
+			GeneralizedGeometry,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];
