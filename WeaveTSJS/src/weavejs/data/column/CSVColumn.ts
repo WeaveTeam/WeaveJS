@@ -128,7 +128,7 @@ namespace weavejs.data.column
 			var table:string[][] = Weave.AS(this.data.getSessionState(), Array) || [];
 			for (var i:int = 0; i < table.length; i++)
 			{
-				var row:string[] = table[i];
+				var row:string[] = Weave.AS(table[i], Array);
 				if (row == null || row.length == 0)
 					continue; // skip blank lines
 

@@ -40,7 +40,7 @@ namespace weavejs.data.column
 			super(metadata);
 		}
 		
-		private _uniqueKeys:IQualifiedKey[] = new Array();
+		private _uniqueKeys:IQualifiedKey[] = [];
 		private map_key_data = new Map<IQualifiedKey, any>();
 		
 		// temp variables for async task
@@ -149,7 +149,7 @@ namespace weavejs.data.column
 			}*/
 			
 			// high priority because not much can be done without data
-			WeaveAPI.Scheduler.startTask(this, (stopTime:int) => this._asyncIterate(stopTime), WeaveAPI.TASK_PRIORITY_HIGH, ()=> this._asyncComplete());
+			WeaveAPI.Scheduler.startTask(this, (stopTime:int) => this._asyncIterate(stopTime), WeaveAPI.TASK_PRIORITY_HIGH, () => this._asyncComplete());
 		}
 		
 		private errorHandler(e:Error):void
