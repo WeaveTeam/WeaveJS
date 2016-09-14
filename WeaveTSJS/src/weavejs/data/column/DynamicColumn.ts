@@ -19,6 +19,8 @@ namespace weavejs.data.column
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
+	import ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
+	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 	import Dictionary2D = weavejs.util.Dictionary2D;
 
 	/**
@@ -26,27 +28,16 @@ namespace weavejs.data.column
 	 * 
 	 * @author adufilie
 	 */
-	@Weave.classInfo({id: "weavejs.data.column.DynamicColumn", interfaces: [IColumnWrapper, IAttributeColumn]})
+	@Weave.classInfo({id: "weavejs.data.column.DynamicColumn", interfaces: [IColumnWrapper, IAttributeColumn, ILinkableDynamicObject, ICallbackCollection]})
 	export class DynamicColumn extends LinkableDynamicObject implements IColumnWrapper
 	{
 		constructor(columnTypeRestriction:GenericClass = null)
 		{
-			super(columnTypeRestriction);
-
-			if (columnTypeRestriction == null)
+			super(columnTypeRestriction && Weave.IS(columnTypeRestriction && columnTypeRestriction.prototype, IAttributeColumn) ? columnTypeRestriction : IAttributeColumn);
+			if (columnTypeRestriction && !Weave.IS(columnTypeRestriction.prototype, IAttributeColumn))
 			{
-				columnTypeRestriction = IAttributeColumn;
+				console.error("DynamicColumn(): columnTypeRestriction does not implement IAttributeColumn:", columnTypeRestriction);
 			}
-			else
-			{
-				// make sure the columnTypeRestriction implements IAttributeColumn
-				if (!Weave.IS(columnTypeRestriction.prototype, IAttributeColumn))
-				{
-					console.error("DynamicColumn(): columnTypeRestriction does not implement IAttributeColumn:", columnTypeRestriction);
-					columnTypeRestriction = IAttributeColumn;
-				}
-			}
-			super(columnTypeRestriction);
 		}
 		
 		/**
