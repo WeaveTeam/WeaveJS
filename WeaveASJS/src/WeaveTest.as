@@ -9,7 +9,10 @@ package
 	import weavejs.api.core.ILinkableVariable;
 	import weavejs.api.data.IAttributeColumn;
 import weavejs.api.data.IBaseColumn;
+import weavejs.api.data.IColumnStatistics;
 import weavejs.api.data.IColumnWrapper;
+import weavejs.api.data.IDynamicKeyFilter;
+import weavejs.api.data.IFilteredKeySet;
 import weavejs.api.data.IPrimitiveColumn;
 	import weavejs.api.data.IQualifiedKey;
 	import weavejs.core.EventCallbackCollection;
@@ -24,6 +27,7 @@ import weavejs.core.LinkableString;
 	import weavejs.core.LinkableVariable;
 	import weavejs.core.LinkableWatcher;
 	import weavejs.core.SessionStateLog;
+import weavejs.data.ColumnStatistics;
 import weavejs.data.EquationColumnLib;
 import weavejs.geom.GeneralizedGeometry;
 import weavejs.geom.Range;
@@ -61,6 +65,10 @@ import weavejs.util.WeaveMenuItem;
 			DateUtils,
 			EquationColumnLib,
 			GeneralizedGeometry,
+			IDynamicKeyFilter,
+			IFilteredKeySet,
+			IColumnStatistics,
+			ColumnStatistics,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];

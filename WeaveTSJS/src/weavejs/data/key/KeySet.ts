@@ -27,11 +27,13 @@ namespace weavejs.data.key
 	 * 
 	 * @author adufilie
 	 */
+	@Weave.classInfo({id: "weavejs.data.key.KeySet", interfaces: [IKeySet]})
 	export class KeySet extends LinkableVariable implements IKeySet
 	{
 		constructor()
 		{
-			super(Array, this.verifySessionState);
+			super(Array);
+			this._verifier = this.verifySessionState;
 			// The first callback will update the keys from the session state.
 			this.addImmediateCallback(this, this.updateKeys);
 		}

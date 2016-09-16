@@ -25,9 +25,9 @@ package weavejs.data
 	import weavejs.util.JS;
 	import weavejs.util.StandardLib;
 	
-	internal class ColumnStatistics implements IColumnStatistics
+	public class ColumnStatistics implements IColumnStatistics
 	{
-		public static var QKeyManager:* = JS.global["weavejs"]["data"]["key"]["QKeyManager"];
+		public var QKeyManager:* = JS.global["weavejs"]["data"]["key"]["QKeyManager"];
 
 		public function ColumnStatistics(column:IAttributeColumn)
 		{

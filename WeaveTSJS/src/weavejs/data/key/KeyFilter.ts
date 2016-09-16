@@ -61,7 +61,7 @@ namespace weavejs.data.key
 		{
 			this._includeMissingKeys = this.includeMissingKeys.value;
 			this._includeMissingKeyTypes = this.includeMissingKeyTypes.value;
-			this._filters = this.filters.getObjects();
+			this._filters = this.filters.getObjects() as IKeyFilter[];
 			this._filterSetOp = this.filterSetOp.value;
 		}
 
@@ -206,7 +206,7 @@ namespace weavejs.data.key
 			}
 			this._deprecatedState[propertyName] = value;
 		}
-		private _deprecatedState:{sessionedKeys?:IQualifiedKey[], includedKeys?:IQualifiedKey[], excludedKeys?: IQualifiedKey[]} = null;
+		private _deprecatedState:{sessionedKeys?:IQualifiedKey[], includedKeys?:IQualifiedKey[], excludedKeys?: IQualifiedKey[], [propertyName:string]: any} = null;
 
 		private _applyDeprecatedSessionState():void
 		{
