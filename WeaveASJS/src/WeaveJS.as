@@ -23,7 +23,6 @@ package
 	import weavejs.core.ProgressIndicator;
 	import weavejs.core.Scheduler;
 	import weavejs.core.SessionManager;
-	import weavejs.data.CSVParser;
 
 public class WeaveJS
 	{
@@ -58,7 +57,6 @@ public class WeaveJS
 			WeaveAPI.ClassRegistry.registerImplementation(IScheduler, Scheduler);
 			WeaveAPI.ClassRegistry.registerImplementation(IProgressIndicator, ProgressIndicator);
 			WeaveAPI.ClassRegistry.registerImplementation(IEditorManager, EditorManager);
-			WeaveAPI.ClassRegistry.registerImplementation(ICSVParser, CSVParser);
 
 			WeaveAPI.ClassRegistry.registerImplementation(ILinkableHashMap, LinkableHashMap);
 			WeaveAPI.ClassRegistry.registerImplementation(ILinkableDynamicObject, LinkableDynamicObject);

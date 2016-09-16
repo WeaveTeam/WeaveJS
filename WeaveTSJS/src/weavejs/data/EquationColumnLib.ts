@@ -13,18 +13,18 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package weavejs.data
+namespace weavejs.data
 {
-	import weavejs.WeaveAPI;
-	import weavejs.api.core.ILinkableVariable;
-	import weavejs.api.data.ColumnMetadata;
-	import weavejs.api.data.DataType;
-	import weavejs.api.data.IAttributeColumn;
-	import weavejs.api.data.IKeySet;
-	import weavejs.api.data.IQualifiedKey;
-	// import weavejs.data.column.DynamicColumn;
-	import weavejs.util.JS;
-	import weavejs.util.StandardLib;
+	import WeaveAPI = weavejs.WeaveAPI;
+	import ILinkableVariable = weavejs.api.core.ILinkableVariable;
+	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import DataType = weavejs.api.data.DataType;
+	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import IKeySet = weavejs.api.data.IKeySet;
+	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import JS = weavejs.util.JS;
+	import StandardLib = weavejs.util.StandardLib;
 	
 	/**
 	 * This class contains static functions that access values from IAttributeColumn objects.
@@ -33,26 +33,26 @@ package weavejs.data
 	 * 
 	 * @author adufilie
 	 */
-	public class EquationColumnLib
+	@Weave.classInfo({id: "weavejs.data.EquationColumnLib"})
+	export class EquationColumnLib
 	{
-		public var DynamicColumn:* = JS.global['weavejs']["data"]["column"]["DynamicColumn"];
-		public static var debug:Boolean = false;
+		public static debug:boolean = false;
 		
 		/**
 		 * This value should be set before calling any of the functions below that get values from IAttributeColumns.
 		 */
-		public static var currentRecordKey:IQualifiedKey = null;
-		
+		public static currentRecordKey:IQualifiedKey = null;
+
 		/**
 		 * This function calls column.getValueFromKey(currentRecordKey, IQualifiedKey)
 		 * @param column A column, or null if you want the currentRecordKey to be returned.
 		 * @return The value at the current record in the column cast as an IQualifiedKey.
 		 */
-		public static function getKey(column:IAttributeColumn = null):IQualifiedKey
+		public static getKey(column:IAttributeColumn = null):IQualifiedKey
 		{
 			if (column)
-				return column.getValueFromKey(currentRecordKey, IQualifiedKey);
-			return currentRecordKey;
+				return column.getValueFromKey(EquationColumnLib.currentRecordKey, IQualifiedKey);
+			return EquationColumnLib.currentRecordKey;
 		}
 		
 		/**
@@ -61,50 +61,50 @@ package weavejs.data
 		 * @param dataType Either a Class object or a String containing the qualified class name of the desired value type.
 		 * @return The value of the object, optionally cast to the requested dataType.
 		 */
-		public static function getValue(object:/*/IAttributeColumn|ILinkableVariable/*/Object, dataType:* = null):*
+		public static getValue(object:IAttributeColumn|ILinkableVariable, dataType:GenericClass|string = null):any
 		{
 			// remember current key
-			var key:IQualifiedKey = currentRecordKey;
+			var key:IQualifiedKey = EquationColumnLib.currentRecordKey;
 			try
 			{
-				if (dataType is String)
-					dataType = Weave.getDefinition(dataType);
+				if (Weave.IS(dataType, String))
+					dataType = Weave.getDefinition(dataType as string);
 				
-				var value:* = null; // the value that will be returned
+				var value:any = null; // the value that will be returned
 				
 				// get the value from the object
-				var column:IAttributeColumn = object as IAttributeColumn;
+				var column:IAttributeColumn = Weave.AS(object, IAttributeColumn);
 				if (column != null)
 				{
 					if (dataType == null)
 					{
-						var dataTypeMetadata:String = column.getMetadata(ColumnMetadata.DATA_TYPE);
+						var dataTypeMetadata:string = column.getMetadata(ColumnMetadata.DATA_TYPE);
 						dataType = DataType.getClass(dataTypeMetadata);
 						if (dataType == String && dataTypeMetadata != DataType.STRING)
 							dataType = IQualifiedKey;
 					}
 					value = column.getValueFromKey(key, JS.asClass(dataType));
 				}
-				else if (object is ILinkableVariable)
+				else if (Weave.IS(object, ILinkableVariable))
 				{
 					value = (object as ILinkableVariable).getSessionState();
 					// cast the value to the requested type
 					if (dataType != null)
-						value = cast(value, dataType);
+						value = EquationColumnLib.cast(value, dataType);
 				}
 				else if (dataType != null)
 				{
-					value = cast(value, dataType);
+					value = EquationColumnLib.cast(value, dataType);
 				}
 				
-				if (debug)
-					JS.log('getValue',object,key.localName,String(value));
+				if (EquationColumnLib.debug)
+					console.log('getValue',object,key.localName,String(value));
 				return value;
 			}
 			finally
 			{
 				// revert to key that was set when entering the function (in case nested calls modified the static variables)
-				currentRecordKey = key;
+				EquationColumnLib.currentRecordKey = key;
 			}
 		}
 		/**
@@ -113,22 +113,22 @@ package weavejs.data
 		 * @param key A key to get the value for.
 		 * @return The result of calling column.getValueFromKey(key, dataType).
 		 */
-		public static function getValueFromKey(column:IAttributeColumn, key:IQualifiedKey, dataType:* = null):*
+		public static getValueFromKey(column:IAttributeColumn, key:IQualifiedKey, dataType:GenericClass = null):any
 		{
 			// remember current key
-			var previousKey:IQualifiedKey = currentRecordKey;
+			var previousKey:IQualifiedKey = EquationColumnLib.currentRecordKey;
 			try
 			{
-				currentRecordKey = key;
-				var value:* = getValue(column, dataType);
-				if (debug)
-					JS.log('getValueFromKey',column,key.localName,String(value));
+				EquationColumnLib.currentRecordKey = key;
+				var value:any = EquationColumnLib.getValue(column, dataType);
+				if (EquationColumnLib.debug)
+					console.log('getValueFromKey',column,key.localName,String(value));
 				return value;
 			}
 			finally
 			{
 				// revert to key that was set when entering the function (in case nested calls modified the static variables)
-				currentRecordKey = previousKey;
+				EquationColumnLib.currentRecordKey = previousKey;
 			}
 		}
 		
@@ -143,31 +143,31 @@ package weavejs.data
 		 * @return the correct filtered value from the data column
 		 * @author kmanohar
 		 */		
-		public static function getValueFromFilterColumn(keyColumn:*/*DynamicColumn*/, filter:IAttributeColumn, data:IAttributeColumn, filterValue:String, dataType:* = null):Object
+		public static getValueFromFilterColumn(keyColumn:DynamicColumn, filter:IAttributeColumn, data:IAttributeColumn, filterValue:string, dataType:GenericClass = null):any
 		{
-			var key:IQualifiedKey = getKey();
-			var foreignKeyType:String = keyColumn.getMetadata(ColumnMetadata.DATA_TYPE);
-			var ignoreKeyType:Boolean = !foreignKeyType || foreignKeyType == DataType.STRING;
-			var cubekeys:Array = getAssociatedKeys(keyColumn, key, ignoreKeyType);
+			var key:IQualifiedKey = EquationColumnLib.getKey();
+			var foreignKeyType:string = keyColumn.getMetadata(ColumnMetadata.DATA_TYPE);
+			var ignoreKeyType:boolean= !foreignKeyType || foreignKeyType == DataType.STRING;
+			var cubekeys:IQualifiedKey[] = EquationColumnLib.getAssociatedKeys(keyColumn, key, ignoreKeyType);
 			
 			if (cubekeys && cubekeys.length == 1)
 			{
-				for each (var cubekey:IQualifiedKey in cubekeys)
+				for (var cubekey of cubekeys || [])
 				{
 					if (filter.getValueFromKey(cubekey, String) == filterValue)
 					{
 						if (dataType === IQualifiedKey)
 							return cubekey;
-						var val:Object = getValueFromKey(data, cubekey, dataType);
+						var val:any = EquationColumnLib.getValueFromKey(data, cubekey, dataType);
 						return val;
 					}
 				}
 			}
-			return cast(undefined, dataType);
+			return EquationColumnLib.cast(undefined, dataType);
 		}
 		
-		private static var map_reverseKeyLookupTriggerCounter:Object = new JS.WeakMap();
-		private static var map_reverseKeyLookupCache:Object = new JS.WeakMap();
+		private static map_reverseKeyLookupTriggerCounter = new WeakMap<IAttributeColumn, number>();
+		private static map_reverseKeyLookupCache = new WeakMap<IAttributeColumn, Map<string|IQualifiedKey, IQualifiedKey[]>>();
 		
 		/**
 		 * This function returns a list of IQualifiedKey objects using a reverse lookup of value-key pairs 
@@ -176,14 +176,14 @@ package weavejs.data
 		 * @param ignoreKeyType If true, ignores the dataType of the column (the column's foreign keyType) and the keyType of the keyValue
 		 * @return An array of record keys with the given value under the given column
 		 */
-		public static function getAssociatedKeys(column:IAttributeColumn, keyValue:IQualifiedKey, ignoreKeyType:Boolean = false):Array/*/<IQualifiedKey>/*/
+		public static getAssociatedKeys(column:IAttributeColumn, keyValue:IQualifiedKey, ignoreKeyType:Boolean = false):IQualifiedKey[]
 		{
-			var map_lookup:Object = map_reverseKeyLookupCache.get(column);
-			if (map_lookup == null || column.triggerCounter != map_reverseKeyLookupTriggerCounter.get(column)) // if cache is invalid, validate it now
+			var map_lookup:Map<string|IQualifiedKey, IQualifiedKey[]> = EquationColumnLib.map_reverseKeyLookupCache.get(column);
+			if (map_lookup == null || column.triggerCounter != EquationColumnLib.map_reverseKeyLookupTriggerCounter.get(column)) // if cache is invalid, validate it now
 			{
-				map_reverseKeyLookupTriggerCounter.set(column, column.triggerCounter);
-				map_reverseKeyLookupCache.set(column, map_lookup = new JS.Map());
-				for each (var recordKey:IQualifiedKey in column.keys)
+				EquationColumnLib.map_reverseKeyLookupTriggerCounter.set(column, column.triggerCounter);
+				EquationColumnLib.map_reverseKeyLookupCache.set(column, map_lookup = new Map<string|IQualifiedKey, IQualifiedKey[]>());
+				for (var recordKey of column.keys || [])
 				{
 					var value:IQualifiedKey = column.getValueFromKey(recordKey, IQualifiedKey) as IQualifiedKey;
 					if (value == null)
@@ -191,14 +191,14 @@ package weavejs.data
 					
 					if (!map_lookup.has(value))
 						map_lookup.set(value, []);
-					(map_lookup.get(value) as Array).push(recordKey);
+					(map_lookup.get(value)).push(recordKey);
 					
 					if (!map_lookup.has(value.localName))
 						map_lookup.set(value.localName, []);
-					(map_lookup.get(value.localName) as Array).push(recordKey);
+					(map_lookup.get(value.localName)).push(recordKey);
 				}
 			}
-			return map_lookup.get(ignoreKeyType ? keyValue.localName : keyValue) as Array;
+			return map_lookup.get(ignoreKeyType ? keyValue.localName : keyValue);
 		}
 		
 		/**
@@ -207,35 +207,35 @@ package weavejs.data
 		 * @param key A key to get the Number for.
 		 * @return The value of the object, cast to a Number.
 		 */
-		public static function getNumber(object:/*/IAttributeColumn|ILinkableVariable/*/Object, key:IQualifiedKey = null):Number
+		public static getNumber(object:IAttributeColumn|ILinkableVariable, key:IQualifiedKey = null):number
 		{
 			// remember current key
-			var previousKey:IQualifiedKey = currentRecordKey;
+			var previousKey:IQualifiedKey = EquationColumnLib.currentRecordKey;
 			try
 			{
 				if (key == null)
-					key = currentRecordKey;
+					key = EquationColumnLib.currentRecordKey;
 				
-				var result:Number;
-				var column:IAttributeColumn = object as IAttributeColumn;
+				var result:number;
+				var column:IAttributeColumn = Weave.AS(object, IAttributeColumn);
 				if (column != null)
 				{
 					result = (object as IAttributeColumn).getValueFromKey(key, Number);
 				}
-				else if (object is ILinkableVariable)
+				else if (Weave.IS(object, ILinkableVariable))
 				{
 					result = StandardLib.asNumber((object as ILinkableVariable).getSessionState());
 				}
 				else
 					throw new Error('first parameter must be either an IAttributeColumn or an ILinkableVariable');
 				
-				if (debug)
-					JS.log('getNumber',column,key.localName,String(result));
+				if (EquationColumnLib.debug)
+					console.log('getNumber',column,key.localName,String(result));
 			}
 			finally
 			{
 				// revert to key that was set when entering the function (in case nested calls modified the static variables)
-				currentRecordKey = previousKey;
+				EquationColumnLib.currentRecordKey = previousKey;
 			}
 			return result;
 		}
@@ -245,35 +245,35 @@ package weavejs.data
 		 * @param key A key to get the Number for.
 		 * @return The value of the object, cast to a String.
 		 */
-		public static function getString(object:/*/IAttributeColumn|ILinkableVariable/*/Object, key:IQualifiedKey = null):String
+		public static getString(object:IAttributeColumn|ILinkableVariable, key:IQualifiedKey = null):string
 		{
 			// remember current key
-			var previousKey:IQualifiedKey = currentRecordKey;
+			var previousKey:IQualifiedKey = EquationColumnLib.currentRecordKey;
 			try
 			{
 				if (key == null)
-					key = currentRecordKey;
+					key = EquationColumnLib.currentRecordKey;
 	
-				var result:String = '';
-				var column:IAttributeColumn = object as IAttributeColumn;
+				var result:string = '';
+				var column:IAttributeColumn = Weave.AS(object, IAttributeColumn);
 				if (column != null)
 				{
 					result = (object as IAttributeColumn).getValueFromKey(key, String);
 				}
-				else if (object is ILinkableVariable)
+				else if (Weave.IS(object, ILinkableVariable))
 				{
 					result = StandardLib.asString((object as ILinkableVariable).getSessionState());
 				}
 				else
 					throw new Error('first parameter must be either an IAttributeColumn or an ILinkableVariable');
 	
-				if (debug)
-					JS.log('getString',column,key.localName,String(result));
+				if (EquationColumnLib.debug)
+					console.log('getString',column,key.localName,String(result));
 			}
 			finally
 			{
 				// revert to key that was set when entering the function (in case nested calls modified the static variables)
-				currentRecordKey = previousKey;
+				EquationColumnLib.currentRecordKey = previousKey;
 			}
 			return result;
 		}
@@ -283,35 +283,35 @@ package weavejs.data
 		 * @param key A key to get the Number for.
 		 * @return The value of the object, cast to a Boolean.
 		 */
-		public static function getBoolean(object:/*/IAttributeColumn|ILinkableVariable/*/Object, key:IQualifiedKey = null):Boolean
+		public static getBoolean(object:IAttributeColumn|ILinkableVariable, key:IQualifiedKey = null):boolean
 		{
 			// remember current key
-			var previousKey:IQualifiedKey = currentRecordKey;
+			var previousKey:IQualifiedKey = EquationColumnLib.currentRecordKey;
 			try
 			{
 				if (key == null)
-					key = currentRecordKey;
+					key = EquationColumnLib.currentRecordKey;
 	
-				var result:Boolean = false;
-				var column:IAttributeColumn = object as IAttributeColumn;
+				var result:boolean = false;
+				var column:IAttributeColumn = Weave.AS(object, IAttributeColumn);
 				if (column != null)
 				{
 					result = StandardLib.asBoolean(column.getValueFromKey(key, Number));
 				}
-				else if (object is ILinkableVariable)
+				else if (Weave.IS(object, ILinkableVariable))
 				{
 					result = StandardLib.asBoolean((object as ILinkableVariable).getSessionState());
 				}
 				else
 					throw new Error('first parameter must be either an IAttributeColumn or an ILinkableVariable');
 	
-				if (debug)
-					JS.log('getBoolean',column,key.localName,String(result));
+				if (EquationColumnLib.debug)
+					console.log('getBoolean',column,key.localName,String(result));
 			}
 			finally
 			{
 				// revert to key that was set when entering the function (in case nested calls modified the static variables)
-				currentRecordKey = previousKey;
+				EquationColumnLib.currentRecordKey = previousKey;
 			}
 			return result;
 		}
@@ -320,30 +320,31 @@ package weavejs.data
 		 * @param column A column to get a value from.
 		 * @param key A key to get the Number for.
 		 * @return The Number corresponding to the given key, normalized to be between 0 and 1.
+		 *
+		 * @deprecated replacement="WeaveAPI.StatisticsCache.getColumnStatistics(column).getNorm(key)")
 		 */
-		[Deprecated(replacement="WeaveAPI.StatisticsCache.getColumnStatistics(column).getNorm(key)")]
-		public static function getNorm(column:IAttributeColumn, key:IQualifiedKey = null):Number
+		public static getNorm(column:IAttributeColumn, key:IQualifiedKey = null):number
 		{
 			// remember current key
-			var previousKey:IQualifiedKey = currentRecordKey;
+			var previousKey:IQualifiedKey = EquationColumnLib.currentRecordKey;
 			try
 			{
 				if (key == null)
-					key = currentRecordKey;
+					key = EquationColumnLib.currentRecordKey;
 	
-				var result:Number = NaN;
+				var result:number = NaN;
 				if (column != null)
 					result = WeaveAPI.StatisticsCache.getColumnStatistics(column).getNorm(key);
 				else
 					throw new Error('first parameter must be an IAttributeColumn');
 	
-				if (debug)
-					JS.log('getNorm',column,key.localName,String(result));
+				if (EquationColumnLib.debug)
+					console.log('getNorm',column,key.localName,String(result));
 			}
 			finally
 			{
 				// revert to key that was set when entering the function (in case nested calls modified the static variables)
-				currentRecordKey = previousKey;
+				EquationColumnLib.currentRecordKey = previousKey;
 			}
 			return result;
 		}
@@ -354,19 +355,19 @@ package weavejs.data
 		 * @param key A key to search for.
 		 * @return The first IKeySet that contains the key.
 		 */
-		public static function findKeySet(keySets:Array/*/<IKeySet>/*/, key:IQualifiedKey = null):IKeySet
+		public static findKeySet(keySets:IKeySet[], key:IQualifiedKey = null):IKeySet
 		{
 			// remember current key
-			var previousKey:IQualifiedKey = currentRecordKey;
+			var previousKey:IQualifiedKey = EquationColumnLib.currentRecordKey;
 			try
 			{
 				if (key == null)
-					key = currentRecordKey;
+					key = EquationColumnLib.currentRecordKey;
 				
 				var keySet:IKeySet = null;
 				for (var i:int = 0; i < keySets.length; i++)
 				{
-					keySet = keySets[i] as IKeySet;
+					keySet = Weave.AS(keySets[i], IKeySet);
 					if (keySet && keySet.containsKey(key))
 						break;
 					else
@@ -376,59 +377,83 @@ package weavejs.data
 			finally
 			{
 				// revert to key that was set when entering the function (in case nested calls modified the static variables)
-				currentRecordKey = previousKey;
+				EquationColumnLib.currentRecordKey = previousKey;
 			}
 			return keySet;
 		}
-		
-		[Deprecated] public static function getSum(column:IAttributeColumn):Number
+
+		/**
+		 * @deprecated
+		 */
+		public static getSum(column:IAttributeColumn):number
 		{
 			return WeaveAPI.StatisticsCache.getColumnStatistics(column).getSum();
 		}
-		
-		[Deprecated] public static function getMean(column:IAttributeColumn):Number
+
+		/**
+		 * @deprecated
+		 */
+		public static getMean(column:IAttributeColumn):number
 		{
 			return WeaveAPI.StatisticsCache.getColumnStatistics(column).getMean();
 		}
-		
-		[Deprecated] public static function getVariance(column:IAttributeColumn):Number
+
+		/**
+		 * @deprecated
+		 */
+		public static getVariance(column:IAttributeColumn):number
 		{
 			return WeaveAPI.StatisticsCache.getColumnStatistics(column).getVariance();
 		}
-		
-		[Deprecated] public static function getStandardDeviation(column:IAttributeColumn):Number
+
+		/**
+		 * @deprecated
+		 */
+		public static getStandardDeviation(column:IAttributeColumn):number
 		{
 			return WeaveAPI.StatisticsCache.getColumnStatistics(column).getStandardDeviation();
 		}
-		
-		[Deprecated] public static function getMin(column:IAttributeColumn):Number
+
+		/**
+		 * @deprecated
+		 */
+		public static getMin(column:IAttributeColumn):Number
 		{
 			return WeaveAPI.StatisticsCache.getColumnStatistics(column).getMin();
 		}
-		
-		[Deprecated] public static function getMax(column:IAttributeColumn):Number
+
+		/**
+		 * @deprecated
+		 */
+		public static getMax(column:IAttributeColumn):number
 		{
 			return WeaveAPI.StatisticsCache.getColumnStatistics(column).getMax();
 		}
-		
-		[Deprecated] public static function getCount(column:IAttributeColumn):Number
+
+		/**
+		 * @deprecated
+		 */
+		public static getCount(column:IAttributeColumn):number
 		{
 			return WeaveAPI.StatisticsCache.getColumnStatistics(column).getCount();
 		}
-		
-		[Deprecated] public static function getRunningTotal(column:IAttributeColumn, key:IQualifiedKey = null):Number
+
+		/**
+		 * @deprecated
+		 */
+		public static getRunningTotal(column:IAttributeColumn, key:IQualifiedKey = null):number
 		{
 			// remember current key
-			var previousKey:IQualifiedKey = currentRecordKey;
+			var previousKey:IQualifiedKey = EquationColumnLib.currentRecordKey;
 			try
 			{
 				if (key == null)
-					key = currentRecordKey;
+					key = EquationColumnLib.currentRecordKey;
 	
-				var result:Number = NaN;
+				var result:number = NaN;
 				if (column != null)
 				{
-					var runningTotals:Object = (WeaveAPI.StatisticsCache /* as StatisticsCache*/).getRunningTotals(column);
+					var runningTotals:Map<IQualifiedKey, number> = (WeaveAPI.StatisticsCache  as StatisticsCache).getRunningTotals(column);
 					if (runningTotals != null)
 						result = runningTotals.get(key);
 				}
@@ -436,7 +461,7 @@ package weavejs.data
 			finally
 			{
 				// revert to key that was set when entering the function (in case nested calls modified the static variables)
-				currentRecordKey = previousKey;
+				EquationColumnLib.currentRecordKey = previousKey;
 			}
 			return result;
 		}
@@ -444,40 +469,40 @@ package weavejs.data
 		 * @param value A value to cast.
 		 * @param newType Either a qualifiedClassName or a Class object referring to the type to cast the value as.
 		 */
-		public static function cast/*/<T>/*/(value:*, newType:/*/Class<T>|string/*/*):/*/T/*/*
+		public static cast<T>(value:any, newType:Class<T>|string):T
 		{
 			if (newType == null)
 				return value;
 			
 			// if newType is a qualified class name, get the Class definition
-			if (newType is String)
-				newType = Weave.getDefinition(newType);
+			if (Weave.IS(newType, String))
+				newType = Weave.getDefinition(newType as string);
 
 			// cast the value as the desired type
-			if (newType == Number)
+			if ((newType as GenericClass) == Number)
 			{
 				value = StandardLib.asNumber(value);
 			}
-			else if (newType == String)
+			else if ((newType as GenericClass) == String)
 			{
 				value = StandardLib.asString(value);
 			}
-			else if (newType == Boolean)
+			else if ((newType as GenericClass) == Boolean)
 			{
 				value = StandardLib.asBoolean(value);
 			}
-			else if (newType == Array)
+			else if ((newType as GenericClass) == Array)
 			{
-				if (value != null && !(value is Array))
+				if (value != null && !Weave.IS(value, Array))
 					value = [value];
 			}
 
-			return value as newType;
+			return Weave.AS(value, newType as GenericClass);
 		}
 		
 		/**
 		 * This is a macro for IQualifiedKey that can be used in equations.
 		 */		
-		public static const QKey:/*/typeof IQualifiedKey/*/Class = IQualifiedKey;
+		public static QKey:Class<IQualifiedKey> = IQualifiedKey;
 	}
 }

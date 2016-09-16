@@ -7,15 +7,26 @@
 package
 {
 	import weavejs.api.core.ILinkableVariable;
-	import weavejs.api.data.IAttributeColumn;
+import weavejs.api.data.Aggregation;
+import weavejs.api.data.ColumnMetadata;
+import weavejs.api.data.DataType;
+import weavejs.api.data.DateFormat;
+import weavejs.api.data.IAttributeColumn;
 import weavejs.api.data.IBaseColumn;
 import weavejs.api.data.IColumnStatistics;
 import weavejs.api.data.IColumnWrapper;
 import weavejs.api.data.IDynamicKeyFilter;
 import weavejs.api.data.IFilteredKeySet;
+import weavejs.api.data.IKeyFilter;
+import weavejs.api.data.IKeySet;
+import weavejs.api.data.IKeySetCallbackInterface;
 import weavejs.api.data.IPrimitiveColumn;
 	import weavejs.api.data.IQualifiedKey;
-	import weavejs.core.EventCallbackCollection;
+import weavejs.api.data.IQualifiedKeyManager;
+import weavejs.api.data.ISimpleGeometry;
+import weavejs.api.data.IStatisticsCache;
+import weavejs.core.CallbackCollection;
+import weavejs.core.EventCallbackCollection;
 	import weavejs.core.LinkableBoolean;
 	import weavejs.core.LinkableCallbackScript;
 	import weavejs.core.LinkableDynamicObject;
@@ -27,8 +38,6 @@ import weavejs.core.LinkableString;
 	import weavejs.core.LinkableVariable;
 	import weavejs.core.LinkableWatcher;
 	import weavejs.core.SessionStateLog;
-import weavejs.data.ColumnStatistics;
-import weavejs.data.EquationColumnLib;
 import weavejs.geom.GeneralizedGeometry;
 import weavejs.geom.Range;
 	import weavejs.geom.ZoomBounds;
@@ -53,6 +62,17 @@ import weavejs.util.WeaveMenuItem;
 			ZoomBounds,
 			EventCallbackCollection,
 			Range,
+			IAttributeColumn,
+			ColumnMetadata,
+			DateFormat,
+			Aggregation,
+			IKeyFilter,
+			IKeySet,
+			IKeySetCallbackInterface,
+			IQualifiedKey,
+			IQualifiedKeyManager,
+			ISimpleGeometry,
+			IStatisticsCache,
 			IPrimitiveColumn,
 			IColumnWrapper,
 			IBaseColumn,
@@ -63,12 +83,12 @@ import weavejs.util.WeaveMenuItem;
 			ArrayUtils,
 			StandardLib,
 			DateUtils,
-			EquationColumnLib,
 			GeneralizedGeometry,
 			IDynamicKeyFilter,
 			IFilteredKeySet,
 			IColumnStatistics,
-			ColumnStatistics,
+			DataType,
+			CallbackCollection,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
 		];
