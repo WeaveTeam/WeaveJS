@@ -20,14 +20,15 @@ namespace weavejs.data.key
 	import IKeySetCallbackInterface = weavejs.api.data.IKeySetCallbackInterface;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import LinkableVariable = weavejs.core.LinkableVariable;
+	import IKeyFilter = weavejs.api.data.IKeyFilter;
 	import JS = weavejs.util.JS;
-	
+
 	/**
 	 * This class contains a set of IQualifiedKeys and functions for adding/removing keys from the set.
 	 * 
 	 * @author adufilie
 	 */
-	@Weave.classInfo({id: "weavejs.data.key.KeySet", interfaces: [IKeySet]})
+	@Weave.classInfo({id: "weavejs.data.key.KeySet", interfaces: [IKeySet, IKeyFilter]})
 	export class KeySet extends LinkableVariable implements IKeySet
 	{
 		constructor()
