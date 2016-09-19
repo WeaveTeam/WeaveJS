@@ -85,7 +85,7 @@ namespace weavejs.data.key
 			if (Weave.isBusy(this))
 				return;
 			
-			WeaveAPI.Scheduler.startTask(this, () => this._asyncTask(), WeaveAPI.TASK_PRIORITY_NORMAL, () => this._asyncComplete());
+			WeaveAPI.Scheduler.startTask(this, this._asyncTask, WeaveAPI.TASK_PRIORITY_NORMAL, this._asyncComplete);
 		}
 		
 		private static EMPTY_ARRAY:any[] = [];

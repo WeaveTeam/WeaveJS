@@ -431,10 +431,10 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 
 	getInteractedRecords():Record[]
 	{
-		let probeKeys = this.probeKeySet.keys;
-		let selectedKeys = this.selectionKeySet.keys;
-		let records:Record[];
-		if (probeKeys.length) {
+		let probeKeys = this.probeKeySet && this.probeKeySet.keys;
+		let selectedKeys = this.selectionKeySet && this.selectionKeySet.keys;
+		let records:Record[] = [];
+		if (probeKeys && probeKeys.length) {
 			//show the sparklines for the probed keys
 			records = probeKeys.map((key,index) => {
 				return _.find(this.records, (record:Record) => {
@@ -442,7 +442,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 				});
 			});
 
-		} else if (selectedKeys.length) {
+		} else if (selectedKeys && selectedKeys.length) {
 			//show the sparklines for the selected keys
 			records = selectedKeys.map((key,index) => {
 				return _.find(this.records, (record:Record) => {
@@ -579,7 +579,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 									onMouseOut={this.handleProbe.bind(this,this.records && (interactive ? interactedRecords && interactedRecords[index]:(this.records[index] as Record)), false)}
 								>
 									{<span style={{position: "absolute", top: 0, left: 0}}>{this.showRowLabels.value ? label:""}</span>}
-									<Sparklines key={this.chartType.value.concat(referenceLineKey,normalBandKey,String(this.probeKeySet.keys),String(this.selectionKeySet.keys))} data={data} width={this.state.width} height={this.state.height/this.state.data.length}>
+									<Sparklines key={this.chartType.value.concat(referenceLineKey,normalBandKey,String(this.probeKeySet && this.probeKeySet.keys),String(this.selectionKeySet && this.selectionKeySet.keys))} data={data} width={this.state.width} height={this.state.height/this.state.data.length}>
 										{this.getLineComponent(this.chartType.value,style)}
 										<SparklinesNormalBand style={{fill: 'red', fillOpacity: this.showNormalBands.value ? .1:0}}/>
 										<SparklinesReferenceLine type={referenceLineKey} value={0} style={{ stroke: 'red', strokeOpacity: this.referenceLineMode.value ? .75:0, strokeDasharray: '2, 2'}}/>

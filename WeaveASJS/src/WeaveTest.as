@@ -7,24 +7,6 @@
 package
 {
 	import weavejs.api.core.ILinkableVariable;
-import weavejs.api.data.Aggregation;
-import weavejs.api.data.ColumnMetadata;
-import weavejs.api.data.DataType;
-import weavejs.api.data.DateFormat;
-import weavejs.api.data.IAttributeColumn;
-import weavejs.api.data.IBaseColumn;
-import weavejs.api.data.IColumnStatistics;
-import weavejs.api.data.IColumnWrapper;
-import weavejs.api.data.IDynamicKeyFilter;
-import weavejs.api.data.IFilteredKeySet;
-import weavejs.api.data.IKeyFilter;
-import weavejs.api.data.IKeySet;
-import weavejs.api.data.IKeySetCallbackInterface;
-import weavejs.api.data.IPrimitiveColumn;
-	import weavejs.api.data.IQualifiedKey;
-import weavejs.api.data.IQualifiedKeyManager;
-import weavejs.api.data.ISimpleGeometry;
-import weavejs.api.data.IStatisticsCache;
 import weavejs.core.CallbackCollection;
 import weavejs.core.EventCallbackCollection;
 	import weavejs.core.LinkableBoolean;
@@ -38,9 +20,6 @@ import weavejs.core.LinkableString;
 	import weavejs.core.LinkableVariable;
 	import weavejs.core.LinkableWatcher;
 	import weavejs.core.SessionStateLog;
-import weavejs.geom.GeneralizedGeometry;
-import weavejs.geom.Range;
-	import weavejs.geom.ZoomBounds;
 import weavejs.util.ArrayUtils;
 import weavejs.util.AsyncSort;
 import weavejs.util.ColorRamp;
@@ -59,23 +38,7 @@ import weavejs.util.WeaveMenuItem;
 			LinkableCallbackScript,LinkableFunction,
 
 			WeaveMenuItem,
-			ZoomBounds,
 			EventCallbackCollection,
-			Range,
-			IAttributeColumn,
-			ColumnMetadata,
-			DateFormat,
-			Aggregation,
-			IKeyFilter,
-			IKeySet,
-			IKeySetCallbackInterface,
-			IQualifiedKey,
-			IQualifiedKeyManager,
-			ISimpleGeometry,
-			IStatisticsCache,
-			IPrimitiveColumn,
-			IColumnWrapper,
-			IBaseColumn,
 			ColorRamp,
 			LinkablePromise,
 			JSByteArray,
@@ -83,11 +46,6 @@ import weavejs.util.WeaveMenuItem;
 			ArrayUtils,
 			StandardLib,
 			DateUtils,
-			GeneralizedGeometry,
-			IDynamicKeyFilter,
-			IFilteredKeySet,
-			IColumnStatistics,
-			DataType,
 			CallbackCollection,
 			//EntityNodeSearch, //TODO - resolve circular dependency issue
 			null
@@ -122,7 +80,7 @@ import weavejs.util.WeaveMenuItem;
 				.call(function():void { JS.log(this.weave.path('ls2').getState()) });
 			var print:Function = function():void {
 				JS.log("column", this.getMetadata("title"));
-				for each (var key:IQualifiedKey in this.keys)
+				for each (var key:* in this.keys)
 					JS.log(key, this.getValueFromKey(key), this.getValueFromKey(key, Number), this.getValueFromKey(key, String));
 			};
 		}

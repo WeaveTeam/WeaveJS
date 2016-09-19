@@ -17,7 +17,7 @@ namespace weavejs.data.column
 {
 	import WeaveAPI = weavejs.WeaveAPI;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IPrimitiveColumn = weavejs.api.data.IPrimitiveColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
@@ -73,7 +73,7 @@ namespace weavejs.data.column
 						return value + this.TYPE_SUFFIX;
 					break;
 				case ColumnMetadata.DATA_TYPE:
-					return value || (this._dataType == Number ? DataType.NUMBER : DataType.STRING);
+					return value || (this._dataType == Number ? DataTypes.NUMBER : DataTypes.STRING);
 			}
 			
 			return value;
@@ -176,10 +176,10 @@ namespace weavejs.data.column
 			
 			//if it's string data - create list of unique strings
 			var dataType:string = super.getMetadata(ColumnMetadata.DATA_TYPE);
-			if (Weave.IS(data[0], String) || (dataType && dataType != DataType.NUMBER))
+			if (Weave.IS(data[0], String) || (dataType && dataType != DataTypes.NUMBER))
 			{
 				if (!dataType)
-					dataType = DataType.STRING;
+					dataType = DataTypes.STRING;
 				for (var i:int = 0; i < data.length; i++)
 				{
 					if (this._uniqueStrings.indexOf(data[i]) < 0)
@@ -193,13 +193,13 @@ namespace weavejs.data.column
 			}
 			else
 			{
-				dataType = DataType.NUMBER;
+				dataType = DataTypes.NUMBER;
 				// reset min,max before looping over records
 				this._minNumber = NaN;
 				this._maxNumber = NaN;
 			}
 			this._metadata.dataType = dataType as any;
-			this._dataType = dataType == DataType.NUMBER ? Number : String;
+			this._dataType = dataType == DataTypes.NUMBER ? Number : String;
 			
 			// save a mapping from keys to data
 			for (index = 0; index < qkeysA.length; index++)
@@ -288,10 +288,10 @@ namespace weavejs.data.column
 				if (!this.map_qkeyAB_qkeyData.has(qkey))
 				{
 					var type:string = this.getMetadata(ColumnMetadata.DATA_TYPE);
-					if (type == DataType.NUMBER)
+					if (type == DataTypes.NUMBER)
 						return null;
 					if (type == '')
-						type = DataType.STRING;
+						type = DataTypes.STRING;
 					this.map_qkeyAB_qkeyData.set(qkey, WeaveAPI.QKeyManager.getQKey(type, this.deriveStringFromNumber(value)));
 				}
 				return this.map_qkeyAB_qkeyData.get(qkey);

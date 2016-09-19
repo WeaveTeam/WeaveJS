@@ -15,7 +15,7 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import LinkableString = weavejs.core.LinkableString;
 import IProjector = weavejs.api.data.IProjector;
 import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
-import DataType = weavejs.api.data.DataType;
+import DataTypes = weavejs.api.data.DataTypes;
 import IKeySet = weavejs.api.data.IKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import {AbstractPlotter} from "weaveapp/plot/AbstractPlotter";
@@ -37,7 +37,7 @@ export default class AbstractGlyphPlotter extends AbstractPlotter implements IOb
 	getDescription():string
 	{
 		var titleX:string = this.dataX.getMetadata(ColumnMetadata.TITLE);
-		if (this.dataX.getMetadata(ColumnMetadata.DATA_TYPE) == DataType.GEOMETRY)
+		if (this.dataX.getMetadata(ColumnMetadata.DATA_TYPE) == DataTypes.GEOMETRY)
 		{
 			if (this.destinationProjection.value && this.sourceProjection.value != this.destinationProjection.value)
 				return Weave.lang('{0} ({1} -> {2})', titleX, this.sourceProjection.value || '?', this.destinationProjection.value);
@@ -114,7 +114,7 @@ export default class AbstractGlyphPlotter extends AbstractPlotter implements IOb
 		{
 			var result:number = NaN;
 			var dataCol:IAttributeColumn = i == 0 ? this.dataX : this.dataY;
-			if (dataCol.getMetadata(ColumnMetadata.DATA_TYPE) == DataType.GEOMETRY)
+			if (dataCol.getMetadata(ColumnMetadata.DATA_TYPE) == DataTypes.GEOMETRY)
 			{
 				var geoms:GeneralizedGeometry[] = dataCol.getValueFromKey(recordKey, Array);
 				var geom:GeneralizedGeometry;
@@ -130,7 +130,7 @@ export default class AbstractGlyphPlotter extends AbstractPlotter implements IOb
 			}
 			else
 			{
-				result = dataCol.getValueFromKey(recordKey, Number);
+				result = dataCol.getValueFromKey(recordKey, Number) as number;
 			}
 
 			if (i == 0)

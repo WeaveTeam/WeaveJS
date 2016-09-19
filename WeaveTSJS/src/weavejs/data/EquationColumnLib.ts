@@ -18,13 +18,14 @@ namespace weavejs.data
 	import WeaveAPI = weavejs.WeaveAPI;
 	import ILinkableVariable = weavejs.api.core.ILinkableVariable;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IKeySet = weavejs.api.data.IKeySet;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import JS = weavejs.util.JS;
 	import StandardLib = weavejs.util.StandardLib;
+	import DataType = weavejs.api.data.DataType;
 	
 	/**
 	 * This class contains static functions that access values from IAttributeColumn objects.
@@ -78,9 +79,9 @@ namespace weavejs.data
 				{
 					if (dataType == null)
 					{
-						var dataTypeMetadata:string = column.getMetadata(ColumnMetadata.DATA_TYPE);
-						dataType = DataType.getClass(dataTypeMetadata);
-						if (dataType == String && dataTypeMetadata != DataType.STRING)
+						var dataTypeMetadata:DataType = column.getMetadata(ColumnMetadata.DATA_TYPE) as DataType;
+						dataType = DataTypes.getClass(dataTypeMetadata);
+						if (dataType == String && dataTypeMetadata != DataTypes.STRING)
 							dataType = IQualifiedKey;
 					}
 					value = column.getValueFromKey(key, JS.asClass(dataType));
@@ -147,7 +148,7 @@ namespace weavejs.data
 		{
 			var key:IQualifiedKey = EquationColumnLib.getKey();
 			var foreignKeyType:string = keyColumn.getMetadata(ColumnMetadata.DATA_TYPE);
-			var ignoreKeyType:boolean= !foreignKeyType || foreignKeyType == DataType.STRING;
+			var ignoreKeyType:boolean= !foreignKeyType || foreignKeyType == DataTypes.STRING;
 			var cubekeys:IQualifiedKey[] = EquationColumnLib.getAssociatedKeys(keyColumn, key, ignoreKeyType);
 			
 			if (cubekeys && cubekeys.length == 1)
@@ -220,7 +221,7 @@ namespace weavejs.data
 				var column:IAttributeColumn = Weave.AS(object, IAttributeColumn);
 				if (column != null)
 				{
-					result = (object as IAttributeColumn).getValueFromKey(key, Number);
+					result = (object as IAttributeColumn).getValueFromKey(key, Number) as number;
 				}
 				else if (Weave.IS(object, ILinkableVariable))
 				{
@@ -258,7 +259,7 @@ namespace weavejs.data
 				var column:IAttributeColumn = Weave.AS(object, IAttributeColumn);
 				if (column != null)
 				{
-					result = (object as IAttributeColumn).getValueFromKey(key, String);
+					result = (object as IAttributeColumn).getValueFromKey(key, String) as string;
 				}
 				else if (Weave.IS(object, ILinkableVariable))
 				{

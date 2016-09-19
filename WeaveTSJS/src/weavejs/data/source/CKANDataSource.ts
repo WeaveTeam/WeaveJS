@@ -17,9 +17,8 @@ namespace weavejs.data.source
 {
 	import WeaveAPI = weavejs.WeaveAPI;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IDataSource = weavejs.api.data.IDataSource;
-	import IDataSource_Service = weavejs.api.data.IDataSource_Service;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import LinkableNumber = weavejs.core.LinkableNumber;
@@ -262,11 +261,11 @@ namespace weavejs.data.source
 								result.fields.map((field:CKANField) => {
 									var type:string = field.type;
 									if (type == 'numeric' || type == 'int4' || type == 'int' || type == 'float' || type == 'double')
-										type = DataType.NUMBER;
+										type = DataTypes.NUMBER;
 									if (type == 'text')
-										type = DataType.STRING;
+										type = DataTypes.STRING;
 									if (type == 'timestamp')
-										type = DataType.DATE;
+										type = DataTypes.DATE;
 									var meta:ICSVColumnMetadata = {};
 									meta.dataType = type as any; // TODO fix this type
 									meta.title = field.id;

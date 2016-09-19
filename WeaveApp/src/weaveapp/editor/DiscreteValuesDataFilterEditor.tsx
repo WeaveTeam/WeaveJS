@@ -13,7 +13,7 @@ import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-import DataType = weavejs.api.data.DataType;
+import DataTypes = weavejs.api.data.DataTypes;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import AbstractFilterEditor from "weaveapp/editor/AbstractFilterEditor";
@@ -62,7 +62,7 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 
 	getChoices():FilterOption[]
 	{
-		var dataType = DataType.getClass(this.column.getMetadata(ColumnMetadata.DATA_TYPE));
+		var dataType = DataTypes.getClass(this.column.getMetadata(ColumnMetadata.DATA_TYPE) as DataType);
 		this.options = ColumnUtils.getRecords(
 			{ value: this.column, label: this.column },
 			this.column.keys,

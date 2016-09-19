@@ -47,7 +47,7 @@ namespace weavejs.data.column
 		{
 			super();
 			this.setMetadataProperty(ColumnMetadata.TITLE, "Untitled Equation");
-			//setMetadataProperty(AttributeColumnMetadata.DATA_TYPE, DataType.NUMBER);
+			//setMetadataProperty(AttributeColumnMetadata.DATA_TYPE, DataTypes.NUMBER);
 			
 			this.variables.childListCallbacks.addImmediateCallback(this, this.handleVariableListChange);
 		}

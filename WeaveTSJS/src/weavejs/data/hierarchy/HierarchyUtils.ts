@@ -17,7 +17,6 @@ namespace weavejs.data.hierarchy
 {
 	import IColumnReference = weavejs.api.data.IColumnReference;
 	import IDataSource = weavejs.api.data.IDataSource;
-	import IDataSource_File = weavejs.api.data.IDataSource_File;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import IWeaveTreeNodeWithPathFinding = weavejs.api.data.IWeaveTreeNodeWithPathFinding;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;

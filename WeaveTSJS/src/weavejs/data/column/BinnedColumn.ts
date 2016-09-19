@@ -118,7 +118,7 @@ namespace weavejs.data.column
 				if (this._column && this._binClassifiers)
 				{
 					// high priority because not much can be done without data
-					WeaveAPI.Scheduler.startTask(this, this._asyncIterate.bind(this), WeaveAPI.TASK_PRIORITY_HIGH, this.triggerCallbacks.bind(this), Weave.lang("Binning {0} records", this._keys.length));
+					WeaveAPI.Scheduler.startTask(this, this._asyncIterate, WeaveAPI.TASK_PRIORITY_HIGH, this.triggerCallbacks, Weave.lang("Binning {0} records", this._keys.length));
 				}
 			}
 		}

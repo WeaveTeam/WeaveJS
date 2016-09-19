@@ -334,7 +334,7 @@ namespace weavejs.data.column
 			var todo:any[]/*[number[], GeneralizedGeometry]*/ = []; // TODO
 			for (var geom of this._geometryStreamDecoder.geometries)
 			{
-				var bounds:Bounds2D = Weave.AS(geom.bounds, Bounds2D);
+				var bounds:Bounds2D = geom.bounds;
 				var key = [bounds.getXNumericMin(), bounds.getYNumericMin(), bounds.getXNumericMax(), bounds.getYNumericMax(), bounds.getArea()];
 				todo.push([key, geom]);
 			}

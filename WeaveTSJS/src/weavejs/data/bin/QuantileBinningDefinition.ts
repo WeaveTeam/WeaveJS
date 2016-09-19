@@ -112,7 +112,7 @@ namespace weavejs.data.bin
 			var i:uint = 0;
 			for (var key of keys)
 			{
-				var n:number = column.getValueFromKey(key,Number);
+				var n:number = column.getValueFromKey(key,Number) as number;
 				if (isFinite(n))
 					_sortedColumn[i++] = n;
 			}

@@ -18,7 +18,7 @@ namespace weavejs.data.column
 	import WeaveAPI = weavejs.WeaveAPI;
 	import Aggregation = weavejs.api.data.Aggregation;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IBaseColumn = weavejs.api.data.IBaseColumn;
 	import IPrimitiveColumn = weavejs.api.data.IPrimitiveColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -45,7 +45,7 @@ namespace weavejs.data.column
 		/* override */ public getMetadata(propertyName:string):string
 		{
 			if (propertyName == ColumnMetadata.DATA_TYPE)
-				return DataType.NUMBER;
+				return DataTypes.NUMBER;
 			return super.getMetadata(propertyName);
 		}
 
@@ -125,7 +125,7 @@ namespace weavejs.data.column
 			}
 			
 			if (dataType === IQualifiedKey)
-				return WeaveAPI.QKeyManager.getQKey(DataType.NUMBER, this.getValueFromKey(key, Number));
+				return WeaveAPI.QKeyManager.getQKey(DataTypes.NUMBER, this.getValueFromKey(key, Number));
 			
 			return null;
 		}

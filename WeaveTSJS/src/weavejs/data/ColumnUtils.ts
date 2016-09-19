@@ -19,7 +19,7 @@ namespace weavejs.data
 	import DynamicState = weavejs.api.core.DynamicState;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IColumnReference = weavejs.api.data.IColumnReference;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
@@ -45,6 +45,8 @@ namespace weavejs.data
 	import StandardLib = weavejs.util.StandardLib;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 	import QKeyLike = weavejs.data.key.QKeyLike;
+	import DataType = weavejs.api.data.DataType;
+	import GeometryObject = GeoJSON.GeometryObject;
 
 	/**
 	 * This class contains static functions that access values from IAttributeColumn objects.
@@ -89,9 +91,9 @@ namespace weavejs.data
 			var projection:string = column.getMetadata(ColumnMetadata.PROJECTION);
 			var dateFormat:string = column.getMetadata(ColumnMetadata.DATE_FORMAT);
 			
-			if (dataType == DataType.DATE && dateFormat)
+			if (dataType == DataTypes.DATE && dateFormat)
 				dataType = dataType + '; ' + dateFormat;
-			if (dataType == DataType.GEOMETRY && projection)
+			if (dataType == DataTypes.GEOMETRY && projection)
 				dataType = dataType + '; ' + projection;
 			
 			if (dataType && keyType)
@@ -286,7 +288,7 @@ namespace weavejs.data
 		{
 			var qkey:IQualifiedKey = ColumnUtils.getQKey(key);
 			if (column != null)
-				return column.getValueFromKey(qkey, Number);
+				return column.getValueFromKey(qkey, Number) as number;
 			return NaN;
 		}
 		/**
@@ -375,11 +377,11 @@ namespace weavejs.data
 		 * @param visibleBounds If not null, this bounds will be used to remove unnecessary offscreen points.
 		 * @return An Array of GeoJson Geometry objects corresponding to the keys.  The Array may be sparse if there are no coordinates for some of the keys.
 		 */
-		public static getGeoJsonGeometries(geometryColumn:IAttributeColumn, keys:IQualifiedKey[], minImportance:number = 0, visibleBounds:Bounds2D = null):any[]/*IGeoJSON[]*/
+		public static getGeoJsonGeometries(geometryColumn:IAttributeColumn, keys:IQualifiedKey[], minImportance:number = 0, visibleBounds:Bounds2D = null):GeometryObject[]
 		{
-			var map_inputGeomArray_outputMultiGeom = new WeakMap<GeneralizedGeometry[], any /*IGeoJSON*/>();
-			var output:any[]/*IGeoJSON[]*/ = new Array(keys.length);
-			var multiGeom:any/*IGeoJSON*/;
+			var map_inputGeomArray_outputMultiGeom = new WeakMap<GeneralizedGeometry[], any /*GeoJSON*/>();
+			var output:GeometryObject[] = new Array(keys.length);
+			var multiGeom:GeometryObject;
 			for (var i:int = 0; i < keys.length; i++)
 			{
 				var key:IQualifiedKey = keys[i];
@@ -392,10 +394,10 @@ namespace weavejs.data
 					}
 					else
 					{
-						var outputGeomArray:any[]/*GeoJSON[] */ = [];
+						var outputGeomArray:GeometryObject[] = [];
 						for (var inputGeom of inputGeomArray || [])
 						{
-							var outputGeom:Object = inputGeom.toGeoJson(minImportance, visibleBounds);
+							var outputGeom:GeometryObject = inputGeom.toGeoJson(minImportance, visibleBounds);
 							if (outputGeom)
 								outputGeomArray.push(outputGeom);
 						}
@@ -462,7 +464,7 @@ namespace weavejs.data
 			}
 			
 			if (Weave.IS(dataType, String))
-				dataType = DataType.getClass(Weave.AS(dataType, String) as string);
+				dataType = DataTypes.getClass(Weave.AS(dataType, String) as DataType);
 			
 			// put the keys in the result
 			var result:(T[]|IQualifiedKey[])[] = [keys];
@@ -473,7 +475,7 @@ namespace weavejs.data
 				
 				var dt:Class<T> = JS.asClass(dataType);
 				if (!dt && column)
-					dt = DataType.getClass(column.getMetadata(ColumnMetadata.DATA_TYPE));
+					dt = DataTypes.getClass(column.getMetadata(ColumnMetadata.DATA_TYPE) as DataType);
 				
 				var values:T[] = [];
 				for (var kIndex:int = 0; kIndex < keys.length; kIndex++)
@@ -628,7 +630,7 @@ namespace weavejs.data
 				for (var i:int = 0; i < attrCols.length; i++)
 				{
 					var col:IAttributeColumn = attrCols[i] as IAttributeColumn;
-					var dt:GenericClass = dataType || DataType.getClass(col.getMetadata(ColumnMetadata.DATA_TYPE));
+					var dt:GenericClass = dataType || DataTypes.getClass(col.getMetadata(ColumnMetadata.DATA_TYPE) as DataType);
 					var value:any = col.getValueFromKey(key, dt);
 					if (StandardLib.isDefined(value))
 						record[columnTitles[i]] = value;

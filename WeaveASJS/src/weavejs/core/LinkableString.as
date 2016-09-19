@@ -11,7 +11,7 @@ package weavejs.core
 	 * @author adufilie
 	 * @see weave.core.LinkableVariable
 	 */
-	public class LinkableString extends LinkableVariable
+	public class LinkableString extends LinkableVariable/*/<string>/*/
 	{
 		public function LinkableString(defaultValue:String = null, verifier:Function = null, defaultValueTriggersCallbacks:Boolean = true)
 		{
@@ -29,7 +29,7 @@ package weavejs.core
 			setSessionState(value);
 		}
 		
-		override public function setSessionState(value:Object):void
+		override public function setSessionState(value:/*/string/*/Object):void
 		{
 			super.setSessionState(value == null ? null : String(value));
 		}

@@ -17,7 +17,7 @@ namespace weavejs.data.column
 {
 	import WeaveAPI = weavejs.WeaveAPI;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
@@ -46,7 +46,7 @@ namespace weavejs.data.column
 			{
 				case ColumnMetadata.TITLE: return this.title.value;
 				case ColumnMetadata.KEY_TYPE: return this.keyType.value;
-				case ColumnMetadata.DATA_TYPE: return this.numericMode.value ? DataType.NUMBER : DataType.STRING;
+				case ColumnMetadata.DATA_TYPE: return this.numericMode.value ? DataTypes.NUMBER : DataTypes.STRING;
 			}
 			return super.getMetadata(propertyName);
 		}

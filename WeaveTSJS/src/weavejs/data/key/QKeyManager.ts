@@ -17,7 +17,7 @@ namespace weavejs.data.key
 {
 	import WeaveAPI = weavejs.WeaveAPI;
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import ICSVParser = weavejs.api.data.ICSVParser;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IQualifiedKeyManager = weavejs.api.data.IQualifiedKeyManager;
@@ -116,7 +116,7 @@ namespace weavejs.data.key
 		public getQKeys_range(keyType:string, keyStrings:string[], iStart:uint, iEnd:uint, output:IQualifiedKey[]):void
 		{
 			if (!keyType)
-				keyType = DataType.STRING;
+				keyType = DataTypes.STRING;
 			
 			var map_localName_qkey:Map<string, IQualifiedKey> = this.d2d_keyType_localName_qkey.map.get(keyType);
 			if (!map_localName_qkey)
@@ -268,7 +268,7 @@ namespace weavejs.data.key
 
 			this.outputKeys.length = keyStrings.length;
 			// high priority because all visualizations depend on key sets
-			WeaveAPI.Scheduler.startTask(this.relevantContext, (stopTime:int) => this.iterate(stopTime), WeaveAPI.TASK_PRIORITY_HIGH, () => this.asyncComplete(), Weave.lang("Initializing {0} record identifiers", keyStrings.length));
+			WeaveAPI.Scheduler.startTask(this.relevantContext, this.iterate, WeaveAPI.TASK_PRIORITY_HIGH, this.asyncComplete, Weave.lang("Initializing {0} record identifiers", keyStrings.length));
 
 			return this;
 		}
@@ -281,7 +281,7 @@ namespace weavejs.data.key
 		private outputKeys:IQualifiedKey[];
 		private batch:uint = 5000;
 
-		private iterate(stopTime:int):Number
+		private iterate=(stopTime:int):number=>
 		{
 			for (; this.i < this.keyStrings.length; this.i += this.batch)
 			{
@@ -293,7 +293,7 @@ namespace weavejs.data.key
 			return 1;
 		}
 
-		private asyncComplete():void
+		private asyncComplete=():void=>
 		{
 			this.setResult(this.outputKeys);
 

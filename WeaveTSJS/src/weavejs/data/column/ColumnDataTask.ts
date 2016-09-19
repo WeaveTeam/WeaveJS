@@ -61,7 +61,7 @@ namespace weavejs.data.column
 			this.map_key_arrayData = new Map<IQualifiedKey, any[]>();
 			
 			// high priority because not much can be done without data
-			WeaveAPI.Scheduler.startTask(this.parentColumn, (stopTime:int)=> this.iterate(stopTime), WeaveAPI.TASK_PRIORITY_HIGH, () => this.callback(), Weave.lang("Processing {0} records", this.n));
+			WeaveAPI.Scheduler.startTask(this.parentColumn, this.iterate, WeaveAPI.TASK_PRIORITY_HIGH, this.callback, Weave.lang("Processing {0} records", this.n));
 		}
 		
 		private parentColumn:IAttributeColumn;
@@ -72,7 +72,7 @@ namespace weavejs.data.column
 		private i:int;
 		private n:int;
 		
-		private iterate(stopTime:int):number
+		private iterate=(stopTime:int):number=>
 		{
 			for (; this.i < this.n; this.i++)
 			{

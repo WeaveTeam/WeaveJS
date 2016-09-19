@@ -8,14 +8,18 @@ package weavejs.path
 {
 	import weavejs.WeaveAPI;
 	import weavejs.api.core.ILinkableObject;
-	import weavejs.api.data.IKeySet;
-	import weavejs.api.data.IQualifiedKey;
-	import weavejs.api.data.IQualifiedKeyManager;
+	// import weavejs.api.data.IKeySet;
+	// import weavejs.api.data.IQualifiedKey;
+	// import weavejs.api.data.IQualifiedKeyManager;
 	import weavejs.util.Dictionary2D;
 	import weavejs.util.JS;
 
 	public class WeavePathDataShared
 	{
+		public var IKeySet:* = JS.global['weavejs']['api']['data']['IKeySet'];
+		public var IQualifiedKeyManager:* = JS.global['weavejs']['api']['data']['IQualifiedKeyManager'];
+		public var IQualifiedKey:* = JS.global['weavejs']['api']['data']['IQualifiedKey'];
+
 		public static const DEFAULT_PROBE_KEY_SET:String = 'defaultProbeKeySet';
 		public static const DEFAULT_SELECTION_KEY_SET:String = 'defaultSelectionKeySet';
 		public static const DEFAULT_SUBSET_KEY_FILTER:String = 'defaultSubsetKeyFilter';
@@ -33,7 +37,7 @@ package weavejs.path
 			this.subset_filter = weave.path(DEFAULT_SUBSET_KEY_FILTER) as WeavePathData;
 		}
 		
-		private var qkm:IQualifiedKeyManager;
+		private var qkm:* //IQualifiedKeyManager;
 		
 		public var weave:Weave;
 		
@@ -50,7 +54,7 @@ package weavejs.path
 		 * @param  {object} key A QualifiedKey object (containing keyType and localName properties) to be converted.
 		 * @return {number}     The existing or newly-allocated index for the qualified key.
 		 */
-		public function qkeyToIndex(qkey:IQualifiedKey):int
+		public function qkeyToIndex(qkey:*/*IQualifiedKey*/):int
 		{
 			return qkey.toNumber();
 		}
@@ -127,7 +131,7 @@ package weavejs.path
 		public function _addKeys(keySet:ILinkableObject, qkeyStrings:Array):void
 		{
 			this.qkm.getQKeys(null, qkeyStrings)
-				.forEach(function(qkey:IQualifiedKey):void {
+				.forEach(function(qkey:*/*IQualifiedKey*/):void {
 					d2d_keySet_addedKeys.set(keySet, qkey, true);
 					d2d_keySet_removedKeys.remove(keySet, qkey);
 				});
@@ -144,7 +148,7 @@ package weavejs.path
 		public function _removeKeys(keySet:ILinkableObject, qkeyStrings:Array):void
 		{
 			this.qkm.getQKeys(null, qkeyStrings)
-				.forEach(function(qkey:IQualifiedKey):void {
+				.forEach(function(qkey:*/*IQualifiedKey*/):void {
 					d2d_keySet_removedKeys.set(keySet, qkey, true);
 					d2d_keySet_addedKeys.remove(keySet, qkey);
 				});

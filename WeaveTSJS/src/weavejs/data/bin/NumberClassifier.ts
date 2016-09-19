@@ -17,7 +17,7 @@ namespace weavejs.data.bin
 {
 	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IBinClassifier = weavejs.api.data.IBinClassifier;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
@@ -113,7 +113,7 @@ namespace weavejs.data.bin
 				return minStr;
 			
 			// if the column dataType is string, put quotes around the labels
-			if (toStringColumn && toStringColumn.getMetadata(ColumnMetadata.DATA_TYPE) == DataType.STRING)
+			if (toStringColumn && toStringColumn.getMetadata(ColumnMetadata.DATA_TYPE) == DataTypes.STRING)
 			{
 				minStr = Weave.lang('"{0}"', minStr);
 				maxStr = Weave.lang('"{0}"', maxStr);

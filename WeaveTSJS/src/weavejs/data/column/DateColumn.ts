@@ -17,7 +17,7 @@ namespace weavejs.data.column
 {
 	import WeaveAPI = weavejs.WeaveAPI;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import DateFormat = weavejs.api.data.DateFormat;
 	import IBaseColumn = weavejs.api.data.IBaseColumn;
 	import IPrimitiveColumn = weavejs.api.data.IPrimitiveColumn;
@@ -60,7 +60,7 @@ namespace weavejs.data.column
 		/* override */ public getMetadata(propertyName:string):string
 		{
 			if (propertyName == ColumnMetadata.DATA_TYPE)
-				return DataType.DATE;
+				return DataTypes.DATE;
 			if (propertyName == ColumnMetadata.DATE_FORMAT)
 				return this._dateFormat || super.getMetadata(propertyName);
 			return super.getMetadata(propertyName);
@@ -149,7 +149,7 @@ namespace weavejs.data.column
 			}*/
 			
 			// high priority because not much can be done without data
-			WeaveAPI.Scheduler.startTask(this, (stopTime:int) => this._asyncIterate(stopTime), WeaveAPI.TASK_PRIORITY_HIGH, () => this._asyncComplete());
+			WeaveAPI.Scheduler.startTask(this, this._asyncIterate, WeaveAPI.TASK_PRIORITY_HIGH, this._asyncComplete);
 		}
 		
 		private errorHandler(e:Error):void
@@ -182,7 +182,7 @@ namespace weavejs.data.column
 			return DateUtils.format(value, this._dateDisplayFormat || this._dateFormat);
 		}
 		
-		private _asyncIterate(stopTime:int):Number
+		private _asyncIterate(stopTime:int):number
 		{
 			for (; this._i < this._keys.length; this._i++)
 			{

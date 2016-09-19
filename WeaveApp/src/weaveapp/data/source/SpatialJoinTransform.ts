@@ -23,6 +23,7 @@ import Feature = ol.Feature;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import Vector = ol.source.Vector;
 import GeoJSON = ol.format.GeoJSON;
+import GeometryObject = GeoJSON.GeometryObject;
 
 export default class SpatialJoinTransform extends AbstractDataSource implements ISelectableAttributes
 {
@@ -101,7 +102,7 @@ export default class SpatialJoinTransform extends AbstractDataSource implements 
 		var metadata:Object = proxyColumn.getProxyMetadata();
 
 		var geomKeys:IQualifiedKey[] = this.geometryColumn.keys;
-		var rawGeometries:JSON[] = weavejs.data.ColumnUtils.getGeoJsonGeometries(this.geometryColumn, this.geometryColumn.keys);
+		var rawGeometries:GeometryObject[] = weavejs.data.ColumnUtils.getGeoJsonGeometries(this.geometryColumn, this.geometryColumn.keys);
 		var key:IQualifiedKey;
 		var feature:Feature;
 
@@ -109,10 +110,10 @@ export default class SpatialJoinTransform extends AbstractDataSource implements 
 
 		for (var idx:int = 0; idx < geomKeys.length; idx++)
 		{
-			var rawGeom:JSON = rawGeometries[idx];
+			var rawGeom:GeometryObject = rawGeometries[idx];
 			key = geomKeys[idx] as IQualifiedKey;
 
-			var geometry:Geometry = this._parser.readGeometry(rawGeom,
+			var geometry:Geometry = this._parser.readGeometry(rawGeom as any,
 				{
 					dataProjection: ol.proj.get(this.geometryColumn.getMetadata(ColumnMetadata.PROJECTION)),
 					featureProjection: ol.proj.get(this.pointProjection.value)

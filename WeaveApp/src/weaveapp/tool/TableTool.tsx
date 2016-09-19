@@ -293,7 +293,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		else
 		{
 			let column = this.columns.getObject(columnKey) as IAttributeColumn;
-			return column.getValueFromKey(row, String);
+			return column.getValueFromKey(row, String) as string;
 		}
 	}
 

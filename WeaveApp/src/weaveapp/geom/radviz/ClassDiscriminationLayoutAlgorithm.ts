@@ -77,7 +77,7 @@ namespace weavejs.geom.radviz
 				
 				for(var b:int = 0; b < normalizedColumns.length; b++)
 				{
-					var tempEntry:number = (normalizedColumns[b] as IAttributeColumn).getValueFromKey(mkey,Number);
+					var tempEntry:number = (normalizedColumns[b] as IAttributeColumn).getValueFromKey(mkey,Number) as number;
 					var zz = infoObject.columnMapping.get(columnNames[b]);
 					zz.push(tempEntry);
 				}

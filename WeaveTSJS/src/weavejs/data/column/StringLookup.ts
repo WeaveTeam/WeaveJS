@@ -104,7 +104,7 @@ namespace weavejs.data.column
 					this._uniqueStringValues.push(stringValue);
 				}
 				// save the mapping from the String value to the corresponding Number value
-				var numberValue:number = this.internalColumn.getValueFromKey(key, Number);
+				var numberValue:number = this.internalColumn.getValueFromKey(key, Number) as number;
 				if (this._stringToNumberMap[stringValue] == undefined) // no number stored yet
 				{
 					this._stringToNumberMap[stringValue] = numberValue;

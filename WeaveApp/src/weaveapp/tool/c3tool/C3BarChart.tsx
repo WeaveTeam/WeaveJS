@@ -511,7 +511,7 @@ export default class C3BarChart extends AbstractC3Tool
 
 			for (var k of heightColumn.keys)
 			{
-				tmp = heightColumn.getValueFromKey(k)
+				tmp = heightColumn.getValueFromKey(k, Number) as number;
 				if (tmp > max)
 					max = tmp;
 				if (tmp < min)
@@ -520,9 +520,9 @@ export default class C3BarChart extends AbstractC3Tool
 
 			for (k of heightColumn.keys)
 			{
-				if (Math.abs(heightColumn.getValueFromKey(k) - max) < 0.001)
+				if (Math.abs(heightColumn.getValueFromKey(k, Number) as number - max) < 0.001)
 					max_keys.push(k);
-				if (Math.abs(heightColumn.getValueFromKey(k) - min) < 0.001)
+				if (Math.abs(heightColumn.getValueFromKey(k, Number) as number - min) < 0.001)
 					min_keys.push(k);
 			}
 

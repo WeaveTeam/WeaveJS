@@ -50,7 +50,7 @@ namespace weavejs.data.bin
 			this.keys = column.keys;
 			this._iterateAll(-1); // restart from first task
 			// high priority because not much can be done without data
-			WeaveAPI.Scheduler.startTask(this.asyncResultCallbacks, this._iterateAll, WeaveAPI.TASK_PRIORITY_HIGH, this._done.bind(this));
+			WeaveAPI.Scheduler.startTask(this.asyncResultCallbacks, this._iterateAll, WeaveAPI.TASK_PRIORITY_HIGH, () => this._done);
 		}
 		
 		private _sortMap:{[key:string]:number}; // used by _sortFunc
@@ -74,7 +74,7 @@ namespace weavejs.data.bin
 				if (this.str && !this._sortMap.hasOwnProperty(this.str))
 				{
 					this.strArray[int(this.iout++)] = this.str;
-					this._sortMap[this.str] = this.column.getValueFromKey(this.keys[this.i], Number);
+					this._sortMap[this.str] = this.column.getValueFromKey(this.keys[this.i], Number) as number;
 				}
 			}
 			

@@ -12,10 +12,6 @@ package
 	import weavejs.api.core.IProgressIndicator;
 	import weavejs.api.core.IScheduler;
 	import weavejs.api.core.ISessionManager;
-	import weavejs.api.data.ICSVParser;
-	import weavejs.api.data.IDataSource_Transform;
-	import weavejs.api.data.IQualifiedKeyManager;
-	import weavejs.api.data.IStatisticsCache;
 	import weavejs.api.ui.IEditorManager;
 	import weavejs.core.EditorManager;
 	import weavejs.core.LinkableDynamicObject;

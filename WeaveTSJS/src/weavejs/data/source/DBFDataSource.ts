@@ -23,7 +23,7 @@ namespace weavejs.data.source
 	import WeaveAPI= weavejs.WeaveAPI;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 	import IColumnReference = weavejs.api.data.IColumnReference;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
@@ -278,17 +278,17 @@ namespace weavejs.data.source
 
 			var newColumn:IAttributeColumn;
 			var dataType = metadata.dataType;
-			if (dataType == DataType.GEOMETRY)
+			if (dataType == DataTypes.GEOMETRY)
 			{
 				newColumn = new GeometryColumn(metadata);
 				(newColumn as GeometryColumn).setRecords(qkeys, data);
 			}
-			else if (dataType == DataType.DATE)
+			else if (dataType == DataTypes.DATE)
 			{
 				newColumn = new DateColumn(metadata);
 				(newColumn as DateColumn).setRecords(qkeys, data);
 			}
-			else if (dataType == DataType.NUMBER)
+			else if (dataType == DataTypes.NUMBER)
 			{
 				newColumn = new NumberColumn(metadata);
 				data.forEach((str:string) => { return StandardLib.asNumber(str); });
@@ -330,7 +330,7 @@ namespace weavejs.data.source
 			if (columnName == DBFDataSource.THE_GEOM_COLUMN)
 			{
 				meta.title = this.getGeomColumnTitle();
-				meta.dataType = DataType.GEOMETRY as "geometry" // TODO;
+				meta.dataType = DataTypes.GEOMETRY as "geometry" // TODO;
 				return meta;
 			}
 			else if (this.dbfHeader)
@@ -344,7 +344,7 @@ namespace weavejs.data.source
 						var dataType = DBFDataSource.FIELD_TYPE_LOOKUP[typeChar] as any;
 						if (dataType)
 							meta.dataType = dataType;
-						if (dataType == DataType.DATE)
+						if (dataType == DataTypes.DATE)
 							meta.dateFormat = "YYYYMMDD";
 						return meta;
 					}
@@ -377,13 +377,13 @@ namespace weavejs.data.source
 		}
 
 		private static /* readonly */ FIELD_TYPE_LOOKUP:{[key:string]:string} = {
-			"C": DataType.STRING, // Char - ASCII
-			"D": DataType.DATE, // Date - 8 Ascii digits (0..9) in the YYYYMMDD format
-			"F": DataType.NUMBER, // Numeric - Ascii digits (-.0123456789) variable position of floating point
-			"N": DataType.NUMBER, // Numeric - Ascii digits (-.0123456789) fixed position/no floating point
-			"2": DataType.NUMBER, // short int -- binary int
-			"4": DataType.NUMBER, // long int - binary int
-			"8": DataType.NUMBER, // double - binary signed double IEEE
+			"C": DataTypes.STRING, // Char - ASCII
+			"D": DataTypes.DATE, // Date - 8 Ascii digits (0..9) in the YYYYMMDD format
+			"F": DataTypes.NUMBER, // Numeric - Ascii digits (-.0123456789) variable position of floating point
+			"N": DataTypes.NUMBER, // Numeric - Ascii digits (-.0123456789) fixed position/no floating point
+			"2": DataTypes.NUMBER, // short int -- binary int
+			"4": DataTypes.NUMBER, // long int - binary int
+			"8": DataTypes.NUMBER, // double - binary signed double IEEE
 			"L": "boolean", // Logical - Ascii chars (YyNnTtFf space ?)
 			"M": null, // Memo - 10 digits representing the start block position in .dbt file, or 10 spaces if no entry in memo
 			"B": null, // Binary - binary data in .dbt, structure like M

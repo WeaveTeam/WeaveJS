@@ -20,7 +20,7 @@ namespace weavejs.plot
 	
 	import DynamicState = weavejs.api.core.DynamicState;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import Bounds2D = weavejs.geom.Bounds2D;
@@ -121,7 +121,7 @@ namespace weavejs.plot
 		protected getCoordFromRecordKey(recordKey:IQualifiedKey, trueXfalseY:boolean):number
 		{
 			var dataCol:IAttributeColumn = trueXfalseY ? this.xData : this.yData;
-			if (dataCol.getMetadata(ColumnMetadata.DATA_TYPE) == DataType.GEOMETRY)
+			if (dataCol.getMetadata(ColumnMetadata.DATA_TYPE) == DataTypes.GEOMETRY)
 			{
 				var geoms:Array = dataCol.getValueFromKey(recordKey, Array) as Array;
 				var geom:GeneralizedGeometry;

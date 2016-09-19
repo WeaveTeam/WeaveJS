@@ -205,7 +205,7 @@ namespace weavejs.data
 				
 				// iterate on this key
 				var key:IQualifiedKey = this.keys[this.i];
-				var value:number = this.column.getValueFromKey(key, Number);
+				var value:number = this.column.getValueFromKey(key, Number) as number;
 				// skip keys that do not have an associated numeric value in the column.
 				if (isFinite(value))
 				{
@@ -229,7 +229,7 @@ namespace weavejs.data
 			return 1;
 		}
 		
-		private asyncComplete():void
+		private asyncComplete=():void=>
 		{
 			if (this.busy)
 			{

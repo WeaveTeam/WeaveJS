@@ -37,7 +37,7 @@ import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-import DataType = weavejs.api.data.DataType;
+import DataTypes = weavejs.api.data.DataTypes;
 import EventCallbackCollection = weavejs.core.EventCallbackCollection;
 import Bounds2D = weavejs.geom.Bounds2D;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
@@ -120,7 +120,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let dataType: string;
 		if (iac) {
 			dataType = iac.getMetadata(ColumnMetadata.DATA_TYPE);
-			if (dataType == DataType.GEOMETRY) {
+			if (dataType == DataTypes.GEOMETRY) {
 				return true;
 			}
 		}
@@ -129,7 +129,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			if (metadata) {
 				dataType = metadata[ColumnMetadata.DATA_TYPE];
 			}
-			if (dataType == DataType.GEOMETRY) {
+			if (dataType == DataTypes.GEOMETRY) {
 				return true;
 			}
 		}

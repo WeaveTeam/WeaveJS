@@ -116,10 +116,10 @@ namespace weavejs.data.key
 			this._asyncKeySetIndex = 0;
 			this._asyncKeyIndex = 0;
 			// high priority because all visualizations depend on key sets
-			WeaveAPI.Scheduler.startTask(this.busyStatus, (stopTime:number) => this.asyncIterate(stopTime), WeaveAPI.TASK_PRIORITY_HIGH, () => this.asyncComplete(), Weave.lang("Computing the union of {0} key sets", this._keySets.length));
+			WeaveAPI.Scheduler.startTask(this.busyStatus, this.asyncIterate, WeaveAPI.TASK_PRIORITY_HIGH, this.asyncComplete, Weave.lang("Computing the union of {0} key sets", this._keySets.length));
 		}
 		
-		private asyncIterate(stopTime:int):number
+		private asyncIterate=(stopTime:int):number=>
 		{
 			for (; this._asyncKeySetIndex < this._keySets.length; this._asyncKeySetIndex++)
 			{
@@ -156,7 +156,7 @@ namespace weavejs.data.key
 			return 1; // avoids division by zero
 		}
 		
-		private asyncComplete():void
+		private asyncComplete=():void=>
 		{
 			// detect change
 			if (this._allKeys.length != this._asyncAllKeys.length || this._allKeys.length != this._prevCompareCounter)

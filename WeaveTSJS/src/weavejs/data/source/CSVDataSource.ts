@@ -20,10 +20,9 @@ namespace weavejs.data.source
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IDataSource = weavejs.api.data.IDataSource;
-	import IDataSource_File = weavejs.api.data.IDataSource_File;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import CallbackCollection = weavejs.core.CallbackCollection;
 	import LinkableFile = weavejs.core.LinkableFile;
@@ -331,7 +330,7 @@ namespace weavejs.data.source
 		{
 			var metadata:ICSVColumnMetadata = {};
 			metadata.title = this.getColumnTitle(id);
-			metadata.keyType = this.keyType.value || DataType.STRING;
+			metadata.keyType = this.keyType.value || DataTypes.STRING;
 			if (this.cachedDataTypes[id])
 				metadata.dataType = this.cachedDataTypes[id];
 			
@@ -565,12 +564,12 @@ namespace weavejs.data.source
 			
 			var dataType:string = metadata.dataType;
 
-			if (dataType == null || dataType == DataType.NUMBER)
+			if (dataType == null || dataType == DataTypes.NUMBER)
 			{
-				numbers = this.stringsToNumbers(strings, dataType == DataType.NUMBER);
+				numbers = this.stringsToNumbers(strings, dataType == DataTypes.NUMBER);
 			}
 
-			if ((!numbers && dataType == null) || dataType == DataType.DATE)
+			if ((!numbers && dataType == null) || dataType == DataTypes.DATE)
 			{
 				dateFormats = DateColumn.detectDateFormats(strings);
 			}
@@ -583,7 +582,7 @@ namespace weavejs.data.source
 			}
 			else
 			{
-				if (dataType == DataType.DATE || (dateFormats && dateFormats.length > 0))
+				if (dataType == DataTypes.DATE || (dateFormats && dateFormats.length > 0))
 				{
 					newColumn = new DateColumn(metadata);
 					(newColumn as DateColumn).setRecords(this.keysArray, strings);

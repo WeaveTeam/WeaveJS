@@ -90,7 +90,7 @@ namespace weavejs.data
 			if (this.asyncMode)
 			{
 				// high priority because preparing data is often the first thing we need to do
-				WeaveAPI.Scheduler.startTask(this, (stopTime:number) => this.parseIterate(stopTime), WeaveAPI.TASK_PRIORITY_HIGH, () => this.parseDone());
+				WeaveAPI.Scheduler.startTask(this, this.parseIterate, WeaveAPI.TASK_PRIORITY_HIGH, this.parseDone);
 			}
 			else
 			{
@@ -189,7 +189,7 @@ namespace weavejs.data
 			return this.i / this.csvData.length;
 		}
 		
-		private parseDone():void
+		private parseDone=():void=>
 		{
 			// if there is more than one row and last row is empty,
 			// remove last row assuming it is there because of a newline at the end of the file.

@@ -21,6 +21,7 @@ import DataSourceEditor from "weaveapp/editor/DataSourceEditor";
 import KeyTypeInput from "weaveapp/ui/KeyTypeInput";
 import FileSelector from "weaveapp/ui/FileSelector";
 import {IDataSourceEditorState} from "weaveapp/editor/DataSourceEditor";
+import GeoJsonObject = GeoJSON.GeoJsonObject;
 
 export default class GeoJSONDataSourceEditor extends DataSourceEditor<IDataSourceEditorState>
 {
@@ -35,7 +36,7 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor<IDataSourc
 		if (dataSource.url.result)
 		{
 			//var json = Weave.getDefinition("JSON");//TODO look into correct serializing of url result
-			var jsonObj = dataSource.url.result;
+			var jsonObj = dataSource.url.result as GeoJsonObject;
 			//var jsonObj = json.parse(jsonStr);
 			validGeoJson = GeoJSON.isGeoJSONObject(jsonObj);
 		}

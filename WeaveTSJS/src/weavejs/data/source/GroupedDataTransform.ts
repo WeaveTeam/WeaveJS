@@ -13,13 +13,14 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+import DataType = weavejs.api.data.DataType;
 namespace weavejs.data.source
 {
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import ILinkableVariable = weavejs.api.core.ILinkableVariable;
 	import Aggregation = weavejs.api.data.Aggregation;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -174,7 +175,7 @@ namespace weavejs.data.source
 				{
 					var localName:string;
 					// if the foreign key column is numeric, avoid using the formatted strings as keys
-					if (this.groupByColumn.getMetadata(ColumnMetadata.DATA_TYPE) == DataType.NUMBER)
+					if (this.groupByColumn.getMetadata(ColumnMetadata.DATA_TYPE) == DataTypes.NUMBER)
 						localName = this.groupByColumn.getValueFromKey(key, Number);
 					else
 						localName = this.groupByColumn.getValueFromKey(key, String);
@@ -196,7 +197,7 @@ namespace weavejs.data.source
 import WeaveAPI = weavejs.WeaveAPI;
 import Aggregation = weavejs.api.data.Aggregation;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-import DataType = weavejs.api.data.DataType;
+import DataTypes = weavejs.api.data.DataTypes;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IPrimitiveColumn = weavejs.api.data.IPrimitiveColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -317,8 +318,8 @@ class AggregateColumn extends AbstractAttributeColumn implements IPrimitiveColum
 		
 		// get input keys from groupKey
 		var tempKeys:IQualifiedKey[] = EquationColumnLib.getAssociatedKeys(this._groupByColumn, groupKey, true);
-		var meta_dataType:string = this._dataColumn ? this._dataColumn.getMetadata(ColumnMetadata.DATA_TYPE) : null;
-		var inputType:GenericClass = DataType.getClass(meta_dataType);
+		var meta_dataType:DataType = this._dataColumn ? this._dataColumn.getMetadata(ColumnMetadata.DATA_TYPE) as DataType : null;
+		var inputType:GenericClass = DataTypes.getClass(meta_dataType);
 
 		if (dataType === Array)
 		{
@@ -367,7 +368,7 @@ class AggregateColumn extends AbstractAttributeColumn implements IPrimitiveColum
 			return undefined;
 		}
 		
-		if (meta_dataType === DataType.GEOMETRY)
+		if (meta_dataType === DataTypes.GEOMETRY)
 		{
 			if (dataType === String)
 				return this.containsKey(groupKey) ? 'Geometry(' + groupKey.keyType + '#' + groupKey.localName + ')' : '';

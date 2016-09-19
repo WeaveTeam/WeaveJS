@@ -18,7 +18,7 @@ namespace weavejs.data.column
 	import WeaveAPI = weavejs.WeaveAPI;
 	import Aggregation = weavejs.api.data.Aggregation;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IBaseColumn = weavejs.api.data.IBaseColumn;
 	import IPrimitiveColumn = weavejs.api.data.IPrimitiveColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -49,7 +49,7 @@ namespace weavejs.data.column
 		{
 			var value:string = super.getMetadata(propertyName);
 			if (!value && propertyName == ColumnMetadata.DATA_TYPE)
-				return DataType.STRING;
+				return DataTypes.STRING;
 			return value;
 		}
 
@@ -152,7 +152,7 @@ namespace weavejs.data.column
 			this._numberToString.clear();
 			this._stringToNumber.clear();
 			// high priority because not much can be done without data
-			WeaveAPI.Scheduler.startTask(this, (stopTime:int) => this._iterate(stopTime), WeaveAPI.TASK_PRIORITY_HIGH, () => this.asyncComplete());
+			WeaveAPI.Scheduler.startTask(this, this._iterate, WeaveAPI.TASK_PRIORITY_HIGH, this.asyncComplete);
 		}
 		
 		private _i:int;
@@ -229,7 +229,7 @@ namespace weavejs.data.column
 			{
 				var type:string = this._metadata ? this._metadata[ColumnMetadata.DATA_TYPE] : null;
 				if (!type)
-					type = DataType.STRING;
+					type = DataTypes.STRING;
 				return WeaveAPI.QKeyManager.getQKey(type, string);
 			}
 			

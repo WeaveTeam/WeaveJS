@@ -15,10 +15,9 @@
 namespace weavejs.data.source {
 	import WeaveAPI = weavejs.WeaveAPI;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import AbstractDataSource = weavejs.data.source.AbstractDataSource;
-	import IDataSource_File = weavejs.api.data.IDataSource_File;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import LinkableFile = weavejs.core.LinkableFile;
 	import LinkableString = weavejs.core.LinkableString;
@@ -34,6 +33,7 @@ namespace weavejs.data.source {
 	import IColumnReference = weavejs.api.data.IColumnReference;
 	import JS = weavejs.util.JS;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
+	import GeoJsonObject = GeoJSON.GeoJsonObject;
 	
 	@Weave.classInfo({id: "weavejs.data.source.GeoJSONDataSource", label: "GeoJSON file", interfaces: [IDataSource]})
 	export class GeoJSONDataSource extends AbstractDataSource
@@ -133,7 +133,7 @@ namespace weavejs.data.source {
 			
 			try
 			{
-				var obj:Object = this.url.result;
+				var obj:GeoJsonObject = this.url.result as GeoJsonObject;
 				
 				// make sure it's valid GeoJSON
 				if (!GeoJSON.isGeoJSONObject(obj))
@@ -206,12 +206,12 @@ namespace weavejs.data.source {
 			proxyColumn.setMetadata(metadata);
 			
 			var dataType:string = metadata[ColumnMetadata.DATA_TYPE];
-			if (dataType == DataType.GEOMETRY)
+			if (dataType == DataTypes.GEOMETRY)
 			{
 				var qkeys:IQualifiedKey[] = [];
 				var geoms:GeneralizedGeometry[] = [];
 				var i:int = 0;
-				var initGeoms:Function = (stopTime:int):Number=>
+				var initGeoms = (stopTime:int):number =>
 				{
 					if (!this.jsonData)
 					{
@@ -220,7 +220,7 @@ namespace weavejs.data.source {
 					}
 					for (; i < this.jsonData.qkeys.length; i++)
 					{
-						if (JS.now() > stopTime)
+						if (Date.now() > stopTime)
 							return i / this.jsonData.qkeys.length;
 						
 						var geomsFromJson:GeneralizedGeometry[] = GeneralizedGeometry.fromGeoJson(this.jsonData.geometries[i]);
@@ -232,7 +232,7 @@ namespace weavejs.data.source {
 					}
 					return 1;
 				}
-				var setGeoms:Function = ():void=>
+				var setGeoms = ():void=>
 				{
 					var gc:GeometryColumn = new GeometryColumn(metadata);
 					gc.setRecords(qkeys, geoms);
@@ -272,7 +272,7 @@ namespace weavejs.data.source {
 				meta[GeoJSONDataSource.GEOJSON_PROPERTY_NAME] = '';
 				meta[ColumnMetadata.TITLE] = this.getGeomColumnTitle();
 				meta[ColumnMetadata.KEY_TYPE] = this.getKeyType();
-				meta[ColumnMetadata.DATA_TYPE] = DataType.GEOMETRY;
+				meta[ColumnMetadata.DATA_TYPE] = DataTypes.GEOMETRY;
 				meta[ColumnMetadata.PROJECTION] = this.getProjection();
 			}
 			else if (this.jsonData.propertyNames.indexOf(propertyName) >= 0)

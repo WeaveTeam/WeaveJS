@@ -17,11 +17,10 @@ namespace weavejs.data.source
 {
 	import WeaveAPI = weavejs.WeaveAPI;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import IDataSourceWithAuthentication = weavejs.api.data.IDataSourceWithAuthentication;
-	import IDataSource_Service = weavejs.api.data.IDataSource_Service;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import IWeaveGeometryTileService = weavejs.api.net.IWeaveGeometryTileService;
 	import LinkableString = weavejs.core.LinkableString;
@@ -352,7 +351,7 @@ namespace weavejs.data.source
 			{
 				this.getMetadata(proxyColumn, [ColumnMetadata.DATA_TYPE, 'dataTable', 'name', 'year', 'sqlParams'], false, params);
 				// dataType is only used for backwards compatibility with geometry collections
-				if (params[ColumnMetadata.DATA_TYPE] != DataType.GEOMETRY)
+				if (params[ColumnMetadata.DATA_TYPE] != DataTypes.GEOMETRY)
 					delete params[ColumnMetadata.DATA_TYPE];
 				
 				query = this._service.getColumnFromMetadata(params);
@@ -447,7 +446,7 @@ namespace weavejs.data.source
 				
 				// special case for geometry column
 				var dataType:string = ColumnUtils.getDataType(proxyColumn);
-				var isGeom:boolean = StandardLib.stringCompare(dataType, DataType.GEOMETRY, true) == 0;
+				var isGeom:boolean = StandardLib.stringCompare(dataType, DataTypes.GEOMETRY, true) == 0;
 				if (isGeom && result.data == null)
 				{
 					var tileService:IWeaveGeometryTileService = this._service.createTileService(result.id);
@@ -464,7 +463,7 @@ namespace weavejs.data.source
 					}
 					
 					if (!dataType) // determine dataType from data
-						dataType = DataType.getDataTypeFromData(result.data);
+						dataType = DataTypes.getDataTypeFromData(result.data);
 					
 					if (isGeom) // result.data is an array of PGGeom objects.
 					{
@@ -488,13 +487,13 @@ namespace weavejs.data.source
 						proxyColumn.setInternalColumn(newColumn);
 						proxyColumn.setMetadata(null); // this will allow SecondaryKeyNumColumn to use its getMetadata() code
 					}
-					else if (StandardLib.stringCompare(dataType, DataType.NUMBER, true) == 0)
+					else if (StandardLib.stringCompare(dataType, DataTypes.NUMBER, true) == 0)
 					{
 						var newNumericColumn:NumberColumn = new NumberColumn(metadata);
 						newNumericColumn.setRecords(qkeys, result.data);
 						proxyColumn.setInternalColumn(newNumericColumn);
 					}
-					else if (StandardLib.stringCompare(dataType, DataType.DATE, true) == 0)
+					else if (StandardLib.stringCompare(dataType, DataTypes.DATE, true) == 0)
 					{
 						var newDateColumn:DateColumn = new DateColumn(metadata);
 						newDateColumn.setRecords(qkeys, result.data);
@@ -748,7 +747,7 @@ namespace weavejs.data.source
 				this.children = [];
 				var meta:IWeaveDataSourceColumnMetadata = {};
 				meta.entityType = EntityType.COLUMN;
-				meta.dataType = DataType.GEOMETRY as any; // TODO fix this type
+				meta.dataType = DataTypes.GEOMETRY as any; // TODO fix this type
 				this.cache.getHierarchyInfo(meta).then(this.handleHierarchyInfo.bind(this, this.children));
 			}
 			return this.children;

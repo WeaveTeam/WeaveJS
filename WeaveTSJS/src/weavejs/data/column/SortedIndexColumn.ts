@@ -113,7 +113,7 @@ namespace weavejs.data.column
 			
 			if (!this._column || index < 0 || index >= this._sortedKeys.length || int(index) != index)
 				return '';
-			return this._column.getValueFromKey(this._sortedKeys[index], String);
+			return this._column.getValueFromKey(this._sortedKeys[index], String) as string;
 		}
 	}
 }

@@ -17,7 +17,7 @@ namespace weavejs.data.bin
 {
 	import WeaveAPI = weavejs.WeaveAPI;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 	import LinkableNumber = weavejs.core.LinkableNumber;
@@ -58,7 +58,7 @@ namespace weavejs.data.bin
 			if (nonWrapperColumn)
 			{
 				var dataType:string = nonWrapperColumn.getMetadata(ColumnMetadata.DATA_TYPE);
-				if (dataType && dataType != DataType.NUMBER)
+				if (dataType && dataType != DataTypes.NUMBER)
 					integerValuesOnly = true;
 			}
 			var stats:IColumnStatistics = WeaveAPI.StatisticsCache.getColumnStatistics(column);

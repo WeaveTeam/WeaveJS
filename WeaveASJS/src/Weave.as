@@ -14,7 +14,7 @@ package
 	import weavejs.api.core.ILinkableHashMap;
 	import weavejs.api.core.ILinkableObject;
 	import weavejs.api.core.ISessionManager;
-	import weavejs.api.data.IAttributeColumn;
+	// import weavejs.api.data.IAttributeColumn;
 	import weavejs.core.SessionStateLog;
 	import weavejs.path.WeavePath;
 	import weavejs.path.WeavePathUI;
@@ -766,7 +766,7 @@ package
 			var undef:Array = [];
 			for each (var item:ILinkableDynamicObject in all)
 			{
-				var col:IAttributeColumn = item as IAttributeColumn;
+				var col:* = item; //: IAttributeColumn = item as IAttributeColumn;
 				if (!col)
 					continue;
 				if (item.target is RefCol)

@@ -21,9 +21,9 @@ package weavejs
 	import weavejs.api.core.IScheduler;
 	import weavejs.api.core.ISessionManager;
 	//import weavejs.api.data.IAttributeColumnCache;
-	import weavejs.api.data.ICSVParser;
-	import weavejs.api.data.IQualifiedKeyManager;
-	import weavejs.api.data.IStatisticsCache;
+	// import weavejs.api.data.ICSVParser;
+	// import weavejs.api.data.IQualifiedKeyManager;
+	// import weavejs.api.data.IStatisticsCache;
 	//import weavejs.api.net.IURLRequestUtils;
 	import weavejs.api.ui.IEditorManager;
 	import weavejs.core.ClassRegistryImpl;
@@ -121,6 +121,7 @@ package weavejs
 		 */
 		public static function get StatisticsCache():*/*IStatisticsCache*/
 		{
+			var IStatisticsCache:* = JS.global['weavejs']['api']['data']['IStatisticsCache'];
 			return (_classRegistry || ClassRegistry as ClassRegistryImpl).map_interface_singletonInstance.get(IStatisticsCache)
 				|| _classRegistry.getSingletonInstance(IStatisticsCache);
 		}
@@ -130,6 +131,7 @@ package weavejs
 		 */
 		public static function get QKeyManager():*/*IQualifiedKeyManager*/
 		{
+			var IQualifiedKeyManager:* = JS.global['weavejs']['api']['data']['IQualifiedKeyManager'];
 			return (_classRegistry || ClassRegistry as ClassRegistryImpl).map_interface_singletonInstance.get(IQualifiedKeyManager)
 				|| _classRegistry.getSingletonInstance(IQualifiedKeyManager);
 		}
@@ -137,8 +139,9 @@ package weavejs
 		/**
 		 * This is the singleton instance of the registered ICSVParser implementation.
 		 */
-		public static function get CSVParser():ICSVParser
+		public static function get CSVParser():*/*ICSVParser*/
 		{
+			var ICSVParser:* = JS.global['weavejs']['api']['data']['ICSVParser'];
 			return (_classRegistry || ClassRegistry as ClassRegistryImpl).map_interface_singletonInstance.get(ICSVParser)
 				|| _classRegistry.getSingletonInstance(ICSVParser);
 		}

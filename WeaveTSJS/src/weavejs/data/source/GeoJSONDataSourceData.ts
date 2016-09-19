@@ -20,24 +20,26 @@ namespace weavejs.data.source
 	import ArrayUtils = weavejs.util.ArrayUtils;
 	import AsyncSort = weavejs.util.AsyncSort;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import GeoJsonObject = GeoJSON.GeoJsonObject;
+	import NamedCoordinateReferenceSystem = GeoJSON.NamedCoordinateReferenceSystem;
 
 	export class GeoJSONDataSourceData
 	{
-		constructor(obj:any, keyType:string, keyPropertyName:string)
+		constructor(obj:GeoJsonObject, keyType:string, keyPropertyName:string)
 		{
 			// get projection
-			var crs:any = obj[GeoJSON.P_CRS];
-			if (crs && crs[GeoJSON.P_TYPE] == GeoJSON.CRS_T_NAME)
-				this.projection = GeoJSON.getProjectionFromURN(crs[GeoJSON.CRS_P_PROPERTIES][GeoJSON.CRS_N_P_NAME]);
+			var crs = obj.crs;
+			if (crs && crs.type == GeoJSON.CRS_T_NAME)
+				this.projection = GeoJSON.getProjectionFromURN((crs as NamedCoordinateReferenceSystem).properties.name);
 			
 			// get features
-			var featureCollection:{[key:string]:any} = GeoJSON.asFeatureCollection(obj);
-			var features:Object[] = featureCollection[GeoJSON.FC_P_FEATURES];
+			var featureCollection = GeoJSON.asFeatureCollection(obj);
+			var features = featureCollection.features;
 			
 			// save data from features
-			this.ids = ArrayUtils.pluck(features, GeoJSON.F_P_ID);
-			this.geometries = ArrayUtils.pluck(features, GeoJSON.F_P_GEOMETRY);
-			this.properties = ArrayUtils.pluck(features, GeoJSON.F_P_PROPERTIES);
+			this.ids = ArrayUtils.pluck(features, "id");
+			this.geometries = ArrayUtils.pluck(features, "geometries");
+			this.properties = ArrayUtils.pluck(features, "properties");
 			
 			// if there are no ids, use index values
 			if (this.ids.every((item, i, a) => { return item === undefined; }))

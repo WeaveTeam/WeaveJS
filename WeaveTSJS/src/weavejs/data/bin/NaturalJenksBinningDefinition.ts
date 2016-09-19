@@ -111,7 +111,7 @@ namespace weavejs.data.bin
 				if (Date.now() > stopTime)
 					return this._keyCount/this._keys.length;
 				/*ignore NaN */
-				currValue = this._column.getValueFromKey(this._keys[this._keyCount],Number);
+				currValue = this._column.getValueFromKey(this._keys[this._keyCount],Number) as number;
 				if (isFinite(currValue))
 					this._sortedValues.push(currValue);
 			}
@@ -391,7 +391,7 @@ namespace weavejs.data.bin
 			var keys:IQualifiedKey[] = column ? column.keys : [];
 			var sortedColumn:number[] = new Array(keys.length);
 			for (var i:int = 0; i < keys.length; i++)
-				sortedColumn[i] = Number(column.getValueFromKey(keys[i], Number));
+				sortedColumn[i] = column.getValueFromKey(keys[i], Number) as number;
 			
 			AsyncSort.sortImmediately(sortedColumn);
 			return sortedColumn;

@@ -8,11 +8,11 @@ package weavejs.path
 {
 	import weavejs.WeaveAPI;
 	import weavejs.api.core.ILinkableObject;
-	import weavejs.api.data.IAttributeColumn;
+	// import weavejs.api.data.IAttributeColumn;
 	// import weavejs.api.data.IDataSource;
-	import weavejs.api.data.IKeySet;
-	import weavejs.api.data.IKeySetCallbackInterface;
-	import weavejs.api.data.IQualifiedKey;
+	// import weavejs.api.data.IKeySet;
+	// import weavejs.api.data.IKeySetCallbackInterface;
+	// import weavejs.api.data.IQualifiedKey;
 	//import weavejs.data.ColumnUtils;
 	// import weavejs.data.column.DynamicColumn;
 	// import weavejs.data.column.ExtendedDynamicColumn;
@@ -26,6 +26,10 @@ package weavejs.path
 		public var ReferencedColumn:* = JS.global['weavejs']['data']['ReferencedColumn'];
 		public var DynamicColumn:* = JS.global['weavejs']['data']['DynamicColumn'];
 		public var ExtendedDynamicColumn:* = JS.global['weavejs']['data']['ExtendedDynamicColumn'];
+		public var IAttributeColumn:* = JS.global['weavejs']['api']['data']['IAttributeColumn'];
+		public var IKeySet:* = JS.global['weavejs']['api']['data']['IKeySet'];
+		public var IKeySetCallbackInterface:* = JS.global['weavejs']['api']['data']['IKeySetCallbackInterface'];
+		public var IQualifiedKey:* = JS.global['weavejs']['api']['data']['IQualifiedKey'];
 
 		public function WeavePathData(weave:Weave, basePath:Array)
 		{
@@ -250,7 +254,7 @@ package weavejs.path
 		public function addKeySetCallback(callback:Function, triggerCallbackNow:Boolean = false):WeavePath
 		{
 			var self:WeavePath = this;
-			var keyCallbacks:IKeySetCallbackInterface = this.getObject('keyCallbacks') as IKeySetCallbackInterface;
+			var keyCallbacks:*/*IKeySetCallbackInterface*/ = this.getObject('keyCallbacks') as IKeySetCallbackInterface;
 			keyCallbacks.addImmediateCallback(keyCallbacks, function():void {
 				callback.call(self, {
 					added: keyCallbacks.keysAdded,
@@ -360,7 +364,7 @@ package weavejs.path
 		    /* Perform the actual retrieval of records */
 		    var results:Array = ColumnUtils.joinColumns(obj.columns, dataType, true, keySetPath ? keySetPath.getObject() : null);
 		    return results[0]
-		        .map(function(key:IQualifiedKey, iRow:int, a:Array):Object {
+		        .map(function(key:*/*IQualifiedKey*/, iRow:int, a:Array):Object {
 		            var record:Object = {id: key};
 		            obj.chains.forEach(function(chain:Array, iChain:int, a:Array):void {
 		                setChain(record, chain, results[iChain + 1][iRow])

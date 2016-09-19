@@ -216,7 +216,7 @@ namespace weavejs.data.key
 			this._asyncInverse = this.inverseFilter.value;
 			
 			// high priority because all visualizations depend on key sets
-			WeaveAPI.Scheduler.startTask(this, (stopTime:int) => this.iterate(stopTime), WeaveAPI.TASK_PRIORITY_HIGH, () => this.asyncComplete(), Weave.lang('Filtering {0} keys', this._asyncInput.length));
+			WeaveAPI.Scheduler.startTask(this, this.iterate, WeaveAPI.TASK_PRIORITY_HIGH, this.asyncComplete, Weave.lang('Filtering {0} keys', this._asyncInput.length));
 		}
 		
 		private _i:int;

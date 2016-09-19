@@ -191,7 +191,7 @@ namespace weavejs.ui
 			for (let child of columns)
 			{
 				let title:string = child.getMetadata("title");
-				let value:string = child.getValueFromKey(keys[0], String);
+				let value:string = child.getValueFromKey(keys[0], String) as string;
 				if (value)
 					result[title] = value;
 			}

@@ -209,10 +209,10 @@ namespace weavejs.data.source
 			//TODO - this should be cached
 			var localName:string;
 			// if the foreign key column is numeric, avoid using the formatted strings as keys
-			if (this._keyColumn.getMetadata(ColumnMetadata.DATA_TYPE) == DataType.NUMBER)
-				localName = this._keyColumn.getValueFromKey(key, Number);
+			if (this._keyColumn.getMetadata(ColumnMetadata.DATA_TYPE) == DataTypes.NUMBER)
+				localName = String(this._keyColumn.getValueFromKey(key, Number) as number);
 			else
-				localName = this._keyColumn.getValueFromKey(key, String);
+				localName = this._keyColumn.getValueFromKey(key, String) as string;
 
 			var foreignKey:IQualifiedKey = WeaveAPI.QKeyManager.getQKey(this._keyType, localName);
 			return this._dataColumn.getValueFromKey(foreignKey, dataType);

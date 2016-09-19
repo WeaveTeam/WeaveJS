@@ -20,7 +20,8 @@ namespace weavejs.geom
 	import ILinkableVariable = weavejs.api.core.ILinkableVariable;
 	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 	import IDisposableObject = weavejs.api.core.IDisposableObject;
-	
+	import Bounds2D = weavejs.geom.Bounds2D;
+
 	/**
 	 * This is a linkable version of a Bounds2D object.
 	 * 

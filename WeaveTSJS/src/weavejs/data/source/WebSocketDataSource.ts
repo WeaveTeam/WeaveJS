@@ -21,7 +21,7 @@ namespace weavejs.data.source
 	import IKeySet = weavejs.api.data.IKeySet;
 	import Aggregation = weavejs.api.data.Aggregation;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -224,7 +224,7 @@ namespace weavejs.data.source
 		private getColumnMetadata(dataColumnName:string):Object
 		{
 			var metadata:IWebSocketColumnMetadata = {};
-			metadata.keyType = this.keyType.value || DataType.STRING;
+			metadata.keyType = this.keyType.value || DataTypes.STRING;
 			metadata.jsonPropertyName = dataColumnName;
 			metadata.title = dataColumnName;
 			

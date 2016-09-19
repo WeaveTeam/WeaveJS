@@ -19,7 +19,7 @@ namespace weavejs.data
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 	import ColumnUtils = weavejs.data.ColumnUtils;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IDataSource = weavejs.api.data.IDataSource;
@@ -39,13 +39,13 @@ namespace weavejs.data
 		{
 			var dateFormats:string[] = DateColumn.detectDateFormats(data);
 			if (dateFormats.length)
-				return DataType.DATE;
+				return DataTypes.DATE;
 
 			for (var value of data)
 				if (value != null && !(typeof value == "number") && !DataSourceUtils.numberRegex.test(value as string))
-					return DataType.STRING;
+					return DataTypes.STRING;
 
-			return DataType.NUMBER;
+			return DataTypes.NUMBER;
 		}
 
 		private static _weakMap_dataSource_isLocal = new WeakMap<IDataSource,boolean>();
@@ -93,12 +93,12 @@ namespace weavejs.data
 			var asyncCallback = function ():void
 			{
 				var newColumn:IAttributeColumn;
-				if (dataType == DataType.NUMBER)
+				if (dataType == DataTypes.NUMBER)
 				{
 					newColumn = new NumberColumn(metadata);
 					(newColumn as NumberColumn).setRecords(qkeys, data);
 				}
-				else if (dataType == DataType.DATE)
+				else if (dataType == DataTypes.DATE)
 				{
 					newColumn = new DateColumn(metadata);
 					(newColumn as DateColumn).setRecords(qkeys, data);
@@ -114,7 +114,7 @@ namespace weavejs.data
 			var metadata:IColumnMetadata = proxyColumn.getProxyMetadata();
 			var dataType:string = metadata[ColumnMetadata.DATA_TYPE];
 			if (!dataType && StandardLib.getArrayType(data) === Number)
-				dataType = DataType.NUMBER;
+				dataType = DataTypes.NUMBER;
 			if (!dataType)
 			{
 				dataType = DataSourceUtils.guessDataType(data);

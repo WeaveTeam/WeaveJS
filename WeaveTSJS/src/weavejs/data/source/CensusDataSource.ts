@@ -18,7 +18,6 @@ namespace weavejs.data.source
     import WeaveAPI = weavejs.WeaveAPI;
     import ColumnMetadata = weavejs.api.data.ColumnMetadata;
     import IDataSource = weavejs.api.data.IDataSource;
-    import IDataSource_Service = weavejs.api.data.IDataSource_Service;
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import LinkableString = weavejs.core.LinkableString;
     import LinkableVariable = weavejs.core.LinkableVariable;

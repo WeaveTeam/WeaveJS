@@ -6,8 +6,6 @@ import {Weave} from "weavejs";
 import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
 import MenuItemProps = weavejs.ui.menu.MenuItemProps;
 import IDataSource = weavejs.api.data.IDataSource;
-import IDataSource_File = weavejs.api.data.IDataSource_File;
-import IDataSource_Service = weavejs.api.data.IDataSource_Service;
 
 /* Import editors and their data sources */
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
@@ -43,7 +41,7 @@ import GroupedDataTransformEditor from "weaveapp/editor/GroupedDataTransformEdit
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-import DataType = weavejs.api.data.DataType;
+import DataTypes = weavejs.api.data.DataTypes;
 import IKeyFilter = weavejs.api.data.IKeyFilter;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import JS = weavejs.util.JS;
@@ -112,31 +110,52 @@ export default class DataMenu implements MenuBarItemProps
 		impls = impls.filter(impl => DataMenu.editorRegistry.has(impl));
 
 		var items:MenuItemProps[] = [];
-		for (var partition of ClassRegistryImpl.partitionClassList(impls, IDataSource_File, IDataSource_Service))
-		{
-			if (items.length)
-				items.push({});
-			partition.forEach(impl => {
-				var label = Weave.lang(registry.getDisplayName(impl));
-				items.push({
-					get shown() {
-						return Weave.beta || !DataMenu.isBeta(impl);
-					},
-					get label() {
-						if (DataMenu.isBeta(impl))
-							return label + " (beta)";
-						return label;
-					},
-					click: () => {
-						var baseName = WeaveAPI.ClassRegistry.getDisplayName(impl);
-						var path = [weave.root.generateUniqueName(baseName)];
-						var dataSource = weave.requestObject(path, impl) as IDataSource;
-						if (onCreateItem)
-							onCreateItem(dataSource);
-					}
-				});
-			});
-		}
+
+		items = impls.map(impl => {
+			var label = Weave.lang(registry.getDisplayName(impl));
+			return {
+				get shown() {
+					return Weave.beta || !DataMenu.isBeta(impl);
+				},
+				get label() {
+					if (DataMenu.isBeta(impl))
+						return label + " (beta)";
+					return label;
+				},
+				click: () => {
+					var baseName = WeaveAPI.ClassRegistry.getDisplayName(impl);
+					var path = [weave.root.generateUniqueName(baseName)];
+					var dataSource = weave.requestObject(path, impl) as IDataSource;
+					if (onCreateItem)
+						onCreateItem(dataSource);
+				}
+			};
+		});
+		// for (var partition of ClassRegistryImpl.partitionClassList(impls, IDataSource_File, IDataSource_Service))
+		// {
+		// 	if (items.length)
+		// 		items.push({});
+		// 	partition.forEach(impl => {
+		// 		var label = Weave.lang(registry.getDisplayName(impl));
+		// 		items.push({
+		// 			get shown() {
+		// 				return Weave.beta || !DataMenu.isBeta(impl);
+		// 			},
+		// 			get label() {
+		// 				if (DataMenu.isBeta(impl))
+		// 					return label + " (beta)";
+		// 				return label;
+		// 			},
+		// 			click: () => {
+		// 				var baseName = WeaveAPI.ClassRegistry.getDisplayName(impl);
+		// 				var path = [weave.root.generateUniqueName(baseName)];
+		// 				var dataSource = weave.requestObject(path, impl) as IDataSource;
+		// 				if (onCreateItem)
+		// 					onCreateItem(dataSource);
+		// 			}
+		// 		});
+		// 	});
+		// }
 
 		return items;
 	}
@@ -154,7 +173,7 @@ export default class DataMenu implements MenuBarItemProps
 		for (var rc of Weave.getDescendants(this.owner.weave.root, ReferencedColumn))
 		{
 			var col = rc.getInternalColumn();
-			if (col && col.getMetadata(ColumnMetadata.DATA_TYPE) != DataType.GEOMETRY)
+			if (col && col.getMetadata(ColumnMetadata.DATA_TYPE) != DataTypes.GEOMETRY)
 				columnSet.add(col)
 		}
 		return JS.toArray(columnSet.values());

@@ -19,7 +19,7 @@ namespace weavejs.plot
 	import Point = weavejs.geom.Point;
 
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -196,7 +196,7 @@ namespace weavejs.plot
 			foreignKeyType = this.groupBy.getMetadata(ColumnMetadata.DATA_TYPE);
 			var groupByKeyType:string = this.groupBy.getMetadata(ColumnMetadata.KEY_TYPE);
 			var lineColorKeyType:string = this.lineStyle.color.getMetadata(ColumnMetadata.KEY_TYPE);
-			if ((!foreignKeyType || foreignKeyType == DataType.STRING) && groupByKeyType != lineColorKeyType)
+			if ((!foreignKeyType || foreignKeyType == DataTypes.STRING) && groupByKeyType != lineColorKeyType)
 				foreignKeyType = lineColorKeyType;
 			return foreignKeyType;
 		}

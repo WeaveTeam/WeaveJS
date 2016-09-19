@@ -10,7 +10,7 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-import DataType = weavejs.api.data.DataType;
+import DataTypes = weavejs.api.data.DataTypes;
 import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 import NormalizedColumn = weavejs.data.column.NormalizedColumn;
 import ColumnUtils = weavejs.data.ColumnUtils;
@@ -118,7 +118,7 @@ export default class GeometryLayer extends AbstractFeatureLayer
 
 		var idc = this.geometryColumn;
 		var keys:Array<IQualifiedKey> = this.filteredKeySet.keys;
-		if (idc.getMetadata(ColumnMetadata.DATA_TYPE) != DataType.GEOMETRY)
+		if (idc.getMetadata(ColumnMetadata.DATA_TYPE) != DataTypes.GEOMETRY)
 			return;
 		var rawGeometries = ColumnUtils.getGeoJsonGeometries(idc, keys);
 
@@ -130,7 +130,7 @@ export default class GeometryLayer extends AbstractFeatureLayer
 
 			let id = keys[idx];
 
-			let geometry = this.geoJsonParser.readGeometry(rawGeom,
+			let geometry = this.geoJsonParser.readGeometry(rawGeom as any,
 				{ dataProjection: Projections.getProjection(this.inputProjection),
 				featureProjection: Projections.getProjection(this.outputProjection)});
 

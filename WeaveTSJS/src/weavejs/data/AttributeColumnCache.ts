@@ -18,7 +18,7 @@ namespace weavejs.data
 	import WeaveAPI = weavejs.WeaveAPI;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
-	import DataType = weavejs.api.data.DataType;
+	import DataTypes = weavejs.api.data.DataTypes;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IAttributeColumnCache = weavejs.api.data.IAttributeColumnCache;
 	import IBaseColumn = weavejs.api.data.IBaseColumn;
@@ -137,7 +137,7 @@ namespace weavejs.data
 						values = [values];
 						for (var value of values)
 						{
-							if (dataType == DataType.GEOMETRY)
+							if (dataType == DataTypes.GEOMETRY)
 							{
 								keys.push(key.localName);
 								data.push((value as GeneralizedGeometry).toGeoJson());
@@ -206,11 +206,11 @@ namespace weavejs.data
 			var keyType:string = metadata[ColumnMetadata.KEY_TYPE];
 			var dataType:string = metadata[ColumnMetadata.DATA_TYPE];
 
-			if (dataType == DataType.GEOMETRY)
+			if (dataType == DataTypes.GEOMETRY)
 				column = Weave.disposableChild(dataSource, column = new GeometryColumn(metadata));
-			else if (dataType == DataType.DATE)
+			else if (dataType == DataTypes.DATE)
 				column = Weave.disposableChild(dataSource, column = new DateColumn(metadata));
-			else if (dataType == DataType.NUMBER)
+			else if (dataType == DataTypes.NUMBER)
 				column = Weave.disposableChild(dataSource, column = new NumberColumn(metadata));
 			else // string
 				column = Weave.disposableChild(dataSource, column = new StringColumn(metadata));
