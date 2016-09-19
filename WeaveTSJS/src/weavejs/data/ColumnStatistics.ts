@@ -185,7 +185,7 @@ namespace weavejs.data
 			this.map_key_runningTotal = new WeakMap<IQualifiedKey, number>();
 			
 			// high priority because preparing data is often a prerequisite for other things
-			WeaveAPI.Scheduler.startTask(this, (stopTime:number) => this.iterate(stopTime), WeaveAPI.TASK_PRIORITY_HIGH, () => this.asyncComplete(), Weave.lang("Calculating statistics for {0} values", this.keys.length));
+			WeaveAPI.Scheduler.startTask(this, this.iterate, WeaveAPI.TASK_PRIORITY_HIGH, this.asyncComplete, Weave.lang("Calculating statistics for {0} values", this.keys.length));
 		}
 		
 		private iterate(stopTime:int):number
