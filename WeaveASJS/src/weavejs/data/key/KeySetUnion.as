@@ -93,7 +93,7 @@ package weavejs.data.key
 		 */
 		public const busyStatus:ICallbackCollection = Weave.disposableChild(this, CallbackCollection); // separate owner for the async task to avoid affecting our busy status
 		
-		private var _asyncKeys:Array; // keys from current key set
+		private var _asyncKeyArrays:Array; // keys from all key sets
 		private var _asyncKeySetIndex:int; // index of current key set
 		private var _asyncKeyIndex:int; // index of current key
 		private var _prevCompareCounter:int; // keeps track of how many new keys are found in the old keys list
@@ -102,36 +102,37 @@ package weavejs.data.key
 		
 		private function asyncStart():void
 		{
-			// remove disposed key sets
-			for (var i:int = _keySets.length; i--;)
-				if (Weave.wasDisposed(_keySets[i]))
-					_keySets.splice(i, 1);
-			
 			// restart async task
 			_prevCompareCounter = 0;
 			_asyncAllKeys = [];
 			_async_map_key = new JS.WeakMap();
-			_asyncKeys = null;
 			_asyncKeySetIndex = 0;
 			_asyncKeyIndex = 0;
+			// request all keys now in case this triggers callbacks
+			_asyncKeyArrays = [];
+			var i:int = _keySets.length;
+			while (i--)
+			{
+				// remove disposed key sets
+				if (Weave.wasDisposed(_keySets[i]))
+					_keySets.splice(i, 1);
+				else
+					_asyncKeyArrays.unshift((_keySets[i] as IKeySet).keys); 
+			}
+			
 			// high priority because all visualizations depend on key sets
 			WeaveAPI.Scheduler.startTask(busyStatus, asyncIterate, WeaveAPI.TASK_PRIORITY_HIGH, asyncComplete, Weave.lang("Computing the union of {0} key sets", _keySets.length));
 		}
 		
 		private function asyncIterate(stopTime:int):Number
 		{
-			for (; _asyncKeySetIndex < _keySets.length; _asyncKeySetIndex++)
+			for (; _asyncKeySetIndex < _asyncKeyArrays.length; _asyncKeySetIndex++)
 			{
-				if (_asyncKeys == null)
-				{
-					_asyncKeys = (_keySets[_asyncKeySetIndex] as IKeySet).keys;
-					_asyncKeyIndex = 0;
-				}
-				
-				for (; _asyncKeys && _asyncKeyIndex < _asyncKeys.length; _asyncKeyIndex++)
+				var _asyncKeys:Array = _asyncKeyArrays[_asyncKeySetIndex];
+				for (; _asyncKeyIndex < _asyncKeys.length; _asyncKeyIndex++)
 				{
 					if (JS.now() > stopTime)
-						return (_asyncKeySetIndex + _asyncKeyIndex / _asyncKeys.length) / _keySets.length;
+						return (_asyncKeySetIndex + _asyncKeyIndex / _asyncKeys.length) / _asyncKeyArrays.length;
 					
 					var key:IQualifiedKey = _asyncKeys[_asyncKeyIndex] as IQualifiedKey;
 					if (!_async_map_key.has(key)) // if we haven't seen this key yet
@@ -149,8 +150,7 @@ package weavejs.data.key
 						}
 					}
 				}
-
-				_asyncKeys = null;
+				_asyncKeyIndex = 0;
 			}
 			return 1; // avoids division by zero
 		}
