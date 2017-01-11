@@ -43,9 +43,9 @@ export class PanelDragEvent
 
 	static hasPanelId(event:React.DragEvent):boolean
 	{
-		var types = event.dataTransfer.types;
+		var types = event.dataTransfer.types as any;
 		if (Array.isArray(types))
-			return (types as any as any[]).indexOf(PanelDragEvent.DRAG_DATA_TYPE) >= 0;
+			return (types as any[]).indexOf(PanelDragEvent.DRAG_DATA_TYPE) >= 0;
 		if (types && types.contains)
 			return types.contains(PanelDragEvent.DRAG_DATA_TYPE);
 		console.error("Unexpected DragEvent.prototype.types value", event);
