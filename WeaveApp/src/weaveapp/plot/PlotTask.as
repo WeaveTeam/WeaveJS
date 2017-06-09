@@ -190,7 +190,7 @@ namespace weavejs.plot
 
 		private asyncStart():void
 		{
-			if (this.asyncInit())
+			if (this.asyncInit(true))
 			{
 				var plotterName = Weave.className(this._plotter).split('.').pop();
 				if (PlotTask.debug)
@@ -220,7 +220,7 @@ namespace weavejs.plot
 		/**
 		 * @return true if shouldBeRendered() returns true.
 		 */
-		private asyncInit():boolean
+		private asyncInit(fromAsyncStart:Boolean = false):boolean
 		{
 			var shouldRender:boolean = this.shouldBeRendered();
 			if (this._delayInit)
@@ -253,7 +253,8 @@ namespace weavejs.plot
 				if (PlotTask.debug)
 					console.log(this, 'clear');
 				// clear bitmap and resize if necessary
-				PlotterUtils.setBitmapDataSize(this.buffer, this._unscaledWidth, this._unscaledHeight);
+				if (!fromAsyncStart)
+					PlotterUtils.setBitmapDataSize(this.buffer, this._unscaledWidth, this._unscaledHeight);
 			}
 			else
 			{

@@ -972,24 +972,17 @@ package weavejs.core
 				// clean up pointers to busy tasks
 				disposeBusyTaskPointers(object as ILinkableObject);
 				
-				try
+				// if the object implements IDisposableObject, call its dispose() function now
+				if (object is IDisposableObject)
 				{
-					// if the object implements IDisposableObject, call its dispose() function now
-					if (object is IDisposableObject)
-					{
-						(object as IDisposableObject).dispose();
-					}
-					else if (typeof object[DISPOSE] === 'function')
-					{
-						// call dispose() anyway if it exists, because it is common to forget to implement IDisposableObject.
-						object[DISPOSE]();
-					}
+					(object as IDisposableObject).dispose();
 				}
-				catch (e:Error)
+				else if (object.hasOwnProperty(DISPOSE) && typeof object[DISPOSE] == 'function' && object[DISPOSE].length == 0)
 				{
-					JS.error(e);
+					// call dispose() anyway if it exists, because it is common to forget to implement IDisposableObject.
+					object[DISPOSE]();
 				}
-				
+
 				var linkableObject:ILinkableObject = object as ILinkableObject;
 				if (linkableObject)
 				{

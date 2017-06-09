@@ -281,7 +281,8 @@ namespace weavejs.data.source
 			if (dataType == DataTypes.GEOMETRY)
 			{
 				newColumn = new GeometryColumn(metadata);
-				(newColumn as GeometryColumn).setRecords(qkeys, data);
+				if (this.shpfile)
+					(newColumn as GeometryColumn).setRecords(qkeys, data);
 			}
 			else if (dataType == DataTypes.DATE)
 			{

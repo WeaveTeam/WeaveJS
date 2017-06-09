@@ -132,6 +132,9 @@ package weavejs.core
 		 */
 		protected function internalSetTarget(newTarget:ILinkableObject):void
 		{
+			if (Weave.wasDisposed(newTarget))
+				newTarget = null;
+
 			if (newTarget && _foundTarget && _typeRestriction)
 			{
 				var classDef:Class = LinkablePlaceholder.getClass(newTarget);
