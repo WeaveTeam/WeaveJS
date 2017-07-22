@@ -15,7 +15,7 @@
     "compile-libs": "npm run compile-librefs && tsc -p ./WeaveTSJS/tsconfig-libs.json && node scripts/babel-with-source-maps.js -i WeaveTSJS/bin/es6/libs.js -m WeaveTSJS/bin/es6/libs.js.map -o WeaveTSJS/bin/js/libs.js",
     "compile-ts": "npm run compile-refs && tsc -p ./WeaveTSJS/tsconfig.json && mkdirp ./WeaveTSJS/bin/js && node scripts/babel-with-source-maps.js -i WeaveTSJS/bin/es6/weavejs.js -m WeaveTSJS/bin/es6/weavejs.js.map -o WeaveTSJS/bin/js/weavejs.js && cp ./WeaveTSJS/bin/es6/weavejs.d.ts ./weave-typings/",
     "compile-astypings": "cp ./weave-typings/as-types.d.ts ./WeaveASJS/typings && as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/ && cp WeaveASJS/typings/weavejs-core.d.ts ./weave-typings && mv WeaveASJS/typings/*.d.ts ./WeaveTSJS/typings/weave",
-    "compile-as": "node WeaveASJS/build.js",
+    "compile-as": "mxmlc -remove-circulars -js-compiler-option=\"--compilation_level WHITESPACE_ONLY\" -fb ./WeaveASJS",
     "prepublish": "npm run compile-weavejs"
   },
   "files": [
@@ -50,7 +50,7 @@
     "babel-cli": "^6.4.5",
     "concat-with-sourcemaps": "^1.0.4",
     "rimraf": "^2.5.3",
-    "typescript": "^1.8.10"
+    "typescript": "1.8.10"
   },
   "dependencies": {
     "classnames": "^2.2.3",
