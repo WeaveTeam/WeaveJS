@@ -38,3 +38,7 @@ after_success:
   $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
 - sshpass -e ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST
   "sudo $DEPLOY_PATH/deploy.sh $TRAVIS_BRANCH $TRAVIS_EVENT_TYPE"
+caches:
+  directories:
+    - node_modules/flexjs
+
