@@ -7,7 +7,7 @@ notifications:
     on_failure: always
 language: node_js
 node_js:
-- '6'
+- '7'
 addons:
   apt:
     sources:
