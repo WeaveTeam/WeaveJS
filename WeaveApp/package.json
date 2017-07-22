@@ -35,7 +35,7 @@
     "font-awesome": "^4.6.3",
     "jquery": "^2.1.4",
     "lodash": "^3.10.1",
-    "openlayers": "3.13.0",
+    "openlayers": "4.2.0",
     "pixi.js": "^3.0.11",
     "proj4": "^2.3.14",
     "rc-slider": "^3.6.2",
