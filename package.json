@@ -39,7 +39,7 @@
     "babel-preset-react": "^6.1.18",
     "combine-source-map": "^0.7.2",
     "dataurl": "^0.1.0",
-    "flexjs": "https://github.com/WeaveTeam/flex-utilities.git#npm-flexjs-only",
+    "flexjs": "0.7.0",
     "fs-extra": "^0.30.0",
     "glob": "^7.0.5",
     "minimist": "^1.2.0",
