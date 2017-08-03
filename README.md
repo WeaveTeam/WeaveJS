@@ -1,4 +1,4 @@
-# WeaveJS [![Build Status](https://travis-ci.org/WeaveTeam/WeaveJS.svg?branch=develop)](https://travis-ci.org/WeaveTeam/WeaveJS)
+# Weave 2 [![Build Status](https://travis-ci.org/WeaveTeam/WeaveJS.svg?branch=develop)](https://travis-ci.org/WeaveTeam/WeaveJS)
 Web-based Analysis and Visualization Environment for HTML5
 
 ## Visit us at [our site](http://iweave.com)
