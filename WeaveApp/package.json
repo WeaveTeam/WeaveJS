@@ -45,7 +45,7 @@
     "react-dom": "0.14.7",
     "react-dropzone": "^3.4.0",
     "react-notification-system": "^0.2.7",
-    "react-sparklines": "^1.5.2",
+    "react-sparklines": "1.5.2",
     "weavejs": "0.0.2"
   },
   "devDependencies": {
