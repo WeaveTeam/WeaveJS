@@ -3,8 +3,9 @@
   "version": "2.2.3",
   "description": "Collection of visualization tools and UI from the WeaveJS project.",
   "scripts": {
-    "build": "npm run copy-typings && tsc && webpack -p --config webpack.prod.js",
+    "build": "webpack -p --config webpack.prod.js",
     "dev": "webpack-dev-server --open --config webpack.dev.js",
+    "copy-libs": "cp ../lib/* node_modules/weavejs/lib",
     "clean": "rimraf bin/ && rimraf dist/weave-app.bundle.js",
     "babel": "mkdirp bin/js && babel bin/es6 -d bin/js --source-maps inline",
     "browserify": "mkdirp dist && node scripts/browserify",
