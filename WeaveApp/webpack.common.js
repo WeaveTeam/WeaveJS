@@ -10,31 +10,6 @@ const distFolder = 'dist';
 module.exports = {
     entry: {
         "weave-app": './src/index.tsx',
-        /*vendor: [
-            "c3",
-            "clipboard",
-            "codemirror",
-            "d3",
-            "filesaver.js",
-            "fixed-data-table",
-            "jquery",
-            "lodash",
-            "jszip",
-            "openlayers",
-            "pixi.js",
-            "proj4",
-            "rc-slider",
-            "react",
-            "react-addons-update",
-            "react-codemirror",
-            "react-color",
-            "react-dom",
-            "react-dropzone",
-            "react-notification-system",
-            "react-sparklines",
-            "immediate",
-            "moment",
-        ],*/
     },
     plugins: [
         new CleanWebpackPlugin([distFolder]),
