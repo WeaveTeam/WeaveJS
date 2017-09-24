@@ -15,8 +15,6 @@ addons:
     packages:
       - sshpass
 before_install:
-- mkdir -p dist
-- yes | npm install
 - npm install
 - npm link
 - pushd WeaveApp
@@ -27,10 +25,7 @@ before_install:
 - chmod a+x *
 - popd
 install:
-- pushd WeaveApp
-- npm run compile-libs
-- popd
-- npm run compile
+- npm run build
 after_success:
 - pushd WeaveApp/dist/ && tar -zcvf ../../$TRAVIS_BRANCH.tgz * && popd
 - export SSHPASS=$DEPLOY_PASS
