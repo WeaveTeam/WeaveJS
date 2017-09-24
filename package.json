@@ -4,8 +4,8 @@
   "description": "Application architecture library for building modern web applications",
   "main": "lib/weavejs.js",
   "scripts": {
-    "dev": "npm run compile-weavejs && cd WeaveApp && npm run dev",
-    "build": "npm run compile-weavejs && cd WeaveApp && npm run build",
+    "dev": "cd WeaveApp && npm run dev",
+    "build": "cd WeaveApp && npm run build",
     "test": "echo \"Error: no test specified\"",
     "clean": "npm run clean:as && npm run clean:ts",
     "clean:ts": "rimraf WeaveTSJS/bin/",

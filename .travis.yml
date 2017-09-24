@@ -15,20 +15,15 @@ addons:
     packages:
       - sshpass
 before_install:
-- mkdir -p dist
 - yes | npm install
-- npm install
-- npm link
-- pushd WeaveApp
-- npm install
-- npm link weavejs
-- popd
 - pushd node_modules/flexjs/js/bin/
 - chmod a+x *
 - popd
+- npm run compile-weavejs
 install:
 - pushd WeaveApp
-- npm run compile-libs
+- npm install
+- npm run copy-libs
 - popd
 - npm run build
 after_success:
