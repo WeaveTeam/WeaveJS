@@ -51,7 +51,7 @@ module.exports = {
             minChunks: 3,
         }),
         new CopyWebpackPlugin([
-                {flatten: true, context: 'resources/', from: 'css/*.css', to: path.resolve(__dirname, distFolder, 'css')},
+                {flatten: false, context: 'resources/', from: 'css/', to: path.resolve(__dirname, distFolder, 'css')},
                 {flatten: true, context: '../WeaveTSJS/css/', from: 'weave-ui.css', to: path.resolve(__dirname, distFolder, 'css/weave-ui.css')},
                 {flatten: true, context: 'resources/', from: 'img/*.*', to: path.resolve(__dirname, distFolder, 'img')},
                 {flatten: true, context: 'resources/', from: 'css/fonts/*.ttf', to: path.resolve(__dirname, distFolder, 'fonts')},
@@ -134,8 +134,4 @@ module.exports = {
     node: {
         fs: 'empty',
     },
-    /*externals: {
-        // Use external version of React
-        "react": "React"
-    },*/
 };
