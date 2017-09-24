@@ -15,6 +15,7 @@ addons:
     packages:
       - sshpass
 before_install:
+- yes | npm install
 - npm install
 - npm link
 - pushd WeaveApp
