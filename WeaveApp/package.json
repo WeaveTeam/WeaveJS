@@ -1,21 +1,11 @@
 {
-  "name": "weaveapp",
+  "name": "@weave/app",
   "version": "2.2.3",
   "description": "Collection of visualization tools and UI from the WeaveJS project.",
   "scripts": {
     "build": "webpack -p --config webpack.prod.js",
     "dev": "webpack-dev-server --open --config webpack.dev.js",
-    "copy-libs": "cp ../lib/* node_modules/weavejs/lib",
-    "clean": "rimraf bin/ && rimraf dist/weave-app.bundle.js",
-    "babel": "mkdirp bin/js && babel bin/es6 -d bin/js --source-maps inline",
-    "browserify": "mkdirp dist && node scripts/browserify",
-    "copy-typings": "mkdirp typings/weave && cp ../weave-typings/* typings/weave",
-    "compile-global": "tsc -p tsconfig-global.json && babel bin/weave-app.jsx -o bin/weave-app.js",
-    "compile-module": "npm run clean && npm run copy-typings && tsc && npm run babel",
-    "compile-libs": "mkdirp dist && node scripts/browserify libs",
-    "compile": "npm run compile-module && npm run browserify && cd .. && node run-ts copy.ts",
-    "copy-files": "cp ./package.json ./bin/js/weaveapp/ && mkdirp ./bin/js/weaveapp/weaveapp-typings/ && cp ./bin/weave-app.d.ts ./bin/js/weaveapp/weaveapp-typings/ && cp ./bin/weave-app.js ./bin/js/weaveapp/",
-    "custom-publish": "npm run compile-module && npm run compile-global && npm run copy-files && npm publish ./bin/js/weaveapp/"
+    "copy-typings": "mkdirp typings/weave && cp ../weave-typings/* typings/weave"
   },
   "main": "app/WeaveApp.js",
   "repository": {
@@ -49,15 +39,13 @@
     "react-dropzone": "^3.4.0",
     "react-notification-system": "^0.2.7",
     "react-sparklines": "1.5.2",
-    "weavejs": "0.0.2"
+    "weavejs": "../"
   },
   "devDependencies": {
-    "babel-cli": "^6.5.2",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.11.1",
-    "browserify": "^13.1.0",
     "clean-webpack-plugin": "^0.1.16",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.7",
@@ -69,10 +57,9 @@
     "mkdirp": "^0.5.1",
     "mold-source-map": "^0.4.0",
     "progress-bar-webpack-plugin": "^1.10.0",
-    "rimraf": "^2.5.3",
     "style-loader": "^0.18.2",
     "ts-loader": "^2.3.7",
-    "typescript": "^2.1.1",
+    "typescript": "2.1.1",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.8.2",
