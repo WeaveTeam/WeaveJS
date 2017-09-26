@@ -1,7 +1,7 @@
 /// <reference path="weavejs-core.d.ts" />
 /// <reference path="weavejs.d.ts" />
 
-declare module weavejs {
+declare namespace weavejs {
 	class Weave extends __global__.Weave {
 
 	}

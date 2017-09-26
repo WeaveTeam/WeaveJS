@@ -14,18 +14,14 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - sshpass
-before_install:
-- yes | npm install
-- pushd node_modules/flexjs/js/bin/
-- chmod a+x *
-- popd
-- npm run compile-weavejs
 install:
+- yes | npm install
+- npm run compile-weavejs
 - pushd WeaveApp
 - npm install
-- npm run copy-libs
-- popd
+- npm run copy-typings
 - npm run build
+- popd
 after_success:
 - pushd WeaveApp/dist/ && tar -zcvf ../../$TRAVIS_BRANCH.tgz * && popd
 - export SSHPASS=$DEPLOY_PASS
