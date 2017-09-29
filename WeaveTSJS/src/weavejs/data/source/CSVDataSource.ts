@@ -676,7 +676,7 @@ namespace weavejs.data.source
 		
 		private nullValues = [null, "", "null", "\\N", "NaN"];
 		
-		public get deprecatedStateMapping():Object
+		public get deprecatedStateMapping()
 		{
 			return {
 				keyColName: this.keyColumn,

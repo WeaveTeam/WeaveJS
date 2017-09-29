@@ -5,8 +5,8 @@ namespace weavejs.util
 	import LinkableString = weavejs.core.LinkableString;
 	import LinkableVariable = weavejs.core.LinkableVariable;
 	import ExternalTool = weavejs.path.ExternalTool;
-  import SessionState = weavejs.api.core.SessionState;
-  import SessionStateObject = weavejs.api.core.TypedState;
+  import TypedState = weavejs.api.core.TypedState;
+  import UnTypedState = weavejs.api.core.UnTypedState;
 
 	export class BackwardsCompatibility
 	{
@@ -31,21 +31,21 @@ namespace weavejs.util
 			
 			for (key in state)
 			{
-				var typedState:SessionStateObject = state[key];
+				var typedState:TypedState = state[key];
 				var className:string = typedState.className;
 				if (!BackwardsCompatibility.classLookup.hasOwnProperty(className))
 					continue;
 
 				var classDef:GenericClass = Weave.getDefinition(className);
 				
-				var externalToolClass:string = DynamicState.traverseState(typedState.sessionState, [BackwardsCompatibility.CLASS]);
+				var externalToolClass:string = DynamicState.traverseState(typedState.sessionState, [BackwardsCompatibility.CLASS]) as string;
 				if (classDef == ExternalTool && Weave.getDefinition(externalToolClass))
 				{
 					typedState.className = externalToolClass;
-					var newState:{[key:string]: any} = {};
-					for (var key in typedState.sessionState as any)
+					var newState:UnTypedState = {};
+					for (var key in typedState.sessionState as UnTypedState)
 					{
-						var item = typedState.sessionState[key];
+						var item = (typedState.sessionState as UnTypedState)[key];
 						var itemName:string = item.objectName;
 						if (itemName != BackwardsCompatibility.CLASS)
 							newState[itemName] = item.sessionState;
@@ -64,14 +64,14 @@ namespace weavejs.util
 				
 				typedState.className = Weave.className(LinkableHashMap);
 				var classNameState = DynamicState.create(BackwardsCompatibility.CLASS, Weave.className(LinkableString), className);
-				var childState = typedState.sessionState;
+				var childState:UnTypedState = typedState.sessionState as UnTypedState;
 				if (DynamicState.isDynamicStateArray(childState))
 				{
 					(childState as any[]).unshift(classNameState);
 				}
 				else
 				{
-					var typedChildState:any[] = [classNameState];
+					var typedChildState:TypedState[] = [classNameState];
 					var childStateKeys:string[] = Object.keys(childState).sort();
 					for (var key of childStateKeys || [])
 					{

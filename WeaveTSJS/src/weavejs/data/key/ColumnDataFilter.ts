@@ -228,7 +228,7 @@ namespace weavejs.data.key
 			return new RegExp(value.regexp || value.regex);
 		}
 		
-		public get deprecatedStateMapping():Object
+		public get deprecatedStateMapping()
 		{
 			return this.handleMissingSessionStateProperties;
 		}

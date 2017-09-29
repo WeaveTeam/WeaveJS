@@ -15,10 +15,10 @@
 
 namespace weavejs.api.core
 {
-  export declare type SessionState = _DynamicState|DynamicStateArray;
-  export declare type DynamicStateArray = _DynamicState[];
-  export declare type _DynamicState = string|TypedState
+  export declare type SessionState = string|UnTypedState|TypedState|DynamicStateArray;
+  export declare type UnTypedState = {[key:string]: any};
 
+  export interface DynamicStateArray extends Array<SessionState>{}
   export interface TypedState {
     /**
      * The name of the property containing the name assigned to the object when the session state is generated.
@@ -33,7 +33,7 @@ namespace weavejs.api.core
     /**
      * The name of the property containing the session state for an object of the type specified by className.
      */
-    sessionState: any,
+    sessionState: SessionState,
     /**
      * The name of the property used to make isDynamicState() return false in order to bypass special diff logic for dynamic state arrays.
      */
@@ -54,7 +54,7 @@ namespace weavejs.api.core
      * @param className The qualified class name of the original object providing the session state.
      * @param sessionState The session state for an object of the type specified by className.
      */
-    public static create(objectName:string = null, className:string = null, sessionState:any = null):TypedState
+    public static create(objectName:string = null, className:string = null, sessionState:SessionState = null):TypedState
     {
       // convert empty strings ("") to null
       var obj:TypedState = {
@@ -72,7 +72,7 @@ namespace weavejs.api.core
      * @param handleBypassDiff Set this to true to allow the object to contain the optional bypassDiff property.
      * @return true if the object has all three properties and no extras (except for "bypassDiff" when the handleBypassDiff parameter is set to true).
      */
-    public static isDynamicState(object:any, handleBypassDiff:boolean = false):boolean
+    public static isDynamicState(object:SessionState, handleBypassDiff:boolean = false):boolean
     {
       if (typeof object !== 'object')
         return false;
@@ -86,7 +86,7 @@ namespace weavejs.api.core
      * @param handleBypassDiff Set this to true to allow dynamic state objects to contain the optional bypassDiff property.
      * @return A value of true if the Array looks like a dynamic session state or diff.
      */
-    public static isDynamicStateArray(state:any, handleBypassDiff:boolean = false):boolean
+    public static isDynamicStateArray(state:SessionState, handleBypassDiff:boolean = false):boolean
     {
       var array:DynamicStateArray = Weave.AS(state, Array);
       if (!array)
@@ -96,7 +96,7 @@ namespace weavejs.api.core
       {
         if (typeof item === 'string')
           continue; // dynamic state diffs can contain String values.
-        if (DynamicState.isDynamicState(item, handleBypassDiff))
+        if (DynamicState.isDynamicState(item as TypedState, handleBypassDiff))
           result = true;
         else
           return false;
@@ -108,7 +108,7 @@ namespace weavejs.api.core
      * Alters a session state object to bypass special diff logic for dynamic state arrays.
      * It does so by adding the "bypassDiff" property to any part for which isDynamicState(part) returns true.
      */
-    public static alterSessionStateToBypassDiff(object:any):void
+    public static alterSessionStateToBypassDiff(object:SessionState):void
     {
       if (DynamicState.isDynamicState(object))
       {
@@ -116,8 +116,8 @@ namespace weavejs.api.core
         object = (object as TypedState).sessionState;
       }
       if (typeof object === 'object')
-        for (var key in object as {[key:string]:TypedState})
-          DynamicState.alterSessionStateToBypassDiff(object[key]);
+        for (var key in object)
+          DynamicState.alterSessionStateToBypassDiff((object as {[key:string]:TypedState})[key]);
     }
 
     /**
@@ -127,7 +127,7 @@ namespace weavejs.api.core
      *                  If this is set to false, this function will only have an effect if the given state is a DynamicState Array.
      * @return The converted state
      */
-    public static removeTypeFromState(state:any, recursive:boolean = true):SessionState
+    public static removeTypeFromState(state:SessionState, recursive:boolean = true):SessionState
     {
       if (DynamicState.isDynamicStateArray(state))
       {
@@ -140,7 +140,7 @@ namespace weavejs.api.core
 
       if (recursive && typeof state === 'object')
         for (var key in state)
-          state[key] = DynamicState.removeTypeFromState(state[key], true);
+          (state as any)[key] = DynamicState.removeTypeFromState((state as any)[key], true);
       return state;
     }
 
@@ -151,7 +151,7 @@ namespace weavejs.api.core
      * @param newValue The new value, or undefined to retrieve the current value
      * @return The new or existing value
      */
-    public static traverseState(state:any/*SessionState*/, path:(string|number)[], newValue:any = undefined):any
+    public static traverseState(state:SessionState, path:(string|number)[], newValue:SessionState = undefined):SessionState
     {
       if (!path.length)
         return newValue === undefined ? state : newValue;
@@ -162,25 +162,26 @@ namespace weavejs.api.core
       path = path.slice(1);
       if (DynamicState.isDynamicStateArray(state, true))
       {
+        var newState:DynamicStateArray = state as DynamicStateArray;
         var i:int;
         if (Weave.IS(property, Number))
           i = property as number;
         else
-          for (i = 0; i < (state as DynamicStateArray).length; i++)
-            if ((state [i] as TypedState).objectName == property || (!property && !(state [i] as TypedState).objectName))
+          for (i = 0; i < newState.length; i++)
+            if ((newState[i] as TypedState).objectName == property || (!property && !(newState[i] as TypedState).objectName))
               break;
 
-        var typedState:TypedState = (state as DynamicStateArray)[i] as any;
+        var typedState:TypedState = newState[i] as TypedState;
         if (!typedState)
           return undefined;
         if (path.length)
-          return DynamicState.traverseState((typedState as TypedState).sessionState, path, newValue);
-        return newValue === undefined ? (typedState as TypedState).sessionState : (typedState as TypedState).sessionState = newValue;
+          return DynamicState.traverseState(typedState.sessionState, path, newValue);
+        return newValue === undefined ? typedState.sessionState : typedState.sessionState = newValue;
       }
 
       if (path.length)
-        return DynamicState.traverseState(state[property], path, newValue);
-      return newValue === undefined ? state[property] : state[property] = newValue;
+        return DynamicState.traverseState((state as any)[property], path, newValue);
+      return newValue === undefined ? (state as any)[property] : (state as any)[property] = newValue;
     }
   }
 }
