@@ -5,6 +5,8 @@ namespace weavejs.util
 	import LinkableString = weavejs.core.LinkableString;
 	import LinkableVariable = weavejs.core.LinkableVariable;
 	import ExternalTool = weavejs.path.ExternalTool;
+  import SessionState = weavejs.api.core.SessionState;
+  import SessionStateObject = weavejs.api.core.TypedState;
 
 	export class BackwardsCompatibility
 	{
@@ -16,7 +18,7 @@ namespace weavejs.util
 		private static /* readonly */ map_class_ignore = new Map<GenericClass, boolean>();
 		private static /* readonly */ CLASS:string = 'class';
 		
-		public static updateSessionState(state:{[key:string]: any}):{[key:string]: any}
+		public static updateSessionState(state:any):any
 		{
 			var key:string;
 			if (!DynamicState.isDynamicStateArray(state))
@@ -29,26 +31,26 @@ namespace weavejs.util
 			
 			for (key in state)
 			{
-				var typedState = state[key];
-				var className:string = typedState[DynamicState.CLASS_NAME];
+				var typedState:SessionStateObject = state[key];
+				var className:string = typedState.className;
 				if (!BackwardsCompatibility.classLookup.hasOwnProperty(className))
 					continue;
 
 				var classDef:GenericClass = Weave.getDefinition(className);
 				
-				var externalToolClass:string = DynamicState.traverseState(typedState[DynamicState.SESSION_STATE], [BackwardsCompatibility.CLASS]);
+				var externalToolClass:string = DynamicState.traverseState(typedState.sessionState, [BackwardsCompatibility.CLASS]);
 				if (classDef == ExternalTool && Weave.getDefinition(externalToolClass))
 				{
-					typedState[DynamicState.CLASS_NAME] = externalToolClass;
+					typedState.className = externalToolClass;
 					var newState:{[key:string]: any} = {};
-					for (var key in typedState[DynamicState.SESSION_STATE])
+					for (var key in typedState.sessionState as any)
 					{
-						var item = typedState[DynamicState.SESSION_STATE][key];
-						var itemName:string = item[DynamicState.OBJECT_NAME];
+						var item = typedState.sessionState[key];
+						var itemName:string = item.objectName;
 						if (itemName != BackwardsCompatibility.CLASS)
-							newState[itemName] = item[DynamicState.SESSION_STATE];
+							newState[itemName] = item.sessionState;
 					}
-					typedState[DynamicState.SESSION_STATE] = newState;
+					typedState.sessionState = newState;
 				}
 				
 				if (classDef && !BackwardsCompatibility.map_class_ignore.get(classDef))
@@ -56,13 +58,13 @@ namespace weavejs.util
 				
 				if (!BackwardsCompatibility.classLookup[className])
 				{
-					typedState[DynamicState.CLASS_NAME] = Weave.className(LinkableVariable);
+					typedState.className = Weave.className(LinkableVariable);
 					continue;
 				}
 				
-				typedState[DynamicState.CLASS_NAME] = Weave.className(LinkableHashMap);
-				var classNameState:{[key:string]: any} = DynamicState.create(BackwardsCompatibility.CLASS, Weave.className(LinkableString), className);
-				var childState:{[key:string]: any} = typedState[DynamicState.SESSION_STATE];
+				typedState.className = Weave.className(LinkableHashMap);
+				var classNameState = DynamicState.create(BackwardsCompatibility.CLASS, Weave.className(LinkableString), className);
+				var childState = typedState.sessionState;
 				if (DynamicState.isDynamicStateArray(childState))
 				{
 					(childState as any[]).unshift(classNameState);
@@ -94,7 +96,7 @@ namespace weavejs.util
 					}
 					childState = typedChildState;
 				}
-				typedState[DynamicState.SESSION_STATE] = BackwardsCompatibility.updateSessionState(childState);
+				typedState.sessionState = BackwardsCompatibility.updateSessionState(childState);
 			}
 			return state;
 		}

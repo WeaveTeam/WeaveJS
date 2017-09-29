@@ -3,4 +3,5 @@ bin
 node_modules
 dist
 typings/weave
+src/weavejs
 npm-debug.log

@@ -1,4 +1,4 @@
-/// <reference path="weavejs-core.d.ts" />
+/// <reference path="../../src/weavejs/ASTypes/weaveas.d.ts" />
 /// <reference path="weavejs.d.ts" />
 
 declare namespace weavejs {

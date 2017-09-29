@@ -15,7 +15,6 @@
 
 import * as React from "react";
 import * as weavejs from "weavejs";
-import {Graphics} from "pixi.js";
 import Weave = weavejs.Weave;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -56,11 +55,11 @@ export default class SolidFillStyle implements ILinkableObject
 		return { 'color': Number, 'alpha': Number };
 	}
 
-	beginFillStyle(key:IQualifiedKey, graphics:Graphics)
-	{
-		var style = this.getStyle(key);
-		graphics.beginFill(style.color, style.alpha);
-	}
+	// beginFillStyle(key:IQualifiedKey, graphics:Graphics)
+	// {
+	// 	var style = this.getStyle(key);
+	// 	graphics.beginFill(style.color, style.alpha);
+	// }
 
 	public getStyle(key:IQualifiedKey):{ color:number, alpha:number }
 	{

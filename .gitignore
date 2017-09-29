@@ -47,5 +47,5 @@ lib/
 
 # auto generated typings
 weave-typings/weavejs.d.ts
-weave-typings/weavejs-core.d.ts
+weave-typings/weaveas.d.ts
 package-lock.json

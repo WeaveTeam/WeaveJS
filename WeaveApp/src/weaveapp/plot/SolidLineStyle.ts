@@ -15,8 +15,6 @@
 
 import * as React from "react";
 import * as weavejs from "weavejs";
-import {Graphics} from "pixi.js";
-
 import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -91,11 +89,11 @@ export default class SolidLineStyle implements ILinkableObject
 	 */
 	private map_key_style:WeakMap<IQualifiedKey, { 'color':number, 'weight':number, 'alpha':number, 'caps':string, 'joints':string, 'miterLimit':number }>;
 
-	public beginLineStyle(key:IQualifiedKey, graphics:Graphics)
-	{
-		var style = this.getStyle(key);
-		graphics.lineStyle(style.weight, style.color, style.alpha);
-	}
+	// public beginLineStyle(key:IQualifiedKey, graphics:Graphics)
+	// {
+	// 	var style = this.getStyle(key);
+	// 	graphics.lineStyle(style.weight, style.color, style.alpha);
+	// }
 
 	public getStyle(key:IQualifiedKey):{ color:number, weight:number, alpha:number, caps:string, joints:string, miterLimit:number }
 	{

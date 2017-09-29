@@ -5,7 +5,6 @@ import * as classNames_ from "classnames";
 import * as React_ from "react";
 import * as ReactDOM_ from "react-dom";
 import * as reactUpdate_ from "react-addons-update";
-import * as PIXI_ from "pixi.js";
 import * as __ from "lodash";
 import * as moment_ from "moment";
 
@@ -18,5 +17,3 @@ var _:any = __;
 var lodash:any = __;
 var classNames:any = (classNames_ as any).default;
 var JSZip:any = (JSZip_ as any).default;
-var PIXI:any = PIXI_;
-(PIXI as any).utils._saidHello = true;

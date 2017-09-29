@@ -8,6 +8,7 @@ namespace weavejs.core
 	import JSByteArray = weavejs.util.JSByteArray;
 	import WeavePromise = weavejs.util.WeavePromise;
 	import CachedColumnData = weavejs.data.CachedColumnData;
+  import SessionState = weavejs.api.core.SessionState;
 
 	export type UpdateCallback = (meta: { percent: number, currentFile: string }) => void;
 
@@ -30,7 +31,7 @@ namespace weavejs.core
 					this.files.set(fileName, WeaveAPI.URLRequestUtils.getLocalFile(weave.root, fileName));
 				}
 
-				this.objects.set(WeaveArchive.ARCHIVE_HISTORY_JSON, weave.history.getSessionState());
+				this.objects.set(WeaveArchive.ARCHIVE_HISTORY_JSON, weave.history.getSessionState() as SessionState);
 
 				let columnCache = ((WeaveAPI.AttributeColumnCache as AttributeColumnCache).map_root_saveCache as WeakMap<any, Object>).get(weave.root);
 				if (columnCache)
@@ -131,8 +132,8 @@ namespace weavejs.core
 
 		public setSessionFromArchive(weave:Weave)
 		{
-			let historyJSON = this.objects.get(WeaveArchive.ARCHIVE_HISTORY_JSON);
-			let historyAMF = this.objects.get(WeaveArchive.ARCHIVE_HISTORY_AMF);
+			let historyJSON:SessionState = this.objects.get(WeaveArchive.ARCHIVE_HISTORY_JSON) as SessionState;
+			let historyAMF:SessionState = this.objects.get(WeaveArchive.ARCHIVE_HISTORY_AMF) as SessionState;
 			
 			if (historyJSON)
 				weave.history.setSessionState(historyJSON);
