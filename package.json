@@ -9,11 +9,12 @@
     "clean": "npm run clean:as && npm run clean:ts",
     "clean:ts": "rimraf WeaveTSJS/bin/",
     "clean:as": "rimraf WeaveASJS/bin/",
-    "compile-weavejs": "npm run compile-ts && npm run compile-libs && mkdirp lib && node run-ts build",
+    "compile-weavejs": "npm run compile-as && npm run compile-ts && npm run compile-libs && mkdirp lib && node run-ts build",
     "compile-refs": "node run-ts main-import-tool -d WeaveTSJS/src/ -x _lib-references.ts,WeaveTSJS/src/libs.ts -f WeaveTSJS/src/_references.ts && npm run compile-librefs",
     "compile-librefs": "node run-ts main-import-tool -d WeaveTSJS/typings/ -f WeaveTSJS/src/_lib-references.ts",
     "compile-libs": "npm run compile-librefs && tsc -p ./WeaveTSJS/tsconfig-libs.json && node scripts/babel-with-source-maps.js -i WeaveTSJS/bin/es6/libs.js -m WeaveTSJS/bin/es6/libs.js.map -o WeaveTSJS/bin/js/libs.js",
-    "compile-ts": "npm run compile-refs && tsc -p ./WeaveTSJS/tsconfig.json && mkdirp ./WeaveTSJS/bin/js && node scripts/babel-with-source-maps.js -i WeaveTSJS/bin/es6/weavejs.js -m WeaveTSJS/bin/es6/weavejs.js.map -o WeaveTSJS/bin/js/weavejs.js && cp ./WeaveTSJS/bin/es6/weavejs.d.ts ./weave-typings/ && cp ./WeaveTSJS/src/weavejs/ASTypes/weaveas.d.ts ./weave-typings/"
+    "compile-ts": "npm run compile-refs && tsc -p ./WeaveTSJS/tsconfig.json && mkdirp ./WeaveTSJS/bin/js && node scripts/babel-with-source-maps.js -i WeaveTSJS/bin/es6/weavejs.js -m WeaveTSJS/bin/es6/weavejs.js.map -o WeaveTSJS/bin/js/weavejs.js && cp ./WeaveTSJS/bin/es6/weavejs.d.ts ./weave-typings/ && cp ./WeaveTSJS/src/weavejs/ASTypes/weaveas.d.ts ./weave-typings/",
+    "compile-as": "node WeaveASJS/build.js"
   },
   "repository": {
     "type": "git",
