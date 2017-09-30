@@ -414,50 +414,6 @@ declare module weavejs.api.ui {
     var IInitSelectableAttributes: new (..._: any[]) => IInitSelectableAttributes;
 }
 
-
-declare module weavejs.core {
-    import IChildListCallbackInterface = weavejs.api.core.IChildListCallbackInterface;
-    import ILinkableObject = weavejs.api.core.ILinkableObject;
-    /**
-     * @private
-     * Implementation of IChildListCallbackInterface for use with LinkableHashMap.
-     *
-     * @author adufilie
-     */
-    class ChildListCallbackInterface extends CallbackCollection implements IChildListCallbackInterface {
-        constructor();
-        /**
-         * This function will set the list callback variables:
-         *     lastNameAdded, lastObjectAdded, lastNameRemoved, lastObjectRemoved, childListChanged
-         * @param name This is the name of the object that was just added or removed from the hash map.
-         * @param objectAdded This is the object that was just added to the hash map.
-         * @param objectRemoved This is the object that was just removed from the hash map.
-         */
-        /**
-         * This function will run callbacks immediately, setting the list callback variables before each one.
-         * @param name
-         * @param objectAdded
-         * @param objectRemoved
-         */
-        runCallbacks(name: string, objectAdded: ILinkableObject, objectRemoved: ILinkableObject): void;
-        /**
-         * This is the name of the object that was added prior to running callbacks.
-         */
-        lastNameAdded: string;
-        /**
-         * This is the object that was added prior to running callbacks.
-         */
-        lastObjectAdded: ILinkableObject;
-        /**
-         * This is the name of the object that was removed prior to running callbacks.
-         */
-        lastNameRemoved: string;
-        /**
-         * This is the object that was removed prior to running callbacks.
-         */
-        lastObjectRemoved: ILinkableObject;
-    }
-}
 declare module weavejs.core {
     import IClassRegistry = weavejs.api.core.IClassRegistry;
     /**
