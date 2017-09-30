@@ -11,6 +11,7 @@ namespace weavejs.core
    * @author adufilie
    * @see weave.core.LinkableVariable
    */
+  @Weave.classInfo({id: "weavejs.core.LinkableBoolean"})
   export class LinkableBoolean extends LinkableVariable
   {
     constructor(defaultValue:boolean = undefined, verifier:(value:boolean)=> boolean = null, defaultValueTriggersCallbacks:boolean = true)
