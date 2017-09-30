@@ -33,7 +33,7 @@ namespace weavejs.api.core
 		 * @return An Array of DynamicState objects which compose the session state for this object.
 		 * @see weave.api.core.DynamicState
 		 */
-		getSessionState:()=>SessionState[];
+		getSessionState:()=>TypedState[];
 
 		/**
 		 * This sets the session state of this composite object.
@@ -42,6 +42,6 @@ namespace weavejs.api.core
 		 *     As a special case, a null session state will result in no change regardless of the removeMissingDynamicObjects value.
 		 * @see weave.api.core.DynamicState
  		 */
-		setSessionState:(newState:SessionState[], removeMissingDynamicObjects:boolean)=>void;
+		setSessionState:(newState:DynamicStateArray, removeMissingDynamicObjects:boolean)=>void;
 	}
 }

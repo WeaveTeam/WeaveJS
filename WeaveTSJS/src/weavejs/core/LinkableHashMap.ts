@@ -448,9 +448,9 @@ namespace weavejs.core
 			return name;
 		}
 
-		public getSessionState():SessionState[]
+		public getSessionState():TypedState[]
 		{
-			var result:SessionState[] = new Array(this._orderedNames.length);
+			var result:TypedState[] = new Array(this._orderedNames.length);
 			for (var i:int = 0; i < this._orderedNames.length; i++)
 			{
 				var name:string = this._orderedNames[i];
