@@ -774,48 +774,6 @@ declare module weavejs.core {
         resumeCallbacks(): void;
     }
 }
-declare module weavejs.core {
-    /**
-     * LinkableFunction allows a function to be defined by a String that can use macros defined in the static macros hash map.
-     * Libraries listed in macroLibraries variable will be included when compiling the function.
-     *
-     * @author adufilie
-     */
-    class LinkableFunction extends LinkableString {
-        /**
-         * Debug mode.
-         */
-        static debug: boolean;
-        /**
-         * @param defaultValue The default function definition.
-         * @param ignoreRuntimeErrors If this is true, errors thrown during evaluation of the function will be caught and values of undefined will be returned.
-         * @param useThisScope When true, variable lookups will be evaluated as if the function were in the scope of the thisArg passed to the apply() function.
-         * @param paramNames An Array of parameter names that can be used in the function definition.
-         */
-        constructor(defaultValue?: string, ignoreRuntimeErrors?: boolean, paramNames?: any[]);
-        /**
-         * This is used as a placeholder to prevent re-compiling erroneous code.
-         */
-        /**
-         * This will attempt to compile the function.  An Error will be thrown if this fails.
-         */
-        validate(): void;
-        /**
-         * This will evaluate the function with the specified parameters.
-         * @param thisArg The value of 'this' to be used when evaluating the function.
-         * @param argArray An Array of arguments to be passed to the compiled function.
-         * @return The result of evaluating the function.
-         */
-        apply(thisArg?: any, argArray?: any[]): any;
-        /**
-         * This will evaluate the function with the specified parameters.
-         * @param thisArg The value of 'this' to be used when evaluating the function.
-         * @param args Arguments to be passed to the compiled function.
-         * @return The result of evaluating the function.
-         */
-        call(thisArg?: any, ...args: any[]): any;
-    }
-}
 
 declare module weavejs.core {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -854,57 +812,7 @@ declare module weavejs.core {
         static whenReady(relevantContext: ILinkableObject, possiblePlaceholder: ILinkableObject, onReady: (instance: ILinkableObject) => void): void;
     }
 }
-declare module weavejs.core {
-    import IDisposableObject = weavejs.api.core.IDisposableObject;
-    import ILinkableObject = weavejs.api.core.ILinkableObject;
-    /**
-     * Use this class to build dependency trees involving asynchronous calls.
-     * When the callbacks of a LinkablePromise are triggered, a function will be invoked.
-     * If the function returns an AsyncToken, LinkablePromise's callbacks will be triggered again when a ResultEvent or FaultEvent is received from the AsyncToken.
-     * Dependency trees can be built using newLinkableChild() and registerLinkableChild().
-     *
-     * @see weave.api.core.ISessionManager#newLinkableChild()
-     * @see weave.api.core.ISessionManager#registerLinkableChild()
-     * @author adufilie
-     */
-    class LinkablePromise implements ILinkableObject, IDisposableObject {
-        /**
-         * Creates a LinkablePromise from an iterative task function.
-         * @param initialize A function that should be called prior to starting the iterativeTask.
-         * @param iterativeTask A function which is designed to be called repeatedly across multiple frames until it returns a value of 1.
-         * @param priority The task priority, which should be one of the static constants in WeaveAPI.
-         * @param description A description of the task as a String, or a function to call which returns a descriptive string.
-         * Such a function has the signature function():String.
-         * @see weave.api.core.IStageUtils#startTask()
-         */
-        static fromIterativeTask(initialize: Function, iterativeTask: Function, priority: number, description?: any, validateNow?: boolean): LinkablePromise;
-        /**
-         * @param task A function to invoke, which must take zero parameters and may return an AsyncToken.
-         * @param description A description of the task as a String, or a function to call which returns a descriptive string.
-         * Such a function has the signature function():String.
-         */
-        constructor(task?: Function, description?: any, validateNow?: boolean);
-        /**
-         * The result of calling the invoke function.
-         * When this value is accessed, validate() will be called.
-         */
-        result: Object;
-        /**
-         * The error that occurred calling the invoke function.
-         * When this value is accessed, validate() will be called.
-         */
-        error: Object;
-        /**
-         * If this LinkablePromise is set to lazy mode, this will switch it to non-lazy mode and automatically invoke the async task when necessary.
-         */
-        validate(): void;
-        /**
-         * Registers dependencies of the LinkablePromise.
-         */
-        depend(dependency: ILinkableObject, ...otherDependencies: any[]): LinkablePromise;
-        dispose(): void;
-    }
-}
+
 declare module weavejs.core {
     import IDisposableObject = weavejs.api.core.IDisposableObject;
     import ILinkableObject = weavejs.api.core.ILinkableObject;

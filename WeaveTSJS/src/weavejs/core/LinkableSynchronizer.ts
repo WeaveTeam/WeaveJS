@@ -52,7 +52,7 @@ namespace weavejs.core
 		}
 		
 		private _callbacks:ICallbackCollection;
-		private _delayedSynchronize:Boolean = false;
+		private _delayedSynchronize:boolean = false;
 		private _primary:ILinkableObject;
 		private _secondary:ILinkableObject;
 		
@@ -130,8 +130,8 @@ namespace weavejs.core
 			{
 				try
 				{
-					var state:Object = Weave.getState(this._primary);
-					var transformedState:Object = this.primaryTransform.apply(null, [state, this._primary, this._secondary]);
+					var state = Weave.getState(this._primary);
+					var transformedState = this.primaryTransform.apply(null, [state, this._primary, this._secondary]);
 					Weave.setState(this._secondary, transformedState, true);
 				}
 				catch (e)
