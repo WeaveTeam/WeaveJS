@@ -273,7 +273,7 @@ namespace weavejs.data.hierarchy
 			}
 			if (child.id != childId)
 			{
-				JS.error("BUG: EntityNode id has changed since it was first cached");
+				console.error("BUG: EntityNode id has changed since it was first cached");
 				child.id = childId;
 			}
 			return child;

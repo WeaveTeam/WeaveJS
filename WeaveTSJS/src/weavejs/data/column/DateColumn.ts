@@ -145,7 +145,7 @@ namespace weavejs.data.column
 			/*if (!_dateFormat && _keys.length)
 			{
 				_reportedError = true;
-				JS.error(lang('No common date format could be determined from the column values. Attribute Column: {0}', Compiler.stringify(_metadata)));
+				console.error(lang('No common date format could be determined from the column values. Attribute Column: {0}', Compiler.stringify(_metadata)));
 			}*/
 			
 			// high priority because not much can be done without data

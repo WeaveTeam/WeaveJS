@@ -100,13 +100,13 @@ namespace weavejs.net
 					throw new Error("returnType_or_castFunction parameter must either be a Class or a Function");
 				if (([Array, String, Number] as GenericClass[]).indexOf(returnType_or_castFunction as GenericClass) < 0) // skip these primitive casts
 					promiseThen = promise.then(WeaveDataServlet.castResult.bind(this, returnType_or_castFunction), (error) => {
-						if (error.code == WeaveDataServlet.WEAVE_AUTHENTICATION_EXCEPTION)
+						if ((error as any).code == WeaveDataServlet.WEAVE_AUTHENTICATION_EXCEPTION)
 						{
 							this._authenticationRequired = true;
 							this._promisesPendingAuthentication.push(promise);
 						}
 						else
-							JS.error(error);
+							console.error(error);
 					});
 			}
 			return promiseThen;

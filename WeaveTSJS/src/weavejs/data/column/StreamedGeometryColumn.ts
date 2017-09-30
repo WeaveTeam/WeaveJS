@@ -155,7 +155,7 @@ namespace weavejs.data.column
 		
 		public requestGeometryDetail(dataBounds:Bounds2D, lowestImportance:number):void
 		{
-			//JS.log("requestGeometryDetail",dataBounds,lowestImportance);
+			//console.log("requestGeometryDetail",dataBounds,lowestImportance);
 			if (dataBounds == null || isNaN(lowestImportance))
 				return;
 			
@@ -215,14 +215,14 @@ namespace weavejs.data.column
 		{
 			if (!this.wasDisposed)
 				console.error(error);
-			//JS.log("handleDownloadFault",token,ObjectUtil.toString(event));
+			//console.log("handleDownloadFault",token,ObjectUtil.toString(event));
 			this._metadataStreamDownloadCounter--;
 		}
 		private handleGeometryDownloadFault(error:Object):void
 		{
 			if (!this.wasDisposed)
-				JS.error(error);
-			//JS.log("handleDownloadFault",token,ObjectUtil.toString(event));
+				console.error(error);
+			//console.log("handleDownloadFault",token,ObjectUtil.toString(event));
 			this._geometryStreamDownloadCounter--;
 		}
 
@@ -271,7 +271,7 @@ namespace weavejs.data.column
 			}
 			
 			this._totalDownloadedSize += result.length;
-			//JS.log("handleMetadataStreamDownload "+result.length,"total bytes "+_totalDownloadedSize);
+			//console.log("handleMetadataStreamDownload "+result.length,"total bytes "+_totalDownloadedSize);
 
 			// when decoding finishes, run callbacks
 			this._geometryStreamDecoder.decodeMetadataStream(result);
@@ -288,7 +288,7 @@ namespace weavejs.data.column
 			}
 
 			this._totalDownloadedSize += result.length;
-			//JS.log("handleGeometryStreamDownload "+result.length,"total bytes "+_totalDownloadedSize);
+			//console.log("handleGeometryStreamDownload "+result.length,"total bytes "+_totalDownloadedSize);
 
 			// when decoding finishes, run callbacks
 			this._geometryStreamDecoder.decodeGeometryStream(result);
@@ -357,7 +357,7 @@ namespace weavejs.data.column
 			return {
 				node_count: todo.length,
 				times_in_ms: results.join(', '),
-				time_mean_ms: StandardLib.mean(results),
+				time_mean_ms: StandardLib.mean(...results),
 				time_min_ms: Math.min.apply(null, results),
 				time_max_ms: Math.max.apply(null, results)
 			};

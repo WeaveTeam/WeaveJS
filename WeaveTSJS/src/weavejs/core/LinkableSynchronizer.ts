@@ -136,7 +136,7 @@ namespace weavejs.core
 				}
 				catch (e)
 				{
-					JS.error("Error evaluating primaryTransform", e);
+					console.error("Error evaluating primaryTransform", e);
 				}
 			}
 			else if (!this.secondaryTransform.value)
@@ -163,7 +163,7 @@ namespace weavejs.core
 				}
 				catch (e)
 				{
-					JS.error("Error evaluating secondaryTransform", e);
+					console.error("Error evaluating secondaryTransform", e);
 				}
 			}
 			else if (!this.primaryTransform.value)

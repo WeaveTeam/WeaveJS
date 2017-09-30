@@ -126,7 +126,7 @@ namespace weavejs.data.source {
 				this.hierarchyRefresh.triggerCallbacks();
 				
 				if (this.url.error)
-					JS.error(this.url.error);
+					console.error(this.url.error);
 				
 				return;
 			}
@@ -146,7 +146,7 @@ namespace weavejs.data.source {
 			}
 			catch (e)
 			{
-				JS.error(e);
+				console.error(e);
 			}
 		}
 		

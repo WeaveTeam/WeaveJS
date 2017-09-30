@@ -61,7 +61,7 @@ namespace weavejs.data.bin
 		private column:IAttributeColumn;
 		private keys:IQualifiedKey[];
 		private _iterateAll = Scheduler.generateCompoundIterativeTask((stopTime:int) => this._iterate1(stopTime), (stopTime:int) => this._iterate2(stopTime));
-		private asyncSort:AsyncSort = Weave.disposableChild(this, AsyncSort);
+		private asyncSort:AsyncSort<string> = Weave.disposableChild(this, AsyncSort);
 		
 		private _iterate1(stopTime:int):number
 		{
@@ -80,6 +80,7 @@ namespace weavejs.data.bin
 			
 			this.strArray.length = this.iout; // truncate
 			this.asyncSort.beginSort(this.strArray, this._sortFunc.bind(this)); // sort strings by corresponding numeric values
+
 			this.i = 0;
 			
 			return 1;

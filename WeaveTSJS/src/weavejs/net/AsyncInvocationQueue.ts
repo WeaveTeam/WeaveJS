@@ -86,7 +86,7 @@ namespace weavejs.net
 			// if this query has already been queued, then do not queue it again
 			if (this._downloadQueue.indexOf(query) >= 0)
 			{
-				//JS.error("already queued", query);
+				//console.error("already queued", query);
 				return;
 			}
 			

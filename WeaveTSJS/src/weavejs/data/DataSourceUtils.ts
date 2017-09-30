@@ -123,7 +123,7 @@ namespace weavejs.data
 			}
 
 			var qkeys:IQualifiedKey[];
-			if (StandardLib.arrayIsType(keys, IQualifiedKey))
+			if (StandardLib.arrayIsType(keys as IQualifiedKey[], IQualifiedKey))
 			{
 				qkeys = keys as IQualifiedKey[];
 				asyncCallback();

@@ -166,7 +166,7 @@ namespace weavejs.geom
 		
 		private getRequiredTileIDs(tileTree:KDTree<TileDescriptor>, bounds:Bounds2D, minImportance:number, removeTilesFromList:boolean):number[]
 		{
-			//JS.log("getRequiredTileIDs, minImportance="+minImportance);
+			//console.log("getRequiredTileIDs, minImportance="+minImportance);
 			// filter out tiles with maxImportance less than the specified minImportance
 			this.minKDKey[GeometryStreamDecoder.IMAX_INDEX] = minImportance;
 			// set the minimum query values for xMax, yMax
@@ -277,7 +277,7 @@ namespace weavejs.geom
 		{
 			var task = (stopTime:int):number =>
 			{
-				//JS.log("decodeMetadataStream",_queuedStreamDictionary[stream],hex(stream));
+				//console.log("decodeMetadataStream",_queuedStreamDictionary[stream],hex(stream));
 		    	// declare temp variables
 				var flag:int;
 				var byte:int;
@@ -343,14 +343,14 @@ namespace weavejs.geom
 								stream.readDouble(),
 								stream.readDouble()
 							);
-						//JS.log("got metadata: geometryID=" + flag + " key=" + key + " bounds=" + geometry.bounds);
+						//console.log("got metadata: geometryID=" + flag + " key=" + key + " bounds=" + geometry.bounds);
 						
 						// read part markers
 						var prev:int = 0;
 						while (stream.position < stream.length)
 						{
 							vertexID = stream.readInt(); // read next vertexID
-							//JS.log("vID=",vertexID);
+							//console.log("vID=",vertexID);
 							if (vertexID < 0)
 								break; // there are no more vertexIDs
 							geometry.addPartMarker(prev, vertexID);
@@ -395,7 +395,7 @@ namespace weavejs.geom
 			25 	PolygonM 	ST_MultiPolygon with measures
 			*/
 			var type:int = stream.readInt();
-			//JS.log("shapeType",flag);
+			//console.log("shapeType",flag);
 			switch (type) // read shapeType
 			{
 				//Point
@@ -444,7 +444,7 @@ namespace weavejs.geom
 		{
 			var task = (stopTime:int):number =>
 			{
-				//JS.log("decodeGeometryStream",_queuedStreamDictionary[stream],hex(stream));
+				//console.log("decodeGeometryStream",_queuedStreamDictionary[stream],hex(stream));
 		    	// declare temp variables
 				var i:int;
 				var flag:int;
@@ -455,7 +455,7 @@ namespace weavejs.geom
 				while (stream.position < stream.length)
 				{
 					flag = stream.readInt();
-					//JS.log("flag",flag);
+					//console.log("flag",flag);
 					if (flag < 0) // flag is negativeTileID
 					{
 						this.totalGeomTiles++;
@@ -523,19 +523,19 @@ namespace weavejs.geom
 						}
 						else
 						{
-							//JS.log("geomIDs",geometryIDArray);
-							//JS.log("vIDs",vertexIDArray);
+							//console.log("geomIDs",geometryIDArray);
+							//console.log("vIDs",vertexIDArray);
 							// read coordinates and importance value
 							x = stream.readDouble();
 							y = stream.readDouble();
 							importance = stream.readFloat();
-							//JS.log("X,Y,I",[x,y,importance]);
+							//console.log("X,Y,I",[x,y,importance]);
 						}
 
 						// save vertex in all corresponding geometries
 						for (i = GeometryStreamDecoder.geometryIDArray.length; i--;)
 						{
-							//JS.log("geom "+geometryIDArray[i]+" insert "+vertexIDArray[i]+" "+importance+" "+x+" "+y);
+							//console.log("geom "+geometryIDArray[i]+" insert "+vertexIDArray[i]+" "+importance+" "+x+" "+y);
 							geometryID = GeometryStreamDecoder.geometryIDArray[i];
 							vertexID = GeometryStreamDecoder.vertexIDArray[i];
 							

@@ -84,7 +84,7 @@ namespace weavejs.data.column
 		
 		public getMetadataPropertyNames():string[]
 		{
-			return JS.objectKeys(this._metadata);
+			return Object.keys(this._metadata);
 		}
 		
 		// 'abstract' functions, should be defined with override when extending this class

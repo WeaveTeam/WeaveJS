@@ -314,7 +314,7 @@ namespace weavejs.net
 				ids[i] = info.id;
 			}
 			// if there is only one metadata property and it's entityType, save the list of ids
-			var keys:string[] = JS.objectKeys(publicMetadata);
+			var keys:string[] = Object.keys(publicMetadata);
 			if (keys.length == 1 && keys[0] == ColumnMetadata.ENTITY_TYPE)
 				this._idsByType[entityType] = ids;
 			

@@ -141,7 +141,7 @@ namespace weavejs.data.column
 			this._asyncSort.beginSort(this._uniqueStrings, AsyncSort.compareCaseInsensitive);
 		}
 		
-		private _asyncSort:AsyncSort = Weave.disposableChild(this, AsyncSort);
+		private _asyncSort:AsyncSort<string> = Weave.disposableChild(this, AsyncSort);
 		
 		private handleSortComplete():void
 		{

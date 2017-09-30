@@ -299,7 +299,7 @@ namespace weavejs.net
 		private interceptFault(error:string):void
 		{
 			// if user has been signed out, clear the queue immediately
-			//JS.error(error);
+			//console.error(error);
 			if (error == WeaveAdminService.WEAVE_AUTHENTICATION_EXCEPTION && this.authenticated.value)
 			{
 				this.resetQueue();
@@ -326,7 +326,7 @@ namespace weavejs.net
 			else
 				paramDebugStr += Weave.stringify(methodParams);
 			
-			JS.error(StandardLib.substitute(
+			console.error(StandardLib.substitute(
 					"Received error on {0}({1}):\n\t{2}",
 					methodName,
 					paramDebugStr,

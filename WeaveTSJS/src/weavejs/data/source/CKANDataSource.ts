@@ -437,7 +437,7 @@ namespace weavejs.data.source
 			else
 			{
 				var error = response && response.hasOwnProperty('error') ? (response as CKANResponse).error : response as Error;
-				JS.error("CKANaction failed", this, error);
+				console.error("CKANaction failed", this, error);
 			}
 
 			// hack to support DKAN
@@ -684,7 +684,7 @@ namespace weavejs.data.source
 				}
 				else
 				{
-					var keys:string[] = JS.objectKeys(this.metadata);
+					var keys:string[] = Object.keys(this.metadata);
 					keys = keys.filter((key) =>  {
 						return (this.metadata as ICKANActionMetadata)[key] != null && (this.metadata as ICKANActionMetadata)[key] != '';
 					});

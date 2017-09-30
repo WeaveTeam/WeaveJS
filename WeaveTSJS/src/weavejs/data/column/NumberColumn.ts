@@ -160,9 +160,9 @@ namespace weavejs.data.column
 				case Aggregation.COUNT:
 					return numbers.length;
 				case Aggregation.MEAN:
-					return StandardLib.mean(numbers);
+					return StandardLib.mean(...numbers);
 				case Aggregation.SUM:
-					return StandardLib.sum(numbers);
+					return StandardLib.sum(...numbers);
 				case Aggregation.MIN:
 					return Math.min.apply(null, numbers);
 				case Aggregation.MAX:

@@ -50,7 +50,7 @@ namespace weavejs.data.bin
 		private _tempNumberClassifier:NumberClassifier = Weave.disposableChild(this, NumberClassifier);
 		
 		private _column:IAttributeColumn = null;
-		private asyncSort:AsyncSort = Weave.disposableChild(this, AsyncSort);
+		private asyncSort:AsyncSort<number> = Weave.disposableChild(this, AsyncSort);
 		/* override */ public generateBinClassifiersForColumn(column:IAttributeColumn):void
 		{
 			this._column = column;

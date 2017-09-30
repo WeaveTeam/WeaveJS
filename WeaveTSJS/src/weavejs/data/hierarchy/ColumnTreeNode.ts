@@ -22,7 +22,7 @@ namespace weavejs.data.hierarchy
     import IWeaveTreeNodeWithPathFinding = weavejs.api.data.IWeaveTreeNodeWithPathFinding;
     import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
     import StandardLib = weavejs.util.StandardLib;
-	import IColumnMetadata = weavejs.api.data.IColumnMetadata;
+    import IColumnMetadata = weavejs.api.data.IColumnMetadata;
 
 	/**
 	 * A node in a tree whose leaves identify attribute columns.
@@ -112,7 +112,7 @@ namespace weavejs.data.hierarchy
 			if (this.idFields) // partial data comparison
 			{
 				for (var field of this.idFields)
-					if (StandardLib.compare(this.data[field], that.data[field]) != 0)
+					if (StandardLib.compare(this.data[field] as any, that.data[field]) != 0)
 						return false; // data differs
 			}
 			else if (StandardLib.compare(this.data, that.data) != 0) // full data comparison

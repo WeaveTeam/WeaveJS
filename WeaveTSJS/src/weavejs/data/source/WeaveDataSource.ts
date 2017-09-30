@@ -393,7 +393,7 @@ namespace weavejs.data.source
 			if (column.wasDisposed)
 				return;
 			
-			JS.error(error, "Error retrieving column:", column.getProxyMetadata(), column);
+			console.error(error, "Error retrieving column:", column.getProxyMetadata(), column);
 			
 			column.dataUnavailable();
 		}
@@ -428,7 +428,7 @@ namespace weavejs.data.source
 			{
 				if (!result)
 				{
-					JS.error("Did not receive any data from service for attribute column:", metadata);
+					console.error("Did not receive any data from service for attribute column:", metadata);
 					return;
 				}
 				
@@ -534,7 +534,7 @@ namespace weavejs.data.source
 						promise = getTablePromise
 							.then((tableData:TableData) => {
 								if (WeaveDataSource.debug)
-									JS.log('received', DebugUtils.debugId(tableData), hash);
+									console.log('received', DebugUtils.debugId(tableData), hash);
 								
 								if (!tableData.keyColumns)
 									tableData.keyColumns = [];
@@ -590,7 +590,7 @@ namespace weavejs.data.source
 									keyStrings as string[]
 								).then((qkeys:IQualifiedKey[]) => {
 									if (WeaveDataSource.debug)
-										JS.log('got QKeys', DebugUtils.debugId(tableData), hash);
+										console.log('got QKeys', DebugUtils.debugId(tableData), hash);
 									tableData.derived_qkeys = qkeys;
 									return tableData;
 								});
@@ -617,7 +617,7 @@ namespace weavejs.data.source
 			}
 			catch (e)
 			{
-				JS.error(e, "handleGetColumn", metadata);
+				console.error(e, "handleGetColumn", metadata);
 			}
 		}
 	}
