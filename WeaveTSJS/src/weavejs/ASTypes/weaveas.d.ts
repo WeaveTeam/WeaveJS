@@ -816,82 +816,7 @@ declare module weavejs.core {
         call(thisArg?: any, ...args: any[]): any;
     }
 }
-declare module weavejs.core {
-    import IChildListCallbackInterface = weavejs.api.core.IChildListCallbackInterface;
-    import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
-    import ILinkableObject = weavejs.api.core.ILinkableObject;
-    /**
-     * Allows dynamically creating instances of objects implementing ILinkableObject at runtime.
-     * The session state is an Array of DynamicState objects.
-     * @see weave.core.DynamicState
-     *
-     * @author adufilie
-     */
-    class LinkableHashMap extends CallbackCollection implements ILinkableHashMap {
-        /**
-         * Constructor.
-         * @param typeRestriction If specified, this will limit the type of objects that can be added to this LinkableHashMap.
-         */
-        constructor(typeRestriction?: new (..._: any[]) => any);
-        typeRestriction: new (..._: any[]) => any;
-        childListCallbacks: IChildListCallbackInterface;
-        getNames(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): any[];
-        getObjects(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): any[];
-        toObject<T>(filter?: Class<T> | string, filterIncludesPlaceholders?: boolean): {
-            [name: string]: T & ILinkableObject;
-        };
-        toMap<T>(filter?: Class<T> | string, filterIncludesPlaceholders?: boolean): Map<string, T & ILinkableObject>;
-        getObject(name: string): ILinkableObject;
-        setObject(name: string, object: ILinkableObject, lockObject?: boolean): void;
-        getName(object: ILinkableObject): string;
-        setNameOrder(newOrder: any[]): void;
-        requestObject(name: string, classDef: new (..._: any[]) => any, lockObject?: boolean): any;
-        requestObjectCopy(name: string, objectToCopy: ILinkableObject): ILinkableObject;
-        renameObject(oldName: string, newName: string): ILinkableObject;
-        /**
-         * If there is an existing object associated with the specified name, it will be kept if it
-         * is the specified type, or replaced with a new instance of the specified type if it is not.
-         * @param name The identifying name of a new or existing object.  If this is null, a new one will be generated.
-         * @param className The qualified class name of the desired object type.
-         * @param lockObject If this is set to true, lockObject() will be called on the given name.
-         * @return The object associated with the given name, or null if an error occurred.
-         */
-        /**
-         * (private)
-         * @param name The identifying name to associate with a new object.
-         * @param classDef The Class definition used to instantiate a new object.
-         */
-        /**
-         * This function will lock an object in place for a given identifying name.
-         * If there is no object using the specified name, this function will have no effect.
-         * @param name The identifying name of an object to lock in place.
-         */
-        objectIsLocked(name: string): boolean;
-        removeObject(name: string): void;
-        removeAllObjects(): void;
-        /**
-         * This function removes all objects from this LinkableHashMap.
-         */
-        dispose(): void;
-        generateUniqueName(baseName: string): string;
-        getSessionState(): any[];
-        setSessionState(newStateArray: any[], removeMissingDynamicObjects: boolean): void;
-    }
-}
-declare module weavejs.core {
-    /**
-     * This is a LinkableVariable which limits its session state to Number values.
-     * @author adufilie
-     * @see weave.core.LinkableVariable
-     */
-    class LinkableNumber extends LinkableVariable {
-        constructor(defaultValue?: number, verifier?: Function, defaultValueTriggersCallbacks?: boolean);
-        value: number;
-        getSessionState(): Object;
-        setSessionState(value: Object): void;
-        protected sessionStateEquals(otherSessionState: any): boolean;
-    }
-}
+
 declare module weavejs.core {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
     /**
@@ -978,18 +903,6 @@ declare module weavejs.core {
          */
         depend(dependency: ILinkableObject, ...otherDependencies: any[]): LinkablePromise;
         dispose(): void;
-    }
-}
-declare module weavejs.core {
-    /**
-     * This is a LinkableVariable which limits its session state to String values.
-     * @author adufilie
-     * @see weave.core.LinkableVariable
-     */
-    class LinkableString extends LinkableVariable {
-        constructor(defaultValue?: string, verifier?: Function, defaultValueTriggersCallbacks?: boolean);
-        value: string;
-        setSessionState(value: string): void;
     }
 }
 declare module weavejs.core {

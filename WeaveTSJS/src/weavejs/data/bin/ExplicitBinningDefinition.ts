@@ -46,7 +46,7 @@ namespace weavejs.data.bin
 		
 		public getBinClassifiers():IBinClassifier[]
 		{
-			return this.getObjects();
+			return this.getObjects(IBinClassifier);
 		}
 		
 		public getBinNames():string[]

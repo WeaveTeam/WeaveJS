@@ -22,7 +22,7 @@ namespace weavejs.api.data
 	 *
 	 * @author adufilie
 	 */
-	@Weave.classInfo({id: "weavejs.api.data.IAttributeColumn"})
+	@Weave.classInfo({id: "weavejs.api.data.IAttributeColumn", interfaces: [ICallbackCollection, IKeySet]})
 	export class IAttributeColumn {}
 
 	export interface IAttributeColumn extends ICallbackCollection, IKeySet
