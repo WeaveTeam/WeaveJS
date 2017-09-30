@@ -48,7 +48,7 @@ namespace weavejs.core
 		/**
 		 * This is the callback function.
 		 */
-		public callback:Function = null;
+		public callback:Callback = null;
 		/**
 		 * This is the current recursion depth.
 		 * If this is greater than zero, it means the function is currently running.

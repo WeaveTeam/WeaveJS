@@ -10,7 +10,7 @@ namespace weavejs.core
 	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 	import IDisposableObject = weavejs.api.core.IDisposableObject;
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
-	
+	import GroupedCallbackEntry = weavejs.core.GroupedCallbackEntry;
 	/**
 	 * This class manages a list of callback functions.
 	 * 
