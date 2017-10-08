@@ -127,7 +127,7 @@ namespace weavejs.api.core
      *                  If this is set to false, this function will only have an effect if the given state is a DynamicState Array.
      * @return The converted state
      */
-    public static removeTypeFromState(state:SessionState, recursive:boolean = true):SessionState
+    public static removeTypeFromState(state:SessionState, recursive:boolean = true):UnTypedState
     {
       if (DynamicState.isDynamicStateArray(state))
       {
@@ -141,7 +141,7 @@ namespace weavejs.api.core
       if (recursive && typeof state === 'object')
         for (var key in state)
           (state as any)[key] = DynamicState.removeTypeFromState((state as any)[key], true);
-      return state;
+      return state as UnTypedState;
     }
 
     /**

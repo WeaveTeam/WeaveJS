@@ -125,7 +125,17 @@ namespace weavejs.api.core
 		 * @see #getLinkableOwner()
 		 */
 		getLinkableDescendants:<T>(root:ILinkableObject, filter?:Class<T>) => Array<T & ILinkableObject>;
-		
+
+    /**
+     * This function gets a list of sessioned property names so accessor functions for non-sessioned properties do not have to be called.
+     * @param linkableObject An object containing sessioned properties.
+     * @param filtered If set to true, filters out excluded properties.
+     * @return An Array containing the names of the sessioned properties of that object class.
+     */
+    getLinkablePropertyNames:(linkableObject:ILinkableObject, filtered?:boolean) => Array<string>;
+
+    getTypedStateTree:(root:ILinkableObject) => TypedState;
+
 		/**
 		 * This will assign an asynchronous task to a linkable object so that <code>linkableObjectIsBusy(busyObject)</code>
 		 * will return true until all assigned tasks are unassigned using <code>unassignBusyTask(taskToken)</code>.

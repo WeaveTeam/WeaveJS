@@ -309,6 +309,7 @@ package weavejs.core
 		{
 			return getTypedStateFromTreeNode(getSessionStateTree(root, null));
 		}
+
 		private function getTypedStateFromTreeNode(node:WeaveTreeItem, i:int = 0, a:Array = null):Object
 		{
 			var state:Object;
